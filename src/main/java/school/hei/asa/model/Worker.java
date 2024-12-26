@@ -10,15 +10,17 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Accessors(fluent = true)
 @Getter
 @AllArgsConstructor
+@ToString
 public abstract sealed class Worker permits Contractor, FullTimeEmployee {
   public final UUID id;
   public final String name;
-  protected final Map<Mission, Set<LocalDate>> datedMissions = new HashMap<>();
+  @ToString.Exclude protected final Map<Mission, Set<LocalDate>> datedMissions = new HashMap<>();
 
   public abstract Set<LocalDate> availabilities();
 

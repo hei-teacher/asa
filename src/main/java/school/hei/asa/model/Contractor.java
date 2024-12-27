@@ -2,11 +2,10 @@ package school.hei.asa.model;
 
 import java.time.LocalDate;
 import java.util.Set;
-import java.util.UUID;
 
 public sealed class Contractor extends Worker permits StudentContractor, PartnerContractor {
-  public Contractor(UUID id, String name) {
-    super(id, name);
+  public Contractor(String code, String name) {
+    super(code, name);
   }
 
   @Override

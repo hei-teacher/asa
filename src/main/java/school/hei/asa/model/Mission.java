@@ -2,7 +2,6 @@ package school.hei.asa.model;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -10,7 +9,7 @@ import lombok.Getter;
 @EqualsAndHashCode
 public class Mission {
 
-  public final UUID id;
+  private final String code;
   @EqualsAndHashCode.Exclude private final String title;
   @EqualsAndHashCode.Exclude private final String description;
   @EqualsAndHashCode.Exclude private final int maxDurationInDays;
@@ -21,8 +20,8 @@ public class Mission {
     workers.add(worker);
   }
 
-  public Mission(UUID id, String title, String description, int maxDurationInDays) {
-    this.id = id;
+  public Mission(String code, String title, String description, int maxDurationInDays) {
+    this.code = code;
     this.title = title;
     this.description = description;
     this.maxDurationInDays = maxDurationInDays;

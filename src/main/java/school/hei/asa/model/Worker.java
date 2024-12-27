@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
@@ -15,7 +14,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @ToString
 public abstract sealed class Worker permits Contractor, FullTimeEmployee {
-  public final UUID id;
+  public final String code;
   public final String name;
 
   @ToString.Exclude

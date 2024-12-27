@@ -63,14 +63,15 @@ public class ThMonth {
   private static Map<Integer, List<DayWithWeek>> dayWithWeeksByWeek(YearMonth yearMonth) {
     List<DayWithWeek> days = new ArrayList<>();
     var firstDayOfMonth = yearMonth.atDay(1);
-    var firstWeekNumber = firstDayOfMonth.get(WeekFields.of(Locale.getDefault()).weekOfYear());
+    var weekOfYear = WeekFields.of(Locale.FRANCE).weekOfYear();
+    var firstWeekNumber = firstDayOfMonth.get(weekOfYear);
     for (int i = 1; i < firstDayOfMonth.getDayOfWeek().getValue(); i++) {
       days.add(new DayWithWeek(FILLER_DAY, firstWeekNumber));
     }
 
     for (int day = 1; day <= yearMonth.lengthOfMonth(); day++) {
       var currentDay = yearMonth.atDay(day);
-      int weekNumber = currentDay.get(WeekFields.of(Locale.getDefault()).weekOfYear());
+      var weekNumber = currentDay.get(weekOfYear);
       days.add(new DayWithWeek(day, weekNumber));
     }
 

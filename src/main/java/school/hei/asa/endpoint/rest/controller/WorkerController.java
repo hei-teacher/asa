@@ -1,4 +1,4 @@
-package school.hei.asa.endpoint;
+package school.hei.asa.endpoint.rest.controller;
 
 import java.util.List;
 import lombok.AllArgsConstructor;

@@ -1,0 +1,47 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 20px;
+}
+
+.month {
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.month h3 {
+    text-align: center;
+    background-color: #f4f4f4;
+    padding: 10px;
+    margin: 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    width: 50px;
+    border: 1px solid #ddd;
+    text-align: center;
+    padding: 5px;
+}
+
+th {
+    background-color: #f9f9f9;
+}
+
+.week {
+    background-color: #f4f4f4;
+}
+
+.today {
+    background-color: #007BFF;
+    color: white;
+}

@@ -28,11 +28,10 @@ public class Mission {
     this.maxDurationInDays = maxDurationInDays;
   }
 
-  public int executedDays() {
+  public double executedDays() {
     return workers.stream()
-        .flatMap((Worker worker) -> worker.missionExecutions().stream())
-        .filter(me -> this.equals(me.mission()))
-        .mapToInt(me -> me.dates().size())
+        .flatMap(worker -> worker.executionsOf(this).values().stream())
+        .mapToDouble(Double::doubleValue)
         .sum();
   }
 }

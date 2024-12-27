@@ -1,10 +1,7 @@
 package school.hei.asa.model;
 
-import static java.util.stream.Collectors.toSet;
-
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -20,21 +17,27 @@ import lombok.experimental.Accessors;
 public abstract sealed class Worker permits Contractor, FullTimeEmployee {
   public final UUID id;
   public final String name;
-  @ToString.Exclude protected final Map<Mission, Set<LocalDate>> datedMissions = new HashMap<>();
+
+  @ToString.Exclude
+  protected final Map<Mission, Map<LocalDate, Double>> executionsByMission = new HashMap<>();
 
   public abstract Set<LocalDate> availabilities();
 
-  public final void execute(Mission mission, Set<LocalDate> dates) {
-    mission.addWorker(this);
+  public final void execute(DayExecution mde) {
+    var missionPercentages = mde.missionPercentages();
+    for (var mission : missionPercentages.keySet()) {
+      mission.addWorker(this);
 
-    var toStoreInMap = new HashSet<>(datedMissions.getOrDefault(mission, dates));
-    toStoreInMap.addAll(dates);
-    datedMissions.put(mission, toStoreInMap);
+      var date = mde.date();
+      var missionPercentage = missionPercentages.get(mission);
+      var toPut =
+          new HashMap<>(executionsByMission.getOrDefault(mission, Map.of(date, missionPercentage)));
+      toPut.put(date, missionPercentage);
+      executionsByMission.put(mission, toPut);
+    }
   }
 
-  public final Set<MissionExecution> missionExecutions() {
-    return datedMissions.entrySet().stream()
-        .map(entry -> new MissionExecution(entry.getKey(), this, entry.getValue()))
-        .collect(toSet());
+  public final Map<LocalDate, Double> executionsOf(Mission mission) {
+    return executionsByMission.get(mission);
   }
 }

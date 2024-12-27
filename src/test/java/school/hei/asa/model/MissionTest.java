@@ -4,7 +4,7 @@ import static java.time.LocalDate.now;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Set;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class MissionTest {
@@ -20,7 +20,7 @@ class MissionTest {
     var studentContractor = new StudentContractor(randomUUID(), "Lita");
     var mission = new Mission(randomUUID(), "Titre", "Description", 10);
 
-    studentContractor.execute(mission, Set.of(now()));
+    studentContractor.execute(new DayExecution(studentContractor, now(), Map.of(mission, 1.)));
 
     assertEquals(1, mission.executedDays());
   }

@@ -27,10 +27,10 @@ table {
 }
 
 th, td {
-    width: 50px;
-    border: 1px solid #ddd;
+    width: 20px;
+    border: 0;
     text-align: center;
-    padding: 5px;
+    padding: 4px;
 }
 
 th {
@@ -38,7 +38,7 @@ th {
 }
 
 .week {
-    background-color: #f4f4f4;
+    background-color: #f9f9f9;
 }
 
 .today {

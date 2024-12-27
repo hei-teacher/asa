@@ -9,7 +9,7 @@ import school.hei.asa.endpoint.rest.model.th.ThYear;
 public class CalendarController {
 
   @GetMapping("/calendar")
-  public String getMonthCalendar(Model model) {
+  public String getCalendar(Model model) {
     var year = 2025;
     model.addAttribute("year", year);
     model.addAttribute("thYear", new ThYear(year));

@@ -7,6 +7,8 @@
 </head>
 <body>
 
+<div th:replace="fragments/header :: header"></div>
+
 <div class="calendar">
     <div class="month" th:each="month : ${thYear.months()}">
         <h1 th:text="${month.yearMonth().month}"></h1>

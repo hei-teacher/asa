@@ -2,6 +2,7 @@ package school.hei.asa.repository;
 
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import school.hei.asa.model.Mission;
@@ -22,5 +23,10 @@ public class MissionRepository {
   @Transactional
   public void saveAll(List<Mission> missions) {
     missions.forEach(this::save);
+  }
+
+  @Transactional
+  public Optional<Mission> findByCode(String code) {
+    return jMissionRepository.findByCode(code).map(missionMapper::toDomain);
   }
 }

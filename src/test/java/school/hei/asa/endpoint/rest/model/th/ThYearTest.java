@@ -1,12 +1,11 @@
 package school.hei.asa.endpoint.rest.model.th;
 
-import org.junit.jupiter.api.Test;
+import static java.time.Month.DECEMBER;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.YearMonth;
 import java.util.Map;
-
-import static java.time.Month.DECEMBER;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 class ThYearTest {
 

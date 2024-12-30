@@ -19,7 +19,8 @@ class MissionTest {
     var studentContractor = new StudentContractor("student-code", "Lita");
     var mission = new Mission("mission-code", "Titre", "Description", 10);
 
-    studentContractor.execute(new DayExecution(studentContractor, now(), Map.of(mission, 1.)));
+    studentContractor.execute(
+        new DailyMissionExecution(studentContractor, now(), Map.of(mission, 1.)));
 
     assertEquals(1, mission.executedDays());
   }

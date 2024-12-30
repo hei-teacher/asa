@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-class DayExecutionTest {
+class DailyMissionExecutionTest {
 
   @Test
   void missionPercentagesSum_lt1_isIllegal() {
@@ -14,6 +14,6 @@ class DayExecutionTest {
     var mission = new Mission("mission-code", "title", "description", 10);
     assertThrows(
         IllegalArgumentException.class,
-        () -> new DayExecution(worker, now(), Map.of(mission, 0.2)));
+        () -> new DailyMissionExecution(worker, now(), Map.of(mission, 0.2)));
   }
 }

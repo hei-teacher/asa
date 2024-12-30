@@ -1,9 +1,6 @@
 package school.hei.asa.repository.model;
 
-import static jakarta.persistence.EnumType.STRING;
-
 import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
@@ -13,23 +10,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "worker")
+@Table(name = "mission")
 @Getter
 @Setter
-public class JWorker {
+public class JMission {
   @Id private String code;
-  private String name;
-
-  @Enumerated(STRING)
-  private WorkerType workerType;
+  private String title;
+  private String description;
+  private int maxDurationInDays;
 
   @OneToMany
-  @JoinColumn(name = "worker_code")
+  @JoinColumn(name = "mission_code")
   private List<JMissionExecution> missionExecutions;
-
-  public enum WorkerType {
-    partnerContractor,
-    studentContractor,
-    fullTimeEmployee
-  }
 }

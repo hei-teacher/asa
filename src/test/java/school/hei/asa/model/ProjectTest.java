@@ -14,7 +14,7 @@ class ProjectTest {
     var mission1 = new Mission("mcode1", "mtitle1", "mdescription1", 10);
     var mission2 = new Mission("mcode2", "mtitle2", "mdescription2", 2);
     var student1 = new StudentContractor("scode", "sname");
-    student1.execute(new DayExecution(student1, now(), Map.of(mission1, 1.)));
+    student1.execute(new DailyMissionExecution(student1, now(), Map.of(mission1, 1.)));
 
     var project = new Project("code", "description", Set.of(mission1, mission2));
 

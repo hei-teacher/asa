@@ -14,15 +14,15 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @ToString
 public abstract sealed class Worker permits Contractor, FullTimeEmployee {
-  public final String code;
-  public final String name;
+  private final String code;
+  private final String name;
 
   @ToString.Exclude
   protected final Map<Mission, Map<LocalDate, Double>> executionsByMission = new HashMap<>();
 
   public abstract Set<LocalDate> availabilities();
 
-  public final void execute(DayExecution mde) {
+  public final void execute(DailyMissionExecution mde) {
     var missionPercentages = mde.missionPercentages();
     for (var mission : missionPercentages.keySet()) {
       mission.addWorker(this);

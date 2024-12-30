@@ -3,12 +3,10 @@ package school.hei.asa.repository.jrepository;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import school.hei.asa.repository.model.JWorker;
+import school.hei.asa.repository.model.JMissionExecution;
 
 @Repository
-public interface JWorkerRepository extends JpaRepository<JWorker, String> {
+public interface JMissionExecutionRepository extends JpaRepository<JMissionExecution, String> {
   @Override
-  List<JWorker> findAll();
-
-  JWorker findByCode(String code);
+  List<JMissionExecution> findAll();
 }

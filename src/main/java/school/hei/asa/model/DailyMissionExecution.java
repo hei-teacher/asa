@@ -13,7 +13,8 @@ public record DailyMissionExecution(
     var percentagesSum =
         missionPercentages.values().stream().mapToDouble(Double::doubleValue).sum();
     if (percentagesSum != 1) {
-      throw new IllegalArgumentException("missionPercentages::sum must equal 1");
+      throw new IllegalArgumentException(
+          "missionPercentages::sum must equal 1, but was: " + percentagesSum);
     }
   }
 }

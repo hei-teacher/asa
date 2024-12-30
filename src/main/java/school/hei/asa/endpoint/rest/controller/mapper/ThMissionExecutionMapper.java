@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.hei.asa.endpoint.rest.model.th.DailyMissionExecutionForm;
+import school.hei.asa.endpoint.rest.model.th.ThDailyMissionExecutionForm;
 import school.hei.asa.model.DailyMissionExecution;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Worker;
@@ -16,11 +16,11 @@ import school.hei.asa.repository.MissionRepository;
 
 @AllArgsConstructor
 @Component
-public class MissionExecutionMapper {
+public class ThMissionExecutionMapper {
 
   private final MissionRepository missionRepository;
 
-  public DailyMissionExecution toDomain(DailyMissionExecutionForm dmeForm, Worker worker) {
+  public DailyMissionExecution toDomain(ThDailyMissionExecutionForm dmeForm, Worker worker) {
     Optional<Mission> mission1Opt = findMissionByOptionalCode(dmeForm.missionCode1());
     var mission2Opt = findMissionByOptionalCode(dmeForm.missionCode2());
     var mission3Opt = findMissionByOptionalCode(dmeForm.missionCode3());

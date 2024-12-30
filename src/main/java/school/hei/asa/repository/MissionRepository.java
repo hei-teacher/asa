@@ -17,7 +17,7 @@ public class MissionRepository {
 
   @Transactional
   public void save(Mission mission) {
-    jMissionRepository.save(missionMapper.toEntity(mission, List.of()));
+    jMissionRepository.save(missionMapper.toEntity(mission));
   }
 
   @Transactional
@@ -28,5 +28,10 @@ public class MissionRepository {
   @Transactional
   public Optional<Mission> findByCode(String code) {
     return jMissionRepository.findByCode(code).map(missionMapper::toDomain);
+  }
+
+  @Transactional
+  public List<Mission> findAll() {
+    return jMissionRepository.findAll().stream().map(missionMapper::toDomain).toList();
   }
 }

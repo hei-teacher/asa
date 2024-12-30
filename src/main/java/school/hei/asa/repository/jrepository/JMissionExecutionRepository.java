@@ -9,4 +9,6 @@ import school.hei.asa.repository.model.JMissionExecution;
 public interface JMissionExecutionRepository extends JpaRepository<JMissionExecution, String> {
   @Override
   List<JMissionExecution> findAll();
+
+  List<JMissionExecution> findByMissionCode(String code);
 }

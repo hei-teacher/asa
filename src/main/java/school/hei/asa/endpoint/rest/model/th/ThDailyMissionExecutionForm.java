@@ -1,6 +1,6 @@
 package school.hei.asa.endpoint.rest.model.th;
 
-public record DailyMissionExecutionForm(
+public record ThDailyMissionExecutionForm(
     String date,
     String missionCode1,
     String missionPercentage1,

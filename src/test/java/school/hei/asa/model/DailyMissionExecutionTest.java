@@ -10,8 +10,9 @@ class DailyMissionExecutionTest {
 
   @Test
   void missionPercentagesSum_lt1_isIllegal() {
+    var product = new Product("pcode", "pname", "pdescription");
     var worker = new PartnerContractor("worker-code", "name");
-    var mission = new Mission("mission-code", "title", "description", 10);
+    var mission = new Mission("mission-code", "title", "description", 10, product);
     assertThrows(
         IllegalArgumentException.class,
         () -> new DailyMissionExecution(worker, now(), Map.of(mission, 0.2)));

@@ -5,13 +5,21 @@
     <title>Monthly Calendar</title>
     <link href="/Prod/main.css" rel="stylesheet"/>
 </head>
-<body>
 
+<body>
 <div th:replace="fragments/header :: header"></div>
 
+<h1 th:text="${thYear.year()} + ' - ' + ${thYear.title()}"></h1>
+<div>
+    Color usage
+    <ul th:each="description: ${thYear.colorDescriptions()}">
+        <li th:text="${description.getValue()}"
+            th:style="'color: ' + ${thYear.hexColor(description.getKey())} + ';'"></li>
+    </ul>
+</div>
 <div class="calendar">
     <div class="month" th:each="month : ${thYear.months()}">
-        <h1 th:text="${month.yearMonth().month}"></h1>
+        <h2 th:text="${month.yearMonth().month}"></h2>
         <table>
             <thead>
             <tr>
@@ -31,7 +39,7 @@
                     th:classappend="week"></td>
                 <td th:each="day: ${month.daysByWeek(week)}"
                     th:text="${month.isFillerDay(day) ? '' : day}"
-                    th:classappend="${month.isNow(day)} ? today : ''"></td>
+                    th:style="'background-color: ' + ${thYear.hexColor(month, day)} + ';'"></td>
             </tr>
             </tbody>
         </table>

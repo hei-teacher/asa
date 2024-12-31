@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import school.hei.asa.model.Mission;
 import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.model.JMissionExecution;
@@ -32,12 +33,14 @@ public class MissionExecutionMapper {
     return jme;
   }
 
-  public MissionExecution toDomain(
+  /*package-private*/ MissionExecution toDomain(
       JMissionExecution jme,
-      // note(circular-worker-mission-avoidance)
-      Map<String, Worker> workersByCode) {
+      // note(circular-mission-worker-avoidance)
+      Map<String, Worker> workersByCode,
+      // note(circular-mission-missionExecution-avoidance)
+      Map<String, Mission> missionsByCode) {
     return new MissionExecution(
-        missionMapper.toDomain(jme.getMission(), workersByCode),
+        missionMapper.toDomain(jme.getMission(), workersByCode, missionsByCode),
         workersByCode.get(jme.getWorker().getCode()),
         jme.getDate().toLocalDate(),
         jme.getDayPercentage());

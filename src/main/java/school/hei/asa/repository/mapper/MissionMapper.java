@@ -12,31 +12,41 @@ import school.hei.asa.repository.model.JMission;
 public class MissionMapper {
 
   private final ProductMapper productMapper;
-  private final WorkerMapper workerMapper;
+  private final MissionExecutionMapper missionExecutionMapper;
 
-  public MissionMapper(ProductMapper productMapper, @Lazy WorkerMapper workerMapper) {
+  public MissionMapper(
+      ProductMapper productMapper, @Lazy MissionExecutionMapper missionExecutionMapper) {
     this.productMapper = productMapper;
-    this.workerMapper = workerMapper;
+    this.missionExecutionMapper = missionExecutionMapper;
   }
 
   public Mission toDomain(JMission jMission) {
-    return toDomain(jMission, new HashMap<>());
+    return toDomain(jMission, new HashMap<>(), new HashMap<>());
   }
 
   /*package-private*/ Mission toDomain(
       JMission jMission,
-      // note(circular-worker-mission-avoidance)
-      Map<String, Worker> workersByCode) {
+      // note(circular-mission-worker-avoidance)
+      Map<String, Worker> workersByCode,
+      // note(circular-mission-missionExecution-avoidance)
+      Map<String, Mission> missionsByCode) {
+    var missionCode = jMission.getCode();
+    if (missionsByCode.containsKey(missionCode)) {
+      return missionsByCode.get(missionCode);
+    }
+
     var mission =
         new Mission(
-            jMission.getCode(),
+            missionCode,
             jMission.getTitle(),
             jMission.getDescription(),
             jMission.getMaxDurationInDays(),
             productMapper.toDomain(jMission.getProduct()));
-    jMission
-        .getMissionExecutions()
-        .forEach(jme -> mission.addWorker(workerMapper.toDomain(jme.getWorker(), workersByCode)));
+    missionsByCode.put(missionCode, mission);
+
+    jMission.getMissionExecutions().stream()
+        .map(jme -> missionExecutionMapper.toDomain(jme, workersByCode, missionsByCode))
+        .forEach(mission::add);
     return mission;
   }
 

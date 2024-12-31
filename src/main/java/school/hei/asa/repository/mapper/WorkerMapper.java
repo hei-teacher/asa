@@ -27,7 +27,7 @@ public class WorkerMapper {
   }
 
   /*package-private*/ Worker toDomain(JWorker jWorker, Map<String, Worker> workersByCode) {
-    // note(circular-worker-mission-avoidance)
+    // note(circular-mission-worker-avoidance)
     var code = jWorker.getCode();
     if (workersByCode.containsKey(code)) {
       return workersByCode.get(code);
@@ -55,7 +55,10 @@ public class WorkerMapper {
                     worker,
                     date.toLocalDate(),
                     jmeListByDate.stream()
-                        .map(jme -> missionExecutionMapper.toDomain(jme, workersByCode))
+                        .map(
+                            jme ->
+                                missionExecutionMapper.toDomain(
+                                    jme, workersByCode, new HashMap<>()))
                         .toList())));
   }
 

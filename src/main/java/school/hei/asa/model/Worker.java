@@ -26,18 +26,13 @@ public abstract sealed class Worker permits Contractor, FullTimeEmployee {
 
   public final void execute(DailyExecution dailyExecution) {
     var missionExecutions = dailyExecution.executions();
-    for (var missionExecution : missionExecutions) {
-      var mission = missionExecution.mission();
-      mission.addWorker(this);
+    for (var me : missionExecutions) {
+      var mission = me.mission();
+      mission.add(me);
 
-      var toPutAsSet =
-          new HashSet<>(executionsByMission.getOrDefault(mission, List.of(missionExecution)));
-      toPutAsSet.add(missionExecution);
+      var toPutAsSet = new HashSet<>(executionsByMission.getOrDefault(mission, List.of(me)));
+      toPutAsSet.add(me);
       executionsByMission.put(mission, toPutAsSet.stream().toList());
     }
-  }
-
-  public final List<MissionExecution> executionsOf(Mission mission) {
-    return executionsByMission.get(mission);
   }
 }

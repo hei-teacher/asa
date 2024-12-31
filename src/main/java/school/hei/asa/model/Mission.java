@@ -1,7 +1,7 @@
 package school.hei.asa.model;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -17,10 +17,14 @@ public class Mission {
   @EqualsAndHashCode.Exclude private final int maxDurationInDays;
   @EqualsAndHashCode.Exclude private final Product product;
 
-  @EqualsAndHashCode.Exclude private final Set<Worker> workers = new HashSet<>();
+  @EqualsAndHashCode.Exclude private final List<MissionExecution> executions = new ArrayList<>();
 
-  public void addWorker(Worker worker) {
-    workers.add(worker);
+  public void add(MissionExecution me) {
+    if (!this.equals(me.mission())) {
+      throw new IllegalArgumentException(
+          String.format("missionExecution.mission=%s is not same as this=%s", me.mission(), this));
+    }
+    executions.add(me);
   }
 
   public Mission(
@@ -34,9 +38,10 @@ public class Mission {
   }
 
   public double executedDays() {
-    return workers.stream()
-        .flatMap(worker -> worker.executionsOf(this).stream())
-        .mapToDouble(MissionExecution::dayPercentage)
-        .sum();
+    return executions.stream().mapToDouble(MissionExecution::dayPercentage).sum();
+  }
+
+  public List<Worker> workers() {
+    return executions.stream().map(MissionExecution::worker).toList();
   }
 }

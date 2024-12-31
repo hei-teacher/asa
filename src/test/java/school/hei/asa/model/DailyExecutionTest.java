@@ -11,7 +11,7 @@ class DailyExecutionTest {
   @Test
   void missionPercentagesSum_lt1_isIllegal() {
     var product = new Product("pcode", "pname", "pdescription");
-    var worker = new PartnerContractor("worker-code", "name");
+    var worker = new PartnerContractor("worker-code", "name", "email");
     var mission = new Mission("mission-code", "title", "description", 10, product);
     assertThrows(
         IllegalArgumentException.class,

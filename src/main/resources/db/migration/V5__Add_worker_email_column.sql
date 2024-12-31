@@ -1,0 +1,2 @@
+ALTER TABLE worker
+    ADD COLUMN email VARCHAR;

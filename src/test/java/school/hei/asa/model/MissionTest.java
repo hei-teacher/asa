@@ -18,7 +18,7 @@ class MissionTest {
   @Test
   void mission_has_non0_executed_days_when_has_executing_worker() {
     var product = new Product("pcode", "pname", "pdescription");
-    var studentContractor = new StudentContractor("student-code", "Lita");
+    var studentContractor = new StudentContractor("student-code", "Lita", "email");
     var mission = new Mission("mission-code", "Titre", "Description", 10, product);
 
     studentContractor.execute(

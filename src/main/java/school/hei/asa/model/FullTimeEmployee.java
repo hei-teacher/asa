@@ -4,9 +4,8 @@ import java.time.LocalDate;
 import java.util.Set;
 
 public final class FullTimeEmployee extends Worker {
-
-  public FullTimeEmployee(String code, String name) {
-    super(code, name);
+  public FullTimeEmployee(String code, String name, String email) {
+    super(code, name, email);
   }
 
   @Override

@@ -35,9 +35,12 @@ public class WorkerMapper {
 
     var worker =
         switch (jWorker.getWorkerType()) {
-          case partnerContractor -> new PartnerContractor(jWorker.getCode(), jWorker.getName());
-          case studentContractor -> new StudentContractor(jWorker.getCode(), jWorker.getName());
-          case fullTimeEmployee -> new FullTimeEmployee(jWorker.getCode(), jWorker.getName());
+          case partnerContractor ->
+              new PartnerContractor(jWorker.getCode(), jWorker.getName(), jWorker.getEmail());
+          case studentContractor ->
+              new StudentContractor(jWorker.getCode(), jWorker.getName(), jWorker.getEmail());
+          case fullTimeEmployee ->
+              new FullTimeEmployee(jWorker.getCode(), jWorker.getName(), jWorker.getEmail());
         };
     workersByCode.put(code, worker);
 

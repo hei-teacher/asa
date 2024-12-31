@@ -18,6 +18,7 @@ import lombok.experimental.Accessors;
 public abstract sealed class Worker permits Contractor, FullTimeEmployee {
   private final String code;
   private final String name;
+  private final String email;
 
   @ToString.Exclude
   protected final Map<Mission, List<MissionExecution>> executionsByMission = new HashMap<>();

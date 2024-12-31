@@ -13,7 +13,7 @@ class ProductTest {
     var product = new Product("pcode", "pname", "pdescription");
     var mission1 = new Mission("mcode1", "mtitle1", "mdescription1", 10, product);
     var mission2 = new Mission("mcode2", "mtitle2", "mdescription2", 2, product);
-    var student1 = new StudentContractor("scode", "sname");
+    var student1 = new StudentContractor("scode", "sname", "email");
     student1.execute(
         new DailyExecution(
             student1, now(), List.of(new MissionExecution(mission1, student1, now(), 1.))));

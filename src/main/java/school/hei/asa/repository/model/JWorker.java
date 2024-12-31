@@ -19,6 +19,7 @@ import lombok.Setter;
 public class JWorker {
   @Id private String code;
   private String name;
+  private String email;
 
   @Enumerated(STRING)
   private WorkerType workerType;

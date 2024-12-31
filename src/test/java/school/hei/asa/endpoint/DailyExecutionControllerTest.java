@@ -24,7 +24,7 @@ class DailyExecutionControllerTest extends FacadeIT {
 
   @Test
   void save_then_read() {
-    var worker = new PartnerContractor("worker-code", "name");
+    var worker = new PartnerContractor("worker-code", "name", "email");
     workerRepository.save(worker);
     var product = new Product("pcode", "pname", "pdescription");
     productRepository.save(product);

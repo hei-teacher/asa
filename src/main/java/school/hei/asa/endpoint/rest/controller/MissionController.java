@@ -1,20 +1,20 @@
 package school.hei.asa.endpoint.rest.controller;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import school.hei.asa.model.Mission;
-import school.hei.asa.repository.MissionRepository;
+import school.hei.asa.repository.ProductRepository;
 
-@RestController
+@Controller
 @AllArgsConstructor
 public class MissionController {
 
-  private final MissionRepository missionRepository;
+  private final ProductRepository productRepository;
 
   @GetMapping("/missions")
-  public List<Mission> getMissions() {
-    return missionRepository.findAll();
+  public String getMissions(Model model) {
+    model.addAttribute("products", productRepository.findAll());
+    return "missions";
   }
 }

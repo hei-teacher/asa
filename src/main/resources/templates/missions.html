@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Monthly Calendar</title>
+    <link href="/Prod/main.css" rel="stylesheet"/>
+</head>
+
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<h1>Missions grouped by products</h1>
+<div>
+    <ul>
+        <li th:each="p: ${products}">
+            <strong th:text="${p.code()} + ': ' + ${p.name()} + ' (' + ${p.executedDays()} + '/'+ ${p.maxDurationInDays()} +')'"
+                    th:title="${p.description()}">
+            </strong>
+            <ul>
+                <li th:each="m: ${p.missions()}"
+                    th:text="${m.code()} + ': ' + ${m.title()} + ' (' + ${m.executedDays()} + '/'+ ${m.maxDurationInDays()} +')'"
+                    th:title="${m.description()}">
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>

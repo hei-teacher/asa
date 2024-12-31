@@ -7,21 +7,17 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
+@Accessors(fluent = true)
+@Getter
 @AllArgsConstructor
 public class Product {
 
-  @Accessors(fluent = true)
-  @Getter
   private final String code;
 
-  @EqualsAndHashCode.Exclude
-  @Accessors(fluent = true)
-  @Getter
-  private final String name;
+  @EqualsAndHashCode.Exclude private final String name;
 
   @EqualsAndHashCode.Exclude
   @Accessors(fluent = true)
-  @Getter
   private final String description;
 
   @EqualsAndHashCode.Exclude private final Set<Mission> missions = new HashSet<>();
@@ -34,7 +30,12 @@ public class Product {
     return missions.stream().mapToDouble(Mission::executedDays).sum();
   }
 
-  /*package-private*/ void add(Mission mission) {
+  public void add(Mission mission) {
+    var missionProduct = mission.product();
+    if (!this.equals(missionProduct)) {
+      throw new IllegalArgumentException(
+          String.format("mission.product=%s is not same as this=%s", missionProduct, this));
+    }
     missions.add(mission);
   }
 }

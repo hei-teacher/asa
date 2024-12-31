@@ -58,7 +58,7 @@ public class WorkerMapper {
                         .map(
                             jme ->
                                 missionExecutionMapper.toDomain(
-                                    jme, workersByCode, new HashMap<>()))
+                                    jme, workersByCode, new HashMap<>(), new HashMap<>()))
                         .toList())));
   }
 

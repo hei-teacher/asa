@@ -7,4 +7,6 @@ import school.hei.asa.repository.model.JProduct;
 public interface JProductRepository extends JpaRepository<JProduct, String> {
   @Override
   List<JProduct> findAll();
+
+  JProduct findByCode(String code);
 }

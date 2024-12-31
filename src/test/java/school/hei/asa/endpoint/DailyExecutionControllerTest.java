@@ -51,5 +51,7 @@ class DailyExecutionControllerTest extends FacadeIT {
     assertEquals(2, savedWorker.executionsByMission().keySet().size());
     var savedMission1 = missionRepository.findByCode("mission1-code");
     assertEquals(1, savedMission1.get().workers().size());
+    var savedProduct = productRepository.findByCode("pcode");
+    assertEquals(1, savedProduct.executedDays());
   }
 }

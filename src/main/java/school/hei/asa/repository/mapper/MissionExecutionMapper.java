@@ -35,9 +35,9 @@ public class MissionExecutionMapper {
 
   /*package-private*/ MissionExecution toDomain(
       JMissionExecution jme,
-      // note(circular-mission-worker-avoidance)
+      // note(circular-missionExecution-worker-avoidance)
       Map<String, Worker> workersByCode,
-      // note(circular-mission-missionExecution-avoidance)
+      // note(circular-missionExecution-mission-avoidance)
       Map<String, Mission> missionsByCode) {
     return new MissionExecution(
         missionMapper.toDomain(jme.getMission(), workersByCode, missionsByCode),

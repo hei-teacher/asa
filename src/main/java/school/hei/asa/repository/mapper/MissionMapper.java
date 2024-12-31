@@ -26,9 +26,9 @@ public class MissionMapper {
 
   /*package-private*/ Mission toDomain(
       JMission jMission,
-      // note(circular-mission-worker-avoidance)
+      // note(circular-missionExecution-worker-avoidance)
       Map<String, Worker> workersByCode,
-      // note(circular-mission-missionExecution-avoidance)
+      // note(circular-missionExecution-mission-avoidance)
       Map<String, Mission> missionsByCode) {
     var missionCode = jMission.getCode();
     if (missionsByCode.containsKey(missionCode)) {

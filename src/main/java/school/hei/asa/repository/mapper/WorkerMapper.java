@@ -27,7 +27,7 @@ public class WorkerMapper {
   }
 
   /*package-private*/ Worker toDomain(JWorker jWorker, Map<String, Worker> workersByCode) {
-    // note(circular-mission-worker-avoidance)
+    // note(circular-missionExecution-worker-avoidance)
     var code = jWorker.getCode();
     if (workersByCode.containsKey(code)) {
       return workersByCode.get(code);

@@ -25,6 +25,8 @@
 </head>
 
 <body>
+<div th:replace="fragments/header :: header"></div>
+
 <h1>What did you do that day?</h1>
 <form th:action="@{/daily-execution}" method="post">
     <label for="date">The day: </label>

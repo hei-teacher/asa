@@ -2,6 +2,7 @@ package school.hei.asa.repository;
 
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import school.hei.asa.model.Worker;
@@ -28,5 +29,10 @@ public class WorkerRepository {
   @Transactional
   public void save(Worker worker) {
     jWorkerRepository.save(workerMapper.toEntity(worker, List.of()));
+  }
+
+  @Transactional
+  public Optional<Worker> findByEmail(String email) {
+    return jWorkerRepository.findByEmail(email).map(workerMapper::toDomain);
   }
 }

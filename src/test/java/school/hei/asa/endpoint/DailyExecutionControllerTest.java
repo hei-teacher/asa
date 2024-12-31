@@ -5,9 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.controller.DailyExecutionController;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
+import school.hei.asa.endpoint.rest.security.SecurityConfig;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.PartnerContractor;
 import school.hei.asa.model.Product;
@@ -21,6 +23,8 @@ class DailyExecutionControllerTest extends FacadeIT {
   @Autowired WorkerRepository workerRepository;
   @Autowired ProductRepository productRepository;
   @Autowired MissionRepository missionRepository;
+
+  @MockBean SecurityConfig securityConfig;
 
   @Test
   void save_then_read() {

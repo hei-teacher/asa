@@ -34,9 +34,4 @@ public class WorkerRepository {
   public void saveAll(List<Worker> workers) {
     workers.forEach(this::save);
   }
-
-  @Transactional
-  public List<Worker> findByMissionCode(String code) {
-    return findAll().stream().filter(worker -> worker.workedOnMissionCode(code)).toList();
-  }
 }

@@ -20,7 +20,8 @@ public class Mission {
 
   @EqualsAndHashCode.Exclude private final Set<Worker> workers = new HashSet<>();
 
-  /*package-private*/ void addWorker(Worker worker) {
+  public void addWorker(Worker worker) {
+    // TODO: test that indeed worker has mission
     workers.add(worker);
   }
 

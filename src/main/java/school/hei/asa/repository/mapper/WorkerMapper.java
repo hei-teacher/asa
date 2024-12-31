@@ -5,7 +5,9 @@ import static school.hei.asa.repository.model.JWorker.WorkerType.fullTimeEmploye
 import static school.hei.asa.repository.model.JWorker.WorkerType.partnerContractor;
 import static school.hei.asa.repository.model.JWorker.WorkerType.studentContractor;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.asa.model.DailyExecution;
@@ -21,26 +23,38 @@ import school.hei.asa.repository.model.JWorker.WorkerType;
 @Component
 public class WorkerMapper {
 
-  private final MissionMapper missionMapper;
   private final MissionExecutionMapper missionExecutionMapper;
 
   public Worker toDomain(JWorker jWorker) {
+    return toDomain(jWorker, new HashMap<>());
+  }
+
+  /*package-private*/ Worker toDomain(JWorker jWorker, Map<String, Worker> workersByCode) {
+    // note(circular-worker-mission-avoidance)
+    var code = jWorker.getCode();
+    if (workersByCode.containsKey(code)) {
+      return workersByCode.get(code);
+    }
+
     var worker =
         switch (jWorker.getWorkerType()) {
           case partnerContractor -> new PartnerContractor(jWorker.getCode(), jWorker.getName());
           case studentContractor -> new StudentContractor(jWorker.getCode(), jWorker.getName());
           case fullTimeEmployee -> new FullTimeEmployee(jWorker.getCode(), jWorker.getName());
         };
+    workersByCode.put(code, worker);
 
     var executionsByDate =
         jWorker.getMissionExecutions().stream().collect(groupingBy(JMissionExecution::getDate));
     executionsByDate.forEach(
-        (date, meList) ->
+        (date, jmeList) ->
             worker.execute(
                 new DailyExecution(
                     worker,
                     date.toLocalDate(),
-                    meList.stream().map(missionExecutionMapper::toDomain).toList())));
+                    jmeList.stream()
+                        .map(jme -> missionExecutionMapper.toDomain(jme, workersByCode))
+                        .toList())));
 
     return worker;
   }

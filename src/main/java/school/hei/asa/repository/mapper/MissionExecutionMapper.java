@@ -4,9 +4,11 @@ import static java.util.UUID.randomUUID;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import school.hei.asa.model.MissionExecution;
+import school.hei.asa.model.Worker;
 import school.hei.asa.repository.model.JMissionExecution;
 
 @Component
@@ -31,11 +33,14 @@ public class MissionExecutionMapper {
     return jme;
   }
 
-  public MissionExecution toDomain(JMissionExecution jMissionExecution) {
+  public MissionExecution toDomain(
+      JMissionExecution jme,
+      // note(circular-worker-mission-avoidance)
+      Map<String, Worker> workersByCode) {
     return new MissionExecution(
-        missionMapper.toDomain(jMissionExecution.getMission()),
-        workerMapper.toDomain(jMissionExecution.getWorker()),
-        jMissionExecution.getDate().toLocalDate(),
-        jMissionExecution.getExecution_percentage());
+        missionMapper.toDomain(jme.getMission(), workersByCode),
+        workersByCode.get(jme.getWorker().getCode()),
+        jme.getDate().toLocalDate(),
+        jme.getExecution_percentage());
   }
 }

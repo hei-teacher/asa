@@ -25,5 +25,5 @@ public class JMissionExecution {
   @JoinColumn(name = "worker_code")
   private JWorker worker;
 
-  private double execution_percentage;
+  private double dayPercentage;
 }

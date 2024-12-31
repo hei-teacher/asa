@@ -29,7 +29,7 @@ public class MissionExecutionMapper {
     jme.setMission(missionMapper.toEntity(me.mission()));
     jme.setWorker(workerMapper.toEntity(me.worker(), List.of(jme)));
     jme.setDate(Date.valueOf(me.date()));
-    jme.setExecution_percentage(me.dayPercentage());
+    jme.setDayPercentage(me.dayPercentage());
     return jme;
   }
 
@@ -41,6 +41,6 @@ public class MissionExecutionMapper {
         missionMapper.toDomain(jme.getMission(), workersByCode),
         workersByCode.get(jme.getWorker().getCode()),
         jme.getDate().toLocalDate(),
-        jme.getExecution_percentage());
+        jme.getDayPercentage());
   }
 }

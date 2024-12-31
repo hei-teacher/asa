@@ -3,7 +3,7 @@ package school.hei.asa.model;
 import static java.time.LocalDate.now;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Map;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class MissionTest {
@@ -22,7 +22,10 @@ class MissionTest {
     var mission = new Mission("mission-code", "Titre", "Description", 10, product);
 
     studentContractor.execute(
-        new DailyMissionExecution(studentContractor, now(), Map.of(mission, 1.)));
+        new DailyExecution(
+            studentContractor,
+            now(),
+            List.of(new MissionExecution(mission, studentContractor, now(), 1.))));
 
     assertEquals(1, mission.executedDays());
   }

@@ -6,8 +6,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import school.hei.asa.conf.FacadeIT;
-import school.hei.asa.endpoint.rest.controller.MissionExecutionController;
-import school.hei.asa.endpoint.rest.model.th.ThDailyMissionExecutionForm;
+import school.hei.asa.endpoint.rest.controller.DailyExecutionController;
+import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.PartnerContractor;
 import school.hei.asa.model.Product;
@@ -15,9 +15,9 @@ import school.hei.asa.repository.MissionRepository;
 import school.hei.asa.repository.ProductRepository;
 import school.hei.asa.repository.WorkerRepository;
 
-class MissionExecutionControllerTest extends FacadeIT {
+class DailyExecutionControllerTest extends FacadeIT {
 
-  @Autowired MissionExecutionController missionExecutionController;
+  @Autowired DailyExecutionController dailyExecutionController;
   @Autowired WorkerRepository workerRepository;
   @Autowired ProductRepository productRepository;
   @Autowired MissionRepository missionRepository;
@@ -33,7 +33,7 @@ class MissionExecutionControllerTest extends FacadeIT {
     missionRepository.saveAll(List.of(mission1, mission2));
 
     var dmeForm =
-        new ThDailyMissionExecutionForm(
+        new ThDailyExecutionForm(
             "2024-12-01",
             "mission1-code",
             "0.2",
@@ -45,7 +45,7 @@ class MissionExecutionControllerTest extends FacadeIT {
             null,
             null,
             null);
-    missionExecutionController.createDailyMissionExecution(dmeForm, worker);
+    dailyExecutionController.createDailyExecution(dmeForm, worker);
 
     var savedWorker = workerRepository.findByCode(worker.code());
     assertEquals(2, savedWorker.executionsByMission().keySet().size());

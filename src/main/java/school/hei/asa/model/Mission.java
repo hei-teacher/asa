@@ -36,12 +36,12 @@ public class Mission {
 
   public double executedDays() {
     return workers.stream()
-        .flatMap(worker -> worker.executionsOf(this).values().stream())
-        .mapToDouble(Double::doubleValue)
+        .flatMap(worker -> worker.executionsOf(this).stream())
+        .mapToDouble(MissionExecution::dayPercentage)
         .sum();
   }
 
-  public List<DailyMissionExecution> executions() {
+  public List<MissionExecution> executions() {
     return workers.stream().flatMap(worker -> worker.executions().stream()).toList();
   }
 }

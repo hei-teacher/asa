@@ -3,7 +3,7 @@
 <head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <title>Asa - Time Tracking</title>
+    <title>Asa - Daily Execution</title>
 
     <script>
         function createInputs(inputNb) {
@@ -26,7 +26,7 @@
 
 <body>
 <h1>What did you do that day?</h1>
-<form th:action="@{/daily-mission-execution}" method="post">
+<form th:action="@{/daily-execution}" method="post">
     <label for="date">The day: </label>
     <input type="text" id="date" name="date" class="datepicker"/>
     <br/>

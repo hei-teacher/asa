@@ -3,24 +3,25 @@ package school.hei.asa.endpoint.rest.controller.mapper;
 import static java.lang.Double.parseDouble;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.hei.asa.endpoint.rest.model.th.ThDailyMissionExecutionForm;
-import school.hei.asa.model.DailyMissionExecution;
+import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
+import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.Mission;
+import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.MissionRepository;
 
 @AllArgsConstructor
 @Component
-public class ThMissionExecutionMapper {
+public class ThDailyExecutionMapper {
 
   private final MissionRepository missionRepository;
 
-  public DailyMissionExecution toDomain(ThDailyMissionExecutionForm dmeForm, Worker worker) {
+  public DailyExecution toDomain(ThDailyExecutionForm dmeForm, Worker worker) {
     Optional<Mission> mission1Opt = findMissionByOptionalCode(dmeForm.missionCode1());
     var mission2Opt = findMissionByOptionalCode(dmeForm.missionCode2());
     var mission3Opt = findMissionByOptionalCode(dmeForm.missionCode3());
@@ -33,19 +34,24 @@ public class ThMissionExecutionMapper {
     var percentage4Opt = optionalPercentage(dmeForm.missionPercentage4());
     var percentage5Opt = optionalPercentage(dmeForm.missionPercentage5());
 
-    Map<Mission, Double> percentageByMission = new HashMap<>();
-    optionalPut(percentageByMission, mission1Opt, percentage1Opt);
-    optionalPut(percentageByMission, mission2Opt, percentage2Opt);
-    optionalPut(percentageByMission, mission3Opt, percentage3Opt);
-    optionalPut(percentageByMission, mission4Opt, percentage4Opt);
-    optionalPut(percentageByMission, mission5Opt, percentage5Opt);
-    return new DailyMissionExecution(worker, LocalDate.parse(dmeForm.date()), percentageByMission);
+    List<MissionExecution> executions = new ArrayList<>();
+    var date = LocalDate.parse(dmeForm.date());
+    optionalAdd(executions, worker, date, mission1Opt, percentage1Opt);
+    optionalAdd(executions, worker, date, mission2Opt, percentage2Opt);
+    optionalAdd(executions, worker, date, mission3Opt, percentage3Opt);
+    optionalAdd(executions, worker, date, mission4Opt, percentage4Opt);
+    optionalAdd(executions, worker, date, mission5Opt, percentage5Opt);
+    return new DailyExecution(worker, date, executions);
   }
 
-  private void optionalPut(
-      Map<Mission, Double> map, Optional<Mission> keyOpt, Optional<Double> valueOpt) {
+  private void optionalAdd(
+      List<MissionExecution> list,
+      Worker worker,
+      LocalDate date,
+      Optional<Mission> keyOpt,
+      Optional<Double> valueOpt) {
     if (keyOpt.isPresent() && valueOpt.isPresent()) {
-      map.put(keyOpt.get(), valueOpt.get());
+      list.add(new MissionExecution(keyOpt.get(), worker, date, valueOpt.get()));
     }
   }
 

@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.hei.asa.model.DailyMissionExecution;
+import school.hei.asa.model.DailyExecution;
 import school.hei.asa.repository.jrepository.JMissionExecutionRepository;
 import school.hei.asa.repository.mapper.MissionExecutionMapper;
 import school.hei.asa.repository.model.JMissionExecution;
@@ -16,12 +16,11 @@ public class MissionExecutionRepository {
   private final MissionExecutionMapper missionExecutionMapper;
 
   @Transactional
-  public void save(DailyMissionExecution dme) {
+  public void save(DailyExecution dailyExecution) {
     var toSave = new ArrayList<JMissionExecution>();
-    dme.missionPercentages()
-        .forEach(
-            (mission, percentage) ->
-                toSave.add(missionExecutionMapper.toEntity(dme, mission, percentage)));
+    dailyExecution
+        .executions()
+        .forEach(missionExecution -> toSave.add(missionExecutionMapper.toEntity(missionExecution)));
     jMissionExecutionRepository.saveAll(toSave);
   }
 }

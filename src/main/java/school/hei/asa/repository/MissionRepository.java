@@ -27,6 +27,10 @@ public class MissionRepository {
 
   @Transactional
   public Optional<Mission> findByCode(String code) {
+    // TODO: distinguish MissionExecution from DailyExecution
+    //   DailyExecution \in domain: it has the sum=1 validation rule
+    //   MissionExecution \MIGHT_NOT \in domain: it CAN be persistence-specific
+    //     In particular: JDailyExecution = { MissionExecution }
     return jMissionRepository.findByCode(code).map(missionMapper::toDomain);
   }
 

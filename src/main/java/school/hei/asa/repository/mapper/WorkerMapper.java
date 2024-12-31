@@ -1,24 +1,18 @@
 package school.hei.asa.repository.mapper;
 
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.summingDouble;
 import static school.hei.asa.repository.model.JWorker.WorkerType.fullTimeEmployee;
 import static school.hei.asa.repository.model.JWorker.WorkerType.partnerContractor;
 import static school.hei.asa.repository.model.JWorker.WorkerType.studentContractor;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.hei.asa.model.DailyMissionExecution;
+import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.FullTimeEmployee;
-import school.hei.asa.model.Mission;
 import school.hei.asa.model.PartnerContractor;
 import school.hei.asa.model.StudentContractor;
 import school.hei.asa.model.Worker;
-import school.hei.asa.repository.model.JMission;
 import school.hei.asa.repository.model.JMissionExecution;
 import school.hei.asa.repository.model.JWorker;
 import school.hei.asa.repository.model.JWorker.WorkerType;
@@ -28,6 +22,7 @@ import school.hei.asa.repository.model.JWorker.WorkerType;
 public class WorkerMapper {
 
   private final MissionMapper missionMapper;
+  private final MissionExecutionMapper missionExecutionMapper;
 
   public Worker toDomain(JWorker jWorker) {
     var worker =
@@ -42,27 +37,12 @@ public class WorkerMapper {
     executionsByDate.forEach(
         (date, meList) ->
             worker.execute(
-                new DailyMissionExecution(
-                    worker, date.toLocalDate(), toMissionMap(toJMissionMap(meList)))));
+                new DailyExecution(
+                    worker,
+                    date.toLocalDate(),
+                    meList.stream().map(missionExecutionMapper::toDomain).toList())));
 
     return worker;
-  }
-
-  private Map<Mission, Double> toMissionMap(Map<JMission, Double> jMissionMap) {
-    Map<Mission, Double> res = new HashMap<>();
-    jMissionMap.forEach(
-        (jMission, percentage) -> res.put(missionMapper.toDomain(jMission), percentage));
-    return res;
-  }
-
-  private Map<JMission, Double> toJMissionMap(List<JMissionExecution> jmeList) {
-    return jmeList.stream()
-        .collect(
-            groupingBy(
-                JMissionExecution::getMission,
-                mapping(
-                    JMissionExecution::getExecution_percentage,
-                    summingDouble(Double::doubleValue))));
   }
 
   public JWorker toEntity(Worker worker, List<JMissionExecution> jMissionExecutions) {

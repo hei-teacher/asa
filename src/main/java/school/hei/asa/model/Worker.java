@@ -1,7 +1,9 @@
 package school.hei.asa.model;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,25 +22,24 @@ public abstract sealed class Worker permits Contractor, FullTimeEmployee {
   private final String name;
 
   @ToString.Exclude
-  protected final Map<Mission, Map<LocalDate, Double>> executionsByMission = new HashMap<>();
+  protected final Map<Mission, List<MissionExecution>> executionsByMission = new HashMap<>();
 
   public abstract Set<LocalDate> availabilities();
 
-  public final void execute(DailyMissionExecution mde) {
-    var missionPercentages = mde.missionPercentages();
-    for (var mission : missionPercentages.keySet()) {
+  public final void execute(DailyExecution dailyExecution) {
+    var missionExecutions = dailyExecution.executions();
+    for (var missionExecution : missionExecutions) {
+      var mission = missionExecution.mission();
       mission.addWorker(this);
 
-      var date = mde.date();
-      var missionPercentage = missionPercentages.get(mission);
-      var toPut =
-          new HashMap<>(executionsByMission.getOrDefault(mission, Map.of(date, missionPercentage)));
-      toPut.put(date, missionPercentage);
-      executionsByMission.put(mission, toPut);
+      var toPutAsSet =
+          new HashSet<>(executionsByMission.getOrDefault(mission, List.of(missionExecution)));
+      toPutAsSet.add(missionExecution);
+      executionsByMission.put(mission, toPutAsSet.stream().toList());
     }
   }
 
-  public final Map<LocalDate, Double> executionsOf(Mission mission) {
+  public final List<MissionExecution> executionsOf(Mission mission) {
     return executionsByMission.get(mission);
   }
 
@@ -52,7 +53,7 @@ public abstract sealed class Worker permits Contractor, FullTimeEmployee {
     return missionWithCode(code).isPresent();
   }
 
-  public List<DailyMissionExecution> executions() {
-    throw new RuntimeException("TODO");
+  public List<MissionExecution> executions() {
+    return executionsByMission.values().stream().flatMap(Collection::stream).toList();
   }
 }

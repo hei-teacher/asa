@@ -4,26 +4,38 @@ import static java.util.UUID.randomUUID;
 
 import java.sql.Date;
 import java.util.List;
-import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import school.hei.asa.model.DailyMissionExecution;
-import school.hei.asa.model.Mission;
+import school.hei.asa.model.MissionExecution;
 import school.hei.asa.repository.model.JMissionExecution;
 
-@AllArgsConstructor
 @Component
 public class MissionExecutionMapper {
 
   private final MissionMapper missionMapper;
   private final WorkerMapper workerMapper;
 
-  public JMissionExecution toEntity(DailyMissionExecution dme, Mission mission, Double percentage) {
+  public MissionExecutionMapper(
+      @Lazy MissionMapper missionMapper, @Lazy WorkerMapper workerMapper) {
+    this.missionMapper = missionMapper;
+    this.workerMapper = workerMapper;
+  }
+
+  public JMissionExecution toEntity(MissionExecution me) {
     var jme = new JMissionExecution();
     jme.setId(randomUUID().toString());
-    jme.setMission(missionMapper.toEntity(mission));
-    jme.setWorker(workerMapper.toEntity(dme.worker(), List.of(jme)));
-    jme.setDate(Date.valueOf(dme.date()));
-    jme.setExecution_percentage(percentage);
+    jme.setMission(missionMapper.toEntity(me.mission()));
+    jme.setWorker(workerMapper.toEntity(me.worker(), List.of(jme)));
+    jme.setDate(Date.valueOf(me.date()));
+    jme.setExecution_percentage(me.dayPercentage());
     return jme;
+  }
+
+  public MissionExecution toDomain(JMissionExecution jMissionExecution) {
+    return new MissionExecution(
+        missionMapper.toDomain(jMissionExecution.getMission()),
+        workerMapper.toDomain(jMissionExecution.getWorker()),
+        jMissionExecution.getDate().toLocalDate(),
+        jMissionExecution.getExecution_percentage());
   }
 }

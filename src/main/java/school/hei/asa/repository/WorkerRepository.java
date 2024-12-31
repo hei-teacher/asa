@@ -29,9 +29,4 @@ public class WorkerRepository {
   public void save(Worker worker) {
     jWorkerRepository.save(workerMapper.toEntity(worker, List.of()));
   }
-
-  @Transactional
-  public void saveAll(List<Worker> workers) {
-    workers.forEach(this::save);
-  }
 }

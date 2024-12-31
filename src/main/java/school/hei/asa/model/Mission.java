@@ -1,7 +1,6 @@
 package school.hei.asa.model;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -21,7 +20,6 @@ public class Mission {
   @EqualsAndHashCode.Exclude private final Set<Worker> workers = new HashSet<>();
 
   public void addWorker(Worker worker) {
-    // TODO: test that indeed worker has mission
     workers.add(worker);
   }
 
@@ -40,9 +38,5 @@ public class Mission {
         .flatMap(worker -> worker.executionsOf(this).stream())
         .mapToDouble(MissionExecution::dayPercentage)
         .sum();
-  }
-
-  public List<MissionExecution> executions() {
-    return workers.stream().flatMap(worker -> worker.executions().stream()).toList();
   }
 }

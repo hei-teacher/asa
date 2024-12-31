@@ -26,10 +26,4 @@ public class JWorker {
   @OneToMany
   @JoinColumn(name = "worker_code")
   private List<JMissionExecution> missionExecutions;
-
-  public enum WorkerType {
-    partnerContractor,
-    studentContractor,
-    fullTimeEmployee
-  }
 }

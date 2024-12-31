@@ -9,8 +9,6 @@ import school.hei.asa.repository.model.JProduct;
 @Component
 public class ProductMapper {
 
-  private final MissionMapper missionMapper;
-
   public Product toDomain(JProduct product) {
     return new Product(product.getCode(), product.getName(), product.getDescription());
   }

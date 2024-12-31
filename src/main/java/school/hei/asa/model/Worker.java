@@ -1,12 +1,10 @@
 package school.hei.asa.model;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,19 +39,5 @@ public abstract sealed class Worker permits Contractor, FullTimeEmployee {
 
   public final List<MissionExecution> executionsOf(Mission mission) {
     return executionsByMission.get(mission);
-  }
-
-  public Optional<Mission> missionWithCode(String code) {
-    return executionsByMission.keySet().stream()
-        .filter(mission -> mission.code().equals(code))
-        .findFirst();
-  }
-
-  public boolean workedOnMissionCode(String code) {
-    return missionWithCode(code).isPresent();
-  }
-
-  public List<MissionExecution> executions() {
-    return executionsByMission.values().stream().flatMap(Collection::stream).toList();
   }
 }

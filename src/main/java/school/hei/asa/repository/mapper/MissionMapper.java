@@ -14,7 +14,7 @@ public class MissionMapper {
   private final ProductMapper productMapper;
   private final WorkerMapper workerMapper;
 
-  public MissionMapper(@Lazy ProductMapper productMapper, @Lazy WorkerMapper workerMapper) {
+  public MissionMapper(ProductMapper productMapper, @Lazy WorkerMapper workerMapper) {
     this.productMapper = productMapper;
     this.workerMapper = workerMapper;
   }

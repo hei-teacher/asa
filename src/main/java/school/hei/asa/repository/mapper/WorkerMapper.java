@@ -1,9 +1,6 @@
 package school.hei.asa.repository.mapper;
 
 import static java.util.stream.Collectors.groupingBy;
-import static school.hei.asa.repository.model.JWorker.WorkerType.fullTimeEmployee;
-import static school.hei.asa.repository.model.JWorker.WorkerType.partnerContractor;
-import static school.hei.asa.repository.model.JWorker.WorkerType.studentContractor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +14,7 @@ import school.hei.asa.model.StudentContractor;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.model.JMissionExecution;
 import school.hei.asa.repository.model.JWorker;
-import school.hei.asa.repository.model.JWorker.WorkerType;
+import school.hei.asa.repository.model.WorkerType;
 
 @AllArgsConstructor
 @Component
@@ -44,40 +41,30 @@ public class WorkerMapper {
         };
     workersByCode.put(code, worker);
 
-    var executionsByDate =
-        jWorker.getMissionExecutions().stream().collect(groupingBy(JMissionExecution::getDate));
+    executeMissions(jWorker.getMissionExecutions(), worker, workersByCode);
+    return worker;
+  }
+
+  private void executeMissions(
+      List<JMissionExecution> jmeList, Worker worker, Map<String, Worker> workersByCode) {
+    var executionsByDate = jmeList.stream().collect(groupingBy(JMissionExecution::getDate));
     executionsByDate.forEach(
-        (date, jmeList) ->
+        (date, jmeListByDate) ->
             worker.execute(
                 new DailyExecution(
                     worker,
                     date.toLocalDate(),
-                    jmeList.stream()
+                    jmeListByDate.stream()
                         .map(jme -> missionExecutionMapper.toDomain(jme, workersByCode))
                         .toList())));
-
-    return worker;
   }
 
   public JWorker toEntity(Worker worker, List<JMissionExecution> jMissionExecutions) {
     var jWorker = new JWorker();
     jWorker.setCode(worker.code());
     jWorker.setName(worker.name());
-    jWorker.setWorkerType(type(worker));
+    jWorker.setWorkerType(WorkerType.type(worker));
     jWorker.setMissionExecutions(jMissionExecutions);
     return jWorker;
-  }
-
-  private WorkerType type(Worker worker) {
-    if (worker instanceof PartnerContractor) {
-      return partnerContractor;
-    }
-    if (worker instanceof StudentContractor) {
-      return studentContractor;
-    }
-    if (worker instanceof FullTimeEmployee) {
-      return fullTimeEmployee;
-    }
-    throw new IllegalArgumentException("Unsupported worker type");
   }
 }

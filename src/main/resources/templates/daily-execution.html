@@ -5,17 +5,24 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <title>Asa - Daily Execution</title>
 
-    <script>
+    <script th:inline="javascript">
         function createInputs(inputNb) {
             const container = document.getElementById("inputContainer");
             container.innerHTML = "";
+            const missions = /*[[${missions}]]*/ [];
+            console.log(missions);
+            const missionsOption = missions.map(mission => `<option value="${mission.code}">${mission.code} ${mission.title}</option>`).join('');
             for (let i = 1; i <= inputNb; i++) {
                 const inputGroup = document.createElement("div");
                 inputGroup.innerHTML = `
                     <label for="mission-code-${i}">Mission: </label>
-                    <input type="text" id="mission-code-${i}" name="missionCode${i}"/>
+                    <select id="mission-code-${i}" name="missionCode${i}">
+                        <option value="">--Choose--</option>
+                        ${missionsOption}
+                    </select>
                     <label for="mission-percentage-${i}">Percentage: </label>
-                    <input type="number" id="mission-percentage-${i}" name="missionPercentage${i}"/>
+                    <input type="number" step=".2"
+                     id="mission-percentage-${i}" name="missionPercentage${i}"/>
                     <br/>
                 `;
                 container.appendChild(inputGroup);

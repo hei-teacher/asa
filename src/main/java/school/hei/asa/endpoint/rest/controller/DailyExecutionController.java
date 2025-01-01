@@ -35,9 +35,14 @@ public class DailyExecutionController {
   }
 
   @PostMapping("/daily-execution")
-  public String createDailyExecution(ThDailyExecutionForm dmeForm, Authentication authentication) {
+  public String createDailyExecution(Authentication authentication, ThDailyExecutionForm dmeForm) {
     var worker = workerFromAuthentication.apply(authentication).get();
-    missionExecutionRepository.save(thDailyExecutionMapper.toDomain(dmeForm, worker));
+    var dailyExecution = thDailyExecutionMapper.toDomain(dmeForm, worker);
+    var date = dailyExecution.date();
+    if (!missionExecutionRepository.findAllBy(worker, date).isEmpty()) {
+      throw new IllegalArgumentException("Day already has MissionExecution: " + date);
+    }
+    missionExecutionRepository.save(dailyExecution);
     return "redirect:/calendar";
   }
 }

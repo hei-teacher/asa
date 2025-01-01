@@ -48,4 +48,12 @@ public class MissionExecutionMapper {
         jme.getDate().toLocalDate(),
         jme.getDayPercentage());
   }
+
+  public MissionExecution toDomain(JMissionExecution jme) {
+    return new MissionExecution(
+        missionMapper.toDomain(jme.getMission()),
+        workerMapper.toDomain(jme.getWorker()),
+        jme.getDate().toLocalDate(),
+        jme.getDayPercentage());
+  }
 }

@@ -21,7 +21,7 @@
                         ${missionsOption}
                     </select>
                     <label for="mission-percentage-${i}">Percentage: </label>
-                    <input type="number" step=".2"
+                    <input type="number" step=".1" min="0" max="1"
                      id="mission-percentage-${i}" name="missionPercentage${i}"/>
                     <br/>
                 `;
@@ -35,6 +35,10 @@
 <div th:replace="fragments/header :: header"></div>
 
 <h1>What did you do that day?</h1>
+
+<p><strong>Sum of percentages must equal 1</strong>.<br>
+    Use care missions to complete missing hours if needed.</p>
+
 <form th:action="@{/daily-execution}" method="post">
     <label for="date">The day: </label>
     <input type="text" id="date" name="date" class="datepicker"/>
@@ -44,7 +48,12 @@
 </form>
 
 <script>
-    flatpickr(".datepicker", {dateFormat: "Y-m-d"});
+    const currentYear = new Date().getFullYear();
+    flatpickr(".datepicker", {
+        minDate: `${currentYear}-01-01`,
+        maxDate: `${currentYear}-12-31`,
+        dateFormat: "Y-m-d"
+    });
     createInputs(5);
 </script>
 </body>

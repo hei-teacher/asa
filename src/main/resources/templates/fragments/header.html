@@ -2,6 +2,9 @@
     <a href="/missions">Mission Explorer</a>
     <a href="/daily-execution">Daily Execution</a>
     <a href="/calendar">My Calendar</a>
+
     <a sec:authorize="isAuthenticated()" th:href="@{/logout}">Log out</a>
+    <strong sec:authorize="isAuthenticated()"
+            th:text="'(' + ${#authentication.getPrincipal().getAttribute('email')} + ')'"></strong>
     <a sec:authorize="isAnonymous()" th:href="@{/oauth2/authorization/cognito}">Log in</a>
 </div>

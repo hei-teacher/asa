@@ -32,8 +32,7 @@ class DailyExecutionControllerIT extends FacadeIT {
   @Autowired WorkerRepository workerRepository;
   @Autowired ProductRepository productRepository;
   @Autowired MissionRepository missionRepository;
-  @Autowired
-  MissionExecutionRepository missionExecutionRepository;
+  @Autowired MissionExecutionRepository missionExecutionRepository;
 
   @MockBean SecurityConfig securityConfig;
   @MockBean WorkerFromAuthentication workerFromAuthentication;

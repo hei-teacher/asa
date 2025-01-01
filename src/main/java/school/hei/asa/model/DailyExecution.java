@@ -22,12 +22,12 @@ public record DailyExecution(Worker worker, LocalDate date, List<MissionExecutio
   }
 
   public Type type(String careProductCode) {
-    var productCodesOfExecutions =
-        executions.stream().map(me -> me.mission().product().code()).collect(Collectors.toSet());
-    if (productCodesOfExecutions.stream().allMatch(careProductCode::equals)) {
+    var executedMissions =
+        executions.stream().map(MissionExecution::mission).collect(Collectors.toSet());
+    if (executedMissions.stream().allMatch(mission -> mission.isCare(careProductCode))) {
       return fullCare;
     }
-    if (productCodesOfExecutions.stream().noneMatch(careProductCode::equals)) {
+    if (executedMissions.stream().noneMatch(mission -> mission.isCare(careProductCode))) {
       return fullWork;
     }
     return mixedWorkAndCare;

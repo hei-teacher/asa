@@ -34,6 +34,20 @@ public class MissionExecutionRepository {
   }
 
   @Transactional
+  public List<DailyExecution> findAllDailyExecution() {
+    var meListByDate =
+        jMissionExecutionRepository.findAll().stream()
+            .map(missionExecutionMapper::toDomain)
+            .collect(groupingBy(MissionExecution::date));
+    List<DailyExecution> dailyExecutions = new ArrayList<>();
+    meListByDate.forEach(
+        (date, meListOfDate) ->
+            dailyExecutions.add(
+                new DailyExecution(meListOfDate.get(0).worker(), date, meListOfDate)));
+    return dailyExecutions;
+  }
+
+  @Transactional
   public List<DailyExecution> findAllDailyExecutionBy(Worker worker) {
     var meListByDate = missionExecutionsBy(worker);
     List<DailyExecution> dailyExecutions = new ArrayList<>();

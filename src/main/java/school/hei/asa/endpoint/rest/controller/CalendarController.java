@@ -30,7 +30,7 @@ public class CalendarController {
   private final CalendarService calendarService;
   private final WorkerFromAuthentication workerFromAuthentication;
 
-  @GetMapping("/calendar")
+  @GetMapping("/work-and-care-calendar")
   public String getCalendar(Model model, Authentication authentication) {
     var year = now().getYear();
     model.addAttribute("year", year);

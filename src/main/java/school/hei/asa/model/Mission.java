@@ -44,4 +44,8 @@ public class Mission {
   public List<Worker> workers() {
     return executions.stream().map(MissionExecution::worker).toList();
   }
+
+  public boolean isCare(String careProductCode) {
+    return careProductCode.equals(product.code());
+  }
 }

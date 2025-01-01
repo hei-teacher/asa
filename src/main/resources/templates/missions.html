@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title>Asa - Calendar</title>
+    <title>Asa - Missions by Products</title>
     <link href="/main.css" rel="stylesheet"/>
 </head>
 
 <body>
 <div th:replace="fragments/header :: header"></div>
 
-<h1>Missions grouped by products</h1>
+<h1>Missions by products</h1>
 <div>
     <ul>
         <li th:each="p: ${products}">

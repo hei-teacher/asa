@@ -43,6 +43,6 @@ public class DailyExecutionController {
       throw new IllegalArgumentException("Day already has MissionExecution: " + date);
     }
     missionExecutionRepository.save(dailyExecution);
-    return "redirect:/calendar";
+    return "redirect:/work-and-care-calendar";
   }
 }

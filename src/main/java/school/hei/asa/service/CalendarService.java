@@ -6,24 +6,18 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.MissionExecutionRepository;
 
+@AllArgsConstructor
 @Service
 public class CalendarService {
 
-  private final String careProductCode;
   private final MissionExecutionRepository missionExecutionRepository;
-
-  public CalendarService(
-      @Value("${asa.care.product.code}") String careProductCode,
-      MissionExecutionRepository missionExecutionRepository) {
-    this.careProductCode = careProductCode;
-    this.missionExecutionRepository = missionExecutionRepository;
-  }
+  private final ProductConf productConf;
 
   @Transactional
   public Map<DailyExecution.Type, List<LocalDate>> datesByDailyExecutionType(
@@ -47,7 +41,9 @@ public class CalendarService {
   private List<LocalDate> filterByDailyExecutionType(
       List<DailyExecution> dayExecutionsOfTheYear, DailyExecution.Type dailyExecutionType) {
     return dayExecutionsOfTheYear.stream()
-        .filter(dailyExecution -> dailyExecutionType.equals(dailyExecution.type(careProductCode)))
+        .filter(
+            dailyExecution ->
+                dailyExecutionType.equals(dailyExecution.type(productConf.careProductCode())))
         .map(DailyExecution::date)
         .toList();
   }

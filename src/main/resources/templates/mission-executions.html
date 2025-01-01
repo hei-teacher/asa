@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Asa - Mission Executions</title>
+    <link href="/main.css" rel="stylesheet"/>
+</head>
+
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<h1>Mission executions</h1>
+<strong style="color: red">Care missions are colored red.</strong>
+
+<div>
+    <ul>
+        <li th:each="dailyExecution: ${dailyExecutions}">
+            <h3 th:text="${dailyExecution.date()}"></h3>
+            <ul>
+                <li th:each="me: ${dailyExecution.executions()}"
+                    th:text="${me.mission().code()} + ': ' + ${me.mission().title()} + ' (' + ${me.worker().name()} + ':'+ ${me.dayPercentage()} +')'"
+                    th:style="'color: ' + (${me.mission().isCare(careProductCode)} ? 'red' : 'black')">
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>

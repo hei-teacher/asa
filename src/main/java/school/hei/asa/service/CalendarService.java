@@ -10,13 +10,13 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.Worker;
-import school.hei.asa.repository.MissionExecutionRepository;
+import school.hei.asa.repository.DailyExecutionRepository;
 
 @AllArgsConstructor
 @Service
 public class CalendarService {
 
-  private final MissionExecutionRepository missionExecutionRepository;
+  private final DailyExecutionRepository dailyExecutionRepository;
   private final ProductConf productConf;
 
   @Transactional
@@ -25,7 +25,7 @@ public class CalendarService {
     Map<DailyExecution.Type, List<LocalDate>> res = new HashMap<>();
 
     var dailyExecutions =
-        missionExecutionRepository.findAllDailyExecutionBy(worker).stream()
+        dailyExecutionRepository.findAllBy(worker).stream()
             .filter(me -> me.date().getYear() == year)
             .toList();
     Arrays.stream(DailyExecution.Type.values())

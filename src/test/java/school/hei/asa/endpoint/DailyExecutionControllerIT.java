@@ -21,7 +21,7 @@ import school.hei.asa.model.Mission;
 import school.hei.asa.model.PartnerContractor;
 import school.hei.asa.model.Product;
 import school.hei.asa.model.Worker;
-import school.hei.asa.repository.MissionExecutionRepository;
+import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.MissionRepository;
 import school.hei.asa.repository.ProductRepository;
 import school.hei.asa.repository.WorkerRepository;
@@ -32,7 +32,7 @@ class DailyExecutionControllerIT extends FacadeIT {
   @Autowired WorkerRepository workerRepository;
   @Autowired ProductRepository productRepository;
   @Autowired MissionRepository missionRepository;
-  @Autowired MissionExecutionRepository missionExecutionRepository;
+  @Autowired DailyExecutionRepository dailyExecutionRepository;
 
   @MockBean SecurityConfig securityConfig;
   @MockBean WorkerFromAuthentication workerFromAuthentication;
@@ -77,7 +77,7 @@ class DailyExecutionControllerIT extends FacadeIT {
     assertEquals(2, savedWorker.executionsByMission().keySet().size());
     var savedMission1 = missionRepository.findByCode("mission1-code");
     assertEquals(1, savedMission1.get().workers().size());
-    var savedDailyExecutions = missionExecutionRepository.findAllDailyExecution();
+    var savedDailyExecutions = dailyExecutionRepository.findAll();
     assertEquals(1, savedDailyExecutions.size());
     var savedProduct = productRepository.findByCode("pcode");
     assertEquals(1, savedProduct.executedDays());

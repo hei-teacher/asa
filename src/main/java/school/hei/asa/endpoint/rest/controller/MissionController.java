@@ -7,7 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import school.hei.asa.model.DailyExecution;
-import school.hei.asa.repository.MissionExecutionRepository;
+import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.ProductRepository;
 import school.hei.asa.service.ProductConf;
 
@@ -16,7 +16,7 @@ import school.hei.asa.service.ProductConf;
 public class MissionController {
 
   private final ProductRepository productRepository;
-  private final MissionExecutionRepository missionExecutionRepository;
+  private final DailyExecutionRepository dailyExecutionRepository;
   private final ProductConf productConf;
 
   @GetMapping("/missions")
@@ -28,7 +28,7 @@ public class MissionController {
   @GetMapping("/mission-executions")
   public String getMissionExecutions(Model model) {
     var dailyExecutions =
-        missionExecutionRepository.findAllDailyExecution().stream()
+        dailyExecutionRepository.findAll().stream()
             .sorted(comparing(DailyExecution::date))
             .map(
                 dailyExecution ->

@@ -12,6 +12,7 @@ import school.hei.asa.endpoint.rest.controller.mapper.ThDailyExecutionMapper;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
+import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.MissionExecutionRepository;
 import school.hei.asa.repository.MissionRepository;
 
@@ -20,6 +21,7 @@ import school.hei.asa.repository.MissionRepository;
 public class DailyExecutionController {
   private final ThDailyExecutionMapper thDailyExecutionMapper;
   private final MissionExecutionRepository missionExecutionRepository;
+  private final DailyExecutionRepository dailyExecutionRepository;
   private final MissionRepository missionRepository;
   private final WorkerFromAuthentication workerFromAuthentication;
 
@@ -42,7 +44,7 @@ public class DailyExecutionController {
     if (!missionExecutionRepository.findAllBy(worker, date).isEmpty()) {
       throw new IllegalArgumentException("Day already has MissionExecution: " + date);
     }
-    missionExecutionRepository.save(dailyExecution);
+    dailyExecutionRepository.save(dailyExecution);
     return "redirect:/work-and-care-calendar";
   }
 }

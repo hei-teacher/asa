@@ -26,4 +26,6 @@ public class JMissionExecution {
   private JWorker worker;
 
   private double dayPercentage;
+
+  private String comment;
 }

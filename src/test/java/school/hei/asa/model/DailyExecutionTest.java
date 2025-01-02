@@ -17,6 +17,8 @@ class DailyExecutionTest {
         IllegalArgumentException.class,
         () ->
             new DailyExecution(
-                worker, now(), List.of(new MissionExecution(mission, worker, now(), 0.2))));
+                worker,
+                now(),
+                List.of(new MissionExecution(mission, worker, now(), 0.2, "comment"))));
   }
 }

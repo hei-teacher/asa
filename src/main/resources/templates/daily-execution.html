@@ -23,7 +23,8 @@
                     <label for="mission-percentage-${i}">Percentage: </label>
                     <input type="number" step=".1" min="0" max="1"
                      id="mission-percentage-${i}" name="missionPercentage${i}"/>
-                    <br/>
+                    <label for="mission-comment-${i}">Comment: </label>
+                    <textarea id="mission-comment-${i}" rows="1" cols="100" name="missionComment${i}"/>
                 `;
                 container.appendChild(inputGroup);
             }
@@ -36,8 +37,12 @@
 
 <h1>What did you do that day?</h1>
 
-<p><strong>Sum of percentages must equal 1</strong>.<br>
+<p><strong>Sum of percentages MUST equal 1.</strong><br>
     Use care missions to complete missing hours if needed.</p>
+<p><strong>Comment MUST be defined.</strong><br>
+    Mind your keywords to ease search.
+    E.g.: if you face a problem that takes many days to complete then
+    create a keyword for it. Afterward, mention that keyword any time you work on it.</p>
 
 <form th:action="@{/daily-execution}" method="post">
     <label for="date">The day: </label>

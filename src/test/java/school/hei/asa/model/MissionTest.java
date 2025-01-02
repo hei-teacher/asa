@@ -25,7 +25,7 @@ class MissionTest {
         new DailyExecution(
             studentContractor,
             now(),
-            List.of(new MissionExecution(mission, studentContractor, now(), 1.))));
+            List.of(new MissionExecution(mission, studentContractor, now(), 1., "comment"))));
 
     assertEquals(1, mission.executedDays());
   }

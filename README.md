@@ -41,4 +41,4 @@ Last, visit `http://localhost:8080`
 
 ### Releases uber jar
 
-* [v1](https://drive.google.com/file/d/1JFlfpSun6Cl26-URsR5dtgYU8-xEoF28/view?usp=drive_link)
+* [v1](https://drive.google.com/file/d/1oo5eESgdkDTnuQo0GBZFVbPkRpKfonqG/view?usp=sharing)

@@ -58,8 +58,13 @@ class CalendarServiceIT extends FacadeIT {
             "2024-12-01",
             "mission1-code",
             "0.2",
+            "missionComment1",
             "mission2-code",
             "0.8",
+            "missionComment2",
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -82,11 +87,41 @@ class CalendarServiceIT extends FacadeIT {
     dailyExecutionController.createDailyExecution(
         authentication,
         new ThDailyExecutionForm(
-            "2025-12-01", "careMission-code", "1", null, null, null, null, null, null, null, null));
+            "2025-12-01",
+            "careMission-code",
+            "1",
+            "missionComment1",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null));
     dailyExecutionController.createDailyExecution(
         authentication,
         new ThDailyExecutionForm(
-            "2025-10-01", "careMission-code", "1", null, null, null, null, null, null, null, null));
+            "2025-10-01",
+            "careMission-code",
+            "1",
+            "missionComment2",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null));
 
     var datesByDailyExecutionType =
         calendarService.datesByDailyExecutionType(authenticatedWorker, 2025);
@@ -103,8 +138,13 @@ class CalendarServiceIT extends FacadeIT {
             "2024-06-01",
             "mission1-code",
             "0.2",
+            "missionComment1",
             "careMission-code",
             "0.8",
+            "missionComment2",
+            null,
+            null,
+            null,
             null,
             null,
             null,

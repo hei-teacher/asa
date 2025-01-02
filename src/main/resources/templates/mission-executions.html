@@ -16,9 +16,15 @@
         <li th:each="dailyExecution: ${dailyExecutions}">
             <h3 th:text="${dailyExecution.date()}"></h3>
             <ul>
-                <li th:each="me: ${dailyExecution.executions()}"
-                    th:text="${me.mission().code()} + ': ' + ${me.mission().title()} + ' (' + ${me.worker().name()} + ':'+ ${me.dayPercentage()} +')'"
-                    th:style="'color: ' + (${me.mission().isCare(careProductCode)} ? 'red' : 'black')">
+                <li th:each="thMe: ${dailyExecution.thExecutions()}">
+                    <h4 th:text="${thMe.mission().code()} + ': ' + ${thMe.mission().title()}"
+                        th:style="'color: ' + (${thMe.mission().isCare(careProductCode)} ? 'red' : 'black')"></h4>
+                    <ul>
+                        <li th:each="me: ${thMe.executions()}"
+                            th:text="${me.worker().name()} + ' ('+ ${me.dayPercentage()} +'): ' + ${me.comment()}"
+                            th:style="'color: ' + (${me.mission().isCare(careProductCode)} ? 'red' : 'black')">
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </li>

@@ -6,7 +6,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import school.hei.asa.model.DailyExecution;
+import school.hei.asa.endpoint.rest.controller.mapper.ThDailyExecutionMapper;
+import school.hei.asa.endpoint.rest.model.th.ThDailyExecution;
 import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.ProductRepository;
 import school.hei.asa.service.ProductConf;
@@ -18,6 +19,7 @@ public class MissionController {
   private final ProductRepository productRepository;
   private final DailyExecutionRepository dailyExecutionRepository;
   private final ProductConf productConf;
+  private final ThDailyExecutionMapper thDailyExecutionMapper;
 
   @GetMapping("/missions")
   public String getMissions(Model model) {
@@ -27,19 +29,12 @@ public class MissionController {
 
   @GetMapping("/mission-executions")
   public String getMissionExecutions(Model model) {
-    var dailyExecutions =
+    var thDailyExecutions =
         dailyExecutionRepository.findAll().stream()
-            .sorted(comparing(DailyExecution::date))
-            .map(
-                dailyExecution ->
-                    new DailyExecution(
-                        dailyExecution.worker(),
-                        dailyExecution.date(),
-                        dailyExecution.executions().stream()
-                            .sorted(comparing(me -> me.mission().code()))
-                            .toList()))
+            .map(thDailyExecutionMapper::toTh)
+            .sorted(comparing(ThDailyExecution::date))
             .toList();
-    model.addAttribute("dailyExecutions", dailyExecutions);
+    model.addAttribute("dailyExecutions", thDailyExecutions);
     model.addAttribute("careProductCode", productConf.careProductCode());
     return "mission-executions";
   }

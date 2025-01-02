@@ -16,7 +16,9 @@ class ProductTest {
     var student1 = new StudentContractor("scode", "sname", "email");
     student1.execute(
         new DailyExecution(
-            student1, now(), List.of(new MissionExecution(mission1, student1, now(), 1.))));
+            student1,
+            now(),
+            List.of(new MissionExecution(mission1, student1, now(), 1., "comment"))));
 
     assertEquals(12, product.maxDurationInDays());
     assertEquals(1, product.executedDays());

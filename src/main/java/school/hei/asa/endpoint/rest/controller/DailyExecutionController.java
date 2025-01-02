@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import school.hei.asa.endpoint.rest.controller.mapper.ThDailyExecutionMapper;
+import school.hei.asa.endpoint.rest.controller.mapper.ThDailyExecutionFormMapper;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
@@ -19,7 +19,7 @@ import school.hei.asa.repository.MissionRepository;
 @Controller
 @AllArgsConstructor
 public class DailyExecutionController {
-  private final ThDailyExecutionMapper thDailyExecutionMapper;
+  private final ThDailyExecutionFormMapper thDailyExecutionFormMapper;
   private final MissionExecutionRepository missionExecutionRepository;
   private final DailyExecutionRepository dailyExecutionRepository;
   private final MissionRepository missionRepository;
@@ -39,7 +39,7 @@ public class DailyExecutionController {
   @PostMapping("/daily-execution")
   public String createDailyExecution(Authentication authentication, ThDailyExecutionForm dmeForm) {
     var worker = workerFromAuthentication.apply(authentication).get();
-    var dailyExecution = thDailyExecutionMapper.toDomain(dmeForm, worker);
+    var dailyExecution = thDailyExecutionFormMapper.toDomain(dmeForm, worker);
     var date = dailyExecution.date();
     if (!missionExecutionRepository.findAllBy(worker, date).isEmpty()) {
       throw new IllegalArgumentException("Day already has MissionExecution: " + date);

@@ -39,9 +39,14 @@ public class DailyExecutionRepository {
             .collect(groupingBy(MissionExecution::date));
     List<DailyExecution> dailyExecutions = new ArrayList<>();
     meListByDate.forEach(
-        (date, meListOfDate) ->
-            dailyExecutions.add(
-                new DailyExecution(meListOfDate.get(0).worker(), date, meListOfDate)));
+        (date, meListOfDate) -> {
+          var meByWorker = meListOfDate.stream().collect(groupingBy(MissionExecution::worker));
+          meByWorker.forEach(
+              (worker, meListOfWorker) -> {
+                DailyExecution de = new DailyExecution(worker, date, meListOfWorker);
+                dailyExecutions.add(de);
+              });
+        });
     return dailyExecutions;
   }
 

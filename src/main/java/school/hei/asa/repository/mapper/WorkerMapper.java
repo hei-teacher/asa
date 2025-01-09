@@ -2,9 +2,7 @@ package school.hei.asa.repository.mapper;
 
 import static java.util.stream.Collectors.groupingBy;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.asa.model.DailyExecution;
@@ -23,14 +21,13 @@ public class WorkerMapper {
   private final MissionExecutionMapper missionExecutionMapper;
 
   public Worker toDomain(JWorker jWorker) {
-    return toDomain(jWorker, new HashMap<>());
+    return toDomain(jWorker, new Cache());
   }
 
-  /*package-private*/ Worker toDomain(JWorker jWorker, Map<String, Worker> workersByCode) {
-    // note(circular-missionExecution-worker-avoidance)
+  /*package-private*/ Worker toDomain(JWorker jWorker, Cache cache) {
     var code = jWorker.getCode();
-    if (workersByCode.containsKey(code)) {
-      return workersByCode.get(code);
+    if (cache.contains(Worker.class, code)) {
+      return cache.get(Worker.class, code);
     }
 
     var worker =
@@ -42,14 +39,13 @@ public class WorkerMapper {
           case fullTimeEmployee ->
               new FullTimeEmployee(jWorker.getCode(), jWorker.getName(), jWorker.getEmail());
         };
-    workersByCode.put(code, worker);
+    cache.put(code, worker);
 
-    executeMissions(jWorker.getMissionExecutions(), worker, workersByCode);
+    executeMissions(jWorker.getMissionExecutions(), worker, cache);
     return worker;
   }
 
-  private void executeMissions(
-      List<JMissionExecution> jmeList, Worker worker, Map<String, Worker> workersByCode) {
+  private void executeMissions(List<JMissionExecution> jmeList, Worker worker, Cache cache) {
     var executionsByDate = jmeList.stream().collect(groupingBy(JMissionExecution::getDate));
     executionsByDate.forEach(
         (date, jmeListByDate) ->
@@ -58,10 +54,7 @@ public class WorkerMapper {
                     worker,
                     date.toLocalDate(),
                     jmeListByDate.stream()
-                        .map(
-                            jme ->
-                                missionExecutionMapper.toDomain(
-                                    jme, workersByCode, new HashMap<>(), new HashMap<>()))
+                        .map(jme -> missionExecutionMapper.toDomain(jme, cache))
                         .toList())));
   }
 

@@ -8,16 +8,16 @@ import lombok.experimental.Accessors;
 
 @Accessors(fluent = true)
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(of = "code")
 public class Mission {
 
   private final String code;
-  @EqualsAndHashCode.Exclude private final String title;
-  @EqualsAndHashCode.Exclude private final String description;
-  @EqualsAndHashCode.Exclude private final int maxDurationInDays;
-  @EqualsAndHashCode.Exclude private final Product product;
+  private final String title;
+  private final String description;
+  private final int maxDurationInDays;
+  private final Product product;
 
-  @EqualsAndHashCode.Exclude private final List<MissionExecution> executions = new ArrayList<>();
+  private final List<MissionExecution> executions = new ArrayList<>();
 
   public void add(MissionExecution me) {
     if (!this.equals(me.mission())) {

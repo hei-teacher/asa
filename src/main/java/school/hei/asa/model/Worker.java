@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
@@ -14,29 +14,14 @@ import lombok.experimental.Accessors;
 @Getter
 @AllArgsConstructor
 @ToString
+@EqualsAndHashCode(of = "code")
 public abstract sealed class Worker permits Contractor, FullTimeEmployee {
   private final String code;
-
   private final String name;
-
   private final String email;
 
   @ToString.Exclude
   protected final Map<Mission, List<MissionExecution>> executionsByMission = new HashMap<>();
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    Worker worker = (Worker) o;
-    return Objects.equals(code, worker.code);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(code);
-  }
 
   public final void execute(DailyExecution dailyExecution) {
     var missionExecutions = dailyExecution.executions();

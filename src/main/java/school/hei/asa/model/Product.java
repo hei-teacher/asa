@@ -10,17 +10,14 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 @Getter
 @AllArgsConstructor
+@EqualsAndHashCode(of = "code")
 public class Product {
 
   private final String code;
-
-  @EqualsAndHashCode.Exclude private final String name;
-
-  @EqualsAndHashCode.Exclude
-  @Accessors(fluent = true)
+  private final String name;
   private final String description;
 
-  @EqualsAndHashCode.Exclude private final Set<Mission> missions = new HashSet<>();
+  private final Set<Mission> missions = new HashSet<>();
 
   public int maxDurationInDays() {
     return missions.stream().mapToInt(Mission::maxDurationInDays).sum();

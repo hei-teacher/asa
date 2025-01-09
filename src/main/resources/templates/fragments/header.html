@@ -1,11 +1,11 @@
 <div th:fragment="header" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-    <a href="/missions">Mission Explorer</a>
-    <a href="/work-and-care-calendar">Work & Care Calendar</a>
-    <a href="/daily-execution">Daily Execution</a>
-    <a href="/mission-executions">Missions Executions</a>
-
-    <a sec:authorize="isAuthenticated()" th:href="@{/logout}">Log out</a>
-    <strong sec:authorize="isAuthenticated()"
-            th:text="'(' + ${#authentication.getPrincipal().getAttribute('email')} + ')'"></strong>
+    <span sec:authorize="isAuthenticated()">
+        <a href="/missions">Mission Explorer</a>
+        <a href="/work-and-care-calendar">Work & Care Calendar</a>
+        <a href="/daily-execution">Daily Execution</a>
+        <a href="/mission-executions">Missions Executions</a>
+        <a th:href="@{/logout}">Log out</a>
+        <strong th:text="'(' + ${#authentication.getPrincipal().getAttribute('email')} + ')'"></strong>
+    </span>
     <a sec:authorize="isAnonymous()" th:href="@{/oauth2/authorization/cognito}">Log in</a>
 </div>

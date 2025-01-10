@@ -39,7 +39,7 @@ public class WorkerMapper {
           case fullTimeEmployee ->
               new FullTimeEmployee(jWorker.getCode(), jWorker.getName(), jWorker.getEmail());
         };
-    cache.put(code, worker);
+    cache.put(code, worker, Worker.class);
 
     executeMissions(jWorker.getMissionExecutions(), worker, cache);
     return worker;

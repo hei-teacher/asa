@@ -1,7 +1,9 @@
 package school.hei.asa.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import static java.util.stream.Collectors.toSet;
+
+import java.util.HashSet;
+import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -17,7 +19,7 @@ public class Mission {
   private final int maxDurationInDays;
   private final Product product;
 
-  private final List<MissionExecution> executions = new ArrayList<>();
+  private final Set<MissionExecution> executions = new HashSet<>();
 
   public void add(MissionExecution me) {
     if (!this.equals(me.mission())) {
@@ -41,8 +43,8 @@ public class Mission {
     return executions.stream().mapToDouble(MissionExecution::dayPercentage).sum();
   }
 
-  public List<Worker> workers() {
-    return executions.stream().map(MissionExecution::worker).toList();
+  public Set<Worker> workers() {
+    return executions.stream().map(MissionExecution::worker).collect(toSet());
   }
 
   public boolean isCare(String careProductCode) {

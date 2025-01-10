@@ -33,20 +33,16 @@ public class MissionExecutionMapper {
   }
 
   /*package-private*/ MissionExecution toDomain(JMissionExecution jme, Cache cache) {
+    var jWorker = jme.getWorker();
     return new MissionExecution(
         missionMapper.toDomain(jme.getMission(), cache),
-        cache.get(Worker.class, jme.getWorker().getCode()),
+        cache.getOrDefault(Worker.class, jWorker.getCode(), workerMapper.toDomain(jWorker, cache)),
         jme.getDate().toLocalDate(),
         jme.getDayPercentage(),
         jme.getComment());
   }
 
   public MissionExecution toDomain(JMissionExecution jme) {
-    return new MissionExecution(
-        missionMapper.toDomain(jme.getMission()),
-        workerMapper.toDomain(jme.getWorker()),
-        jme.getDate().toLocalDate(),
-        jme.getDayPercentage(),
-        jme.getComment());
+    return toDomain(jme, new Cache());
   }
 }

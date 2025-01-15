@@ -14,20 +14,13 @@ public record DailyExecution(Worker worker, LocalDate date, List<MissionExecutio
   }
 
   private void validate(List<MissionExecution> executions) {
-    var percentagesSum = calculateSumExecutionPercentage(executions);
+    var percentagesSum =
+        executions.stream().mapToDouble(MissionExecution::dayPercentage).map(p -> p * 100).sum();
 
-    if ((int) percentagesSum != 100) {
+    if (percentagesSum != 100) {
       throw new IllegalArgumentException(
           "missionPercentages::sum must equal 1, but was: " + percentagesSum);
     }
-  }
-
-  private static double calculateSumExecutionPercentage(List<MissionExecution> executions) {
-    return executions.stream().mapToDouble(MissionExecution::dayPercentage).map(p -> p * 100).sum();
-  }
-
-  public double sumExecutionPercentage() {
-    return calculateSumExecutionPercentage(executions);
   }
 
   public Type type(String careProductCode) {

@@ -10,8 +10,23 @@
 <div th:replace="fragments/header :: header"></div>
 
 <h1 th:text="${thYear.year()} + ' - ' + ${thYear.title()}"></h1>
+
 <div>
-    Color usage
+    <h2>Worker</h2>
+    <form th:action="@{/work-and-care-calendar}" method="get">
+        <label for="worker"></label>
+        <select id="worker" name="workerCode">
+            <option value="">Myself</option>
+            <option th:each="worker : ${workers}"
+                    th:value="${worker.code()}"
+                    th:text="${worker.name()}"/>
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+<div>
+    <h2>Color description</h2>
     <ul th:each="description: ${thYear.colorDescriptions()}">
         <li th:text="${description.getValue()}"
             th:style="'color: ' + ${thYear.hexColor(description.getKey())} + ';'"></li>

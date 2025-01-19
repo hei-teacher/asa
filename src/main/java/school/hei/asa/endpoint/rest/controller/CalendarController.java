@@ -5,12 +5,14 @@ import static java.awt.Color.GREEN;
 import static java.awt.Color.MAGENTA;
 import static java.awt.Color.RED;
 import static java.time.LocalDate.now;
+import static java.util.Comparator.comparing;
 import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
 import static school.hei.asa.model.DailyExecution.Type.mixedWorkAndCare;
 
 import java.awt.*;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -18,9 +20,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import school.hei.asa.endpoint.rest.model.th.ThYear;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Worker;
+import school.hei.asa.repository.WorkerRepository;
 import school.hei.asa.service.CalendarService;
 
 @AllArgsConstructor
@@ -29,15 +33,29 @@ public class CalendarController {
 
   private final CalendarService calendarService;
   private final WorkerFromAuthentication workerFromAuthentication;
+  private final WorkerRepository workerRepository;
 
   @GetMapping("/work-and-care-calendar")
-  public String getCalendar(Model model, Authentication authentication) {
+  public String getCalendar(
+      Model model,
+      Authentication authentication,
+      @RequestParam(required = false) String workerCode) {
     var year = now().getYear();
     model.addAttribute("year", year);
-    var worker = workerFromAuthentication.apply(authentication).get();
+    var worker =
+        workerCode == null || workerCode.isBlank()
+            ? workerFromAuthentication.apply(authentication).get()
+            : workerRepository.findByCode(workerCode);
     model.addAttribute(
         "thYear",
-        new ThYear(year, "Work & Care days", getColoredDates(year, worker), colorDescription()));
+        new ThYear(
+            year,
+            "Work & Care days - " + worker.name(),
+            getColoredDates(year, worker),
+            colorDescription()));
+
+    model.addAttribute("worker", worker);
+    model.addAttribute("workers", workerRepository.findAll().stream().sorted(comparing(Worker::name)));
     return "calendar";
   }
 

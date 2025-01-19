@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
+import school.hei.asa.repository.model.JMission;
 import school.hei.asa.repository.model.JMissionExecution;
+import school.hei.asa.repository.model.JWorker;
 
 @Component
 public class MissionExecutionMapper {
@@ -33,13 +35,28 @@ public class MissionExecutionMapper {
   }
 
   /*package-private*/ MissionExecution toDomain(JMissionExecution jme, Cache cache) {
-    var jWorker = jme.getWorker();
+    var jWorkerCode = jme.getWorker_code();
+    var jMissionCode = jme.getMission_code();
     return new MissionExecution(
-        missionMapper.toDomain(jme.getMission(), cache),
-        cache.getOrDefault(Worker.class, jWorker.getCode(), workerMapper.toDomain(jWorker, cache)),
+        missionMapper.toDomain(
+            cache.getOrDefault(JMission.class, jMissionCode, jme.getMission()), cache),
+        cache.getOrDefault(
+            Worker.class,
+            jWorkerCode,
+            workerMapper.toDomain(
+                cache.getOrDefault(JWorker.class, jWorkerCode, jme.getWorker()), cache)),
         jme.getDate().toLocalDate(),
         jme.getDayPercentage(),
         jme.getComment());
+  }
+
+  public MissionExecution toDomain(
+      JMissionExecution jme, List<JWorker> jWorkers, List<JMission> jMissions) {
+    var cache = new Cache();
+    jWorkers.forEach(jWorker -> cache.put(jWorker.getCode(), JWorker.class));
+    jMissions.forEach(jMission -> cache.put(jMission.getCode(), JMission.class));
+
+    return toDomain(jme, cache);
   }
 
   public MissionExecution toDomain(JMissionExecution jme) {

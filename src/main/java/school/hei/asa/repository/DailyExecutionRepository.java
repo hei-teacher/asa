@@ -3,6 +3,7 @@ package school.hei.asa.repository;
 import static java.util.stream.Collectors.groupingBy;
 
 import jakarta.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,8 @@ import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.jrepository.JMissionExecutionRepository;
+import school.hei.asa.repository.jrepository.JMissionRepository;
+import school.hei.asa.repository.jrepository.JWorkerRepository;
 import school.hei.asa.repository.mapper.MissionExecutionMapper;
 import school.hei.asa.repository.model.JMissionExecution;
 
@@ -19,6 +22,9 @@ import school.hei.asa.repository.model.JMissionExecution;
 public class DailyExecutionRepository {
 
   private final JMissionExecutionRepository jMissionExecutionRepository;
+  private final JWorkerRepository jWorkerRepository;
+  private final JMissionRepository jMissionRepository;
+
   private final MissionExecutionMapper missionExecutionMapper;
   private final MissionExecutionRepository missionExecutionRepository;
 
@@ -33,21 +39,24 @@ public class DailyExecutionRepository {
 
   @Transactional
   public List<DailyExecution> findAll() {
+    var jWorkers = jWorkerRepository.findAll();
+    var jMissions = jMissionRepository.findAll();
     var meListByDate =
         jMissionExecutionRepository.findAll().stream()
-            .map(missionExecutionMapper::toDomain)
+            .map(jme -> missionExecutionMapper.toDomain(jme, jWorkers, jMissions))
             .collect(groupingBy(MissionExecution::date));
     List<DailyExecution> dailyExecutions = new ArrayList<>();
     meListByDate.forEach(
-        (date, meListOfDate) -> {
-          var meByWorker = meListOfDate.stream().collect(groupingBy(MissionExecution::worker));
-          meByWorker.forEach(
-              (worker, meListOfWorker) -> {
-                DailyExecution de = new DailyExecution(worker, date, meListOfWorker);
-                dailyExecutions.add(de);
-              });
-        });
+        (date, meListOfDate) -> addToDailyExecutions(date, meListOfDate, dailyExecutions));
     return dailyExecutions;
+  }
+
+  private static void addToDailyExecutions(
+      LocalDate date, List<MissionExecution> meList, List<DailyExecution> dailyExecutions) {
+    var meByWorker = meList.stream().collect(groupingBy(MissionExecution::worker));
+    meByWorker.forEach(
+        (worker, meListOfWorker) ->
+            dailyExecutions.add(new DailyExecution(worker, date, meListOfWorker)));
   }
 
   @Transactional

@@ -1,5 +1,6 @@
 package school.hei.asa.repository.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -21,9 +22,15 @@ public class JMissionExecution {
   @JoinColumn(name = "mission_code")
   private JMission mission;
 
+  @Column(insertable = false, updatable = false)
+  private String mission_code;
+
   @ManyToOne
   @JoinColumn(name = "worker_code")
   private JWorker worker;
+
+  @Column(insertable = false, updatable = false)
+  private String worker_code;
 
   private double dayPercentage;
 

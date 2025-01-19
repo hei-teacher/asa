@@ -12,7 +12,6 @@ import static school.hei.asa.model.DailyExecution.Type.mixedWorkAndCare;
 
 import java.awt.*;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -55,7 +54,8 @@ public class CalendarController {
             colorDescription()));
 
     model.addAttribute("worker", worker);
-    model.addAttribute("workers", workerRepository.findAll().stream().sorted(comparing(Worker::name)));
+    model.addAttribute(
+        "workers", workerRepository.findAll().stream().sorted(comparing(Worker::name)));
     return "calendar";
   }
 

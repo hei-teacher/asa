@@ -24,10 +24,7 @@ public class CalendarService {
       Worker worker, int year) {
     Map<DailyExecution.Type, List<LocalDate>> res = new HashMap<>();
 
-    var dailyExecutions =
-        dailyExecutionRepository.findAllBy(worker).stream()
-            .filter(me -> me.date().getYear() == year)
-            .toList();
+    var dailyExecutions = dailyExecutionsBy(worker, year);
     Arrays.stream(DailyExecution.Type.values())
         .forEach(
             dailyExecutionType ->
@@ -38,9 +35,15 @@ public class CalendarService {
     return res;
   }
 
+  private List<DailyExecution> dailyExecutionsBy(Worker worker, int year) {
+    return dailyExecutionRepository.findAllBy(worker).stream()
+        .filter(me -> me.date().getYear() == year)
+        .toList();
+  }
+
   private List<LocalDate> filterByDailyExecutionType(
-      List<DailyExecution> dayExecutionsOfTheYear, DailyExecution.Type dailyExecutionType) {
-    return dayExecutionsOfTheYear.stream()
+      List<DailyExecution> dayExecutions, DailyExecution.Type dailyExecutionType) {
+    return dayExecutions.stream()
         .filter(
             dailyExecution ->
                 dailyExecutionType.equals(dailyExecution.type(productConf.careProductCode())))

@@ -1,8 +1,5 @@
 package school.hei.asa.repository.mapper;
 
-import static java.util.stream.Collectors.groupingBy;
-
-import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.asa.model.DailyExecution;
@@ -13,6 +10,10 @@ import school.hei.asa.model.Worker;
 import school.hei.asa.repository.model.JMissionExecution;
 import school.hei.asa.repository.model.JWorker;
 import school.hei.asa.repository.model.WorkerType;
+
+import java.util.List;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @AllArgsConstructor
 @Component
@@ -32,12 +33,9 @@ public class WorkerMapper {
 
     var worker =
         switch (jWorker.getWorkerType()) {
-          case partnerContractor ->
-              new PartnerContractor(jWorker.getCode(), jWorker.getName(), jWorker.getEmail());
-          case studentContractor ->
-              new StudentContractor(jWorker.getCode(), jWorker.getName(), jWorker.getEmail());
-          case fullTimeEmployee ->
-              new FullTimeEmployee(jWorker.getCode(), jWorker.getName(), jWorker.getEmail());
+          case partnerContractor -> new PartnerContractor(jWorker.getCode(), jWorker.getName(), jWorker.getEmail());
+          case studentContractor -> new StudentContractor(jWorker.getCode(), jWorker.getName(), jWorker.getEmail());
+          case fullTimeEmployee -> new FullTimeEmployee(jWorker.getCode(), jWorker.getName(), jWorker.getEmail());
         };
     cache.put(code, worker, Worker.class);
 
@@ -58,12 +56,16 @@ public class WorkerMapper {
                         .toList())));
   }
 
-  public JWorker toEntity(Worker worker, List<JMissionExecution> jMissionExecutions) {
+  JWorker toEntity(Worker worker, List<JMissionExecution> jmeList) {
     var jWorker = new JWorker();
     jWorker.setCode(worker.code());
     jWorker.setName(worker.name());
     jWorker.setWorkerType(WorkerType.type(worker));
-    jWorker.setMissionExecutions(jMissionExecutions);
+    jWorker.setMissionExecutions(jmeList);
     return jWorker;
+  }
+
+  public JWorker toEntity(Worker worker) {
+    return toEntity(worker, List.of());
   }
 }

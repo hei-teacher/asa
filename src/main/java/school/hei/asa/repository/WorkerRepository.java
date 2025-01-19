@@ -28,7 +28,7 @@ public class WorkerRepository {
 
   @Transactional
   public void save(Worker worker) {
-    jWorkerRepository.save(workerMapper.toEntity(worker, List.of()));
+    jWorkerRepository.save(workerMapper.toEntity(worker));
   }
 
   @Transactional

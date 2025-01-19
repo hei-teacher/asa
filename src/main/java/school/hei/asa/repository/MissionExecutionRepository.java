@@ -29,7 +29,7 @@ public class MissionExecutionRepository {
   @Transactional
   public Map<LocalDate, List<MissionExecution>> missionExecutionsBy(Worker worker) {
     var jmeList =
-        jMissionExecutionRepository.findAllByWorker(workerMapper.toEntity(worker, List.of()));
+        jMissionExecutionRepository.findAllByWorker(workerMapper.toEntity(worker));
     var meList = missionExecutionMapper.toDomain(jmeList);
     return meList.stream().collect(groupingBy(MissionExecution::date));
   }

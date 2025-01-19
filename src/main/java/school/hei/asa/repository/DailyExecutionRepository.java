@@ -41,10 +41,9 @@ public class DailyExecutionRepository {
   public List<DailyExecution> findAll() {
     var jWorkers = jWorkerRepository.findAll();
     var jMissions = jMissionRepository.findAll();
-    var meListByDate =
-        jMissionExecutionRepository.findAll().stream()
-            .map(jme -> missionExecutionMapper.toDomain(jme, jWorkers, jMissions))
-            .collect(groupingBy(MissionExecution::date));
+    var jmeList = jMissionExecutionRepository.findAll();
+    var meList = missionExecutionMapper.toDomain(jmeList, jWorkers, jMissions);
+    var meListByDate = meList.stream().collect(groupingBy(MissionExecution::date));
     List<DailyExecution> dailyExecutions = new ArrayList<>();
     meListByDate.forEach(
         (date, meListOfDate) -> addToDailyExecutions(date, meListOfDate, dailyExecutions));

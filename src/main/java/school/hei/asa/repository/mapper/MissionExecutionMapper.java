@@ -50,16 +50,21 @@ public class MissionExecutionMapper {
         jme.getComment());
   }
 
-  public MissionExecution toDomain(
-      JMissionExecution jme, List<JWorker> jWorkers, List<JMission> jMissions) {
+  public List<MissionExecution> toDomain(
+      List<JMissionExecution> jmeList, List<JWorker> jWorkers, List<JMission> jMissions) {
     var cache = new Cache();
     jWorkers.forEach(jWorker -> cache.put(jWorker.getCode(), JWorker.class));
     jMissions.forEach(jMission -> cache.put(jMission.getCode(), JMission.class));
 
-    return toDomain(jme, cache);
+    return toDomain(jmeList, cache);
   }
 
-  public MissionExecution toDomain(JMissionExecution jme) {
-    return toDomain(jme, new Cache());
+  public List<MissionExecution> toDomain(List<JMissionExecution> jmeList) {
+    return jmeList.stream().map(jme -> toDomain(jme, new Cache())).toList();
+  }
+
+  /*package-private*/ List<MissionExecution> toDomain(
+      List<JMissionExecution> jmeList, Cache cache) {
+    return jmeList.stream().map(jme -> toDomain(jme, cache)).toList();
   }
 }

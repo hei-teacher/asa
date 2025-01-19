@@ -8,6 +8,7 @@ import jakarta.persistence.Table;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Table(name = "product")
@@ -20,5 +21,6 @@ public class JProduct {
 
   @OneToMany
   @JoinColumn(name = "product_code")
+  @BatchSize(size = 200)
   private List<JMission> missions;
 }

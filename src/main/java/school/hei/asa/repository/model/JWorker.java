@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Table(name = "worker")
@@ -26,5 +27,6 @@ public class JWorker {
 
   @OneToMany
   @JoinColumn(name = "worker_code")
+  @BatchSize(size = 200)
   private List<JMissionExecution> missionExecutions;
 }

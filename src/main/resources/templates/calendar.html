@@ -26,6 +26,7 @@
 <div class="calendar">
     <div class="month" th:each="month : ${thYear.months()}">
         <h2 th:text="${month.yearMonth().month}"></h2>
+
         <table>
             <thead>
             <tr>
@@ -49,8 +50,12 @@
             </tr>
             </tbody>
         </table>
+
+        <p th:text="'Work days: ' + ${workDaysByMonth[month.yearMonth()]}"
+           style="margin-top: 10px; font-weight: bold;"></p>
     </div>
 </div>
+
 
 </body>
 </html>

@@ -53,19 +53,29 @@ public class WorkerCalendar {
         .toList();
   }
 
-  private boolean isPaidCareDay(DailyExecution dailyExecution) {
-    return dailyExecution.type(productConf.careProductCode()) == DailyExecution.Type.fullCare & dailyExecution.executions().stream()
-            .anyMatch(missionExecution -> Objects.equals(missionExecution.mission().code(), productConf.paidCareProductCode()));
-  }
-
-  private Map<Month, Integer> paidWorkDaysByMonth() {
+  public Map<Month, Integer> paidWorkDaysByMonth() {
     return dailyExecutions.stream()
+            .filter(this::isPaidDay)
             .collect(Collectors.groupingBy(
                     dailyExecution -> dailyExecution.date().getMonth(),
-                    Collectors.summingInt(dailyExecution ->
-                            dailyExecution.type(productConf.careProductCode()) == DailyExecution.Type.fullWork ||
-                                    isPaidCareDay(dailyExecution) ? 1 : 0
-                    )
+                    Collectors.summingInt(dailyExecution -> 1)
             ));
   }
+
+  private boolean isPaidDay(DailyExecution dailyExecution) {
+    var type = dailyExecution.type(productConf.careProductCode());
+    return type == DailyExecution.Type.fullWork ||
+            type == DailyExecution.Type.fullCare &&
+                    hasPaidCare(dailyExecution);
+  }
+
+  private boolean hasPaidCare(DailyExecution dailyExecution) {
+    return dailyExecution.executions().stream()
+            .anyMatch(execution ->
+                    execution.mission().type(
+                            productConf.careProductCode(),
+                            productConf.paidCareProductCode()) == Mission.Type.paidCare
+            );
+  }
+
 }

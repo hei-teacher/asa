@@ -51,7 +51,7 @@
             </tbody>
         </table>
 
-        <p th:text="'Work days: ' + ${workDaysByMonth[month.yearMonth()]}"
+        <p th:text="'Paid work days: ' + (${paidWorkDaysByMonth.containsKey(month.yearMonth().month) ? paidWorkDaysByMonth[month.yearMonth().month] : 0})"
            style="margin-top: 10px; font-weight: bold;"></p>
     </div>
 </div>

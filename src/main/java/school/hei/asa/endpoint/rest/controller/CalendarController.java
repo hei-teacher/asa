@@ -34,24 +34,28 @@ public class CalendarController {
 
   @GetMapping("/work-and-care-calendar")
   public String getCalendar(
-      Model model,
-      Authentication authentication,
-      @RequestParam(required = false) String workerCode) {
+          Model model,
+          Authentication authentication,
+          @RequestParam(required = false) String workerCode) {
     var year = now().getYear();
     model.addAttribute("year", year);
 
     var workerCodeOrAuth =
-        workerCode == null || workerCode.isBlank()
-            ? workerFromAuthentication.apply(authentication).get().code()
-            : workerCode;
+            workerCode == null || workerCode.isBlank()
+                    ? workerFromAuthentication.apply(authentication).get().code()
+                    : workerCode;
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
+
+    var paidWorkDaysByMonth = calendarService.paidWorkDaysByMonth(worker, year);
+    model.addAttribute("paidWorkDaysByMonth", paidWorkDaysByMonth);
+
     model.addAttribute(
-        "thYear",
-        new ThYear(
-            year,
-            "Work & Care days - " + worker.name(),
-            getColoredDates(year, worker),
-            colorDescription()));
+            "thYear",
+            new ThYear(
+                    year,
+                    "Work & Care days - " + worker.name(),
+                    getColoredDates(year, worker),
+                    colorDescription()));
 
     return "calendar";
   }

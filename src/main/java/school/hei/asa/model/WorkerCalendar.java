@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
@@ -55,27 +54,26 @@ public class WorkerCalendar {
 
   public Map<Month, Integer> paidWorkDaysByMonth() {
     return dailyExecutions.stream()
-            .filter(this::isPaidDay)
-            .collect(Collectors.groupingBy(
-                    dailyExecution -> dailyExecution.date().getMonth(),
-                    Collectors.summingInt(dailyExecution -> 1)
-            ));
+        .filter(this::isPaidDay)
+        .collect(
+            Collectors.groupingBy(
+                dailyExecution -> dailyExecution.date().getMonth(),
+                Collectors.summingInt(dailyExecution -> 1)));
   }
 
   private boolean isPaidDay(DailyExecution dailyExecution) {
     var type = dailyExecution.type(productConf.careProductCode());
-    return type == DailyExecution.Type.fullWork ||
-            type == DailyExecution.Type.fullCare &&
-                    hasPaidCare(dailyExecution);
+    return type == DailyExecution.Type.fullWork
+        || type == DailyExecution.Type.fullCare && hasPaidCare(dailyExecution);
   }
 
   private boolean hasPaidCare(DailyExecution dailyExecution) {
     return dailyExecution.executions().stream()
-            .anyMatch(execution ->
-                    execution.mission().type(
-                            productConf.careProductCode(),
-                            productConf.paidCareMissionCode()) == Mission.Type.paidCare
-            );
+        .anyMatch(
+            execution ->
+                execution
+                        .mission()
+                        .type(productConf.careProductCode(), productConf.paidCareMissionCode())
+                    == Mission.Type.paidCare);
   }
-
 }

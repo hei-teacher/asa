@@ -24,15 +24,20 @@ public class CalendarService {
   public Map<DailyExecution.Type, List<LocalDate>> datesByDailyExecutionType(
       Worker worker, int year) {
     return new WorkerCalendar(
-            worker, year, new school.hei.asa.model.ProductConf(careProductCodeSupplier.get(), paidCareMissionCodeSupplier.get()))
+            worker,
+            year,
+            new school.hei.asa.model.ProductConf(
+                careProductCodeSupplier.get(), paidCareMissionCodeSupplier.get()))
         .datesByDailyExecutionType();
   }
 
   @Transactional
-  public  Map<Month, Integer> paidWorkDaysByMonth(
-          Worker worker, int year) {
+  public Map<Month, Integer> paidWorkDaysByMonth(Worker worker, int year) {
     return new WorkerCalendar(
-            worker, year, new school.hei.asa.model.ProductConf(careProductCodeSupplier.get(), paidCareMissionCodeSupplier.get()))
-            .paidWorkDaysByMonth();
+            worker,
+            year,
+            new school.hei.asa.model.ProductConf(
+                careProductCodeSupplier.get(), paidCareMissionCodeSupplier.get()))
+        .paidWorkDaysByMonth();
   }
 }

@@ -33,18 +33,23 @@ public class ThYear {
       int year,
       String title,
       Map<LocalDate, Color> coloredDates,
-      Map<Color, String> colorDescriptions) {
+      Map<Color, String> colorDescriptions,
+      Map<Month, String> paidWorkDaysByMonth) {
     this.year = year;
     this.title = title;
-    this.thMonths = thMonths(year);
+    this.thMonths = thMonths(year, paidWorkDaysByMonth);
     this.coloredDates = coloredDates;
     this.colorDescriptions = colorDescriptions;
   }
 
-  private static Map<Month, ThMonth> thMonths(int year) {
+  private static Map<Month, ThMonth> thMonths(int year, Map<Month, String> paidWorkDaysByMonth) {
     Map<Month, ThMonth> res = new LinkedHashMap<>();
     for (int month = 1; month <= 12; month++) {
-      res.put(Month.of(month), new ThMonth(YearMonth.of(year, month)));
+      ThMonth thMonth = new ThMonth(YearMonth.of(year, month));
+      if (paidWorkDaysByMonth.containsKey(Month.of(month))) {
+        thMonth.setPaidDays(paidWorkDaysByMonth.get(Month.of(month)));
+      }
+      res.put(Month.of(month), thMonth);
     }
     return res;
   }

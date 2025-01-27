@@ -7,7 +7,6 @@ import static school.hei.asa.model.Mission.Type.work;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;

@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,35 +48,33 @@ public class MissionController {
 
   @GetMapping("/mission-executions")
   public String getMissionExecutions(
-          Model model,
-          @RequestParam(required = false) String workerCode,
-          @RequestParam(required = false) String month) {
+      Model model,
+      @RequestParam(required = false) String workerCode,
+      @RequestParam(required = false) String month) {
 
-    YearMonth currentMonth = (month == null || month.isBlank())
-            ? YearMonth.now()
-            : YearMonth.parse(month);
+    YearMonth currentMonth =
+        (month == null || month.isBlank()) ? YearMonth.now() : YearMonth.parse(month);
 
-    var dailyExecutionsByDate = dailyExecutionsByDate(workerCode)
-            .entrySet()
-            .stream()
+    var dailyExecutionsByDate =
+        dailyExecutionsByDate(workerCode).entrySet().stream()
             .filter(entry -> YearMonth.from(entry.getKey()).equals(currentMonth))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     var thDailyExecutions = new ArrayList<ThDailyExecution>();
     dailyExecutionsByDate.forEach(
-            (date, deList) -> thDailyExecutions.add(thDailyExecutionMapper.toTh(date, deList)));
+        (date, deList) -> thDailyExecutions.add(thDailyExecutionMapper.toTh(date, deList)));
 
-    model.addAttribute("dailyExecutions",
-            thDailyExecutions.stream()
-                    .sorted(Comparator.comparing(ThDailyExecution::date).reversed())
-                    .toList());
+    model.addAttribute(
+        "dailyExecutions",
+        thDailyExecutions.stream()
+            .sorted(Comparator.comparing(ThDailyExecution::date).reversed())
+            .toList());
     model.addAttribute("careProductCode", careProductCodeSupplier.get());
     model.addAttribute("currentMonth", currentMonth.toString());
     workerToModelAdder.apply(workerCode, model);
 
     return "mission-executions";
   }
-
 
   private Map<LocalDate, List<DailyExecution>> dailyExecutionsByDate(String workerCode) {
     List<DailyExecution> allDailyExecutions = dailyExecutionRepository.findAll();

@@ -8,15 +8,15 @@ import java.util.function.Supplier;
 
 @Accessors(fluent = true)
 @Configuration
-public class PaidCareProductCodeSupplier implements Supplier<String> {
-  private final String paidCareProductCode;
+public class PaidCareMissionCodeSupplier implements Supplier<String> {
+  private final String paidCareMissionCode;
 
-  public PaidCareProductCodeSupplier(@Value("${asa.paid.care.mission.code}") String paidCareProductCode) {
-    this.paidCareProductCode = paidCareProductCode;
+  public PaidCareMissionCodeSupplier(@Value("${asa.paid.care.mission.code}") String paidCareMissionCode) {
+    this.paidCareMissionCode = paidCareMissionCode;
   }
 
   @Override
   public String get() {
-    return paidCareProductCode;
+    return paidCareMissionCode;
   }
 }

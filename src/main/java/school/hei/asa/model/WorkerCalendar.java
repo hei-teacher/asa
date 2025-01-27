@@ -74,7 +74,7 @@ public class WorkerCalendar {
             .anyMatch(execution ->
                     execution.mission().type(
                             productConf.careProductCode(),
-                            productConf.paidCareProductCode()) == Mission.Type.paidCare
+                            productConf.paidCareMissionCode()) == Mission.Type.paidCare
             );
   }
 

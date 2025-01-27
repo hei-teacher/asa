@@ -8,7 +8,7 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.asa.CareProductCodeSupplier;
-import school.hei.asa.PaidCareProductCodeSupplier;
+import school.hei.asa.PaidCareMissionCodeSupplier;
 import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.WorkerCalendar;
@@ -18,13 +18,13 @@ import school.hei.asa.model.WorkerCalendar;
 public class CalendarService {
 
   private final CareProductCodeSupplier careProductCodeSupplier;
-  private final PaidCareProductCodeSupplier paidCareProductCodeSupplier;
+  private final PaidCareMissionCodeSupplier paidCareMissionCodeSupplier;
 
   @Transactional
   public Map<DailyExecution.Type, List<LocalDate>> datesByDailyExecutionType(
       Worker worker, int year) {
     return new WorkerCalendar(
-            worker, year, new school.hei.asa.model.ProductConf(careProductCodeSupplier.get(), paidCareProductCodeSupplier.get()))
+            worker, year, new school.hei.asa.model.ProductConf(careProductCodeSupplier.get(), paidCareMissionCodeSupplier.get()))
         .datesByDailyExecutionType();
   }
 
@@ -32,7 +32,7 @@ public class CalendarService {
   public  Map<Month, Integer> paidWorkDaysByMonth(
           Worker worker, int year) {
     return new WorkerCalendar(
-            worker, year, new school.hei.asa.model.ProductConf(careProductCodeSupplier.get(), paidCareProductCodeSupplier.get()))
+            worker, year, new school.hei.asa.model.ProductConf(careProductCodeSupplier.get(), paidCareMissionCodeSupplier.get()))
             .paidWorkDaysByMonth();
   }
 }

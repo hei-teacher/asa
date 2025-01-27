@@ -3,10 +3,10 @@ package school.hei.asa.model;
 import static java.util.stream.Collectors.toList;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Month;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
@@ -51,5 +51,21 @@ public class WorkerCalendar {
                 dailyExecutionType.equals(dailyExecution.type(productConf.careProductCode())))
         .map(DailyExecution::date)
         .toList();
+  }
+
+  private boolean isPaidCareDay(DailyExecution dailyExecution) {
+    return dailyExecution.type(productConf.careProductCode()) == DailyExecution.Type.fullCare & dailyExecution.executions().stream()
+            .anyMatch(missionExecution -> Objects.equals(missionExecution.mission().code(), productConf.paidCareProductCode()));
+  }
+
+  private Map<Month, Integer> paidWorkDaysByMonth() {
+    return dailyExecutions.stream()
+            .collect(Collectors.groupingBy(
+                    dailyExecution -> dailyExecution.date().getMonth(),
+                    Collectors.summingInt(dailyExecution ->
+                            dailyExecution.type(productConf.careProductCode()) == DailyExecution.Type.fullWork ||
+                                    isPaidCareDay(dailyExecution) ? 1 : 0
+                    )
+            ));
   }
 }

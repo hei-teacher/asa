@@ -1,11 +1,53 @@
 <div th:fragment="header" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-    <span sec:authorize="isAuthenticated()">
-        <a href="/missions">Mission Explorer</a>
-        <a href="/work-and-care-calendar">Work & Care Calendar</a>
-        <a href="/daily-execution">Daily Execution</a>
-        <a href="/mission-executions">Missions Executions</a>
-        <a th:href="@{/logout}">Log out</a>
-        <strong th:text="'(' + ${#authentication.getPrincipal().getAttribute('email')} + ')'"></strong>
-    </span>
-    <a sec:authorize="isAnonymous()" th:href="@{/oauth2/authorization/cognito}">Log in</a>
+    <div sec:authorize="isAuthenticated()" class="bg-[#16163F] p-4 flex items-center gap-6">
+        <a href="/missions" class="text-white font-medium hover:text-gray-300 transition">Mission Explorer</a>
+        <a href="/work-and-care-calendar" class="text-white font-medium hover:text-gray-300 transition">Work & Care
+            Calendar</a>
+        <a href="/daily-execution" class="text-white font-medium hover:text-gray-300 transition">Daily Execution</a>
+        <a href="/mission-executions" class="text-white font-medium hover:text-gray-300 transition">Missions
+            Executions</a>
+
+        <div class="ml-auto flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="w-5 h-5 text-white">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <strong class="text-white text-sm"
+                    th:text="'(' + ${#authentication.getPrincipal().getAttribute('email')} + ')'"></strong>
+
+            <button
+                    class="flex items-center gap-2 bg-red-600 text-white font-medium py-2 px-4 rounded-lg shadow-md hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition duration-200">
+                <a th:href="@{/logout}">Log out</a>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M17 16l4-4m0 0l-4-4m4 4H7M9 4h6a2 2 0 012 2v12a2 2 0 01-2 2H9a2 2 0 01-2-2V6a2 2 0 012-2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+
+    <div sec:authorize="isAnonymous()" class="bg-[#16163F] p-4 flex items-center gap-6">
+        <div class="flex items-center gap-4 px-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="w-6 h-6 text-white">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M6.75 7.5V6a2.25 2.25 0 012.25-2.25h6a2.25 2.25 0 012.25 2.25v1.5m-10.5 0h10.5m-13.5 0h16.5a1.5 1.5 0 011.5 1.5v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V9a1.5 1.5 0 011.5-1.5zm3 3.75h10.5m-10.5 3.75h10.5" />
+            </svg>
+            <h1 class="text-white font-medium text-lg">Asa - Work Management Tool</h1>
+        </div>
+        <div class="ml-auto flex items-center gap-2">
+            <button
+                    class="flex items-center gap-2 bg-[#9933CC] text-white font-medium py-2 px-4 rounded-lg shadow-md hover:bg-[#7A29A5] focus:ring-4 focus:ring-red-300 transition duration-200">
+                <a sec:authorize="isAnonymous()" th:href="@{/oauth2/authorization/cognito}">Log in</a>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M15 12H3m0 0l4-4m-4 4l4 4m9-4h6a2 2 0 012 2v12a2 2 0 01-2 2h-6a2 2 0 01-2-2V6a2 2 0 012-2h6a2 2 0 012 2V10"/>
+                </svg>
+            </button>
+        </div>
+    </div>
 </div>

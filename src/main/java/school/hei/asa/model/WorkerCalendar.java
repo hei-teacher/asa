@@ -52,19 +52,27 @@ public class WorkerCalendar {
         .toList();
   }
 
-  public Map<Month, Integer> paidWorkDaysByMonth() {
+  public Map<Month, Map<Mission.Type, Integer>> countMissionTypeByMonth() {
     return dailyExecutions.stream()
-        .filter(this::isPaidDay)
-        .collect(
-            Collectors.groupingBy(
-                dailyExecution -> dailyExecution.date().getMonth(),
-                Collectors.summingInt(dailyExecution -> 1)));
+            .collect(
+                    Collectors.groupingBy(
+                            dailyExecution -> dailyExecution.date().getMonth(),
+                            Collectors.groupingBy(
+                                    this::determineMissionType,
+                                    Collectors.summingInt(dailyExecution -> 1)
+                            )
+                    )
+            );
   }
 
-  private boolean isPaidDay(DailyExecution dailyExecution) {
+  private Mission.Type determineMissionType(DailyExecution dailyExecution) {
     var type = dailyExecution.type(productConf.careProductCode());
-    return type == DailyExecution.Type.fullWork
-        || type == DailyExecution.Type.fullCare && hasPaidCare(dailyExecution);
+    if (type == DailyExecution.Type.fullWork) {
+      return Mission.Type.work;
+    } else if (type == DailyExecution.Type.fullCare && hasPaidCare(dailyExecution)) {
+      return Mission.Type.paidCare;
+    }
+    return Mission.Type.unpaidCare;
   }
 
   private boolean hasPaidCare(DailyExecution dailyExecution) {

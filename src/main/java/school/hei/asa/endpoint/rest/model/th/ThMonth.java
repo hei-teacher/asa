@@ -22,7 +22,9 @@ public class ThMonth {
   @Getter
   private final YearMonth yearMonth;
 
-  @Setter @Getter private String paidDays;
+  @Getter
+  @Setter
+  private String description;
 
   private final Map<Integer, List<Integer>> daysByWeek;
   public static final int FILLER_DAY = -1;
@@ -30,7 +32,7 @@ public class ThMonth {
   public ThMonth(YearMonth yearMonth) {
     this.yearMonth = yearMonth;
     this.daysByWeek = daysByWeek(yearMonth);
-    this.paidDays = "0";
+    this.description = "";
   }
 
   public List<Integer> weeks() {

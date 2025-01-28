@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.PaidCareMissionCodeSupplier;
 import school.hei.asa.model.DailyExecution;
+import school.hei.asa.model.Mission;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.WorkerCalendar;
 
@@ -32,12 +33,12 @@ public class CalendarService {
   }
 
   @Transactional
-  public Map<Month, Integer> paidWorkDaysByMonth(Worker worker, int year) {
+  public Map<Month, Map<Mission.Type, Integer>> paidWorkDaysByMonth(Worker worker, int year) {
     return new WorkerCalendar(
             worker,
             year,
             new school.hei.asa.model.ProductConf(
                 careProductCodeSupplier.get(), paidCareMissionCodeSupplier.get()))
-        .paidWorkDaysByMonth();
+        .countMissionTypeByMonth();
   }
 }

@@ -14,6 +14,8 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -35,31 +37,38 @@ public class CalendarController {
 
   @GetMapping("/work-and-care-calendar")
   public String getCalendar(
-      Model model,
-      Authentication authentication,
-      @RequestParam(required = false) String workerCode) {
+          Model model,
+          Authentication authentication,
+          @RequestParam(required = false) String workerCode) {
     var year = now().getYear();
     model.addAttribute("year", year);
 
     var workerCodeOrAuth =
-        workerCode == null || workerCode.isBlank()
-            ? workerFromAuthentication.apply(authentication).get().code()
-            : workerCode;
+            workerCode == null || workerCode.isBlank()
+                    ? workerFromAuthentication.apply(authentication).get().code()
+                    : workerCode;
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
 
-    var paidWorkDaysByMonth = calendarService.paidWorkDaysByMonth(worker, year);
+    var missionTypeByMonth = calendarService.paidWorkDaysByMonth(worker, year);
 
-    Map<Month, String> paidDaysMap = new HashMap<>();
-    paidWorkDaysByMonth.forEach((month, days) -> paidDaysMap.put(month, String.valueOf(days)));
+    Map<Month, Map<String, Integer>> missionCounts = new HashMap<>();
+    missionTypeByMonth.forEach((month, counts) -> {
+      Map<String, Integer> typeCounts = counts.entrySet().stream()
+              .collect(Collectors.toMap(
+                      entry -> entry.getKey().name(),
+                      Map.Entry::getValue
+              ));
+      missionCounts.put(month, typeCounts);
+    });
 
     model.addAttribute(
-        "thYear",
-        new ThYear(
-            year,
-            "Work & Care days - " + worker.name(),
-            getColoredDates(year, worker),
-            colorDescription(),
-            paidDaysMap));
+            "thYear",
+            new ThYear(
+                    year,
+                    "Work & Care days - " + worker.name(),
+                    getColoredDates(year, worker),
+                    colorDescription(),
+                    missionCounts));
 
     return "calendar";
   }

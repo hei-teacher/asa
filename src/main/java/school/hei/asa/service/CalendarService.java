@@ -39,6 +39,6 @@ public class CalendarService {
             year,
             new school.hei.asa.model.ProductConf(
                 careProductCodeSupplier.get(), paidCareMissionCodeSupplier.get()))
-        .countMissionTypeByMonth()  ;
+        .countMissionTypeByMonth();
   }
 }

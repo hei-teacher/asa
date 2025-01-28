@@ -47,7 +47,7 @@ public class Mission {
     if (isNotCare) {
       return work;
     } else {
-      if(isPaidCare(paidCareProductCode)) {
+      if (isPaidCare(paidCareProductCode)) {
         return paidCare;
       }
       return unpaidCare;

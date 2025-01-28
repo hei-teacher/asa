@@ -21,14 +21,11 @@ public class ThMonth {
   @Getter
   private final YearMonth yearMonth;
 
-  @Getter
-  private String unpaidCareDays;
+  @Getter private String unpaidCareDays;
 
-  @Getter
-  private String paidCareDays;
+  @Getter private String paidCareDays;
 
-  @Getter
-  private String workDays;
+  @Getter private String workDays;
 
   private final Map<Integer, List<Integer>> daysByWeek;
   public static final int FILLER_DAY = -1;

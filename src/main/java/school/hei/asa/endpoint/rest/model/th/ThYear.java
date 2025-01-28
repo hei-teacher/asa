@@ -10,7 +10,6 @@ import java.time.YearMonth;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
@@ -31,11 +30,11 @@ public class ThYear {
   private final Map<Color, String> colorDescriptions;
 
   public ThYear(
-          int year,
-          String title,
-          Map<LocalDate, Color> coloredDates,
-          Map<Color, String> colorDescriptions,
-          Map<Month, Map<String, Integer>> missionCounts) {
+      int year,
+      String title,
+      Map<LocalDate, Color> coloredDates,
+      Map<Color, String> colorDescriptions,
+      Map<Month, Map<String, Integer>> missionCounts) {
     this.year = year;
     this.title = title;
     this.thMonths = thMonths(year, missionCounts);
@@ -43,7 +42,8 @@ public class ThYear {
     this.colorDescriptions = colorDescriptions;
   }
 
-  private static Map<Month, ThMonth> thMonths(int year, Map<Month, Map<String, Integer>> missionCounts) {
+  private static Map<Month, ThMonth> thMonths(
+      int year, Map<Month, Map<String, Integer>> missionCounts) {
     Map<Month, ThMonth> res = new LinkedHashMap<>();
     for (int month = 1; month <= 12; month++) {
       Month currentMonth = Month.of(month);
@@ -66,10 +66,10 @@ public class ThYear {
   public String hexColor(ThMonth thMonth, int day) {
     var yearMonth = thMonth.yearMonth();
     var color =
-            thMonth.isFillerDay(day)
-                    ? WHITE
-                    : coloredDates.getOrDefault(
-                    LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), day), WHITE);
+        thMonth.isFillerDay(day)
+            ? WHITE
+            : coloredDates.getOrDefault(
+                LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), day), WHITE);
     return hexColor(color);
   }
 
@@ -77,4 +77,3 @@ public class ThYear {
     return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
   }
 }
-

@@ -55,24 +55,22 @@ public class WorkerCalendar {
 
   public Map<Month, Map<Mission.Type, Integer>> countMissionTypeByMonth() {
     return dailyExecutions.stream()
-            .collect(
-                    Collectors.groupingBy(
-                            dailyExecution -> dailyExecution.date().getMonth(),
-                            Collectors.groupingBy(
-                                    this::determineMissionType,
-                                    summingInt(dailyExecution -> 1)
-                            )
-                    )
-            );
+        .collect(
+            Collectors.groupingBy(
+                dailyExecution -> dailyExecution.date().getMonth(),
+                Collectors.groupingBy(
+                    this::determineMissionType, summingInt(dailyExecution -> 1))));
   }
 
   private Mission.Type determineMissionType(DailyExecution dailyExecution) {
     var dailyExecutionType = dailyExecution.type(productConf.careProductCode());
     if (DailyExecution.Type.fullWork.equals(dailyExecutionType)) {
       return Mission.Type.work;
-    } else if (DailyExecution.Type.fullCare.equals(dailyExecutionType) && hasPaidCare(dailyExecution)) {
+    } else if (DailyExecution.Type.fullCare.equals(dailyExecutionType)
+        && hasPaidCare(dailyExecution)) {
       return Mission.Type.paidCare;
-    } else if (DailyExecution.Type.mixedWorkAndCare.equals(dailyExecutionType) && hasPaidCare(dailyExecution)) {
+    } else if (DailyExecution.Type.mixedWorkAndCare.equals(dailyExecutionType)
+        && hasPaidCare(dailyExecution)) {
       return Mission.Type.paidCare;
     }
     return Mission.Type.unpaidCare;
@@ -82,8 +80,9 @@ public class WorkerCalendar {
     return dailyExecution.executions().stream()
         .anyMatch(
             execution ->
-                    Mission.Type.paidCare.equals(execution
-                            .mission()
-                            .type(productConf.careProductCode(), productConf.paidCareMissionCode())));
+                Mission.Type.paidCare.equals(
+                    execution
+                        .mission()
+                        .type(productConf.careProductCode(), productConf.paidCareMissionCode())));
   }
 }

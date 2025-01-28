@@ -66,10 +66,10 @@ public class WorkerCalendar {
   }
 
   private Mission.Type determineMissionType(DailyExecution dailyExecution) {
-    var type = dailyExecution.type(productConf.careProductCode());
-    if (type == DailyExecution.Type.fullWork) {
+    var dailyExecutionType = dailyExecution.type(productConf.careProductCode());
+    if (DailyExecution.Type.fullWork.equals(dailyExecutionType)) {
       return Mission.Type.work;
-    } else if (type == DailyExecution.Type.fullCare && hasPaidCare(dailyExecution)) {
+    } else if (DailyExecution.Type.fullCare.equals(dailyExecutionType) && hasPaidCare(dailyExecution)) {
       return Mission.Type.paidCare;
     }
     return Mission.Type.unpaidCare;
@@ -79,9 +79,8 @@ public class WorkerCalendar {
     return dailyExecution.executions().stream()
         .anyMatch(
             execution ->
-                execution
-                        .mission()
-                        .type(productConf.careProductCode(), productConf.paidCareMissionCode())
-                    == Mission.Type.paidCare);
+                    Mission.Type.paidCare.equals(execution
+                            .mission()
+                            .type(productConf.careProductCode(), productConf.paidCareMissionCode())));
   }
 }

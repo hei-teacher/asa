@@ -12,7 +12,6 @@ import java.util.Locale;
 import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @EqualsAndHashCode
@@ -23,8 +22,13 @@ public class ThMonth {
   private final YearMonth yearMonth;
 
   @Getter
-  @Setter
-  private String description;
+  private String unpaidCareDays;
+
+  @Getter
+  private String paidCareDays;
+
+  @Getter
+  private String workDays;
 
   private final Map<Integer, List<Integer>> daysByWeek;
   public static final int FILLER_DAY = -1;
@@ -32,7 +36,17 @@ public class ThMonth {
   public ThMonth(YearMonth yearMonth) {
     this.yearMonth = yearMonth;
     this.daysByWeek = daysByWeek(yearMonth);
-    this.description = "";
+    this.unpaidCareDays = "";
+    this.paidCareDays = "";
+    this.workDays = "";
+  }
+
+  public ThMonth(YearMonth yearMonth, String unpaidCareDays, String paidCareDays, String workDays) {
+    this.yearMonth = yearMonth;
+    this.daysByWeek = daysByWeek(yearMonth);
+    this.unpaidCareDays = unpaidCareDays;
+    this.paidCareDays = paidCareDays;
+    this.workDays = workDays;
   }
 
   public List<Integer> weeks() {

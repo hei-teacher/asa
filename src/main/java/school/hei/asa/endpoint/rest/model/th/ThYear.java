@@ -10,7 +10,6 @@ import java.time.YearMonth;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -39,43 +38,26 @@ public class ThYear {
           Map<Month, Map<String, Integer>> missionCounts) {
     this.year = year;
     this.title = title;
-    this.thMonths = thMonths(year, mapMissionCountsToDescriptions(missionCounts));
+    this.thMonths = thMonths(year, missionCounts);
     this.coloredDates = coloredDates;
     this.colorDescriptions = colorDescriptions;
   }
 
-  private static Map<Month, ThMonth> thMonths(int year, Map<Month, String> descriptions) {
+  private static Map<Month, ThMonth> thMonths(int year, Map<Month, Map<String, Integer>> missionCounts) {
     Map<Month, ThMonth> res = new LinkedHashMap<>();
     for (int month = 1; month <= 12; month++) {
-      ThMonth thMonth = new ThMonth(YearMonth.of(year, month));
-      if (descriptions.containsKey(Month.of(month))) {
-        thMonth.setDescription(descriptions.get(Month.of(month)));
-      }
-      res.put(Month.of(month), thMonth);
+      Month currentMonth = Month.of(month);
+      YearMonth yearMonth = YearMonth.of(year, month);
+      Map<String, Integer> counts = missionCounts.getOrDefault(currentMonth, Map.of());
+
+      String unpaidCareDays = String.valueOf(counts.getOrDefault("unpaidCare", 0));
+      String paidCareDays = String.valueOf(counts.getOrDefault("paidCare", 0));
+      String workDays = String.valueOf(counts.getOrDefault("work", 0));
+
+      res.put(currentMonth, new ThMonth(yearMonth, unpaidCareDays, paidCareDays, workDays));
     }
     return res;
   }
-
-  private static Map<Month, String> mapMissionCountsToDescriptions(
-          Map<Month, Map<String, Integer>> missionCounts) {
-    Map<Month, String> descriptions = new LinkedHashMap<>();
-
-    Map<String, String> missionTypeMapping = Map.of(
-            "unpaidCare", "UnpaidCareDays",
-            "work", "WorkDays",
-            "paidCare", "PaidCareDays"
-    );
-
-    missionCounts.forEach((month, counts) -> {
-      String description = counts.entrySet().stream()
-              .map(entry -> missionTypeMapping.getOrDefault(entry.getKey(), entry.getKey()) + ": " + entry.getValue())
-              .collect(Collectors.joining(", "));
-      descriptions.put(month, description);
-    });
-
-    return descriptions;
-  }
-
 
   public List<ThMonth> months() {
     return thMonths.values().stream().sorted(comparing(ThMonth::yearMonth)).toList();

@@ -43,14 +43,14 @@ public class Mission {
   }
 
   public Type type(String careProductCode, String paidCareProductCode) {
-
-    if (isCare(careProductCode) && isPaidCare(paidCareProductCode)) {
-      return paidCare;
-    }
-    if (isCare(careProductCode) && !isPaidCare(paidCareProductCode)) {
+    var isNotCare = isCare(careProductCode);
+    if (isNotCare) return work;
+    else {
+      if(isPaidCare(paidCareProductCode)) {
+        return paidCare;
+      }
       return unpaidCare;
     }
-    return work;
   }
 
   public enum Type {
@@ -71,7 +71,7 @@ public class Mission {
     return product().isCare(careProductCode);
   }
 
-  public boolean isPaidCare(String missionCode) {
-    return code.equals(missionCode);
+  public boolean isPaidCare(String paidCareMissionCode) {
+    return code.equals(paidCareMissionCode);
   }
 }

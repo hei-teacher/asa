@@ -51,10 +51,11 @@
             </tbody>
         </table>
 
-        <!-- Afficher la description des missions pour chaque mois -->
-        <div style="margin-top: 10px; font-weight: bold;">
+        <div style="margin-top: 10px;">
             <h3>Mission Summary</h3>
-            <p th:text="${month.description}"></p>
+            <p>Work Days: <span th:text="${month.workDays}"></span></p>
+            <p>Paid Care Days: <span th:text="${month.paidCareDays}"></span></p>
+            <p>Unpaid Care Days: <span th:text="${month.unpaidCareDays}"></span></p>
         </div>
     </div>
 </div>

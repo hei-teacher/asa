@@ -52,15 +52,12 @@ public class MissionController {
       @RequestParam(required = false) String workerCode,
       @RequestParam(required = false) String yearMonth) {
 
-    System.out.println("yearMonth" + yearMonth);
-
-    YearMonth currentMonth =
+    YearMonth monthParam =
         (yearMonth == null || yearMonth.isBlank()) ? YearMonth.now() : YearMonth.parse(yearMonth);
-    System.out.println("currentMonth" + currentMonth);
 
     var dailyExecutionsByYearMonth =
         dailyExecutionsByDate(workerCode).entrySet().stream()
-            .filter(entry -> YearMonth.from(entry.getKey()).equals(currentMonth))
+            .filter(entry -> YearMonth.from(entry.getKey()).equals(monthParam))
             .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     var thDailyExecutions = new ArrayList<ThDailyExecution>();
@@ -71,7 +68,7 @@ public class MissionController {
         "dailyExecutions",
         thDailyExecutions.stream().sorted(comparing(ThDailyExecution::date).reversed()).toList());
     model.addAttribute("careProductCode", careProductCodeSupplier.get());
-    model.addAttribute("currentMonth", currentMonth.toString());
+    model.addAttribute("monthParam", monthParam.toString());
     workerToModelAdder.apply(workerCode, model);
 
     return "mission-executions";

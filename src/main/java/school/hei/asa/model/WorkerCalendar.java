@@ -1,12 +1,13 @@
 package school.hei.asa.model;
 
-import static java.util.stream.Collectors.summingInt;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
@@ -56,10 +57,9 @@ public class WorkerCalendar {
   public Map<Month, Map<Mission.Type, Integer>> countMissionTypeByMonth() {
     return dailyExecutions.stream()
         .collect(
-            Collectors.groupingBy(
+            groupingBy(
                 dailyExecution -> dailyExecution.date().getMonth(),
-                Collectors.groupingBy(
-                    this::determineMissionType, summingInt(dailyExecution -> 1))));
+                groupingBy(this::determineMissionType, summingInt(dailyExecution -> 1))));
   }
 
   private Mission.Type determineMissionType(DailyExecution dailyExecution) {

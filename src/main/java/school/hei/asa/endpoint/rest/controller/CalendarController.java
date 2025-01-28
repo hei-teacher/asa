@@ -5,6 +5,7 @@ import static java.awt.Color.GREEN;
 import static java.awt.Color.MAGENTA;
 import static java.awt.Color.RED;
 import static java.time.LocalDate.now;
+import static java.util.stream.Collectors.toMap;
 import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
 import static school.hei.asa.model.DailyExecution.Type.mixedWorkAndCare;
@@ -14,7 +15,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -55,7 +55,7 @@ public class CalendarController {
         (month, counts) -> {
           Map<String, Integer> typeCounts =
               counts.entrySet().stream()
-                  .collect(Collectors.toMap(entry -> entry.getKey().name(), Map.Entry::getValue));
+                  .collect(toMap(entry -> entry.getKey().name(), Map.Entry::getValue));
           missionCounts.put(month, typeCounts);
         });
 

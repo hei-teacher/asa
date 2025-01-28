@@ -7,7 +7,6 @@ import static java.util.stream.Collectors.toMap;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -53,8 +52,11 @@ public class MissionController {
       @RequestParam(required = false) String workerCode,
       @RequestParam(required = false) String yearMonth) {
 
+    System.out.println("yearMonth" + yearMonth);
+
     YearMonth currentMonth =
         (yearMonth == null || yearMonth.isBlank()) ? YearMonth.now() : YearMonth.parse(yearMonth);
+    System.out.println("currentMonth" + currentMonth);
 
     var dailyExecutionsByYearMonth =
         dailyExecutionsByDate(workerCode).entrySet().stream()

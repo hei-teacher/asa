@@ -43,9 +43,10 @@ public class Mission {
   }
 
   public Type type(String careProductCode, String paidCareProductCode) {
-    var isNotCare = isCare(careProductCode);
-    if (isNotCare) return work;
-    else {
+    var isNotCare = !isCare(careProductCode);
+    if (isNotCare) {
+      return work;
+    } else {
       if(isPaidCare(paidCareProductCode)) {
         return paidCare;
       }

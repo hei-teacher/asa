@@ -1,5 +1,6 @@
 package school.hei.asa.model;
 
+import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.toList;
 
 import java.time.LocalDate;
@@ -59,7 +60,7 @@ public class WorkerCalendar {
                             dailyExecution -> dailyExecution.date().getMonth(),
                             Collectors.groupingBy(
                                     this::determineMissionType,
-                                    Collectors.summingInt(dailyExecution -> 1)
+                                    summingInt(dailyExecution -> 1)
                             )
                     )
             );
@@ -70,6 +71,8 @@ public class WorkerCalendar {
     if (DailyExecution.Type.fullWork.equals(dailyExecutionType)) {
       return Mission.Type.work;
     } else if (DailyExecution.Type.fullCare.equals(dailyExecutionType) && hasPaidCare(dailyExecution)) {
+      return Mission.Type.paidCare;
+    } else if (DailyExecution.Type.mixedWorkAndCare.equals(dailyExecutionType) && hasPaidCare(dailyExecution)) {
       return Mission.Type.paidCare;
     }
     return Mission.Type.unpaidCare;

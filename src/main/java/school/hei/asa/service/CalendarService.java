@@ -33,12 +33,12 @@ public class CalendarService {
   }
 
   @Transactional
-  public Map<Month, Map<Mission.Type, Integer>> paidWorkDaysByMonth(Worker worker, int year) {
+  public Map<Month, Map<Mission.Type, Integer>> countMissionTypeByMonth(Worker worker, int year) {
     return new WorkerCalendar(
             worker,
             year,
             new school.hei.asa.model.ProductConf(
                 careProductCodeSupplier.get(), paidCareMissionCodeSupplier.get()))
-        .countMissionTypeByMonth();
+        .countMissionTypeByMonth()  ;
   }
 }

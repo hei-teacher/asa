@@ -10,25 +10,36 @@
 <div th:replace="fragments/header :: header"></div>
 
 <div>
-    <h2>Worker</h2>
     <div th:replace="fragments/workerSelector :: workerSelector(missions, All)"></div>
 </div>
 
-<div>
-    <h2 th:text="'Missions by Products - ' + ${worker == null ? 'All' : worker.name()}"></h2>
-    <ul>
-        <li th:each="p: ${products}">
-            <strong th:text="${p.code()} + ': ' + ${p.name()} + ' (' + ${p.executedDays()} + ')'"
-                    th:title="${p.description()}">
-            </strong>
-            <ul>
-                <li th:each="m: ${p.missions()}"
-                    th:text="${m.getCode()} + ': ' + ${m.getTitle()} + ' (' + ${m.executedDays()}  + ')'"
-                    th:title="${m.getDescription()}">
+<div class="p-6 bg-gray-100 min-h-screen">
+    <h2 th:text="'Missions by Products - ' + ${worker == null ? 'All' : worker.name()}"
+        class="text-2xl font-bold text-[#3F2F6A] mb-6">
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div th:each="p: ${products}" class="bg-white shadow-lg rounded-lg p-4 border border-gray-200 hover:shadow-xl transition-shadow duration-200">
+            <div class="mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">
+            <span th:class="'text-' + ${p.code()}">
+                <span th:text="${p.code()}"></span> :
+                <span th:text="${p.name()}"></span>
+                <span class="text-sm text-gray-500" th:text="' (' + ${p.executedDays()} + ')'"></span>
+            </span>
+                </h3>
+            </div>
+            <ul class="space-y-2">
+                <li th:each="m: ${p.missions()}" class="bg-gray-50 border border-gray-200 rounded-md p-2">
+                    <p>
+                <span th:class="'text-' + ${m.getCode()}">
+                    <span th:text="${m.getCode()}"></span> :
+                    <span th:text="${m.getTitle()}"></span>
+                </span>
+                    <p class="text-xs text-gray-500" th:title="${m.getDescription()}" th:text="${m.getDescription()}"></p>
                 </li>
             </ul>
-        </li>
-    </ul>
+        </div>
+    </div>
 </div>
 
 </body>

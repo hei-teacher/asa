@@ -2,6 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <title>Asa - Daily Execution</title>
 
@@ -15,16 +16,28 @@
             for (let i = 1; i <= inputNb; i++) {
                 const inputGroup = document.createElement("div");
                 inputGroup.innerHTML = `
-                    <label for="mission-code-${i}">Mission: </label>
-                    <select id="mission-code-${i}" name="missionCode${i}">
-                        <option value="">--Choose--</option>
-                        ${missionsOption}
-                    </select>
-                    <label for="mission-percentage-${i}">Percentage: </label>
-                    <input type="number" step=".1" min="0" max="1"
-                     id="mission-percentage-${i}" name="missionPercentage${i}"/>
-                    <label for="mission-comment-${i}">Comment: </label>
-                    <textarea id="mission-comment-${i}" rows="1" cols="100" name="missionComment${i}"/>
+                    <div class="flex items-center space-x-4 mb-6">
+    <div class="flex-1">
+        <label for="mission-code-${i}" class="block text-gray-700 font-semibold">Mission:</label>
+        <select id="mission-code-${i}" name="missionCode${i}"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <option value="">--Choose--</option>
+            ${missionsOption}
+        </select>
+    </div>
+
+    <div class="w-1/6">
+        <label for="mission-percentage-${i}" class="block text-gray-700 font-semibold">Percentage:</label>
+        <input type="number" step=".1" min="0" max="1" id="mission-percentage-${i}" name="missionPercentage${i}"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+    </div>
+
+    <div class="flex-grow">
+        <label for="mission-comment-${i}" class="block text-gray-700 font-semibold">Comment:</label>
+        <textarea id="mission-comment-${i}" rows="1" name="missionComment${i}"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+    </div>
+</div>
                 `;
                 container.appendChild(inputGroup);
             }
@@ -32,25 +45,54 @@
     </script>
 </head>
 
-<body>
+<body class="bg-gray-50 font-sans antialiased text-gray-800">
+
 <div th:replace="fragments/header :: header"></div>
 
-<h1>What did you do that day?</h1>
+<main class="mx-auto px-6 py-12">
+    <h1 class="text-3xl font-bold text-center mb-6">What did you do that day?</h1>
 
-<p><strong>Sum of percentages MUST equal 1.</strong><br>
-    Use care missions to complete missing hours if needed.</p>
-<p><strong>Comment MUST be defined.</strong><br>
-    Mind your keywords to ease search.
-    E.g.: if you face a problem that takes many days to complete then
-    create a keyword for it. Afterward, mention that keyword any time you work on it.</p>
+    <p class="text-lg mt-4 mb-6">
+        <strong>Sum of percentages MUST equal 1.</strong><br>
+        Use care missions to complete missing hours if needed.
+    </p>
 
-<form th:action="@{/daily-execution}" method="post">
-    <label for="date">The day: </label>
-    <input type="text" id="date" name="date" class="datepicker"/>
-    <br/>
-    <div id="inputContainer"></div>
-    <button type="submit">Submit</button>
-</form>
+    <p class="text-lg mb-6">
+        <strong>Comment MUST be defined.</strong><br>
+        Mind your keywords to ease search.<br>
+        E.g.: if you face a problem that takes many days to complete then create a keyword for it. Afterward, mention
+        that keyword any time you work on it.
+    </p>
+
+    <form th:action="@{/daily-execution}" method="post" class="space-y-8">
+        <div class="relative w-1/4">
+            <label for="date" class="block text-gray-700 font-semibold mb-2">The day:</label>
+            <div class="relative">
+                <input
+                        type="text"
+                        id="date"
+                        name="date"
+                        placeholder="Select a date"
+                        class="datepicker w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 4h10M3 11h18M5 19h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+        </span>
+            </div>
+        </div>
+
+        <div id="inputContainer"></div>
+
+        <button type="submit"
+                class="w-1/3 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+            Submit
+        </button>
+    </form>
+</main>
 
 <script>
     const currentYear = new Date().getFullYear();
@@ -61,5 +103,6 @@
     });
     createInputs(5);
 </script>
+
 </body>
 </html>

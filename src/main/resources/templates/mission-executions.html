@@ -13,7 +13,7 @@
     <div th:replace="fragments/workerSelector :: workerSelector(mission-executions, All)"></div>
 
     <input id="monthPicker" type="month"
-           th:value="${monthParam}"
+           th:value="${month}"
            onchange="updateMonth(this.value)"
            style="margin-top: 20px;" />
 </div>

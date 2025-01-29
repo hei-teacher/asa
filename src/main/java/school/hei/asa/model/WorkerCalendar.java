@@ -1,6 +1,7 @@
 package school.hei.asa.model;
 
 import static java.util.stream.Collectors.*;
+import static school.hei.asa.model.DailyExecution.Type.*;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -64,13 +65,11 @@ public class WorkerCalendar {
 
   private Mission.Type determineMissionType(DailyExecution dailyExecution) {
     var dailyExecutionType = dailyExecution.type(productConf.careProductCode());
-    if (DailyExecution.Type.fullWork.equals(dailyExecutionType)) {
+    if (fullWork.equals(dailyExecutionType)) {
       return Mission.Type.work;
-    } else if (DailyExecution.Type.fullCare.equals(dailyExecutionType)
-        && hasPaidCare(dailyExecution)) {
+    } else if (fullCare.equals(dailyExecutionType) && hasPaidCare(dailyExecution)) {
       return Mission.Type.paidCare;
-    } else if (DailyExecution.Type.mixedWorkAndCare.equals(dailyExecutionType)
-        && hasPaidCare(dailyExecution)) {
+    } else if (mixedWorkAndCare.equals(dailyExecutionType) && hasPaidCare(dailyExecution)) {
       return Mission.Type.paidCare;
     }
     return Mission.Type.unpaidCare;

@@ -50,9 +50,9 @@ public class ThYear {
       YearMonth yearMonth = YearMonth.of(year, month);
       Map<String, Integer> counts = missionCounts.getOrDefault(currentMonth, Map.of());
 
-      String unpaidCareDays = String.valueOf(counts.getOrDefault("unpaidCare", 0));
-      String paidCareDays = String.valueOf(counts.getOrDefault("paidCare", 0));
-      String workDays = String.valueOf(counts.getOrDefault("work", 0));
+      Integer unpaidCareDays = counts.getOrDefault("unpaidCare", 0);
+      Integer paidCareDays = counts.getOrDefault("paidCare", 0);
+      Integer workDays = counts.getOrDefault("work", 0);
 
       res.put(currentMonth, new ThMonth(yearMonth, unpaidCareDays, paidCareDays, workDays));
     }

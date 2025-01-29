@@ -47,9 +47,7 @@ public class CalendarController {
             ? workerFromAuthentication.apply(authentication).get().code()
             : workerCode;
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-
     var missionTypeByMonth = calendarService.countMissionTypeByMonth(worker, year);
-
     Map<Month, Map<String, Integer>> missionCounts = new HashMap<>();
     missionTypeByMonth.forEach(
         (month, counts) -> {

@@ -10,11 +10,13 @@
 <body>
 <div th:replace="fragments/header :: header"></div>
 
-<div class="flex gap-6 py-6 bg-gray-100 border-b border-gray-200">
-    <div>
+<div class="flex gap-6 py-6 bg-gray-50 pb-6">
+    <div class="px-6">
         <h1 th:text="${thYear.year()} + ' - ' + ${thYear.title()}"
-            class="px-6 text-2xl font-semibold"></h1>
-        <div th:replace="fragments/workerSelector :: workerSelector(work-and-care-calendar, Myself)"></div>
+            class="text-2xl font-semibold"></h1>
+        <div class="pt-5">
+            <div th:replace="fragments/workerSelector :: workerSelector(work-and-care-calendar, Myself)"></div>
+        </div>
     </div>
 
     <div class="px-6 ml-auto">
@@ -29,7 +31,7 @@
     </div>
 </div>
 
-<div class="calendar bg-gray-100 pt-6">
+<div class="calendar bg-gray-50 pt-6">
     <div class="month grid gap-1 px-6" th:each="month : ${thYear.months()}">
         <h2 class="text-center text-3xl font-semibold text-gray-800 mb-2" th:text="${month.yearMonth().month}"></h2>
         <table class="min-w-full min-h-[250px] bg-white rounded-lg shadow-md">

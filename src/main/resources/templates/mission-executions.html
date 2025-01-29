@@ -8,11 +8,9 @@
 
 <body class="bg-gray-50 text-gray-800">
 
-<!-- Header -->
 <div th:replace="fragments/header :: header"></div>
 
-<!-- Sélecteur de profil -->
-<div class="max-w-4xl mx-auto my-6 p-4 bg-white shadow-md rounded-lg">
+<div class="max-w-4xl mx-auto pt-6">
     <div th:replace="fragments/workerSelector :: workerSelector(mission-executions, All)"></div>
 
     <input id="monthPicker" type="month"
@@ -21,33 +19,27 @@
            style="margin-top: 20px;" />
 </div>
 
-<!-- Liste des missions exécutées -->
 <div class="max-w-4xl mx-auto my-6 space-y-6">
     <h2 class="text-2xl font-semibold text-[#3F2F6A]"
         th:text="'Missions Executed by ' + (${worker == null ? 'All' : worker.name()})"></h2>
     <p class="text-sm text-gray-500 mt-1">Care missions are <span
             class="text-red-500 font-semibold">highlighted in red</span>.</p>
 
-    <!-- Boucle sur les jours -->
     <div th:each="dailyExecution: ${dailyExecutions}" class="bg-white p-6 shadow-lg rounded-lg">
 
-        <!-- Bannière de date -->
         <div class="text-[#3F2F6A] py-2 px-4 rounded-md font-semibold text-lg">
             <span th:text="${#strings.toUpperCase(#temporals.format(dailyExecution.date(), 'EEEE dd MMMM yyyy', T(java.util.Locale).ENGLISH))}"></span>
         </div>
 
-        <!-- Liste des missions -->
         <div class="mt-4 space-y-4">
             <div th:each="thMe: ${dailyExecution.thExecutionsPerMission()}"
                  class="p-4 border-l-4 rounded-lg shadow bg-white"
                  th:classappend="'text-' + ${#strings.substring(thMe.mission().code(), 0, 2)}">
 
-                <!-- Titre de la mission -->
                 <h3 class="text-lg font-semibold"
                     th:text="${thMe.mission().code()} + ': ' + ${thMe.mission().title()}">
                 </h3>
 
-                <!-- Liste des exécutions pour cette mission -->
                 <ul class="mt-2 space-y-2">
                     <li th:each="me: ${thMe.executions()}"
                         class="flex flex-col text-sm text-gray-700"

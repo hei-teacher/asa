@@ -2,10 +2,65 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <title>Asa</title>
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
+<body class="h-screen bg-gray-50" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <div th:replace="fragments/header :: header"></div>
+
+<div class="container mx-auto p-12">
+    <h1 sec:authorize="isAnonymous()" class="text-3xl font-bold mb-8 text-center">Work Management Dashboard</h1>
+    <h1 sec:authorize="isAuthenticated()" class="text-3xl font-bold mb-8 text-center">
+        <span th:text="'Welcome ' + ${#authentication.getPrincipal().getAttribute('email').split('@')[0]} + ' !'"></span>
+    </h1>
+    <p class="text-2xl font-light mb-8 text-center">Manage your missions efficiently and track work progress.</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div class="bg-white shadow-lg rounded-lg p-6 flex flex-col">
+            <div class="flex items-center mb-4">
+                <h2 class="text-xl font-semibold flex items-center"><span class="mr-2">📌</span> Mission Explorer</h2>
+            </div>
+            <ul class="space-y-2">
+                <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> View all active missions</li>
+                <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Track days spent per worker</li>
+                <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Access mission details (Admin, Accounting, R&D)</li>
+            </ul>
+        </div>
+
+        <div class="bg-white shadow-lg rounded-lg p-6 flex flex-col">
+            <div class="flex items-center mb-4">
+                <h2 class="text-xl font-semibold flex items-center"><span class="mr-2">📆</span> Work & Care Calendar</h2>
+            </div>
+            <ul class="space-y-2">
+                <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Visualize worked and break days</li>
+                <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Color-coded for intuitive tracking</li>
+                <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Annual work summary</li>
+            </ul>
+        </div>
+
+        <div class="bg-white shadow-lg rounded-lg p-6 flex flex-col">
+            <div class="flex items-center mb-4">
+                <h2 class="text-xl font-semibold flex items-center"><span class="mr-2">⏳</span> Daily Execution</h2>
+            </div>
+            <ul class="space-y-2">
+                <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Time tracking per mission</li>
+                <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Detail daily work logs</li>
+                <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Percentage of hours spent</li>
+            </ul>
+        </div>
+
+        <div class="bg-white shadow-lg rounded-lg p-6 flex flex-col">
+            <div class="flex items-center mb-4">
+                <h2 class="text-xl font-semibold flex items-center"><span class="mr-2">📊</span> Missions Executions</h2>
+            </div>
+            <ul class="space-y-2">
+                <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> View mission history</li>
+                <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Total hours spent per mission</li>
+                <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Archive of completed missions</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

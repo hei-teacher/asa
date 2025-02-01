@@ -11,11 +11,17 @@
 <div>
     <h2>Worker</h2>
     <div th:replace="fragments/workerSelector :: workerSelector(mission-executions, All)"></div>
+
+    <input id="monthPicker" type="month"
+           th:value="${month}"
+           onchange="updateMonth(this.value)"
+           style="margin-top: 20px;" />
 </div>
 
 <div>
-    <h2 th:text="'Mission executions - ' + ${worker == null ? 'All' : worker.name()}"></h2>
+    <h2 th:text="'Mission executions - ' + (${worker == null ? 'All' : worker.name()})"></h2>
     <strong style="color: red">Care missions are colored red.</strong>
+
     <ul>
         <li th:each="dailyExecution: ${dailyExecutions}">
             <h3 th:text="${dailyExecution.date()}"></h3>
@@ -35,5 +41,11 @@
     </ul>
 </div>
 
+<script>
+    function updateMonth(selectedMonth) {
+        window.location.href = '/mission-executions?yearMonth=' + selectedMonth;
+    }
+</script>
 </body>
+
 </html>

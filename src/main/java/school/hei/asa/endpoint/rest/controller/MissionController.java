@@ -2,8 +2,10 @@ package school.hei.asa.endpoint.rest.controller;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,17 +48,27 @@ public class MissionController {
 
   @GetMapping("/mission-executions")
   public String getMissionExecutions(
-      Model model, @RequestParam(required = false) String workerCode) {
-    var dailyExecutionsByDate = dailyExecutionsByDate(workerCode);
+      Model model,
+      @RequestParam(required = false) String workerCode,
+      @RequestParam(required = false) String yearMonth) {
+    YearMonth month =
+        (yearMonth == null || yearMonth.isBlank()) ? YearMonth.now() : YearMonth.parse(yearMonth);
+
+    var dailyExecutionsByYearMonth =
+        dailyExecutionsByDate(workerCode).entrySet().stream()
+            .filter(entry -> YearMonth.from(entry.getKey()).equals(month))
+            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
     var thDailyExecutions = new ArrayList<ThDailyExecution>();
-    dailyExecutionsByDate.forEach(
+    dailyExecutionsByYearMonth.forEach(
         (date, deList) -> thDailyExecutions.add(thDailyExecutionMapper.toTh(date, deList)));
+
     model.addAttribute(
         "dailyExecutions",
         thDailyExecutions.stream().sorted(comparing(ThDailyExecution::date).reversed()).toList());
     model.addAttribute("careProductCode", careProductCodeSupplier.get());
-
+    model.addAttribute("month", month.toString());
     workerToModelAdder.apply(workerCode, model);
+
     return "mission-executions";
   }
 

@@ -1,8 +1,11 @@
 package school.hei.asa.model;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
+import static school.hei.asa.model.DailyExecution.Type.*;
+import static school.hei.asa.model.Mission.Type.*;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -51,5 +54,35 @@ public class WorkerCalendar {
                 dailyExecutionType.equals(dailyExecution.type(productConf.careProductCode())))
         .map(DailyExecution::date)
         .toList();
+  }
+
+  public Map<Month, Map<Mission.Type, Integer>> countMissionTypeByMonth() {
+    return dailyExecutions.stream()
+        .collect(
+            groupingBy(
+                dailyExecution -> dailyExecution.date().getMonth(),
+                groupingBy(this::determineMissionType, summingInt(dailyExecution -> 1))));
+  }
+
+  private Mission.Type determineMissionType(DailyExecution dailyExecution) {
+    var dailyExecutionType = dailyExecution.type(productConf.careProductCode());
+    if (fullWork.equals(dailyExecutionType)) {
+      return work;
+    } else if (fullCare.equals(dailyExecutionType) && hasPaidCare(dailyExecution)) {
+      return paidCare;
+    } else if (mixedWorkAndCare.equals(dailyExecutionType) && hasPaidCare(dailyExecution)) {
+      return paidCare;
+    }
+    return unpaidCare;
+  }
+
+  private boolean hasPaidCare(DailyExecution dailyExecution) {
+    return dailyExecution.executions().stream()
+        .anyMatch(
+            execution ->
+                paidCare.equals(
+                    execution
+                        .mission()
+                        .type(productConf.careProductCode(), productConf.paidCareMissionCode())));
   }
 }

@@ -21,12 +21,30 @@ public class ThMonth {
   @Getter
   private final YearMonth yearMonth;
 
+  @Getter private Integer unpaidCareDays;
+
+  @Getter private Integer paidCareDays;
+
+  @Getter private Integer workDays;
+
   private final Map<Integer, List<Integer>> daysByWeek;
   public static final int FILLER_DAY = -1;
 
   public ThMonth(YearMonth yearMonth) {
     this.yearMonth = yearMonth;
     this.daysByWeek = daysByWeek(yearMonth);
+    this.unpaidCareDays = null;
+    this.paidCareDays = null;
+    this.workDays = null;
+  }
+
+  public ThMonth(
+      YearMonth yearMonth, Integer unpaidCareDays, Integer paidCareDays, Integer workDays) {
+    this.yearMonth = yearMonth;
+    this.daysByWeek = daysByWeek(yearMonth);
+    this.unpaidCareDays = unpaidCareDays;
+    this.paidCareDays = paidCareDays;
+    this.workDays = workDays;
   }
 
   public List<Integer> weeks() {

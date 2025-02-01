@@ -1,6 +1,9 @@
 package school.hei.asa.model;
 
 import static java.util.stream.Collectors.toSet;
+import static school.hei.asa.model.Mission.Type.paidCare;
+import static school.hei.asa.model.Mission.Type.unpaidCare;
+import static school.hei.asa.model.Mission.Type.work;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,6 +42,24 @@ public class Mission {
     this.product.add(this);
   }
 
+  public Type type(String careProductCode, String paidCareProductCode) {
+    var isNotCare = !isCare(careProductCode);
+    if (isNotCare) {
+      return work;
+    } else {
+      if (isPaidCare(paidCareProductCode)) {
+        return paidCare;
+      }
+      return unpaidCare;
+    }
+  }
+
+  public enum Type {
+    work,
+    paidCare,
+    unpaidCare
+  }
+
   public double executedDays() {
     return executions.stream().mapToDouble(MissionExecution::dayPercentage).sum();
   }
@@ -49,5 +70,9 @@ public class Mission {
 
   public boolean isCare(String careProductCode) {
     return product().isCare(careProductCode);
+  }
+
+  public boolean isPaidCare(String paidCareMissionCode) {
+    return code.equals(paidCareMissionCode);
   }
 }

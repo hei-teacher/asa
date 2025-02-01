@@ -1,5 +1,7 @@
 package school.hei.asa.endpoint.rest.security;
 
+import static org.springframework.security.config.http.SessionCreationPolicy.ALWAYS;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +37,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             authz -> authz.requestMatchers("/").permitAll().anyRequest().authenticated())
         .oauth2Login(oauth2 -> oauth2.successHandler(oAuth2SuccessHandler))
+        .sessionManagement(s -> s.sessionCreationPolicy(ALWAYS))
         .logout(
             logout ->
                 logout.logoutSuccessHandler(

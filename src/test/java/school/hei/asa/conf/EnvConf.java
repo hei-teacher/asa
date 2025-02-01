@@ -5,9 +5,11 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 public class EnvConf {
 
   public static final String DUMMY_CARE_PRODUCT_CODE = "dummy-care-product-code";
+  public static final String DUMMY_PAID_CARE_MISSION_CODE = "dummy-paid-care-mission-code";
 
   void configureProperties(DynamicPropertyRegistry registry) {
     registry.add("asa.care.product.code", () -> DUMMY_CARE_PRODUCT_CODE);
+    registry.add("asa.paid.care.mission.code", () -> DUMMY_PAID_CARE_MISSION_CODE);
     registry.add("spring.security.oauth2.client.provider.cognito.authorization-uri", () -> "dummy");
     registry.add("spring.security.oauth2.client.provider.cognito.token-uri", () -> "dummy");
     registry.add("spring.security.oauth2.client.registration.cognito.provider", () -> "cognito");

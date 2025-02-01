@@ -11,7 +11,8 @@ class ThYearTest {
 
   @Test
   void december_2024() {
-    var year = new ThYear(2024, "title", Map.of(), Map.of());
-    assertTrue(year.months().contains(new ThMonth(YearMonth.of(2024, DECEMBER))));
+    var year =
+        new ThYear(2024, "title", Map.of(), Map.of(), Map.of(DECEMBER, Map.of("unpaidCare", 2)));
+    assertTrue(year.months().contains(new ThMonth(YearMonth.of(2024, DECEMBER), 2, 0, 0)));
   }
 }

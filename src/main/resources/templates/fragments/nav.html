@@ -1,0 +1,6 @@
+<th:block th:fragment="navLink(url, icon, text)">
+    <a th:href="${url}" class="flex items-center gap-2 text-white font-medium hover:text-gray-300 transition">
+        <i class="material-icons" th:text="${icon}"></i>
+        <span th:text="${text}"></span>
+    </a>
+</th:block>

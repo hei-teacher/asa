@@ -1,48 +1,26 @@
 <div th:fragment="header" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-    <div sec:authorize="isAuthenticated()" class="bg-[#16163F] p-6 flex items-center gap-10">
-        <a href="/missions" class="flex items-center gap-1 text-white font-medium hover:text-gray-300 transition">
-            <i class="material-icons">subject</i>
-            Mission Explorer
-        </a>
-        <a href="/work-and-care-calendar" class="flex items-center gap-2 text-white font-medium hover:text-gray-300 transition">
-            <i class="material-icons">calendar_month</i>
-            Work & Care Calendar
-        </a>
-        <a href="/daily-execution" class="flex items-center gap-2 text-white font-medium hover:text-gray-300 transition">
-            <i class="material-icons">note_alt</i>
-            Daily Execution
-        </a>
-        <a href="/mission-executions" class="flex items-center gap-2 text-white font-medium hover:text-gray-300 transition">
-            <i class="material-icons">playlist_add_check</i>
-            Missions Executions
-        </a>
+    <div class="bg-[#16163F] p-6 flex items-center w-full">
+        <div sec:authorize="isAuthenticated()" class="flex items-center gap-10 w-full">
+            <th:block th:replace="fragments/nav :: navLink('/missions', 'subject', 'Mission Explorer')"></th:block>
+            <th:block th:replace="fragments/nav :: navLink('/work-and-care-calendar', 'calendar_month', 'Work & Care Calendar')"></th:block>
+            <th:block th:replace="fragments/nav :: navLink('/daily-execution', 'note_alt', 'Daily Execution')"></th:block>
+            <th:block th:replace="fragments/nav :: navLink('/mission-executions', 'playlist_add_check', 'Missions Executions')"></th:block>
 
-        <div class="ml-auto flex items-center gap-2">
-            <i class="material-icons text-white">person</i>
-            <strong class="text-white text-sm" th:text="'(' + ${#authentication.getPrincipal().getAttribute('email')} + ')'"></strong>
-            <button class="flex items-center gap-2 bg-red-600 text-white font-medium py-2 px-4 rounded-lg shadow-md hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition duration-200">
-                <a th:href="@{/logout}" class="flex items-center gap-2">
-                    Log out
-                    <i class="material-icons">logout</i>
-                </a>
-            </button>
-
+            <div class="ml-auto flex text-white items-center gap-2">
+                <i class="material-icons">person</i>
+                <strong th:text="'(' + ${#authentication.getPrincipal().getAttribute('email')} + ')'"></strong>
+                <th:block th:replace="fragments/button :: iconButton('/logout', 'Log out', 'logout', 'bg-red-600', 'bg-red-700')"></th:block>
+            </div>
         </div>
-    </div>
 
-    <div sec:authorize="isAnonymous()" class="bg-[#16163F] p-6 flex items-center gap-6">
-        <div class="flex items-center gap-4 px-4 text-white">
-            <i class="material-icons">business_center</i>
-            <h1 class="font-medium text-lg">Asa - Work Management Tool</h1>
-        </div>
-        <div class="ml-auto flex items-center gap-2">
-            <button
-                    class="flex items-center gap-2 bg-[#9933CC] text-white font-medium py-2 px-4 rounded-lg shadow-md hover:bg-[#7A29A5] focus:ring-4 focus:ring-red-300 transition duration-200">
-                <a sec:authorize="isAnonymous()" th:href="@{/oauth2/authorization/cognito}" class="flex items-center gap-2">
-                    Log in
-                    <i class="material-icons">login</i>
-                </a>
-            </button>
+        <div sec:authorize="isAnonymous()" class="flex items-center gap-6 w-full">
+            <div class="flex items-center gap-4 px-4 text-white">
+                <i class="material-icons">business_center</i>
+                <h1 class="font-medium text-lg">Asa - Work Management Tool</h1>
+            </div>
+            <div class="ml-auto flex items-center gap-2">
+                <th:block th:replace="fragments/button :: iconButton('/oauth2/authorization/cognito', 'Log in', 'login', 'bg-[#9933CC]', 'bg-[#7A29A5]')"></th:block>
+            </div>
         </div>
     </div>
 </div>

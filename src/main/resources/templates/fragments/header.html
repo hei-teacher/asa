@@ -1,15 +1,15 @@
 <div th:fragment="header" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <div class="bg-[#16163F] p-6 flex items-center w-full">
-        <div sec:authorize="isAuthenticated()" class="flex items-center gap-10 w-full">
-            <th:block th:replace="fragments/nav :: navLink('/missions', 'subject', 'Mission Explorer')"></th:block>
-            <th:block th:replace="fragments/nav :: navLink('/work-and-care-calendar', 'calendar_month', 'Work & Care Calendar')"></th:block>
-            <th:block th:replace="fragments/nav :: navLink('/daily-execution', 'note_alt', 'Daily Execution')"></th:block>
-            <th:block th:replace="fragments/nav :: navLink('/mission-executions', 'playlist_add_check', 'Missions Executions')"></th:block>
+        <div sec:authorize="isAuthenticated()" class="flex items-center gap-8 w-full">
+            <th:block th:replace="fragments/nav :: nav('/missions', 'Mission Explorer', 'subject', '', 'text-gray-300')"></th:block>
+            <th:block th:replace="fragments/nav :: nav('/work-and-care-calendar', 'Work & Care Calendar', 'calendar_month', '', 'text-gray-300')"></th:block>
+            <th:block th:replace="fragments/nav :: nav('/daily-execution', 'Daily Execution', 'note_alt', '', 'text-gray-300')"></th:block>
+            <th:block th:replace="fragments/nav :: nav('/mission-executions', 'Missions Executions', 'playlist_add_check', '', 'text-gray-300')"></th:block>
 
             <div class="ml-auto flex text-white items-center gap-2">
                 <i class="material-icons">person</i>
                 <strong th:text="'(' + ${#authentication.getPrincipal().getAttribute('email')} + ')'"></strong>
-                <th:block th:replace="fragments/button :: iconButton('/logout', 'Log out', 'logout', 'bg-red-600', 'bg-red-700')"></th:block>
+                <th:block th:replace="fragments/nav :: nav('/logout', 'Log out', 'logout', 'bg-red-600', 'bg-red-700')"></th:block>
             </div>
         </div>
 
@@ -19,7 +19,7 @@
                 <h1 class="font-medium text-lg">Asa - Work Management Tool</h1>
             </div>
             <div class="ml-auto flex items-center gap-2">
-                <th:block th:replace="fragments/button :: iconButton('/oauth2/authorization/cognito', 'Log in', 'login', 'bg-[#9933CC]', 'bg-[#7A29A5]')"></th:block>
+                <th:block th:replace="fragments/nav :: nav('/oauth2/authorization/cognito', 'Log in', 'login', 'bg-[#9933CC]', 'bg-[#7A29A5]')"></th:block>
             </div>
         </div>
     </div>

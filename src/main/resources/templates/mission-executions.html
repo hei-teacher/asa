@@ -14,10 +14,11 @@
 <div class="max-w-4xl mx-auto pt-6">
     <div th:replace="fragments/workerSelector :: workerSelector(mission-executions, All)"></div>
 
-    <input id="monthPicker" type="month"
-           th:value="${month}"
-           onchange="updateMonth(this.value)"
-           style="margin-top: 20px;" />
+    <div class="flex flex-col gap-2 mt-5">
+        <label for="monthPicker" class="text-gray-700 font-semibold">Select Month:</label>
+        <input id="monthPicker" type="month" th:value="${month}" onchange="updateMonth(this.value)"
+               class="border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
 </div>
 
 <div class="max-w-4xl mx-auto my-6 space-y-6">

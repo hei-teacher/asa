@@ -1,0 +1,16 @@
+<th:block th:fragment="card(title, icon, items)">
+    <div class="bg-white shadow-lg rounded-lg p-6 flex flex-col">
+        <div class="flex items-center mb-4">
+            <h2 class="text-xl font-semibold flex items-center">
+                <span class="mr-2" th:text="${icon}"></span>
+                <span th:text="${title}"></span>
+            </h2>
+        </div>
+        <ul class="space-y-2">
+            <li th:each="item : ${items}" class="flex items-center">
+                <span class="text-green-500 mr-2">✔</span>
+                <span th:text="${item}"></span>
+            </li>
+        </ul>
+    </div>
+</th:block>

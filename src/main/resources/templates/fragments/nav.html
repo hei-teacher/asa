@@ -1,6 +1,6 @@
 <th:block th:fragment="nav(url, text, icon, bgColor, hoverColor)">
     <a th:href="${url}"
-       class="flex items-center gap-2 text-white font-medium p-2 rounded-lg shadow-md transition duration-200"
+       class="flex items-center gap-2 text-white font-medium py-2 px-4 rounded-lg shadow-md transition duration-200"
        th:classappend="${bgColor} + ' hover:' + ${hoverColor}">
         <i class="material-icons" th:if="${icon != null and icon != ''}" th:text="${icon}"></i>
         <span th:text="${text}"></span>

@@ -1,6 +1,6 @@
 <div th:fragment="header" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <div class="bg-[#16163F] p-6 flex items-center w-full">
-        <div sec:authorize="isAuthenticated()" class="flex items-center gap-8 w-full">
+        <div sec:authorize="isAuthenticated()" class="flex items-center w-full">
             <th:block th:replace="fragments/nav :: nav('/missions', 'Mission Explorer', 'subject', '', 'text-gray-300')"></th:block>
             <th:block th:replace="fragments/nav :: nav('/work-and-care-calendar', 'Work & Care Calendar', 'calendar_month', '', 'text-gray-300')"></th:block>
             <th:block th:replace="fragments/nav :: nav('/daily-execution', 'Daily Execution', 'note_alt', '', 'text-gray-300')"></th:block>

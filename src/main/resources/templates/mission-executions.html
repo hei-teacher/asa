@@ -42,9 +42,16 @@
 </div>
 
 <script>
-    function updateMonth(selectedMonth) {
-        window.location.href = '/mission-executions?yearMonth=' + selectedMonth;
+    function updateFilters() {
+        const workerCode = document.getElementById("worker").value;
+        const month = document.getElementById("monthPicker").value;
+        window.location.href = `/mission-executions?yearMonth=${month}&workerCode=${workerCode}`;
     }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("worker").addEventListener("change", updateFilters);
+        document.getElementById("monthPicker").addEventListener("change", updateFilters);
+    });
 </script>
 </body>
 

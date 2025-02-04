@@ -1,14 +1,14 @@
 package school.hei.asa.endpoint.rest.controller;
 
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,37 +48,41 @@ public class MissionController {
 
   @GetMapping("/mission-executions")
   public String getMissionExecutions(
-      Model model,
-      @RequestParam(required = false) String workerCode,
-      @RequestParam(required = false) String yearMonth) {
-    YearMonth month =
-        (yearMonth == null || yearMonth.isBlank()) ? YearMonth.now() : YearMonth.parse(yearMonth);
+          Model model,
+          @RequestParam(required = false) String workerCode,
+          @RequestParam(required = false) String yearMonth) {
 
-    var dailyExecutionsByYearMonth =
-        dailyExecutionsByDate(workerCode).entrySet().stream()
-            .filter(entry -> YearMonth.from(entry.getKey()).equals(month))
-            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+    YearMonth month =
+            (yearMonth == null || yearMonth.isBlank()) ? YearMonth.now() : YearMonth.parse(yearMonth);
+
+    var dailyExecutionsByYearMonth = dailyExecutionsByDate(workerCode, month);
+
     var thDailyExecutions = new ArrayList<ThDailyExecution>();
     dailyExecutionsByYearMonth.forEach(
-        (date, deList) -> thDailyExecutions.add(thDailyExecutionMapper.toTh(date, deList)));
+            (date, deList) -> thDailyExecutions.add(thDailyExecutionMapper.toTh(date, deList)));
 
     model.addAttribute(
-        "dailyExecutions",
-        thDailyExecutions.stream().sorted(comparing(ThDailyExecution::date).reversed()).toList());
+            "dailyExecutions",
+            thDailyExecutions.stream().sorted(comparing(ThDailyExecution::date).reversed()).toList());
     model.addAttribute("careProductCode", careProductCodeSupplier.get());
     model.addAttribute("month", month.toString());
+    model.addAttribute("workerCode", workerCode);
     workerToModelAdder.apply(workerCode, model);
 
     return "mission-executions";
   }
 
-  private Map<LocalDate, List<DailyExecution>> dailyExecutionsByDate(String workerCode) {
-    List<DailyExecution> allDailyExecutions = dailyExecutionRepository.findAll();
-    var dailyExecutionsStream =
-        workerCode == null || workerCode.isBlank()
-            ? allDailyExecutions.stream()
-            : allDailyExecutions.stream()
-                .filter(dailyExecution -> workerCode.equals(dailyExecution.worker().code()));
-    return dailyExecutionsStream.collect(groupingBy(DailyExecution::date));
+  private Map<LocalDate, List<DailyExecution>> dailyExecutionsByDate(String workerCode, YearMonth month) {
+    LocalDate startDate = month.atDay(1);
+    LocalDate endDate = month.atEndOfMonth();
+
+    List<DailyExecution> filteredExecutions;
+    if (workerCode == null || workerCode.isBlank()) {
+      filteredExecutions = dailyExecutionRepository.findByDateBetween(startDate, endDate);
+    } else {
+      filteredExecutions = dailyExecutionRepository.findByWorkerCodeAndDateBetween(workerCode, startDate, endDate);
+    }
+
+    return filteredExecutions.stream().collect(Collectors.groupingBy(DailyExecution::date));
   }
 }

@@ -2,10 +2,11 @@
       th:action="@{'/' + ${targetEndpoint}}" method="get">
     <label for="worker"></label>
     <select id="worker" name="workerCode">
-        <option th:text="${defaultOption}" value=""></option>
+        <option th:text="${defaultOption}" value=""
+                th:selected="${workerCode == null or workerCode.isBlank()}"></option>
         <option th:each="worker : ${workers}"
                 th:value="${worker.code()}"
-                th:text="${worker.name()}"></option>
+                th:text="${worker.name()}"
+                th:selected="${worker.code() == workerCode}"></option>
     </select>
-    <button type="submit">Submit</button>
 </form>

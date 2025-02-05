@@ -68,9 +68,9 @@ public class WorkerCalendar {
     var dailyExecutionType = dailyExecution.type(productConf.careProductCode());
     if (fullWork.equals(dailyExecutionType)) {
       return work;
-    } else if (fullCare.equals(dailyExecutionType) && hasPaidCare(dailyExecution)) {
-      return paidCare;
     } else if (mixedWorkAndCare.equals(dailyExecutionType) && hasPaidCare(dailyExecution)) {
+      return work;
+    } else if (fullCare.equals(dailyExecutionType) && hasPaidCare(dailyExecution)) {
       return paidCare;
     }
     return unpaidCare;

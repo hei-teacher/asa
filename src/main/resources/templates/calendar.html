@@ -59,5 +59,16 @@
     </div>
 </div>
 
+<script>
+    function updateFilters() {
+        const workerCode = document.getElementById("worker").value;
+        window.location.href = `/work-and-care-calendar?workerCode=${workerCode}`;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("worker").addEventListener("change", updateFilters);
+    });
+</script>
+
 </body>
 </html>

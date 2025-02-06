@@ -52,9 +52,9 @@
         </table>
 
         <div style="margin-top: 10px;">
-            Work Days: <span th:text="${month.workDays}"></span><br>
-            Paid Care Days: <span th:text="${month.paidCareDays}"></span><br>
-            Unpaid Care Days: <span th:text="${month.unpaidCareDays}"></span>
+            Work Days: <span th:text="${#numbers.formatDecimal(month.workDays, 1, 1)}"></span><br>
+            Paid Care Days: <span th:text="${#numbers.formatDecimal(month.paidCareDays, 1, 1)}"></span><br>
+            Unpaid Care Days: <span th:text="${#numbers.formatDecimal(month.unpaidCareDays, 1, 1)}"></span><br>
         </div>
     </div>
 </div>

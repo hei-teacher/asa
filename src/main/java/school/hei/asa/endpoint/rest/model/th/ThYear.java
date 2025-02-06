@@ -34,7 +34,7 @@ public class ThYear {
       String title,
       Map<LocalDate, Color> coloredDates,
       Map<Color, String> colorDescriptions,
-      Map<Month, Map<String, Integer>> missionCounts) {
+      Map<Month, Map<String, Double>> missionCounts) {
     this.year = year;
     this.title = title;
     this.thMonths = thMonths(year, missionCounts);
@@ -43,16 +43,16 @@ public class ThYear {
   }
 
   private static Map<Month, ThMonth> thMonths(
-      int year, Map<Month, Map<String, Integer>> missionCounts) {
+      int year, Map<Month, Map<String, Double>> missionCounts) {
     Map<Month, ThMonth> res = new LinkedHashMap<>();
     for (int month = 1; month <= 12; month++) {
       Month currentMonth = Month.of(month);
       YearMonth yearMonth = YearMonth.of(year, month);
-      Map<String, Integer> counts = missionCounts.getOrDefault(currentMonth, Map.of());
+      Map<String, Double> counts = missionCounts.getOrDefault(currentMonth, Map.of());
 
-      Integer unpaidCareDays = counts.getOrDefault("unpaidCare", 0);
-      Integer paidCareDays = counts.getOrDefault("paidCare", 0);
-      Integer workDays = counts.getOrDefault("work", 0);
+      Double unpaidCareDays = counts.getOrDefault("unpaidCare", 0.0);
+      Double paidCareDays = counts.getOrDefault("paidCare", 0.0);
+      Double workDays = counts.getOrDefault("work", 0.0);
 
       res.put(currentMonth, new ThMonth(yearMonth, unpaidCareDays, paidCareDays, workDays));
     }

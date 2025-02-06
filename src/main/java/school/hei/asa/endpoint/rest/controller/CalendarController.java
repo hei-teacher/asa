@@ -47,11 +47,11 @@ public class CalendarController {
             ? workerFromAuthentication.apply(authentication).get().code()
             : workerCode;
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-    var missionTypeByMonth = calendarService.countMissionTypeByMonth(worker, year);
-    Map<Month, Map<String, Integer>> missionCounts = new HashMap<>();
+    var missionTypeByMonth = calendarService.missionExecutionPercentageSumByMissionType(worker, year);
+    Map<Month, Map<String, Double>> missionCounts = new HashMap<>();
     missionTypeByMonth.forEach(
         (month, counts) -> {
-          Map<String, Integer> typeCounts =
+          Map<String, Double> typeCounts =
               counts.entrySet().stream()
                   .collect(toMap(entry -> entry.getKey().name(), Map.Entry::getValue));
           missionCounts.put(month, typeCounts);

@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
@@ -27,53 +26,52 @@ public class WorkerCalendar {
     this.year = year;
     this.productConf = productConf;
     this.dailyExecutions =
-            worker.dailyExecutions().stream()
-                    .filter(me -> year == me.date().getYear())
-                    .collect(toList());
+        worker.dailyExecutions().stream()
+            .filter(me -> year == me.date().getYear())
+            .collect(toList());
   }
 
   public Map<DailyExecution.Type, List<LocalDate>> datesByDailyExecutionType() {
     Map<DailyExecution.Type, List<LocalDate>> res = new HashMap<>();
 
     Arrays.stream(DailyExecution.Type.values())
-            .forEach(
-                    dailyExecutionType ->
-                            res.put(
-                                    dailyExecutionType,
-                                    filterByDailyExecutionType(dailyExecutions, dailyExecutionType)));
+        .forEach(
+            dailyExecutionType ->
+                res.put(
+                    dailyExecutionType,
+                    filterByDailyExecutionType(dailyExecutions, dailyExecutionType)));
 
     return res;
   }
 
   private List<LocalDate> filterByDailyExecutionType(
-          List<DailyExecution> dayExecutions, DailyExecution.Type dailyExecutionType) {
+      List<DailyExecution> dayExecutions, DailyExecution.Type dailyExecutionType) {
     return dayExecutions.stream()
-            .filter(
-                    dailyExecution ->
-                            dailyExecutionType.equals(dailyExecution.type(productConf.careProductCode())))
-            .map(DailyExecution::date)
-            .toList();
+        .filter(
+            dailyExecution ->
+                dailyExecutionType.equals(dailyExecution.type(productConf.careProductCode())))
+        .map(DailyExecution::date)
+        .toList();
   }
 
   public Map<Month, Map<Mission.Type, Double>> missionExecutionPercentageSumByMissionType() {
     return dailyExecutions.stream()
-            .collect(groupingBy(
-                    dailyExecution -> dailyExecution.date().getMonth(),
-                    mapping(
-                            dailyExecution -> dailyExecution.executions().stream(),
-                            collectingAndThen(
-                                    flatMapping(Function.identity(),
-                                            groupingBy(
-                                                    missionExecution -> missionExecution.mission()
-                                                            .type(productConf.careProductCode(), productConf.paidCareMissionCode()),
-                                                    summingDouble(MissionExecution::dayPercentage)
-                                            )
-                                    ),
-                                    HashMap::new
-                            )
-                    )
-            ));
+        .collect(
+            groupingBy(
+                dailyExecution -> dailyExecution.date().getMonth(),
+                mapping(
+                    dailyExecution -> dailyExecution.executions().stream(),
+                    collectingAndThen(
+                        flatMapping(
+                            Function.identity(),
+                            groupingBy(
+                                missionExecution ->
+                                    missionExecution
+                                        .mission()
+                                        .type(
+                                            productConf.careProductCode(),
+                                            productConf.paidCareMissionCodes()),
+                                summingDouble(MissionExecution::dayPercentage))),
+                        HashMap::new))));
   }
-
 }
-

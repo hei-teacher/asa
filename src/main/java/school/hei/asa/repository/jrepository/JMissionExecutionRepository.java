@@ -16,5 +16,6 @@ public interface JMissionExecutionRepository extends JpaRepository<JMissionExecu
 
   List<JMissionExecution> findByDateBetween(LocalDate startDate, LocalDate endDate);
 
-  List<JMissionExecution> findByWorkerCodeAndDateBetween(String workerCode, LocalDate startDate, LocalDate endDate);
+  List<JMissionExecution> findByWorkerCodeAndDateBetween(
+      String workerCode, LocalDate startDate, LocalDate endDate);
 }

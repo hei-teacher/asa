@@ -38,8 +38,7 @@ public class ThMonth {
     this.workDays = null;
   }
 
-  public ThMonth(
-      YearMonth yearMonth, Double unpaidCareDays, Double paidCareDays, Double workDays) {
+  public ThMonth(YearMonth yearMonth, Double unpaidCareDays, Double paidCareDays, Double workDays) {
     this.yearMonth = yearMonth;
     this.daysByWeek = daysByWeek(yearMonth);
     this.unpaidCareDays = unpaidCareDays;

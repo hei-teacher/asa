@@ -6,6 +6,7 @@ import static school.hei.asa.model.Mission.Type.unpaidCare;
 import static school.hei.asa.model.Mission.Type.work;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -42,12 +43,12 @@ public class Mission {
     this.product.add(this);
   }
 
-  public Type type(String careProductCode, String paidCareProductCode) {
+  public Type type(String careProductCode, List<String> paidCareProductCodes) {
     var isNotCare = !isCare(careProductCode);
     if (isNotCare) {
       return work;
     } else {
-      if (isPaidCare(paidCareProductCode)) {
+      if (isPaidCare(paidCareProductCodes)) {
         return paidCare;
       }
       return unpaidCare;
@@ -72,7 +73,7 @@ public class Mission {
     return product().isCare(careProductCode);
   }
 
-  public boolean isPaidCare(String paidCareMissionCode) {
-    return code.equals(paidCareMissionCode);
+  public boolean isPaidCare(List<String> paidCareMissionCodes) {
+    return paidCareMissionCodes.contains(code);
   }
 }

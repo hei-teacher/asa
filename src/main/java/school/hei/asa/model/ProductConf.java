@@ -1,3 +1,5 @@
 package school.hei.asa.model;
 
-public record ProductConf(String careProductCode, String paidCareMissionCode) {}
+import java.util.List;
+
+public record ProductConf(String careProductCode, List<String> paidCareMissionCodes) {}

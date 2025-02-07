@@ -73,17 +73,14 @@ public class MissionController {
 
   private Map<LocalDate, List<DailyExecution>> dailyExecutionsByDate(
       String workerCode, YearMonth month) {
+
     LocalDate startDate = month.atDay(1);
     LocalDate endDate = month.atEndOfMonth();
 
-    List<DailyExecution> filteredExecutions;
-    if (workerCode == null || workerCode.isBlank()) {
-      filteredExecutions = dailyExecutionRepository.findByDateBetween(startDate, endDate);
-    } else {
-      filteredExecutions =
-          dailyExecutionRepository.findByWorkerCodeAndDateBetween(workerCode, startDate, endDate);
-    }
-
-    return filteredExecutions.stream().collect(Collectors.groupingBy(DailyExecution::date));
+    return (workerCode == null || workerCode.isBlank()
+            ? dailyExecutionRepository.findByDateBetween(startDate, endDate)
+            : dailyExecutionRepository.findByWorkerCodeAndDateBetween(
+                workerCode, startDate, endDate))
+        .stream().collect(Collectors.groupingBy(DailyExecution::date));
   }
 }

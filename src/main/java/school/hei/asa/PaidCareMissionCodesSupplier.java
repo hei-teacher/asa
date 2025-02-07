@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Accessors(fluent = true)
 @Configuration
-public class PaidCareMissionCodeSupplier implements Supplier<List<String>> {
+public class PaidCareMissionCodesSupplier implements Supplier<List<String>> {
   private final List<String> paidCareMissionCodes;
 
-  public PaidCareMissionCodeSupplier(
+  public PaidCareMissionCodesSupplier(
       @Value("${asa.paid.care.mission.code}") String paidCareMissionCode) {
     this.paidCareMissionCodes = Arrays.asList(paidCareMissionCode.split(","));
   }

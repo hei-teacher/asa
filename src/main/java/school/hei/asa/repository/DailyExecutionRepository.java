@@ -65,11 +65,9 @@ public class DailyExecutionRepository {
       String workerCode, LocalDate startDate, LocalDate endDate) {
     var jWorkers = jWorkerRepository.findAll();
     var jMissions = jMissionRepository.findAll();
-
     var jmeList =
         jMissionExecutionRepository.findByWorkerCodeAndDateBetween(workerCode, startDate, endDate);
     var meList = missionExecutionMapper.toDomain(jmeList, jWorkers, jMissions);
-
     return groupExecutionsByDate(meList);
   }
 

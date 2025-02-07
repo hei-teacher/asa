@@ -8,63 +8,39 @@
 </head>
 
 <body class="bg-gray-50 text-gray-800">
-
 <div th:replace="fragments/header :: header"></div>
 
-<div class="max-w-4xl mx-auto pt-6">
+<div class="m-6">
+    <h2 class="text-xl font-bold mb-2">Worker</h2>
     <div th:replace="fragments/workerSelector :: workerSelector(mission-executions, All)"></div>
 </div>
 
-<div class="max-w-4xl mx-auto my-6 space-y-6">
-    <!-- Main title -->
-    <h2 class="text-2xl font-semibold text-primary"
-        th:text="'Missions Executed by ' + ${worker == null ? 'All' : worker.name()}">
-    </h2>
-    <p class="text-sm text-gray-500 mt-1">
-        Care missions are <span class="text-red-500 font-semibold">highlighted in red</span>.
-    </p>
-
-    <!-- List of daily executions -->
-    <div th:each="dailyExecution : ${dailyExecutions}" class="bg-white p-6 shadow-lg rounded-lg">
-
-        <!-- Date -->
-        <div class="text-primary py-2 px-4 rounded-md font-semibold text-lg">
-            <span th:text="${#strings.toUpperCase(#temporals.format(dailyExecution.date(), 'EEEE dd MMMM yyyy', T(java.util.Locale).ENGLISH))}">
-            </span>
-        </div>
-
-        <div class="mt-4 space-y-4">
-            <!-- Missions -->
-            <div th:each="thMe : ${dailyExecution.thExecutionsPerMission()}"
-                 th:classappend="'text-' + ${#strings.substring(thMe.mission().code(), 0, 2)}"
-                 class="p-4 border-l-4 rounded-lg shadow bg-white"
-            >
-
-                <h3 th:text="${thMe.mission().code()} + ': ' + ${thMe.mission().title()}" class="text-lg font-semibold"></h3>
-
-                <!--  List of executions -->
-                <ul class="mt-2 space-y-2">
-                    <li th:each="me : ${thMe.executions()}" class="text-sm text-gray-700">
-
-                        <div class="border border-gray-100 rounded-lg bg-gray-50 p-3">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-black" th:text="${me.worker().name()}"></span>
-                                <span class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs font-semibold"
-                                      th:text="${me.dayPercentage()} + '%'">
-                                </span>
-                            </div>
-                            <p class="mt-2 text-gray-600 italic" th:text="${me.comment()}"></p>
-                        </div>
-
-                    </li>
-                </ul>
-
-            </div>
-        </div>
-    </div>
+<div class="m-6">
+    <h2 class="text-xl font-bold mb-2" th:text="'Mission executions - ' + ${worker == null ? 'All' : worker.name()}"></h2>
+    <strong class="text-red-500">Care missions are colored red.</strong>
+    <ul class="ml-6 list-disc">
+        <li th:each="dailyExecution: ${dailyExecutions}" class="mb-4">
+            <h3 class="text-lg font-semibold" th:text="${dailyExecution.date()}"></h3>
+            <ul class="ml-6 list-disc">
+                <li th:each="thMe: ${dailyExecution.thExecutionsPerMission()}" class="mb-2">
+                    <h4 class="text-md font-medium"
+                        th:text="${thMe.mission().code()} + ': ' + ${thMe.mission().title()}"
+                        th:style="'color: ' + (${thMe.mission().isCare(careProductCode)} ? 'red' : 'black')">
+                    </h4>
+                    <ul class="ml-6 list-disc">
+                        <li th:each="me: ${thMe.executions()}"
+                            class="ml-4 text-sm"
+                            th:text="${me.worker().name()} + ' ('+ ${me.dayPercentage()} +'): ' + ${me.comment()}"
+                            th:style="'color: ' + (${me.mission().isCare(careProductCode)} ? 'red' : 'black')">
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
 </div>
 
 <div th:replace="fragments/footer :: footer"></div>
-
 </body>
+
 </html>

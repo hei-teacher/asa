@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import school.hei.asa.model.Mission;
 
 public class ThYear {
   @Accessors(fluent = true)
@@ -34,7 +35,7 @@ public class ThYear {
       String title,
       Map<LocalDate, Color> coloredDates,
       Map<Color, String> colorDescriptions,
-      Map<Month, Map<String, Double>> missionCounts) {
+      Map<Month, Map<Mission.Type, Double>> missionCounts) {
     this.year = year;
     this.title = title;
     this.thMonths = thMonths(year, missionCounts);
@@ -43,16 +44,16 @@ public class ThYear {
   }
 
   private static Map<Month, ThMonth> thMonths(
-      int year, Map<Month, Map<String, Double>> missionCounts) {
+      int year, Map<Month, Map<Mission.Type, Double>> missionCounts) {
     Map<Month, ThMonth> res = new LinkedHashMap<>();
     for (int month = 1; month <= 12; month++) {
       Month currentMonth = Month.of(month);
       YearMonth yearMonth = YearMonth.of(year, month);
-      Map<String, Double> counts = missionCounts.getOrDefault(currentMonth, Map.of());
+      Map<Mission.Type, Double> counts = missionCounts.getOrDefault(currentMonth, Map.of());
 
-      Double unpaidCareDays = counts.getOrDefault("unpaidCare", 0.0);
-      Double paidCareDays = counts.getOrDefault("paidCare", 0.0);
-      Double workDays = counts.getOrDefault("work", 0.0);
+      Double unpaidCareDays = counts.getOrDefault(Mission.Type.unpaidCare, 0.0);
+      Double paidCareDays = counts.getOrDefault(Mission.Type.paidCare, 0.0);
+      Double workDays = counts.getOrDefault(Mission.Type.work, 0.0);
 
       res.put(currentMonth, new ThMonth(yearMonth, unpaidCareDays, paidCareDays, workDays));
     }

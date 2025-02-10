@@ -73,10 +73,8 @@ public class MissionController {
 
   private Map<LocalDate, List<DailyExecution>> dailyExecutionsByDate(
       String workerCode, YearMonth month) {
-
     LocalDate startDate = month.atDay(1);
     LocalDate endDate = month.atEndOfMonth();
-
     return (workerCode == null || workerCode.isBlank()
             ? dailyExecutionRepository.findByDateBetween(startDate, endDate)
             : dailyExecutionRepository.findByWorkerCodeAndDateBetween(

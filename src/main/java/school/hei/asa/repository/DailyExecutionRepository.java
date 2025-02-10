@@ -53,10 +53,8 @@ public class DailyExecutionRepository {
   public List<DailyExecution> findByDateBetween(LocalDate startDate, LocalDate endDate) {
     var jWorkers = jWorkerRepository.findAll();
     var jMissions = jMissionRepository.findAll();
-
     var jmeList = jMissionExecutionRepository.findByDateBetween(startDate, endDate);
     var meList = missionExecutionMapper.toDomain(jmeList, jWorkers, jMissions);
-
     return groupExecutionsByDate(meList);
   }
 

@@ -40,7 +40,6 @@ public class CalendarController {
       Model model,
       Authentication authentication,
       @RequestParam(required = false) String workerCode) {
-
     var year = now().getYear();
     model.addAttribute("year", year);
 
@@ -49,24 +48,19 @@ public class CalendarController {
             ? workerFromAuthentication.apply(authentication).get().code()
             : workerCode;
 
-    model.addAttribute("workerCode", workerCodeOrAuth);
-
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
+
     var missionTypeByMonth =
         calendarService.missionExecutionPercentageSumByMissionType(worker, year);
-
     Map<Month, Map<Mission.Type, Double>> missionCounts = new HashMap<>();
     missionTypeByMonth.forEach(
         (month, counts) -> {
           Map<Mission.Type, Double> typeCounts =
-              counts.entrySet().stream()
-                  .collect(
-                      toMap(
-                          entry -> Mission.Type.valueOf(entry.getKey().name()),
-                          Map.Entry::getValue));
+              counts.entrySet().stream().collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
           missionCounts.put(month, typeCounts);
         });
 
+    model.addAttribute("workerCode", workerCodeOrAuth);
     model.addAttribute(
         "thYear",
         new ThYear(

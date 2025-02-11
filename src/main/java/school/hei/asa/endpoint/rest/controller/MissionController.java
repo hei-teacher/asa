@@ -1,13 +1,13 @@
 package school.hei.asa.endpoint.rest.controller;
 
 import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.groupingBy;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -50,12 +50,10 @@ public class MissionController {
       Model model,
       @RequestParam(required = false) String workerCode,
       @RequestParam(required = false) String yearMonth) {
-
     YearMonth month =
         (yearMonth == null || yearMonth.isBlank()) ? YearMonth.now() : YearMonth.parse(yearMonth);
 
     var dailyExecutionsByYearMonth = dailyExecutionsByDate(workerCode, month);
-
     var thDailyExecutions = new ArrayList<ThDailyExecution>();
     dailyExecutionsByYearMonth.forEach(
         (date, deList) -> thDailyExecutions.add(thDailyExecutionMapper.toTh(date, deList)));
@@ -75,10 +73,15 @@ public class MissionController {
       String workerCode, YearMonth month) {
     LocalDate startDate = month.atDay(1);
     LocalDate endDate = month.atEndOfMonth();
-    return (workerCode == null || workerCode.isBlank()
-            ? dailyExecutionRepository.findByDateBetween(startDate, endDate)
-            : dailyExecutionRepository.findByWorkerCodeAndDateBetween(
-                workerCode, startDate, endDate))
-        .stream().collect(Collectors.groupingBy(DailyExecution::date));
+
+    if (workerCode == null || workerCode.isBlank()) {
+      return dailyExecutionRepository.findByDateBetween(startDate, endDate).stream()
+          .collect(groupingBy(DailyExecution::date));
+    } else {
+      return dailyExecutionRepository
+          .findByWorkerCodeAndDateBetween(workerCode, startDate, endDate)
+          .stream()
+          .collect(groupingBy(DailyExecution::date));
+    }
   }
 }

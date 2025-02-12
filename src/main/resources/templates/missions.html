@@ -7,60 +7,31 @@
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
 
-<body>
+<body class="bg-gray-50 text-gray-800">
 <div th:replace="fragments/header :: header"></div>
 
-<div class="p-6 bg-gray-50">
+<div class="m-6">
+    <h2 class="text-xl font-bold mb-2">Worker</h2>
     <div th:replace="fragments/workerSelector :: workerSelector(missions, All)"></div>
 </div>
 
-<div class="px-6 pt-3 pb-12 bg-gray-50 min-h-screen">
-    <!-- Main title -->
-    <h2 class="text-2xl font-bold text-primary mb-6"
-        th:text="'Missions by Products - ' + ${worker == null ? 'All' : worker.name()}">
-    </h2>
-
-    <!-- Product grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div th:each="p : ${products}"
-             class="bg-white shadow-md rounded-lg p-4 border border-gray-300 hover:shadow-lg transition-shadow duration-200">
-
-            <!-- Product details -->
-            <div class="mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">
-                    <span th:class="'text-' + ${p.code()}">
-                        <span th:text="${p.code()}"></span> :
-                        <span th:text="${p.name()}"></span>
-                        <span class="text-sm text-gray-500"
-                              th:text="' (' + ${p.executedDays()} + ')'">
-                        </span>
-                    </span>
-                </h3>
-            </div>
-
-            <!-- Mission list -->
-            <ul class="space-y-2">
-                <li th:each="m : ${p.missions()}"
-                    class="bg-gray-100 border border-gray-300 rounded-md p-3">
-
-                    <!-- Mission details -->
-                    <p class="text-gray-800 font-medium">
-                        <span th:class="'text-' + ${m.getCode()}">
-                            <span th:text="${m.getCode()}"></span> :
-                            <span th:text="${m.getTitle()}"></span>
-                        </span>
-                    </p>
-                    <p class="text-xs text-gray-600"
-                       th:title="${m.getDescription()}"
-                       th:text="${m.getDescription()}">
-                    </p>
+<div class="m-6">
+    <h2 class="text-xl font-bold mb-2" th:text="'Missions by Products - ' + ${worker == null ? 'All' : worker.name()}"></h2>
+    <ul class="ml-6 list-disc">
+        <li th:each="p: ${products}" class="mb-4">
+            <strong class="text-lg font-semibold"
+                    th:text="${p.code()} + ': ' + ${p.name()} + ' (' + ${p.executedDays()} + ')'"
+                    th:title="${p.description()}">
+            </strong>
+            <ul class="ml-6 list-disc">
+                <li th:each="m: ${p.missions()}"
+                    class="ml-4 text-sm"
+                    th:text="${m.getCode()} + ': ' + ${m.getTitle()} + ' (' + ${m.executedDays()}  + ')'"
+                    th:title="${m.getDescription()}">
                 </li>
             </ul>
-        </div>
-    </div>
+        </li>
+    </ul>
 </div>
-
-<div th:replace="fragments/footer :: footer"></div>
-
 </body>
 </html>

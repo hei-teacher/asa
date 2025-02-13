@@ -65,10 +65,22 @@
             </tbody>
         </table>
 
-        <div style="margin-top: 10px;">
-            Work Days: <span th:text="${#numbers.formatDecimal(month.workDays, 1, 1)}"></span><br>
-            Paid Care Days: <span th:text="${#numbers.formatDecimal(month.paidCareDays, 1, 1)}"></span><br>
-            Unpaid Care Days: <span th:text="${#numbers.formatDecimal(month.unpaidCareDays, 1, 1)}"></span><br>
+        <div class="mt-6 bg-gray-100 p-4 rounded-lg shadow-md text-gray-800 flex flex-col gap-3 text-lg font-medium">
+            <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6">
+                <span class="w-4 h-4 bg-green-400 rounded-full"></span>
+                <span>Work Days:</span>
+                <span class="font-semibold" th:text="${#numbers.formatDecimal(month.workDays, 1, 1)}"></span>
+            </div>
+            <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6">
+                <span class="w-4 h-4 bg-fuchsia-600 rounded-full"></span>
+                <span>Paid Care Days:</span>
+                <span class="font-semibold" th:text="${#numbers.formatDecimal(month.paidCareDays, 1, 1)}"></span>
+            </div>
+            <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6">
+                <span class="w-4 h-4 bg-red-600 rounded-full"></span>
+                <span>Unpaid Care Days:</span>
+                <span class="font-semibold" th:text="${#numbers.formatDecimal(month.unpaidCareDays, 1, 1)}"></span>
+            </div>
         </div>
     </div>
 </div>

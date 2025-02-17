@@ -5,7 +5,9 @@ import static school.hei.asa.model.DailyExecution.Type.fullWork;
 import static school.hei.asa.model.DailyExecution.Type.mixedWorkAndCare;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public record DailyExecution(Worker worker, LocalDate date, List<MissionExecution> executions) {
@@ -14,8 +16,12 @@ public record DailyExecution(Worker worker, LocalDate date, List<MissionExecutio
   }
 
   private void validate(List<MissionExecution> executions) {
+    Set<MissionExecution> executionsAsSet = new HashSet<>(executions);
     var percentagesSum =
-        executions.stream().mapToDouble(MissionExecution::dayPercentage).map(p -> p * 100).sum();
+        executionsAsSet.stream()
+            .mapToDouble(MissionExecution::dayPercentage)
+            .map(p -> p * 100)
+            .sum();
     if (percentagesSum != 100) {
       throw new IllegalArgumentException(
           "missionPercentages::sum*100 must equal 100, but was: "

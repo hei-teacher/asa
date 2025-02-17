@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 class DailyExecutionTest {
 
   @Test
-  void missionPercentagesSum_lt1_isIllegal() {
+  void missionPercentagesSum_lt100_isIllegal() {
     var product = new Product("pcode", "pname", "pdescription");
     var worker = new PartnerContractor("worker-code", "name", "email");
     var mission = new Mission("mission-code", "title", "description", 10, product);
@@ -36,9 +36,9 @@ class DailyExecutionTest {
                 worker,
                 now(),
                 List.of(
-                    new MissionExecution(mission, worker, now(), parseDouble("0.1"), "comment"),
-                    new MissionExecution(mission, worker, now(), parseDouble("0.1"), "comment"),
-                    new MissionExecution(mission, worker, now(), parseDouble("0.7"), "comment"),
-                    new MissionExecution(mission, worker, now(), parseDouble("0.1"), "comment"))));
+                    new MissionExecution(mission, worker, now(), parseDouble("0.1"), "comment1"),
+                    new MissionExecution(mission, worker, now(), parseDouble("0.1"), "comment2"),
+                    new MissionExecution(mission, worker, now(), parseDouble("0.7"), "comment3"),
+                    new MissionExecution(mission, worker, now(), parseDouble("0.1"), "comment4"))));
   }
 }

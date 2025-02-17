@@ -55,20 +55,20 @@ class DailyExecutionControllerIT extends FacadeIT {
   }
 
   @Test
-  void save_then_read() {
+  void save_then_read_with_duplicates_ok_if_sum_of_set_is_100() {
     setUp();
     var dmeForm =
         new ThDailyExecutionForm(
-            "2024-12-01",
+            "2024-12-03",
             "mission1-code",
-            "0.2",
+            "0.4",
             "missionComment1",
             "mission2-code",
-            "0.8",
+            "0.6",
             "missionComment2",
-            null,
-            null,
-            null,
+            "mission2-code",
+            "0.6",
+            "missionComment2",
             null,
             null,
             null,

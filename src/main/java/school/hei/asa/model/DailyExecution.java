@@ -9,7 +9,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public record DailyExecution(Worker worker, LocalDate date, List<MissionExecution> executions) {
   public DailyExecution {
     validate(executions);
@@ -17,6 +19,10 @@ public record DailyExecution(Worker worker, LocalDate date, List<MissionExecutio
 
   private void validate(List<MissionExecution> executions) {
     Set<MissionExecution> executionsAsSet = new HashSet<>(executions);
+    if (executionsAsSet.size() < executions.size()) {
+      log.warn("duplicate elements in missionExecutions={}", executions);
+    }
+
     var percentagesSum =
         executionsAsSet.stream()
             .mapToDouble(MissionExecution::dayPercentage)

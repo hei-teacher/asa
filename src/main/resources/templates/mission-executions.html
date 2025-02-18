@@ -26,34 +26,43 @@
 </div>
 
 <div class="m-6">
-    <h2 class="text-xl font-bold mb-2"
-        th:text="'Mission executions - ' + ${worker == null ? 'All' : worker.name()}"></h2>
+    <div class="flex justify-between items-center">
+        <h2 class="text-xl font-bold mb-2" th:text="'Mission executions - ' + ${worker == null ? 'All' : worker.name()}"></h2>
+        <div class="btn-group">
+            <button onclick="setView('list')" class="bg-gray-800 text-white" title="List View">
+                <span class="material-icons">list</span>
+            </button>
+            <button onclick="setView('grid')" class="bg-white text-gray-800" title="Grid View">
+                <span class="material-icons">grid_view</span>
+            </button>
+        </div>
+    </div>
 
-    <strong class="text-red-500">Care missions are colored red.</strong>
-    <strong class="text-blue-500">!Important mission executions are colored blue.</strong>
+    <strong class="text-red-500">Care missions are colored red.</strong><br>
+    <strong class="text-blue-500 mb-6">!Important mission executions are colored blue.</strong>
 
-    <ul class="ml-6 list-disc">
-        <li th:each="dailyExecution: ${dailyExecutions}" class="mb-4">
-            <h3 class="text-lg font-semibold" th:text="${dailyExecution.date()}"></h3>
-            <ul class="ml-6 list-disc">
-                <li th:each="thMe: ${dailyExecution.thExecutionsPerMission()}" class="mb-2">
-                    <h4 class="text-md font-medium"
-                        th:text="${thMe.mission().code()} + ': ' + ${thMe.mission().title()}"
-                        th:style="'color: ' + (${thMe.mission().isCare(careProductCode)} ? 'red' : 'black')">
-                    </h4>
-                    <ul class="ml-6 list-disc">
-                        <li th:each="me: ${thMe.executions()}"
-                            class="ml-4 text-sm"
-                            th:text="${me.worker().name()} + ' ('+ ${me.dayPercentage()} +'): ' + ${me.comment()}"
-                            th:style="'color: ' + (${me.mission().isCare(careProductCode)}
-                            ? 'red'
-                            : (${me.comment().startsWith('!')} ? 'blue' : 'black'))">
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </li>
-    </ul>
+    <div id="missionContainer" class="list-view">
+        <ul id="missionList" class="ml-6 list-disc">
+            <li th:each="dailyExecution: ${dailyExecutions}" class="mb-4">
+                <h3 class="text-lg font-semibold" th:text="${dailyExecution.date()}"></h3>
+                <ul class="ml-6 list-disc">
+                    <li th:each="thMe: ${dailyExecution.thExecutionsPerMission()}" class="mb-2">
+                        <h4 class="text-md font-medium"
+                            th:text="${thMe.mission().code()} + ': ' + ${thMe.mission().title()}"
+                            th:style="'color: ' + (${thMe.mission().isCare(careProductCode)} ? 'red' : 'black')">
+                        </h4>
+                        <ul class="ml-6 list-disc">
+                            <li th:each="me: ${thMe.executions()}"
+                                class="ml-4 text-sm"
+                                th:text="${me.worker().name()} + ' ('+ ${me.dayPercentage()} +'): ' + ${me.comment()}"
+                                th:style="'color: ' + (${me.mission().isCare(careProductCode)} ? 'red' : (${me.comment().startsWith('!')} ? 'blue' : 'black'))">
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
 </div>
 
 <script>
@@ -63,12 +72,34 @@
         window.location.href = `/mission-executions?yearMonth=${month}&workerCode=${workerCode}`;
     }
 
+    function setView(view) {
+        const container = document.getElementById("missionList");
+        const items = container.querySelectorAll("li");
+        const listBtn = document.querySelector("button[onclick=\"setView('list')\"]");
+        const gridBtn = document.querySelector("button[onclick=\"setView('grid')\"]");
+
+        if (view === "grid") {
+            container.classList.add("grid", "grid-cols-2", "gap-6");
+            gridBtn.classList.add("bg-gray-800", "text-white");
+            gridBtn.classList.remove("bg-white", "text-gray-800");
+            listBtn.classList.remove("bg-gray-800", "text-white");
+            listBtn.classList.add("bg-white", "text-gray-800");
+
+        } else {
+            container.classList.remove("grid", "grid-cols-2", "gap-6");
+            listBtn.classList.add("bg-gray-800", "text-white");
+            listBtn.classList.remove("bg-white", "text-gray-800");
+            gridBtn.classList.remove("bg-gray-800", "text-white");
+            gridBtn.classList.add("bg-white", "text-gray-800");
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("worker").addEventListener("change", updateFilters);
         document.getElementById("monthPicker").addEventListener("change", updateFilters);
     });
 </script>
+
 <div th:replace="fragments/footer :: footer"></div>
 </body>
-
 </html>

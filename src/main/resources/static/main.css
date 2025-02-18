@@ -52,3 +52,11 @@ th {
 .text-HL { color: #DFA408; }
 .text-AA { color: #02dc02; }
 .text-CA { color: #FF6F61; }
+
+.btn-group button {
+    border: 1px solid;
+    border-radius: 0.375rem;
+    padding-bottom: 0.25rem;
+    padding-top: 0.5rem;
+    padding-inline: 0.5rem;
+}

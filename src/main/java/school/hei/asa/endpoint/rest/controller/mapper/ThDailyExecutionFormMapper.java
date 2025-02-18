@@ -36,6 +36,7 @@ public class ThDailyExecutionFormMapper {
 
     List<MissionExecution> executions = new ArrayList<>();
     var date = LocalDate.parse(dmeForm.date());
+    var creationInstant =+
     optionalAdd(executions, worker, date, mission1Opt, percentage1Opt, dmeForm.missionComment1());
     optionalAdd(executions, worker, date, mission2Opt, percentage2Opt, dmeForm.missionComment2());
     optionalAdd(executions, worker, date, mission3Opt, percentage3Opt, dmeForm.missionComment3());

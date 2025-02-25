@@ -7,10 +7,9 @@ import static java.util.stream.Collectors.toMap;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.time.format.TextStyle;
+import java.util.*;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -47,7 +46,7 @@ public class MissionController {
         Arrays.stream(Month.values())
             .collect(
                 toMap(
-                    month -> month,
+                    month -> month.toString().toLowerCase(),
                     month ->
                         filteredThProductsByWorkerCode.stream()
                             .map(p -> p.filterByMonth(month))

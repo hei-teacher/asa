@@ -10,52 +10,56 @@
 <body class="bg-gray-50 text-gray-800">
 <div th:replace="fragments/header :: header"></div>
 
-<div class="m-6">
+<div class="ml-6 mr-6 mt-6">
     <h2 class="text-xl font-bold mb-2">Worker</h2>
     <div th:replace="fragments/workerSelector :: workerSelector(missions, All)"></div>
 
-    <h2 class="text-xl font-bold mb-2" th:text="'Missions by Products - ' + ${worker == null ? 'All' : worker.name()}"></h2>
+    <h2 class="text-xl font-bold mt-6" th:text="'Missions by Products - ' + ${worker == null ? 'All' : worker.name()}"></h2>
 </div>
 
-<div class="m-6 flex gap-6">
-    <ul class="ml-6 list-disc w-1/2">
+<div class="ml-6 mr-6 flex gap-6">
+    <ul class="ml-6 mt-9 list-disc w-1/3">
         <li th:each="p: ${products}" class="mb-4">
             <strong class="text-lg font-semibold"
-                    th:text="${p.code()} + ': ' + ${p.name()} + ' (' + ${p.executedDays()} + ')' "
+                    th:text="${p.code()} + ': ' + ${p.name()} + ' (' + ${#numbers.formatDecimal(p.executedDays(), 1, 2)} + ')' "
                     th:title="${p.description()}">
             </strong>
             <ul class="ml-6 list-disc">
                 <li th:each="m: ${p.missions()}"
                     class="ml-4 text-sm"
-                    th:text="${m.getCode()} + ': ' + ${m.getTitle()} + ' (' + ${m.executedDays()}  + ')' "
+                    th:text="${m.getCode()} + ': ' + ${m.getTitle()} + ' (' + ${#numbers.formatDecimal(m.executedDays(), 1, 2)}  + ')' "
                     th:title="${m.getDescription()}">
                 </li>
             </ul>
         </li>
     </ul>
 
-        <table class="border-collapse border border-gray-400 w-1/2 text-center">
-            <thead>
-            <tr>
-                <th th:each="month : ${months.keySet()}" class="border border-gray-400 p-2" th:text="${month}"></th>
-            </tr>
-            </thead>
-            <tbody>
-                <ul class="ml-2 list-disc" th:each="month : ${months.values()}">
-                <li th:each="p : ${month}" class="mb-4">
-                    <strong class="text-lg font-semibold"
-                            th:text="${p.executedDays()} ">
-                    </strong>
-                    <ul class="ml-2 list-disc">
-                        <li th:each="m: ${p.missions()}"
-                            class="ml-2 text-sm"
-                            th:text="${m.executedDays()}">
-                        </li>
-                    </ul>
-                </li>
-                </ul>
-            </tbody>
-        </table>
+            <table class="w-2/3">
+                <thead>
+                <tr>
+                    <th th:each="month : ${months.keySet()}" style="text-align:center" class="w-1/12 text-center" th:text="${#strings.capitalize(month)}">></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="w-1/12 text-center" th:each="month : ${months.values()}">
+                        <ul class="list-none text-center">
+                            <li th:each="p : ${month}" class="mb-4 text-center">
+                                <strong class="text-lg font-semibold"
+                                        th:text="${#numbers.formatDecimal(p.executedDays(), 1, 2)}">
+                                </strong>
+                                <ul class="list-none text-center">
+                                    <li th:each="m: ${p.missions()}"
+                                        class="text-sm text-center"
+                                        th:text="${#numbers.formatDecimal(m.executedDays(), 1, 2)}">
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
 
     <script>
         function updateFilters() {

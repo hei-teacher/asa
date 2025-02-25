@@ -13,25 +13,61 @@
 <div class="m-6">
     <h2 class="text-xl font-bold mb-2">Worker</h2>
     <div th:replace="fragments/workerSelector :: workerSelector(missions, All)"></div>
+
+    <h2 class="text-xl font-bold mb-2" th:text="'Missions by Products - ' + ${worker == null ? 'All' : worker.name()}"></h2>
 </div>
 
-<div class="m-6">
-    <h2 class="text-xl font-bold mb-2" th:text="'Missions by Products - ' + ${worker == null ? 'All' : worker.name()}"></h2>
-    <ul class="ml-6 list-disc">
+<div class="m-6 flex gap-6">
+    <ul class="ml-6 list-disc w-1/2">
         <li th:each="p: ${products}" class="mb-4">
             <strong class="text-lg font-semibold"
-                    th:text="${p.code()} + ': ' + ${p.name()} + ' (' + ${p.executedDays()} + ')'"
+                    th:text="${p.code()} + ': ' + ${p.name()} + ' (' + ${p.executedDays()} + ')' "
                     th:title="${p.description()}">
             </strong>
             <ul class="ml-6 list-disc">
                 <li th:each="m: ${p.missions()}"
                     class="ml-4 text-sm"
-                    th:text="${m.getCode()} + ': ' + ${m.getTitle()} + ' (' + ${m.executedDays()}  + ')'"
+                    th:text="${m.getCode()} + ': ' + ${m.getTitle()} + ' (' + ${m.executedDays()}  + ')' "
                     th:title="${m.getDescription()}">
                 </li>
             </ul>
         </li>
     </ul>
+
+        <table class="border-collapse border border-gray-400 w-1/2 text-center">
+            <thead>
+            <tr>
+                <th th:each="month : ${months.keySet()}" class="border border-gray-400 p-2" th:text="${month}"></th>
+            </tr>
+            </thead>
+            <tbody>
+                <ul class="ml-2 list-disc" th:each="month : ${months.values()}">
+                <li th:each="p : ${month}" class="mb-4">
+                    <strong class="text-lg font-semibold"
+                            th:text="${p.executedDays()} ">
+                    </strong>
+                    <ul class="ml-2 list-disc">
+                        <li th:each="m: ${p.missions()}"
+                            class="ml-2 text-sm"
+                            th:text="${m.executedDays()}">
+                        </li>
+                    </ul>
+                </li>
+                </ul>
+            </tbody>
+        </table>
+
+    <script>
+        function updateFilters() {
+            const workerCode = document.getElementById("worker").value;
+            window.location.href = `/missions?workerCode=${workerCode}`;
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("worker").addEventListener("change", updateFilters);
+        });
+    </script>
 </div>
+
 </body>
 </html>

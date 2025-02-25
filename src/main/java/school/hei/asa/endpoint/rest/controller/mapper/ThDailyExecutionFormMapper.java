@@ -2,6 +2,7 @@ package school.hei.asa.endpoint.rest.controller.mapper;
 
 import static java.lang.Double.parseDouble;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,6 @@ public class ThDailyExecutionFormMapper {
 
     List<MissionExecution> executions = new ArrayList<>();
     var date = LocalDate.parse(dmeForm.date());
-    var creationInstant =+
     optionalAdd(executions, worker, date, mission1Opt, percentage1Opt, dmeForm.missionComment1());
     optionalAdd(executions, worker, date, mission2Opt, percentage2Opt, dmeForm.missionComment2());
     optionalAdd(executions, worker, date, mission3Opt, percentage3Opt, dmeForm.missionComment3());
@@ -52,6 +52,7 @@ public class ThDailyExecutionFormMapper {
       Optional<Mission> keyOpt,
       Optional<Double> valueOpt,
       String comment) {
+    Instant creationInstant = Instant.now();
     if (keyOpt.isPresent() && valueOpt.isPresent()) {
       if (comment == null || comment.isBlank()) {
         throw new IllegalArgumentException("Comment cannot be null or blank");

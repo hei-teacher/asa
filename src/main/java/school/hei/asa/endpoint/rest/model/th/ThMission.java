@@ -1,5 +1,6 @@
 package school.hei.asa.endpoint.rest.model.th;
 
+import java.time.Month;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,12 @@ public class ThMission {
   public ThMission filterByWorkerCode(String workerCode) {
     var filteredExecutions =
         missionExecutions.stream().filter(me -> workerCode.equals(me.workerCode)).toList();
+    return new ThMission(code, title, description, filteredExecutions, isCare);
+  }
+
+  public ThMission filterByMonth(Month month) {
+    var filteredExecutions =
+        missionExecutions.stream().filter(me -> me.getDate().getMonth() == month).toList();
     return new ThMission(code, title, description, filteredExecutions, isCare);
   }
 }

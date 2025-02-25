@@ -2,7 +2,6 @@ package school.hei.asa.endpoint.rest.controller.mapper;
 
 import static java.lang.Double.parseDouble;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +51,6 @@ public class ThDailyExecutionFormMapper {
       Optional<Mission> keyOpt,
       Optional<Double> valueOpt,
       String comment) {
-    Instant creationInstant = Instant.now();
     if (keyOpt.isPresent() && valueOpt.isPresent()) {
       if (comment == null || comment.isBlank()) {
         throw new IllegalArgumentException("Comment cannot be null or blank");

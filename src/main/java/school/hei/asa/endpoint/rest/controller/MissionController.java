@@ -1,7 +1,8 @@
 package school.hei.asa.endpoint.rest.controller;
 
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -52,11 +53,7 @@ public class MissionController {
                             .map(p -> p.filterByMonth(month))
                             .toList()));
 
-    int maxProducts =
-        filteredThProductsByMonth.values().stream().mapToInt(List::size).max().orElse(0);
-
     model.addAttribute("months", filteredThProductsByMonth);
-    model.addAttribute("maxProducts", maxProducts);
     model.addAttribute("products", filteredThProductsByWorkerCode);
     workerToModelAdder.apply(workerCode, model);
     return "missions";

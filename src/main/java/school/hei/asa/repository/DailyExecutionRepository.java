@@ -46,7 +46,6 @@ public class DailyExecutionRepository {
     List<DailyExecution> dailyExecutions = new ArrayList<>();
     meListByDate.forEach(
         (date, meListOfDate) -> addToDailyExecutions(date, meListOfDate, dailyExecutions));
-    System.out.println("This is the creation instant: " + dailyExecutions.getFirst().executions().getFirst().creationInstant().toString());
     return dailyExecutions;
   }
 

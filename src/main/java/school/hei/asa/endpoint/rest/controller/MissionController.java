@@ -53,7 +53,11 @@ public class MissionController {
                             .map(p -> p.filterByMonth(month))
                             .toList()));
 
+    int maxProducts =
+        filteredThProductsByMonth.values().stream().mapToInt(List::size).max().orElse(0);
+
     model.addAttribute("months", filteredThProductsByMonth);
+    model.addAttribute("maxProducts", maxProducts);
     model.addAttribute("products", filteredThProductsByWorkerCode);
     workerToModelAdder.apply(workerCode, model);
     return "missions";

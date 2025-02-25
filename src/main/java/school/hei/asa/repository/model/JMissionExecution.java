@@ -8,7 +8,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.sql.Date;
 import java.time.Instant;
-
 import lombok.Getter;
 import lombok.Setter;
 

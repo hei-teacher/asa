@@ -34,32 +34,35 @@
         </li>
     </ul>
 
-            <table class="w-2/3">
-                <thead>
-                <tr>
-                    <th th:each="month : ${months.keySet()}" style="text-align:center" class="w-1/12 text-center" th:text="${#strings.capitalize(month)}">></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="w-1/12 text-center" th:each="month : ${months.values()}">
+    <table class="w-2/3">
+        <thead>
+        <tr>
+            <th th:each="month : ${months.keySet()}"
+                style="text-align:center" class="w-1/12 text-center"
+                th:text="${#strings.capitalize(month)}">
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="w-1/12 text-center"
+                th:each="month : ${T(java.time.Month).values()}">
+                <ul class="list-none text-center">
+                    <li th:each="p : ${months[month.toString().toLowerCase()]}" class="mb-4 text-center">
+                        <strong class="text-lg font-semibold"
+                                th:text="${p.executedDays() > 0 ? #numbers.formatDecimal(p.executedDays(), 1, 2) : '-'}">
+                        </strong>
                         <ul class="list-none text-center">
-                            <li th:each="p : ${month}" class="mb-4 text-center">
-                                <strong class="text-lg font-semibold"
-                                        th:text="${#numbers.formatDecimal(p.executedDays(), 1, 2)}">
-                                </strong>
-                                <ul class="list-none text-center">
-                                    <li th:each="m: ${p.missions()}"
-                                        class="text-sm text-center"
-                                        th:text="${#numbers.formatDecimal(m.executedDays(), 1, 2)}">
-                                    </li>
-                                </ul>
+                            <li th:each="m: ${p.missions()}" class="text-sm text-center"
+                                th:text="${m.executedDays() > 0 ? #numbers.formatDecimal(m.executedDays(), 1, 2) : '-'}">
                             </li>
                         </ul>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
     <script>
         function updateFilters() {

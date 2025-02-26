@@ -1,5 +1,6 @@
 package school.hei.asa.endpoint.rest.controller;
 
+import static java.util.Arrays.stream;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
@@ -7,8 +8,11 @@ import static java.util.stream.Collectors.toMap;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,7 +47,7 @@ public class MissionController {
             : thProducts.stream().map(p -> p.filterByWorkerCode(workerCode)).toList();
 
     var filteredThProductsByMonth =
-        Arrays.stream(Month.values())
+        stream(Month.values())
             .collect(
                 toMap(
                     month ->

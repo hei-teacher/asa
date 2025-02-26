@@ -7,9 +7,8 @@ import static java.util.stream.Collectors.toMap;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
-import java.util.LinkedHashMap;
 import java.util.*;
-
+import java.util.LinkedHashMap;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,20 +42,29 @@ public class MissionController {
             ? thProducts
             : thProducts.stream().map(p -> p.filterByWorkerCode(workerCode)).toList();
 
-    var filteredThProductsByMonth = Arrays.stream(Month.values())
-            .collect(toMap(
-                    month -> filteredThProductsByWorkerCode.stream()
-                                    .map(p -> p.filterByMonth(month)).mapToDouble(ThProduct::executedDays).sum() > 0 ?
-                            month.toString().toLowerCase() : ' ',
+    var filteredThProductsByMonth =
+        Arrays.stream(Month.values())
+            .collect(
+                toMap(
+                    month ->
+                        filteredThProductsByWorkerCode.stream()
+                                    .map(p -> p.filterByMonth(month))
+                                    .mapToDouble(ThProduct::executedDays)
+                                    .sum()
+                                > 0
+                            ? month.toString().toLowerCase()
+                            : ' ',
                     month -> {
-                      var products = filteredThProductsByWorkerCode.stream()
+                      var products =
+                          filteredThProductsByWorkerCode.stream()
                               .map(p -> p.filterByMonth(month))
                               .toList();
-                      return products.stream().mapToDouble(ThProduct::executedDays).sum() > 0 ? products : List.of();
+                      return products.stream().mapToDouble(ThProduct::executedDays).sum() > 0
+                          ? products
+                          : List.of();
                     },
                     (v1, v2) -> v1,
-                    LinkedHashMap::new
-            ));
+                    LinkedHashMap::new));
 
     model.addAttribute("months", filteredThProductsByMonth);
     model.addAttribute("products", filteredThProductsByWorkerCode);

@@ -38,17 +38,17 @@ public class MissionExecutionMapper {
     var jWorkerCode = jme.getWorker_code();
     var jMissionCode = jme.getMission_code();
     return new MissionExecution(
-            missionMapper.toDomain(
-                cache.getOrDefault(JMission.class, jMissionCode, jme.getMission()), cache),
-            cache.getOrDefault(
-                Worker.class,
-                jWorkerCode,
-                workerMapper.toDomain(
-                    cache.getOrDefault(JWorker.class, jWorkerCode, jme.getWorker()), cache)),
-            jme.getDate().toLocalDate(),
-            jme.getDayPercentage(),
-            jme.getComment(),
-            jme.getCreationInstant());
+        missionMapper.toDomain(
+            cache.getOrDefault(JMission.class, jMissionCode, jme.getMission()), cache),
+        cache.getOrDefault(
+            Worker.class,
+            jWorkerCode,
+            workerMapper.toDomain(
+                cache.getOrDefault(JWorker.class, jWorkerCode, jme.getWorker()), cache)),
+        jme.getDate().toLocalDate(),
+        jme.getDayPercentage(),
+        jme.getComment(),
+        jme.getCreationInstant());
   }
 
   public List<MissionExecution> toDomain(

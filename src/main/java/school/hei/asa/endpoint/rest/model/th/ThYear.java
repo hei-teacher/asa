@@ -35,27 +35,33 @@ public class ThYear {
       String title,
       Map<LocalDate, Color> coloredDates,
       Map<Color, String> colorDescriptions,
-      Map<Month, Map<Mission.Type, Double>> missionCounts) {
+      Map<Month, Map<Mission.Type, Double>> missionCounts,
+      Map<Month, Long> lateReportedDays) {
     this.year = year;
     this.title = title;
-    this.thMonths = thMonths(year, missionCounts);
+    this.thMonths = thMonths(year, missionCounts, lateReportedDays);
     this.coloredDates = coloredDates;
     this.colorDescriptions = colorDescriptions;
   }
 
   private static Map<Month, ThMonth> thMonths(
-      int year, Map<Month, Map<Mission.Type, Double>> missionCounts) {
+      int year,
+      Map<Month, Map<Mission.Type, Double>> missionCounts,
+      Map<Month, Long> lateReportedDays) {
     Map<Month, ThMonth> res = new LinkedHashMap<>();
     for (int month = 1; month <= 12; month++) {
       Month currentMonth = Month.of(month);
       YearMonth yearMonth = YearMonth.of(year, month);
+      Long lateReportedDaysMonth = lateReportedDays.getOrDefault(currentMonth, 0L);
       Map<Mission.Type, Double> counts = missionCounts.getOrDefault(currentMonth, Map.of());
 
       Double unpaidCareDays = counts.getOrDefault(Mission.Type.unpaidCare, 0.0);
       Double paidCareDays = counts.getOrDefault(Mission.Type.paidCare, 0.0);
       Double workDays = counts.getOrDefault(Mission.Type.work, 0.0);
 
-      res.put(currentMonth, new ThMonth(yearMonth, unpaidCareDays, paidCareDays, workDays));
+      res.put(
+          currentMonth,
+          new ThMonth(yearMonth, unpaidCareDays, paidCareDays, workDays, lateReportedDaysMonth));
     }
     return res;
   }

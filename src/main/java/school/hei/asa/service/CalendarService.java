@@ -51,4 +51,16 @@ public class CalendarService {
                 careProductCodeSupplier.get(), paidCareMissionCodesSupplier.get()))
         .missionExecutionPercentageSumByMissionType();
   }
+
+  @Transactional
+  public Map<Month, Long> lateReportedDaysByMonth(Worker worker, int year) {
+    return new WorkerCalendar(
+            worker,
+            dailyExecutionRepository.findByWorkerCodeAndDateBetween(
+                worker.code(), LocalDate.of(year, JANUARY, 1), LocalDate.of(year, DECEMBER, 31)),
+            year,
+            new school.hei.asa.model.ProductConf(
+                careProductCodeSupplier.get(), paidCareMissionCodesSupplier.get()))
+        .lateReportedDaysByMonth();
+  }
 }

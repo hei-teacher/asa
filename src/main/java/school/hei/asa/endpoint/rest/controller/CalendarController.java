@@ -59,6 +59,7 @@ public class CalendarController {
               counts.entrySet().stream().collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
           missionCounts.put(month, typeCounts);
         });
+    var lateReportedDaysByMonth = calendarService.lateReportedDaysByMonth(worker, year);
 
     model.addAttribute("workerCode", workerCodeOrAuth);
     model.addAttribute(
@@ -68,7 +69,8 @@ public class CalendarController {
             "Work & Care days - " + worker.name(),
             getColoredDates(year, worker),
             colorDescription(),
-            missionCounts));
+            missionCounts,
+            lateReportedDaysByMonth));
 
     return "calendar";
   }

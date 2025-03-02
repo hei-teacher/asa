@@ -53,6 +53,7 @@ class DailyExecutionTest {
     var product = new Product("pcode", "pname", "pdescription");
     var worker = new PartnerContractor("worker-code", "name", "email");
     var mission = new Mission("mission-code", "title", "description", 10, product);
+    var now = Instant.now();
 
     assertDoesNotThrow(
         () ->
@@ -61,20 +62,20 @@ class DailyExecutionTest {
                 now(),
                 List.of(
                     new MissionExecution(
-                        mission, worker, now(), parseDouble("0.1"), "comment1", Instant.now()),
+                        mission, worker, now(), parseDouble("0.1"), "comment1", now),
                     new MissionExecution(
-                        mission, worker, now(), parseDouble("0.1"), "comment2", Instant.now()),
+                        mission, worker, now(), parseDouble("0.1"), "comment2", now),
                     new MissionExecution(
-                        mission, worker, now(), parseDouble("0.7"), "comment3", Instant.now()),
+                        mission, worker, now(), parseDouble("0.7"), "comment3", now),
                     new MissionExecution(
-                        mission, worker, now(), parseDouble("0.1"), "comment4", Instant.now()),
+                        mission, worker, now(), parseDouble("0.1"), "comment4", now),
                     new MissionExecution(
-                        mission, worker, now(), parseDouble("0.1"), "comment1", Instant.now()),
+                        mission, worker, now(), parseDouble("0.1"), "comment1", now),
                     new MissionExecution(
-                        mission, worker, now(), parseDouble("0.1"), "comment2", Instant.now()),
+                        mission, worker, now(), parseDouble("0.1"), "comment2", now),
                     new MissionExecution(
-                        mission, worker, now(), parseDouble("0.7"), "comment3", Instant.now()),
+                        mission, worker, now(), parseDouble("0.7"), "comment3", now),
                     new MissionExecution(
-                        mission, worker, now(), parseDouble("0.1"), "comment4", Instant.now()))));
+                        mission, worker, now(), parseDouble("0.1"), "comment4", now))));
   }
 }

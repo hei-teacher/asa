@@ -9,4 +9,4 @@ public record MissionExecution(
     LocalDate date,
     double dayPercentage,
     String comment,
-    Instant creationInstant) {}
+    Instant reportedAt) {}

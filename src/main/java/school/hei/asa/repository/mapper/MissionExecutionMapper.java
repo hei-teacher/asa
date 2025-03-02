@@ -48,7 +48,7 @@ public class MissionExecutionMapper {
         jme.getDate().toLocalDate(),
         jme.getDayPercentage(),
         jme.getComment(),
-        jme.getCreationInstant());
+        jme.getReportedAt());
   }
 
   public List<MissionExecution> toDomain(

@@ -37,5 +37,6 @@ public class JMissionExecution {
 
   private String comment;
 
-  private Instant creationInstant;
+  @Column(name = "creation_instant")
+  private Instant reportedAt;
 }

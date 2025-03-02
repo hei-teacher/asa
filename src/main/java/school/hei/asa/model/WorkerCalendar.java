@@ -82,7 +82,7 @@ public class WorkerCalendar {
                     .anyMatch(
                         missionExecution ->
                             missionExecution
-                                    .reportedAt()
+                                .reportedAt()
                                 .isAfter(
                                     dailyExecution
                                         .date()

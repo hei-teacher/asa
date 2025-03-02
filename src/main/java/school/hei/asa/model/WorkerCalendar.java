@@ -86,7 +86,7 @@ public class WorkerCalendar {
                                 .isAfter(
                                     dailyExecution
                                         .date()
-                                        .plusDays(2)
+                                        .plusDays(3)
                                         .atStartOfDay(ZoneId.systemDefault())
                                         .toInstant())))
         .collect(groupingBy(dailyExecution -> dailyExecution.date().getMonth(), counting()));

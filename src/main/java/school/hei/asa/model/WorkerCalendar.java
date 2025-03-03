@@ -2,9 +2,10 @@ package school.hei.asa.model;
 
 import static java.util.stream.Collectors.*;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -76,19 +77,22 @@ public class WorkerCalendar {
 
   public Map<Month, Long> lateReportedDaysByMonth() {
     return dailyExecutions.stream()
-        .filter(
-            dailyExecution ->
-                dailyExecution.executions().stream()
-                    .anyMatch(
-                        missionExecution ->
-                            missionExecution
-                                .reportedAt()
-                                .isAfter(
-                                    dailyExecution
-                                        .date()
-                                        .plusDays(3)
-                                        .atStartOfDay(ZoneId.systemDefault())
-                                        .toInstant())))
-        .collect(groupingBy(dailyExecution -> dailyExecution.date().getMonth(), counting()));
+        .collect(
+            groupingBy(
+                dailyExecution -> dailyExecution.date().getMonth(),
+                filtering(
+                    dailyExecution -> {
+                      Instant deadline =
+                          dailyExecution
+                              .date()
+                              .plusDays(3)
+                              .atStartOfDay(ZoneOffset.UTC)
+                              .toInstant();
+
+                      return dailyExecution.executions().stream()
+                          .anyMatch(
+                              missionExecution -> missionExecution.reportedAt().isAfter(deadline));
+                    },
+                    counting())));
   }
 }

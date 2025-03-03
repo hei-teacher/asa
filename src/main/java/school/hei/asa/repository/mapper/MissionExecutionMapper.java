@@ -31,6 +31,7 @@ public class MissionExecutionMapper {
     jme.setDate(Date.valueOf(me.date()));
     jme.setDayPercentage(me.dayPercentage());
     jme.setComment(me.comment());
+    jme.setReportedAt(me.reportedAt());
     return jme;
   }
 

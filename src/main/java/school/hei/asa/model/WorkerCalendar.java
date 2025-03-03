@@ -1,5 +1,8 @@
 package school.hei.asa.model;
 
+import static java.time.ZoneOffset.UTC;
+import static java.util.stream.Collectors.*;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
@@ -10,9 +13,6 @@ import java.util.Map;
 import java.util.function.Function;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-
-import static java.time.ZoneOffset.UTC;
-import static java.util.stream.Collectors.*;
 
 @Accessors(fluent = true)
 @Getter
@@ -77,22 +77,16 @@ public class WorkerCalendar {
 
   public Map<Month, Long> lateReportedDaysByMonth() {
     return dailyExecutions.stream()
-            .collect(
-                    groupingBy(
-                            dailyExecution -> dailyExecution.date().getMonth(),
-                            filtering(this::isLateReported, counting())
-                    )
-            );
+        .collect(
+            groupingBy(
+                dailyExecution -> dailyExecution.date().getMonth(),
+                filtering(this::isLateReported, counting())));
   }
 
   private boolean isLateReported(DailyExecution dailyExecution) {
-    Instant deadline = dailyExecution
-            .date()
-            .plusDays(3)
-            .atStartOfDay(UTC)
-            .toInstant();
+    Instant deadline = dailyExecution.date().plusDays(3).atStartOfDay(UTC).toInstant();
 
     return dailyExecution.executions().stream()
-            .anyMatch(missionExecution -> missionExecution.reportedAt().isAfter(deadline));
+        .anyMatch(missionExecution -> missionExecution.reportedAt().isAfter(deadline));
   }
 }

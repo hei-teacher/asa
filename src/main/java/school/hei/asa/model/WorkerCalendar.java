@@ -18,12 +18,12 @@ import lombok.experimental.Accessors;
 @Getter
 public class WorkerCalendar {
 
+  public static final int MINIMUM_LATE_DAYS = 3;
+
   private final Worker worker;
   private final int year;
   private final ProductConf productConf;
   private final List<DailyExecution> dailyExecutions;
-
-  public static final int MINIMUM_LATE_DAYS = 3;
 
   public WorkerCalendar(
       Worker worker, List<DailyExecution> dailyExecutions, int year, ProductConf productConf) {

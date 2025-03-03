@@ -23,6 +23,8 @@ public class WorkerCalendar {
   private final ProductConf productConf;
   private final List<DailyExecution> dailyExecutions;
 
+  public static final int MINIMUM_LATE_DAYS = 3;
+
   public WorkerCalendar(
       Worker worker, List<DailyExecution> dailyExecutions, int year, ProductConf productConf) {
     this.worker = worker;
@@ -84,8 +86,8 @@ public class WorkerCalendar {
   }
 
   private boolean isLateReported(DailyExecution dailyExecution) {
-    Instant deadline = dailyExecution.date().plusDays(3).atStartOfDay(UTC).toInstant();
-
+    Instant deadline =
+        dailyExecution.date().plusDays(MINIMUM_LATE_DAYS).atStartOfDay(UTC).toInstant();
     return dailyExecution.executions().stream()
         .anyMatch(missionExecution -> missionExecution.reportedAt().isAfter(deadline));
   }

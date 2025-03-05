@@ -15,19 +15,20 @@
     <div th:replace="fragments/workerSelector :: workerSelector(missions, All)"></div>
 
     <h2 class="text-xl font-bold mt-6" th:text="'Missions by Products - ' + ${worker == null ? 'All' : worker.name()}"></h2>
+    <strong>"st="</strong> refers to the days executed by a <strong>st</strong>udent worker.
 </div>
 
 <div class="ml-6 mr-6 flex gap-6">
     <ul class="ml-6 mt-9 list-disc w-1/3">
         <li th:each="p: ${products}" class="mb-4">
             <strong class="text-lg font-semibold"
-                    th:text="${p.code()} + ': ' + ${p.name()} + ' (' + ${#numbers.formatDecimal(p.executedDays(), 1, 2)} + ')' "
+                    th:text="${p.code()} + ': ' + ${p.name()} + ' (' + ${#numbers.formatDecimal(p.executedDays(), 1, 2)} + ' | st=' + ${#numbers.formatDecimal(p.studentExecutedDays(), 1, 2)} + ')' "
                     th:title="${p.description()}">
             </strong>
             <ul class="ml-6 list-disc">
                 <li th:each="m: ${p.missions()}"
                     class="ml-4 text-sm"
-                    th:text="${m.getCode()} + ': ' + ${m.getTitle()} + ' (' + ${#numbers.formatDecimal(m.executedDays(), 1, 2)}  + ')' "
+                    th:text="${m.getCode()} + ': ' + ${m.getTitle()} + ' (' + ${#numbers.formatDecimal(m.executedDays(), 1, 2)}  + ' | st=' + ${#numbers.formatDecimal(m.studentExecutedDays(), 1, 2)} + ')' "
                     th:title="${m.getDescription()}">
                 </li>
             </ul>

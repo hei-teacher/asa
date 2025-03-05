@@ -11,9 +11,9 @@ class ThMissionTest {
   @Test
   void can_calculate_executed_days() {
     var execution1 =
-        new ThMissionExecution("me-code", "wc1", LocalDate.now(), 0.5, "comment1", true);
+        new ThMissionExecution("me-code", "wc1", LocalDate.now(), 0.5, "comment1", true, true);
     var execution2 =
-        new ThMissionExecution("me-code", "wc2", LocalDate.now(), 0.3, "comment2", true);
+        new ThMissionExecution("me-code", "wc2", LocalDate.now(), 0.3, "comment2", true, true);
     var thMission =
         new ThMission("mcode", "mtitle", "mdesc", List.of(execution1, execution2), true);
 
@@ -23,11 +23,11 @@ class ThMissionTest {
   @Test
   void can_filter_by_worker_code() {
     var execution1 =
-        new ThMissionExecution("me-code", "wc1", LocalDate.now(), 0.2, "comment1", true);
+        new ThMissionExecution("me-code", "wc1", LocalDate.now(), 0.2, "comment1", true, true);
     var execution2 =
-        new ThMissionExecution("me-code", "wc2", LocalDate.now(), 0.2, "comment2", true);
+        new ThMissionExecution("me-code", "wc2", LocalDate.now(), 0.2, "comment2", true, true);
     var execution3 =
-        new ThMissionExecution("me-code", "wc1", LocalDate.now(), 0.3, "comment3", true);
+        new ThMissionExecution("me-code", "wc1", LocalDate.now(), 0.3, "comment3", true, true);
     var thMission =
         new ThMission(
             "mcode", "mtitle", "mdesc", List.of(execution1, execution2, execution3), true);

@@ -10,8 +10,8 @@ class ThProductTest {
 
   @Test
   void can_filter_by_worker_code() {
-    var execution1 = new ThMissionExecution("mcode", "wc1", now(), 0.1, "ecomment1", true);
-    var execution2 = new ThMissionExecution("mcode", "wc2", now(), 0.2, "ecomment2", true);
+    var execution1 = new ThMissionExecution("mcode", "wc1", now(), 0.1, "ecomment1", true, true);
+    var execution2 = new ThMissionExecution("mcode", "wc2", now(), 0.2, "ecomment2", true, true);
     var thMission =
         new ThMission("mcode", "mtitle", "mdesc", List.of(execution1, execution2), true);
 

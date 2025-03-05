@@ -15,4 +15,5 @@ public class ThMissionExecution {
   double dayPercentage;
   String comment;
   boolean isCare;
+  boolean isExecutedByStudent;
 }

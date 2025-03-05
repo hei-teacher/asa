@@ -20,6 +20,13 @@ public class ThMission {
     return missionExecutions.stream().mapToDouble(ThMissionExecution::getDayPercentage).sum();
   }
 
+  public double studentExecutedDays() {
+    return missionExecutions.stream()
+        .filter(ThMissionExecution::isExecutedByStudent)
+        .mapToDouble(ThMissionExecution::getDayPercentage)
+        .sum();
+  }
+
   public ThMission filterByWorkerCode(String workerCode) {
     var filteredExecutions =
         missionExecutions.stream().filter(me -> workerCode.equals(me.workerCode)).toList();

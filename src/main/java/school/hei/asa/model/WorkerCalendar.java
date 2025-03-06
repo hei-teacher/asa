@@ -79,14 +79,11 @@ public class WorkerCalendar {
 
   public Map<Month, List<LocalDate>> lateReportedDaysByMonth() {
     return dailyExecutions.stream()
-            .filter(this::isLateReported)
-            .collect(groupingBy(
-                    dailyExecution -> dailyExecution.date().getMonth(),
-                    mapping(
-                            DailyExecution::date,
-                            toList()
-                    )
-            ));
+        .filter(this::isLateReported)
+        .collect(
+            groupingBy(
+                dailyExecution -> dailyExecution.date().getMonth(),
+                mapping(DailyExecution::date, toList())));
   }
 
   private boolean isLateReported(DailyExecution dailyExecution) {

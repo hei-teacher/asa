@@ -57,10 +57,10 @@ public class CalendarService {
     return new WorkerCalendar(
             worker,
             dailyExecutionRepository.findByWorkerCodeAndDateBetween(
-                    worker.code(), LocalDate.of(year, JANUARY, 1), LocalDate.of(year, DECEMBER, 31)),
+                worker.code(), LocalDate.of(year, JANUARY, 1), LocalDate.of(year, DECEMBER, 31)),
             year,
             new school.hei.asa.model.ProductConf(
-                    careProductCodeSupplier.get(), paidCareMissionCodesSupplier.get()))
-            .lateReportedDaysByMonth();
+                careProductCodeSupplier.get(), paidCareMissionCodesSupplier.get()))
+        .lateReportedDaysByMonth();
   }
 }

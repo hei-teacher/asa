@@ -81,16 +81,40 @@
                 <span>Unpaid Care Days:</span>
                 <span th:text="${#numbers.formatDecimal(month.unpaidCareDays, 1, 1)}"></span>
             </div>
-            <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6">
+            <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6 relative group">
                 <span class="w-4 h-4 bg-gray-500 rounded-full"></span>
-                <span>Late Reported Days:</span>
-                <span th:text="${#numbers.formatDecimal(month.lateReportedDays, 1, 1)}"></span>
+                <span class="relative cursor-pointer">Late Reported Days:
+                <div class="absolute bottom-full ml-10 mb-2 w-64 p-2 text-sm bg-gray-500 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                    Jours pointés 3 jours plus tard ou plus
+                </div>
+                </span>
+                <span th:text="${#numbers.formatDecimal(month.lateReportedDays, 1, 1)}"
+                      class="cursor-pointer text-blue-600 hover:underline"
+                      onclick="openModal()"></span>
+            </div>
+
+            <!-- Modal -->
+            <div id="infoModal" class="fixed inset-0 bg-gray-900/30 backdrop-blur-sm hidden flex items-center justify-center">
+                <div class="bg-white p-4 rounded shadow-lg w-80">
+                    <h2 class="text-lg font-semibold mb-2">Late Reported Days</h2>
+                    <p>Un Late Reported Days est un jour reporté 3 jours après.</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+    function openModal() {
+        document.getElementById("infoModal").classList.remove("hidden");
+    }
+
+    document.getElementById("infoModal").addEventListener("click", function (e) {
+        if (e.target === this) {
+            this.classList.add("hidden");
+        }
+    });
+
     function updateFilters() {
         const workerCode = document.getElementById("worker").value;
         window.location.href = `/work-and-care-calendar?workerCode=${workerCode}`;

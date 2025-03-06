@@ -62,6 +62,21 @@
             </td>
         </tr>
         </tbody>
+        <tfoot>
+        <tr>
+            <td class="w-1/12 text-center font-bold"
+                th:each="month : ${T(java.time.Month).values()}">
+                <ul class="list-none text-center">
+                    <li th:each="t : ${total[month.toString().toLowerCase()]}" class="mb-4 text-center">
+                        <strong class="text-lg font-semibold"
+                                th:text="${#numbers.formatDecimal(t, 1, 2)}">
+                        </strong>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        </tfoot>
+
     </table>
 
     <script>

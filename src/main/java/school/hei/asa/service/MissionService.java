@@ -32,22 +32,38 @@ public class MissionService {
         .collect(
             toMap(
                 month ->
-                    thProductsHasExecutedDays(thProducts, month)
+                        thProductsExecutedDaysSum(thProducts, month) > 0
                         ? month.toString().toLowerCase()
                         : " ",
                 month ->
-                    thProductsHasExecutedDays(thProducts, month)
+                        thProductsExecutedDaysSum(thProducts, month) > 0
                         ? thProducts.stream().map(p -> p.filterByMonth(month)).toList()
                         : List.of(),
                 (v1, v2) -> v1,
                 LinkedHashMap::new));
   }
 
-  public boolean thProductsHasExecutedDays(List<ThProduct> thProducts, Month month) {
+  public Map<String, Double> thProductsExecutedDaysSumByMonth(List<ThProduct> thProducts) {
+    return Arrays.stream(Month.values())
+            .collect(
+                    toMap(
+                            month ->
+                                    thProductsExecutedDaysSum(thProducts, month) > 0
+                                            ? month.toString().toLowerCase()
+                                            : " ",
+                            month ->
+                                    thProductsExecutedDaysSum(thProducts, month) > 0
+                                            ? thProductsExecutedDaysSum(thProducts, month)
+                                            : 0,
+                            (v1, v2) -> v1,
+                            LinkedHashMap::new));
+  }
+
+  public Double thProductsExecutedDaysSum(List<ThProduct> thProducts, Month month) {
     return thProducts.stream()
             .map(p -> p.filterByMonth(month))
             .mapToDouble(ThProduct::executedDays)
-            .sum()
-        > 0;
+            .sum();
   }
+
 }

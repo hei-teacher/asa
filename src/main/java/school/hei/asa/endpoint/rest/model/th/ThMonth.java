@@ -27,7 +27,7 @@ public class ThMonth {
 
   @Getter private Double workDays;
 
-  @Getter private Long lateReportedDays;
+  @Getter private List<LocalDate> lateReportedDays;
 
   private final Map<Integer, List<Integer>> daysByWeek;
   public static final int FILLER_DAY = -1;
@@ -46,7 +46,7 @@ public class ThMonth {
       Double unpaidCareDays,
       Double paidCareDays,
       Double workDays,
-      Long lateReportedDays) {
+      List<LocalDate> lateReportedDays) {
     this.yearMonth = yearMonth;
     this.daysByWeek = daysByWeek(yearMonth);
     this.unpaidCareDays = unpaidCareDays;

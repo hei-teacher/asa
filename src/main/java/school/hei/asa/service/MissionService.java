@@ -51,10 +51,10 @@ public class MissionService {
                     thProductsExecutedDaysSum(thProducts, month) > 0
                         ? month.toString().toLowerCase()
                         : "",
-                month ->
-                    thProductsExecutedDaysSum(thProducts, month) > 0
-                        ? thProductsExecutedDaysSum(thProducts, month)
-                        : 0,
+                month -> {
+                  double sum = thProductsExecutedDaysSum(thProducts, month);
+                  return sum > 0 ? sum : 0;
+                },
                 (v1, v2) -> v1,
                 LinkedHashMap::new));
   }

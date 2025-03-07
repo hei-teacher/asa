@@ -50,17 +50,17 @@ public class ThYear {
       Map<Month, List<LocalDate>> lateReportedDays) {
     Map<Month, ThMonth> res = new LinkedHashMap<>();
     for (int month = 1; month <= 12; month++) {
-      Month monthl = Month.of(month);
+      Month monthI = Month.of(month);
       YearMonth yearMonth = YearMonth.of(year, month);
-      List<LocalDate> lateReportedDaysMonth = lateReportedDays.getOrDefault(monthl, List.of());
-      Map<Mission.Type, Double> counts = missionCounts.getOrDefault(monthl, Map.of());
+      List<LocalDate> lateReportedDaysMonth = lateReportedDays.getOrDefault(monthI, List.of());
+      Map<Mission.Type, Double> counts = missionCounts.getOrDefault(monthI, Map.of());
 
       Double unpaidCareDays = counts.getOrDefault(Mission.Type.unpaidCare, 0.0);
       Double paidCareDays = counts.getOrDefault(Mission.Type.paidCare, 0.0);
       Double workDays = counts.getOrDefault(Mission.Type.work, 0.0);
 
       res.put(
-          monthl,
+          monthI,
           new ThMonth(yearMonth, unpaidCareDays, paidCareDays, workDays, lateReportedDaysMonth));
     }
     return res;

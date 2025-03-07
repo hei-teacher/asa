@@ -90,19 +90,18 @@
                     </span>
                     <span th:text="${#numbers.formatDecimal(month.lateReportedDays.size(), 1, 1)}"
                           class="cursor-pointer text-blue-600 hover:underline"
-                          onclick="openModal()"></span>
+                          onclick="openModal(this)"
+                          th:attr="data-month=${#strings.capitalize(month.yearMonth().month.name().toLowerCase())},
+                          data-dates=${#strings.arrayJoin(month.lateReportedDays, ',')}">
+                    </span>
                 </div>
 
                 <!-- Modal -->
                 <div id="infoModal" class="fixed inset-0 bg-gray-900/30 backdrop-blur-sm hidden flex items-center justify-center">
                     <div class="bg-white p-4 rounded shadow-lg w-80">
-                        <h2 class="text-lg font-semibold mb-2" th:text="'Late Reported Days - ' + ${#strings.capitalize(month.yearMonth().month.name().toLowerCase())}"></h2>
+                        <h2 id="modalTitle" class="text-lg font-semibold mb-2"></h2>
                         <div>
-                            <ul class="list-disc pl-5">
-                                <li th:each="date : ${month.lateReportedDays}">
-                                    <span th:text="${date}"></span>
-                                </li>
-                            </ul>
+                            <ul id="modalDates" class="list-disc pl-5"></ul>
                         </div>
                     </div>
                 </div>
@@ -112,8 +111,22 @@
     </div>
 
     <script>
-        function openModal() {
-            document.getElementById("infoModal").classList.remove("hidden");
+        function openModal(element) {
+            const modal = document.getElementById("infoModal");
+            const monthName = element.getAttribute("data-month");
+            const dates = element.getAttribute("data-dates").split(",");
+
+            document.getElementById("modalTitle").innerText = `Late Reported Days - ${monthName}`;
+
+            const listContainer = document.getElementById("modalDates");
+            listContainer.innerHTML = "";
+            dates.forEach(date => {
+                const li = document.createElement("li");
+                li.innerText = date;
+                listContainer.appendChild(li);
+            });
+
+            modal.classList.remove("hidden");
         }
 
         document.getElementById("infoModal").addEventListener("click", function (e) {

@@ -52,8 +52,7 @@ public class ThYear {
     for (int month = 1; month <= 12; month++) {
       Month monthl = Month.of(month);
       YearMonth yearMonth = YearMonth.of(year, month);
-      List<LocalDate> lateReportedDaysMonth =
-          lateReportedDays.getOrDefault(monthl, List.of());
+      List<LocalDate> lateReportedDaysMonth = lateReportedDays.getOrDefault(monthl, List.of());
       Map<Mission.Type, Double> counts = missionCounts.getOrDefault(monthl, Map.of());
 
       Double unpaidCareDays = counts.getOrDefault(Mission.Type.unpaidCare, 0.0);

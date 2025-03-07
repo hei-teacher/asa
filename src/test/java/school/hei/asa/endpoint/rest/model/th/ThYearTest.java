@@ -25,6 +25,7 @@ class ThYearTest {
             Map.of(DECEMBER, List.of(december22)));
     assertTrue(
         year.months()
-            .contains(new ThMonth(YearMonth.of(2024, DECEMBER), 2.0, 0.0, 0.0, List.of(december22))));
+            .contains(
+                new ThMonth(YearMonth.of(2024, DECEMBER), 2.0, 0.0, 0.0, List.of(december22))));
   }
 }

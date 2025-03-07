@@ -34,7 +34,7 @@ public class MissionService {
                 month ->
                     thProductsExecutedDaysSum(thProducts, month) > 0
                         ? month.toString().toLowerCase()
-                        : " ",
+                        : "",
                 month ->
                     thProductsExecutedDaysSum(thProducts, month) > 0
                         ? thProducts.stream().map(p -> p.filterByMonth(month)).toList()
@@ -50,7 +50,7 @@ public class MissionService {
                 month ->
                     thProductsExecutedDaysSum(thProducts, month) > 0
                         ? month.toString().toLowerCase()
-                        : " ",
+                        : "",
                 month ->
                     thProductsExecutedDaysSum(thProducts, month) > 0
                         ? thProductsExecutedDaysSum(thProducts, month)

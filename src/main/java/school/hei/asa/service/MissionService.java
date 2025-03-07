@@ -25,27 +25,19 @@ public class MissionService {
   }
 
   public Map<String, List<ThProduct>> thProductsByMonth(List<ThProduct> thProducts) {
-    EnumMap<Month, List<ThProduct>> thProductsByMonth = new EnumMap<>(Month.class);
+    EnumSet<Month> months = EnumSet.allOf(Month.class);
     Map<String, List<ThProduct>> res = new LinkedHashMap<>();
-    EnumSet.allOf(Month.class)
-        .forEach(
-            month -> {
-              List<ThProduct> filteredProducts =
-                  thProducts.stream()
-                      .map(p -> p.filterByMonth(month))
-                      .filter(Objects::nonNull)
-                      .toList();
-              thProductsByMonth.put(month, filteredProducts);
-            });
-
-    EnumSet.allOf(Month.class)
-        .forEach(
-            (month) -> {
-              var monthProducts = thProductsByMonth.getOrDefault(month, List.of());
-              if (monthProducts.stream().mapToDouble(ThProduct::executedDays).sum() > 0) {
-                res.putIfAbsent(month.toString().toLowerCase(), monthProducts);
-              }
-            });
+    months.forEach(
+        (month) -> {
+          List<ThProduct> monthProducts =
+              thProducts.stream()
+                  .map(p -> p.filterByMonth(month))
+                  .filter(Objects::nonNull)
+                  .toList();
+          if (monthProducts.stream().mapToDouble(ThProduct::executedDays).sum() > 0) {
+            res.putIfAbsent(month.toString().toLowerCase(), monthProducts);
+          }
+        });
     return res;
   }
 

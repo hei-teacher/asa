@@ -3,10 +3,7 @@ package school.hei.asa.service;
 import static java.util.stream.Collectors.toMap;
 
 import java.time.Month;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.rest.controller.mapper.ThProductMapper;
@@ -28,19 +25,28 @@ public class MissionService {
   }
 
   public Map<String, List<ThProduct>> thProductsByMonth(List<ThProduct> thProducts) {
-    return Arrays.stream(Month.values())
-        .collect(
-            toMap(
-                month ->
-                    thProductsExecutedDaysSum(thProducts, month) > 0
-                        ? month.toString().toLowerCase()
-                        : "",
-                month ->
-                    thProductsExecutedDaysSum(thProducts, month) > 0
-                        ? thProducts.stream().map(p -> p.filterByMonth(month)).toList()
-                        : List.of(),
-                (v1, v2) -> v1,
-                LinkedHashMap::new));
+    EnumMap<Month, List<ThProduct>> thProductsByMonth = new EnumMap<>(Month.class);
+    Map<String, List<ThProduct>> res = new LinkedHashMap<>();
+    EnumSet.allOf(Month.class)
+        .forEach(
+            month -> {
+              List<ThProduct> filteredProducts =
+                  thProducts.stream()
+                      .map(p -> p.filterByMonth(month))
+                      .filter(Objects::nonNull)
+                      .toList();
+              thProductsByMonth.put(month, filteredProducts);
+            });
+
+    EnumSet.allOf(Month.class)
+        .forEach(
+            (month) -> {
+              var monthProducts = thProductsByMonth.getOrDefault(month, List.of());
+              if (monthProducts.stream().mapToDouble(ThProduct::executedDays).sum() > 0) {
+                res.putIfAbsent(month.toString().toLowerCase(), monthProducts);
+              }
+            });
+    return res;
   }
 
   public Map<String, Double> thProductsExecutedDaysSumByMonth(List<ThProduct> thProducts) {

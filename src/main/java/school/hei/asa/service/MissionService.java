@@ -32,7 +32,11 @@ public class MissionService {
                   .map(p -> p.filterByMonth(month))
                   .filter(Objects::nonNull)
                   .toList();
-          if (hasExecutedDays(monthProducts)) {
+
+          var hasExecutedDays =
+              monthProducts.stream().mapToDouble(ThProduct::executedDays).sum() > 0;
+
+          if (hasExecutedDays) {
             res.putIfAbsent(month.toString().toLowerCase(), monthProducts);
           }
         });
@@ -49,7 +53,11 @@ public class MissionService {
                   .map(p -> p.filterByMonth(month))
                   .filter(Objects::nonNull)
                   .toList();
-          if (hasExecutedDays(monthProducts)) {
+
+          var hasExecutedDays =
+              monthProducts.stream().mapToDouble(ThProduct::executedDays).sum() > 0;
+
+          if (hasExecutedDays) {
             res.putIfAbsent(
                 month.toString().toLowerCase(), thProductsExecutedDaysSum(monthProducts, month));
           }
@@ -62,9 +70,5 @@ public class MissionService {
         .map(p -> p.filterByMonth(month))
         .mapToDouble(ThProduct::executedDays)
         .sum();
-  }
-
-  public boolean hasExecutedDays(List<ThProduct> products) {
-    return products.stream().mapToDouble(ThProduct::executedDays).sum() > 0;
   }
 }

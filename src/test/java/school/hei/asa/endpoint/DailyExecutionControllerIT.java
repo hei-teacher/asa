@@ -2,7 +2,8 @@ package school.hei.asa.endpoint;
 
 import static java.time.Month.DECEMBER;
 import static java.util.concurrent.Executors.newFixedThreadPool;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

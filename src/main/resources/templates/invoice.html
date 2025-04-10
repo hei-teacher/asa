@@ -9,7 +9,7 @@
             font-size: 10px;
             font-family: 'EB Garamond', serif;
             font-weight: 400;
-            margin: 40px 0 40px 20px;
+            margin: 20px 40px;
         }
 
         header {
@@ -35,10 +35,6 @@
             text-align: left;
         }
 
-        .text-right {
-            text-align: right;
-        }
-
         .text-center {
             text-align: center;
         }
@@ -51,26 +47,27 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 12px;
-            font-family: 'EB Garamond', serif;
         }
 
         th {
-            font-weight: 700;
             font-size: 12px;
+            font-family: 'EB Garamond', serif;
+            font-weight: 600;
         }
 
         th, td {
             padding: 6px;
             font-size: 12px;
             font-family: 'EB Garamond', serif;
+            font-weight: 400;
         }
 
         thead th {
-            border-bottom: 2px solid black;
+            border-bottom: 1px solid grey;
         }
 
         tbody tr {
-            border-bottom: 1px solid grey;
+            border-top: 1px solid grey;
         }
 
         tbody tr:first-child {
@@ -86,22 +83,6 @@
             page-break-before: auto;
         }
 
-        .main-table tbody td {
-            border-bottom: 1px solid lightgrey;
-        }
-
-        .main-table th {
-            font-size: 15px;
-            font-family: 'EB Garamond', serif;
-            font-weight: 700;
-        }
-
-        .main-table td {
-            font-size: 14px;
-            font-family: 'EB Garamond', serif;
-            padding: 9px 6px;
-        }
-
         .amount-section p {
             border: 1px solid black;
             padding: 4px 8px;
@@ -113,11 +94,11 @@
             display: block;
         }
 
-        #footer p {
-            margin: 2px 0;
-            letter-spacing: 0.08px;
-            line-height: 1.2;
-        }
+        #footer p{
+              margin: 2px 0;
+              letter-spacing: 0.2px;
+              line-height: 1.2;
+          }
 
         #content {
             page-break-inside: auto;
@@ -139,10 +120,10 @@
     <table class="table-head">
         <tr>
             <td>
-                <p th:text="${worker.fullname}"><strong></strong></p>
-                <p th:text="${worker.address}"></p>
-                <p th:text="${worker.city}"></p>
-                <p th:text="${'NIF: ' + worker.nif + ' -  STAT: ' + worker.stat}" class="text-justify"></p>
+                <p><strong>RATOVONANAHARY Lina Finaritra</strong></p>
+                <p>LOT VL 26 I Ampamantanana</p>
+                <p>101 Antananarivo, Madagascar</p>
+                <p class="text-justify">NIF:  3018 63 1269 -  STAT: 70209 11 2024 0 06259</p>
             </td>
         </tr>
     </table>
@@ -153,15 +134,15 @@
 <div id="footer">
     <table style="width: 100%;">
         <tr>
-            <td style="width: 43%; vertical-align: top;">
-                <p th:text="'Facture : ' + ${invoice.reference}" style="font-family: 'EB Garamond', serif; font-weight: 700;"></p>
-                <p th:text="'Date d\'émission : ' + ${invoice.issueDate}" style="font-family: 'EB Garamond', serif; font-weight: 700;"></p>
+            <td style="width: 50%; vertical-align: top;">
+                <p><strong>Facture : FAC2025/02/25</strong></p>
+                <p><strong>Date d'émission : 28/02/2025</strong></p>
             </td>
-            <td style="width: 57%; vertical-align: top;">
+            <td style="width: 50%; vertical-align: top;">
                 <p><strong>NUMER MADAGASCAR (SARLU)</strong></p>
-                <p>Lot II M 92 Antsakaviro</p>
+                <p>Antsakaviro</p>
                 <p>101 Antananarivo, Madagascar</p>
-                <p>RCS : 2022 B 007111 - NIF : 4011 84 6446 - STAT : 62022 11 2022 0 10730</p>
+                <p class="text-justify">NIF - STAT</p>
             </td>
         </tr>
     </table>
@@ -169,48 +150,30 @@
 
 <div id="content">
     <section>
-        <table style="margin: 10px 0 20px 0; table-layout: fixed; border-top: 1px solid black;" class="main-table">
-        <thead>
+        <table style="margin: 10px 0px 20px 0px;table-layout: fixed;" class="main-table">
+            <thead class="text-center" style="border: 1px solid black">
             <tr>
-                <th class="text-left" style="width: 230px;">Description</th>
-                <th class="text-center">Quantité</th>
-                <th class="text-center">Prix unitaire</th>
-                <th class="text-right">Montant</th>
+                <th style="width: 150px">Description</th>
+                <th>Quantité</th>
+                <th>Prix Unitaire</th>
+                <th>Montant</th>
             </tr>
             </thead>
             <tbody>
             <tr>
-                <td class="text-left" style="width: 230px; word-wrap: break-word;" th:text="${invoice.description}"></td>
-                <td class="text-center" th:text="${invoice.quantity}"></td>
-                <td class="text-center" th:text="${invoice.unitPrice}"></td>
-                <td class="text-right" th:text="${invoice.amount}"></td>
-            </tr>
-            <tr th:if="${invoice.hasBonus}">
-                <td class="text-left" style="width: 230px; word-wrap: break-word;" th:text="${invoice.bonusDescription}"></td>
-                <td class="text-center" th:text="${invoice.bonusQuantity}"></td>
-                <td class="text-center" th:text="${invoice.bonusUnitPrice}"></td>
-                <td class="text-right" th:text="${invoice.bonusAmount}"></td>
+                <td class="text-left" style="width: 150px; word-wrap: break-word;">Développeur Mobile</td>
+                <td class="text-center">18</td>
+                <td class="text-center">30000</td>
+                <td class="text-center">1750000</td>
             </tr>
             <tr>
-                <td colspan="2" style="border-bottom: none;"></td>
-                <td class="text-left" style="font-size: 15px; font-family: 'EB Garamond', serif; font-weight: 700;"> Total</td>
-                <td class="text-right" style="font-size: 15px; font-family: 'EB Garamond', serif; font-weight: 700;" th:text="${invoice.total}" ></td>
+                <td></td>
+                <td></td>
+                <td class="text-center"><strong>Total</strong></td>
+                <td class="text-center"><strong>1750000</strong></td>
             </tr>
             </tbody>
         </table>
-
-        <div style="margin-top: 100px; display: flex; gap: 10px; align-items: center;">
-            <span style="font-family: 'EB Garamond', serif; font-size: 14px; font-weight: 400;">
-                Montant total arrêté à la somme de :
-            </span>
-            <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 700;" th:text="${invoice.parsedAmount + ' Ariary'}"></span>
-        </div>
-
-        <div style="margin-top: 60px; display: flex; gap: 8px; align-items: center;">
-            <span style="font-family: 'EB Garamond', serif; font-size: 14px; font-weight: 400;">
-                Signature
-            </span>
-        </div>
     </section>
 </div>
 </body>

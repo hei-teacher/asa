@@ -1,16 +1,15 @@
 package school.hei.asa.service;
 
+import school.hei.asa.file.FileWriter;
 import com.lowagie.text.DocumentException;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.xhtmlrenderer.pdf.ITextRenderer;
-import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
-import school.hei.asa.file.FileWriter;
-import school.hei.asa.model.Worker;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 @Component
 @AllArgsConstructor
@@ -18,9 +17,9 @@ public class InvoicePDFGenerator {
   private final FileWriter fileWriter;
   private final TemplateResolverEngine templateResolverEngine;
 
-  public File apply(Worker worker, ThInvoiceForm thInvoiceForm, String template) {
+  public File apply(/*Invoice invoice, AccountHolder accountHolder, File logoFile, */String template) {
     ITextRenderer renderer = new ITextRenderer();
-    loadStyle(renderer, worker, thInvoiceForm, template);
+    loadStyle(renderer, /*invoice, accountHolder, logoFile, */template);
     renderer.layout();
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -33,22 +32,31 @@ public class InvoicePDFGenerator {
   }
 
   private void loadStyle(
-      ITextRenderer renderer, Worker worker, ThInvoiceForm thInvoiceForm, String template) {
-    renderer.setDocumentFromString(parseInvoiceTemplateToString(worker, thInvoiceForm, template));
+      ITextRenderer renderer,
+      /*Invoice invoice,
+      AccountHolder accountHolder,
+      File logoFile,*/
+      String template) {
+    renderer.setDocumentFromString(
+        parseInvoiceTemplateToString(/*invoice, accountHolder, logoFile, */template));
   }
 
   private String parseInvoiceTemplateToString(
-      Worker worker, ThInvoiceForm thInvoiceForm, String template) {
+      /*Invoice invoice, AccountHolder accountHolder, File logoFile, */String template) {
     TemplateEngine templateEngine = templateResolverEngine.getTemplateEngine();
-    Context context = configureContext(worker, thInvoiceForm);
+    Context context = configureContext(/*invoice, accountHolder, logoFile*/);
     return templateEngine.process(template, context);
   }
 
-  private Context configureContext(Worker worker, ThInvoiceForm thInvoiceForm) {
+  private Context configureContext(/*Invoice invoice, AccountHolder accountHolder, File logoFile*/) {
     Context context = new Context();
-    context.setVariable("worker", worker);
-    context.setVariable("invoice", thInvoiceForm);
+    /*Account account = invoice.getActualAccount();*/
+    //byte[] logoAsBytes = fileWriter.writeAsByte(logoFile);
 
+    // context.setVariable("invoice", invoice);
+    //context.setVariable("logo", base64Image(logoAsBytes));
+    // context.setVariable("account", account);
+    // context.setVariable("accountHolder", accountHolder);
     return context;
   }
 }

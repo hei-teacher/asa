@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Invoice</title>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond&amp;display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-size: 10px;
+            font-family: 'EB Garamond', serif;
+            font-weight: 400;
+            margin: 20px 40px;
+        }
+
+        header {
+            margin-top: 50px;
+            margin-bottom: 10px;
+        }
+
+        .table-head {
+            width: 100%;
+        }
+
+        .table-head p {
+            margin: 2px 0;
+            letter-spacing: 0.2px;
+            line-height: 1.2;
+        }
+
+        .table-head p:first-child {
+            font-weight: 600;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-justify {
+            text-align: justify;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th {
+            font-size: 12px;
+            font-family: 'EB Garamond', serif;
+            font-weight: 600;
+        }
+
+        th, td {
+            padding: 6px;
+            font-size: 12px;
+            font-family: 'EB Garamond', serif;
+            font-weight: 400;
+        }
+
+        thead th {
+            border-bottom: 1px solid grey;
+        }
+
+        tbody tr {
+            border-top: 1px solid grey;
+        }
+
+        tbody tr:first-child {
+            border-top: none;
+        }
+
+        tbody table tr:nth-child(odd) {
+            background-color: #dddddd;
+        }
+
+        .main-table tbody > * {
+            page-break-after: auto;
+            page-break-before: auto;
+        }
+
+        .amount-section p {
+            border: 1px solid black;
+            padding: 4px 8px;
+            margin-left: 250px;
+            width: 150px;
+        }
+
+        #footer {
+            display: block;
+        }
+
+        #footer p{
+              margin: 2px 0;
+              letter-spacing: 0.2px;
+              line-height: 1.2;
+          }
+
+        #content {
+            page-break-inside: auto;
+            margin-top: 100px;
+        }
+
+        @page {
+            size: A4;
+            margin-top: 50px;
+            margin-bottom: 120px;
+            @bottom-center {
+                content: element(footer)
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <table class="table-head">
+        <tr>
+            <td>
+                <p><strong>RATOVONANAHARY Lina Finaritra</strong></p>
+                <p>LOT VL 26 I Ampamantanana</p>
+                <p>101 Antananarivo, Madagascar</p>
+                <p class="text-justify">NIF:  3018 63 1269 -  STAT: 70209 11 2024 0 06259</p>
+            </td>
+        </tr>
+    </table>
+</header>
+
+<hr style="border: none; border-top: 0.3px solid #444; margin: 10px 0 2px 0;"/>
+
+<div id="footer">
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 50%; vertical-align: top;">
+                <p><strong>Facture : FAC2025/02/25</strong></p>
+                <p><strong>Date d'émission : 28/02/2025</strong></p>
+            </td>
+            <td style="width: 50%; vertical-align: top;">
+                <p><strong>NUMER MADAGASCAR (SARLU)</strong></p>
+                <p>Antsakaviro</p>
+                <p>101 Antananarivo, Madagascar</p>
+                <p class="text-justify">NIF - STAT</p>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="content">
+    <section>
+        <table style="margin: 10px 0px 20px 0px;table-layout: fixed;" class="main-table">
+            <thead class="text-center" style="border: 1px solid black">
+            <tr>
+                <th style="width: 150px">Description</th>
+                <th>Quantité</th>
+                <th>Prix Unitaire</th>
+                <th>Montant</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="text-left" style="width: 150px; word-wrap: break-word;">Développeur Mobile</td>
+                <td class="text-center">18</td>
+                <td class="text-center">30000</td>
+                <td class="text-center">1750000</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td class="text-center"><strong>Total</strong></td>
+                <td class="text-center"><strong>1750000</strong></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+</body>
+</html>

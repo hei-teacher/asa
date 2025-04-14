@@ -8,7 +8,9 @@
 
             <div class="ml-auto flex text-white items-center gap-2">
                 <i class="material-icons">person</i>
-                <strong th:text="'(' + ${#authentication.getPrincipal().getAttribute('email')} + ')'"></strong>
+                <a th:href="@{/worker}" class="hover:underline">
+                    <strong th:text="'(' + ${#authentication.getPrincipal().getAttribute('email')} + ')'"></strong>
+                </a>
                 <th:block th:replace="fragments/nav :: nav('/logout', 'Log out', 'logout', 'bg-red-600', 'bg-red-700')"></th:block>
             </div>
         </div>

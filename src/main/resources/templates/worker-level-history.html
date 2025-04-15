@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Asa - Worker Level History</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex flex-col min-h-screen bg-gray-50" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<div th:replace="fragments/header :: header"></div>
+
+<main class="flex-grow flex flex-col items-center justify-center px-3">
+    <div class="w-1/2 space-y-8">
+
+        <div th:replace="fragments/workerSelector :: workerSelector(work-and-care-calendar, Myself)"></div>
+
+        <h2 class="text-2xl font-semibold text-center text-gray-800">Historique de niveaux</h2>
+
+        <div class="overflow-x-auto">
+            <table class="w-full bg-white shadow-md rounded-xl">
+                <thead>
+                <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal text-center">
+                    <th class="py-3 px-6">Niveau</th>
+                    <th class="py-3 px-6">Date d’entrée</th>
+                </tr>
+                </thead>
+                <tbody class="text-gray-700 text-sm font-light text-center">
+                <tr th:each="levelHistory : ${workerLevelHistory}"
+                    class="border-b border-gray-200 hover:bg-gray-50 text-center">
+                    <td class="py-3 px-6 text-center" th:text="${levelHistory.level}">L3</td>
+                    <td class="py-3 px-6 text-center" th:text="${#dates.format(levelHistory.entranceInstant, 'dd MMM yyyy à HH:mm')}">
+                        01 janv. 2024 à 10:30
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Worker;
+import school.hei.asa.model.WorkerLevelHistory;
+import school.hei.asa.repository.WorkerLevelHistoryRepository;
 import school.hei.asa.repository.WorkerRepository;
 
 @Controller
@@ -16,7 +18,9 @@ import school.hei.asa.repository.WorkerRepository;
 public class WorkerController {
 
   private final WorkerRepository workerRepository;
+  private final WorkerLevelHistoryRepository workerLevelHistoryRepository;
   private final WorkerFromAuthentication workerFromAuthentication;
+  private final WorkerToModelAdder workerToModelAdder;
 
   @GetMapping("/workers")
   public List<Worker> getWorkers() {
@@ -36,5 +40,22 @@ public class WorkerController {
 
     model.addAttribute("worker", worker);
     return "worker";
+  }
+
+  @GetMapping("/worker-level-history")
+  public String getWorkersLevelHistory(Model model,
+                          Authentication authentication,
+                          @RequestParam(required = false) String workerCode) {
+    var workerCodeOrAuth =
+            workerCode == null || workerCode.isBlank()
+                    ? workerFromAuthentication.apply(authentication).get().code()
+                    : workerCode;
+
+    var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
+    List<WorkerLevelHistory> wlhList = workerLevelHistoryRepository.findAllByWorker(worker);
+
+    model.addAttribute("worker", worker);
+    model.addAttribute("workerLevelHistory", wlhList);
+    return "worker-level-history";
   }
 }

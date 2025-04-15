@@ -1,0 +1,1 @@
+ALTER TYPE level ADD VALUE 'L0' BEFORE 'L1';

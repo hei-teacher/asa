@@ -10,7 +10,8 @@ import school.hei.asa.repository.mapper.WorkerLevelHistoryMapper;
 import school.hei.asa.repository.mapper.WorkerMapper;
 
 import java.util.List;
-import java.util.Optional;
+
+import static java.util.Comparator.comparing;
 
 @AllArgsConstructor
 @Repository
@@ -22,6 +23,12 @@ public class WorkerLevelHistoryRepository {
 
   @Transactional
   public List<WorkerLevelHistory> findAllByWorker(Worker worker) {
-    return workerLevelHistoryMapper.toDomain(jWorkerLevelHistoryRepository.findAllByWorker(workerMapper.toEntity(worker)));
+    return sortByEntranceInstant(workerLevelHistoryMapper.toDomain(jWorkerLevelHistoryRepository.findAllByWorker(workerMapper.toEntity(worker))));
+  }
+
+  private List<WorkerLevelHistory> sortByEntranceInstant(List<WorkerLevelHistory> historyList) {
+    return historyList.stream()
+            .sorted(comparing(WorkerLevelHistory::entranceInstant))
+            .toList();
   }
 }

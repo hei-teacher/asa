@@ -37,7 +37,11 @@ public class WorkerController {
                     : workerCode;
 
     Worker worker = workerRepository.findByCode(workerCodeOrAuth);
+    List<WorkerLevelHistory> wlhList = workerLevelHistoryRepository.findAllByWorker(worker);
 
+    model.addAttribute("entranceInstant", wlhList.getFirst().entranceInstant());
+    model.addAttribute("level", wlhList.getLast().level());
+    model.addAttribute("levelEntranceInstant", wlhList.getLast().entranceInstant());
     model.addAttribute("worker", worker);
     return "worker";
   }

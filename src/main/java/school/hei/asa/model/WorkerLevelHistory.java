@@ -1,12 +1,11 @@
 package school.hei.asa.model;
 
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import school.hei.asa.repository.model.JWorkerLevelEnum;
-
-import java.time.Instant;
 
 @Accessors(fluent = true)
 @Getter

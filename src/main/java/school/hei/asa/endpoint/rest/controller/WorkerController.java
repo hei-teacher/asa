@@ -28,13 +28,14 @@ public class WorkerController {
   }
 
   @GetMapping("/worker")
-  public String getWorker(Model model,
-                          Authentication authentication,
-                          @RequestParam(required = false) String workerCode) {
+  public String getWorker(
+      Model model,
+      Authentication authentication,
+      @RequestParam(required = false) String workerCode) {
     var workerCodeOrAuth =
-            workerCode == null || workerCode.isBlank()
-                    ? workerFromAuthentication.apply(authentication).get().code()
-                    : workerCode;
+        workerCode == null || workerCode.isBlank()
+            ? workerFromAuthentication.apply(authentication).get().code()
+            : workerCode;
 
     Worker worker = workerRepository.findByCode(workerCodeOrAuth);
     List<WorkerLevelHistory> wlhList = workerLevelHistoryRepository.findAllByWorker(worker);
@@ -47,13 +48,14 @@ public class WorkerController {
   }
 
   @GetMapping("/worker-level-history")
-  public String getWorkersLevelHistory(Model model,
-                          Authentication authentication,
-                          @RequestParam(required = false) String workerCode) {
+  public String getWorkersLevelHistory(
+      Model model,
+      Authentication authentication,
+      @RequestParam(required = false) String workerCode) {
     var workerCodeOrAuth =
-            workerCode == null || workerCode.isBlank()
-                    ? workerFromAuthentication.apply(authentication).get().code()
-                    : workerCode;
+        workerCode == null || workerCode.isBlank()
+            ? workerFromAuthentication.apply(authentication).get().code()
+            : workerCode;
 
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     List<WorkerLevelHistory> wlhList = workerLevelHistoryRepository.findAllByWorker(worker);

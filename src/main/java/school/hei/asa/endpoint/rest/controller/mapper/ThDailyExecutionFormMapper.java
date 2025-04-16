@@ -36,7 +36,7 @@ public class ThDailyExecutionFormMapper {
     var percentage5Opt = optionalPercentage(dmeForm.missionPercentage5());
 
     List<MissionExecution> executions = new ArrayList<>();
-    if (dmeForm.date() == null || dmeForm.date().isBlank()){
+    if (dmeForm.date() == null || dmeForm.date().isBlank()) {
       throw new IllegalArgumentException("Please enter a date");
     }
     var date = LocalDate.parse(dmeForm.date());

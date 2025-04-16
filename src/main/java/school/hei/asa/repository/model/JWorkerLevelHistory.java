@@ -1,10 +1,9 @@
 package school.hei.asa.repository.model;
 
 import jakarta.persistence.*;
+import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.Instant;
 
 @Entity
 @Table(name = "worker_level_history")

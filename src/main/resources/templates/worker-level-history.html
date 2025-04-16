@@ -34,10 +34,8 @@
                 <tbody class="text-gray-700 text-sm font-light text-center">
                 <tr th:each="levelHistory : ${workerLevelHistory}"
                     class="border-b border-gray-200 hover:bg-gray-50 text-center">
-                    <td class="py-3 px-6 text-center" th:text="${levelHistory.level}">L3</td>
-                    <td class="py-3 px-6 text-center" th:text="${#dates.format(levelHistory.entranceInstant, 'dd MMM yyyy')}">
-                        01 janv. 2024
-                    </td>
+                    <td class="py-3 px-6 text-center" th:text="${levelHistory.level}"></td>
+                    <td class="py-3 px-6 text-center" th:text="${#dates.format(levelHistory.entranceInstant, 'dd MMM yyyy')}"></td>
                 </tr>
                 </tbody>
             </table>

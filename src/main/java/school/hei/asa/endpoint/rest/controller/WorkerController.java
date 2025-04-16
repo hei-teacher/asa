@@ -37,12 +37,16 @@ public class WorkerController {
             ? workerFromAuthentication.apply(authentication).get().code()
             : workerCode;
 
-    Worker worker = workerRepository.findByCode(workerCodeOrAuth);
+    var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     List<WorkerLevelHistory> wlhList = workerLevelHistoryRepository.findAllByWorker(worker);
 
-    model.addAttribute("entranceInstant", wlhList.getFirst().entranceInstant());
-    model.addAttribute("level", wlhList.getLast().level());
-    model.addAttribute("levelEntranceInstant", wlhList.getLast().entranceInstant());
+    var entranceInstant = wlhList.isEmpty() ? null : wlhList.getFirst().entranceInstant();
+    var level = wlhList.isEmpty() ? null : wlhList.getLast().level();
+    var levelEntranceInstant = wlhList.isEmpty() ? null : wlhList.getLast().entranceInstant();
+
+    model.addAttribute("entranceInstant", entranceInstant);
+    model.addAttribute("level", level);
+    model.addAttribute("levelEntranceInstant", levelEntranceInstant);
     model.addAttribute("worker", worker);
     return "worker";
   }

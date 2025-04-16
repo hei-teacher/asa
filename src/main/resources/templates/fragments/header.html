@@ -7,8 +7,8 @@
             <th:block th:replace="fragments/nav :: nav('/mission-executions', 'Missions Executions', 'playlist_add_check', '', 'text-gray-300')"></th:block>
 
             <div class="ml-auto flex text-white items-center gap-2">
-                <i class="material-icons">person</i>
-                <a th:href="@{/worker}" class="hover:underline">
+                <a th:href="@{/worker}" class="flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-[#2D2D5A] transition">
+                    <i class="material-icons">person</i>
                     <strong th:text="'(' + ${#authentication.getPrincipal().getAttribute('email')} + ')'"></strong>
                 </a>
                 <th:block th:replace="fragments/nav :: nav('/logout', 'Log out', 'logout', 'bg-red-600', 'bg-red-700')"></th:block>

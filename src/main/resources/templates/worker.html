@@ -10,23 +10,34 @@
 
 <main class="flex-grow container mx-auto py-12 px-4">
     <div class="max-w-xl mx-auto bg-white shadow-md rounded-xl p-8">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">My profile</h2>
-        <div class="space-y-4">
-            <div>
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">About yourself</h2>
+        <div class="space-y-2">
+            <div class="flex gap-2">
                 <label class="block text-gray-500">Name :</label>
-                <p class="text-lg font-medium text-gray-800" th:text="${worker.name}">Nom</p>
+                <p class="text-lg font-medium text-gray-600" th:text="${worker.name}">Nom</p>
             </div>
-            <div>
+            <div class="flex gap-2">
                 <label class="block text-gray-500">Email :</label>
-                <p class="text-lg font-medium text-gray-800" th:text="${worker.email}">Email</p>
+                <p class="text-lg font-medium text-gray-600" th:text="${worker.email}">Email</p>
             </div>
-            <div>
-                <label class="block text-gray-500">Code :</label>
-                <p class="text-lg font-medium text-gray-800" th:text="${worker.code}">Code</p>
+            <div class="flex gap-2">
+                <label class="block text-gray-500">Entrance Date:</label>
+                <p class="text-lg font-medium text-gray-600">Type</p>
             </div>
-            <div>
-                <label class="block text-gray-500">Type :</label>
-                <p class="text-lg font-medium text-gray-800" th:text="">Type</p>
+            <div class="flex gap-2">
+                <label class="block text-gray-500">Level :</label>
+                <p class="text-lg font-medium text-gray-600">Code</p>
+            </div>
+            <div class="flex gap-2">
+                <label class="block text-gray-500">Level Entrance Date:</label>
+                <p class="text-lg font-medium text-gray-600">Type</p>
+            </div>
+            <div class="pt-6">
+                <a th:href="@{/worker-level-history(workerCode=${worker.code})}"
+                   class="inline-flex items-center gap-2 bg-[#2D2D5A] hover:bg-[#16163F] text-white font-semibold py-2 px-4 rounded transition">
+                    <i class="material-icons">history</i>
+                    View level history
+                </a>
             </div>
         </div>
     </div>

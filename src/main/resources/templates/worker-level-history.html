@@ -11,7 +11,15 @@
 <main class="flex-grow flex flex-col items-center px-3 mt-16">
     <div class="w-1/2 space-y-8">
 
-        <div th:replace="fragments/workerSelector :: workerSelector(work-and-care-calendar, Myself)"></div>
+        <div class="flex justify-between items-center">
+            <div th:replace="fragments/workerSelector :: workerSelector(work-and-care-calendar, Myself)"></div>
+
+            <a th:href="@{/worker}"
+               class="inline-flex items-center gap-2 bg-[#2D2D5A] hover:bg-[#16163F] text-white font-semibold py-2 px-4 rounded transition">
+                <i class="material-icons">person</i>
+                Back to profile
+            </a>
+        </div>
 
         <h2 class="text-2xl font-semibold text-center text-gray-800" th:text="'History of levels - ' + ${worker.name()}"></h2>
 

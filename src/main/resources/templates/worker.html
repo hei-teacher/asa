@@ -22,15 +22,15 @@
             </div>
             <div class="flex gap-2">
                 <label class="block text-gray-500">Entrance Date:</label>
-                <p class="text-lg font-medium text-gray-600" th:text="${#dates.format(entranceInstant, 'dd MMM yyyy')}">Entrance Date</p>
+                <p class="text-lg font-medium text-gray-600" th:text="${#dates.format(worker.entranceInstant, 'dd MMM yyyy')}">Entrance Date</p>
             </div>
             <div class="flex gap-2">
                 <label class="block text-gray-500">Level :</label>
-                <p class="text-lg font-medium text-gray-600" th:text="${level}">Level</p>
+                <p class="text-lg font-medium text-gray-600" th:text="${worker.level}">Level</p>
             </div>
             <div class="flex gap-2">
                 <label class="block text-gray-500">Level Entrance Date:</label>
-                <p class="text-lg font-medium text-gray-600" th:text="${#dates.format(levelEntranceInstant, 'dd MMM yyyy')}">Level Entrance Date</p>
+                <p class="text-lg font-medium text-gray-600" th:text="${#dates.format(worker.levelEntranceInstant, 'dd MMM yyyy')}">Level Entrance Date</p>
             </div>
             <div class="pt-6">
                 <a th:href="@{/worker-level-history(workerCode=${worker.code})}"

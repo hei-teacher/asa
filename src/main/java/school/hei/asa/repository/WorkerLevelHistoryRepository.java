@@ -1,7 +1,5 @@
 package school.hei.asa.repository;
 
-import static java.util.Comparator.comparing;
-
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -23,11 +21,7 @@ public class WorkerLevelHistoryRepository {
   @Transactional
   public List<WorkerLevelHistory> findAllByWorker(Worker worker) {
     return workerLevelHistoryMapper.toDomain(
-        jWorkerLevelHistoryRepository.findAllByWorkerOrOrderByEntranceInstantAsc(
+        jWorkerLevelHistoryRepository.findAllByWorkerOrderByEntranceInstantAsc(
             workerMapper.toEntity(worker)));
-  }
-
-  private List<WorkerLevelHistory> sortByEntranceInstant(List<WorkerLevelHistory> historyList) {
-    return historyList.stream().sorted(comparing(WorkerLevelHistory::entranceInstant)).toList();
   }
 }

@@ -37,6 +37,7 @@ public class MissionController {
     var thProductsExecutedDaysSumByMonth =
         missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode);
 
+    model.addAttribute("workerCode", workerCode);
     model.addAttribute("months", thProductsByMonth);
     model.addAttribute("products", thProductsByWorkerCode);
     model.addAttribute("total", thProductsExecutedDaysSumByMonth);

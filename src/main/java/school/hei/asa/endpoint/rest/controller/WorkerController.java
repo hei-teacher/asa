@@ -55,6 +55,7 @@ public class WorkerController {
     List<WorkerLevelHistory> wlhList = workerLevelHistoryRepository.findAllByWorker(worker);
 
     model.addAttribute("worker", worker);
+    model.addAttribute("workerCode", workerCodeOrAuth);
     model.addAttribute("workerLevelHistory", wlhList);
     return "worker-level-history";
   }

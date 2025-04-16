@@ -8,27 +8,27 @@
 <body class="flex flex-col min-h-screen bg-gray-50" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <div th:replace="fragments/header :: header"></div>
 
-<main class="flex-grow flex flex-col items-center justify-center px-3">
+<main class="flex-grow flex flex-col items-center px-3 mt-16">
     <div class="w-1/2 space-y-8">
 
         <div th:replace="fragments/workerSelector :: workerSelector(work-and-care-calendar, Myself)"></div>
 
-        <h2 class="text-2xl font-semibold text-center text-gray-800">Historique de niveaux</h2>
+        <h2 class="text-2xl font-semibold text-center text-gray-800" th:text="'History of levels - ' + ${worker.name()}"></h2>
 
         <div class="overflow-x-auto">
             <table class="w-full bg-white shadow-md rounded-xl">
                 <thead>
                 <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal text-center">
-                    <th class="py-3 px-6">Niveau</th>
-                    <th class="py-3 px-6">Date d’entrée</th>
+                    <th class="py-3 px-6">Level</th>
+                    <th class="py-3 px-6">Entrance date</th>
                 </tr>
                 </thead>
                 <tbody class="text-gray-700 text-sm font-light text-center">
                 <tr th:each="levelHistory : ${workerLevelHistory}"
                     class="border-b border-gray-200 hover:bg-gray-50 text-center">
                     <td class="py-3 px-6 text-center" th:text="${levelHistory.level}">L3</td>
-                    <td class="py-3 px-6 text-center" th:text="${#dates.format(levelHistory.entranceInstant, 'dd MMM yyyy à HH:mm')}">
-                        01 janv. 2024 à 10:30
+                    <td class="py-3 px-6 text-center" th:text="${#dates.format(levelHistory.entranceInstant, 'dd MMM yyyy')}">
+                        01 janv. 2024
                     </td>
                 </tr>
                 </tbody>
@@ -36,6 +36,17 @@
         </div>
     </div>
 </main>
+
+<script>
+    function updateFilters() {
+        const workerCode = document.getElementById("worker").value;
+        window.location.href = `/worker-level-history?workerCode=${workerCode}`;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("worker").addEventListener("change", updateFilters);
+    });
+</script>
 
 <div th:replace="fragments/footer :: footer"></div>
 </body>

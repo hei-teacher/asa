@@ -22,9 +22,9 @@ public class WorkerLevelHistoryRepository {
 
   @Transactional
   public List<WorkerLevelHistory> findAllByWorker(Worker worker) {
-    return sortByEntranceInstant(
-        workerLevelHistoryMapper.toDomain(
-            jWorkerLevelHistoryRepository.findAllByWorker(workerMapper.toEntity(worker))));
+    return workerLevelHistoryMapper.toDomain(
+        jWorkerLevelHistoryRepository.findAllByWorkerOrOrderByEntranceInstantAsc(
+            workerMapper.toEntity(worker)));
   }
 
   private List<WorkerLevelHistory> sortByEntranceInstant(List<WorkerLevelHistory> historyList) {

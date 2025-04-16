@@ -1,9 +1,12 @@
 package school.hei.asa.repository.model;
 
+import static org.hibernate.type.SqlTypes.NAMED_ENUM;
+
 import jakarta.persistence.*;
 import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
 
 @Entity
 @Table(name = "worker_level_history")
@@ -19,7 +22,7 @@ public class JWorkerLevelHistory {
   @JoinColumn(name = "worker_code")
   private JWorker worker;
 
-  @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(NAMED_ENUM)
   @Column(nullable = false)
   private JWorkerLevelEnum level;
 

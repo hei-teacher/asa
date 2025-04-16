@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import school.hei.asa.endpoint.rest.model.th.ThWorker;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.WorkerLevelHistory;
@@ -44,10 +45,15 @@ public class WorkerController {
     var level = wlhList.isEmpty() ? null : wlhList.getLast().level();
     var levelEntranceInstant = wlhList.isEmpty() ? null : wlhList.getLast().entranceInstant();
 
-    model.addAttribute("entranceInstant", entranceInstant);
-    model.addAttribute("level", level);
-    model.addAttribute("levelEntranceInstant", levelEntranceInstant);
-    model.addAttribute("worker", worker);
+    model.addAttribute(
+        "worker",
+        new ThWorker(
+            worker.code(),
+            worker.name(),
+            worker.email(),
+            entranceInstant,
+            level,
+            levelEntranceInstant));
     return "worker";
   }
 

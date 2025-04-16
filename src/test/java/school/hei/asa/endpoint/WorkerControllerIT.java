@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.controller.WorkerController;
 import school.hei.asa.endpoint.rest.controller.WorkerToModelAdder;
+import school.hei.asa.endpoint.rest.model.th.ThWorker;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.PartnerContractor;
 import school.hei.asa.model.Worker;
@@ -50,7 +51,7 @@ class WorkerControllerIT extends FacadeIT {
   void can_get_worker_without_worker_code() {
     String viewName = workerController.getWorker(model, authentication, null);
 
-    verify(model).addAttribute(eq("worker"), any(Worker.class));
+    verify(model).addAttribute(eq("worker"), any(ThWorker.class));
     assertEquals("worker", viewName);
   }
 
@@ -58,7 +59,7 @@ class WorkerControllerIT extends FacadeIT {
   void can_get_worker_with_worker_code() {
     String viewName = workerController.getWorker(model, authentication, "worker-code");
 
-    verify(model).addAttribute(eq("worker"), any(Worker.class));
+    verify(model).addAttribute(eq("worker"), any(ThWorker.class));
     assertEquals("worker", viewName);
   }
 

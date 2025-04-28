@@ -12,6 +12,7 @@ public class ThWorker {
   String code;
   String name;
   String email;
+  String workerType;
   Instant entranceInstant;
   String level;
   Instant levelEntranceInstant;

@@ -14,11 +14,15 @@
         <div class="space-y-2">
             <div class="flex gap-2">
                 <label class="block text-gray-500">Name :</label>
-                <p class="text-lg font-medium text-gray-600" th:text="${worker.name}">Nom</p>
+                <p class="text-lg font-medium text-gray-600" th:text="${worker.name}">Name</p>
             </div>
             <div class="flex gap-2">
                 <label class="block text-gray-500">Email :</label>
                 <p class="text-lg font-medium text-gray-600" th:text="${worker.email}">Email</p>
+            </div>
+            <div class="flex gap-2">
+                <label class="block text-gray-500">Worker Type :</label>
+                <p class="text-lg font-medium text-gray-600" th:text="${worker.workerType}">Worker Type</p>
             </div>
             <div class="flex gap-2">
                 <label class="block text-gray-500">Entrance Date:</label>

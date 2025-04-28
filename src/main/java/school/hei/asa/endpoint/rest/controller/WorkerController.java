@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import school.hei.asa.endpoint.rest.model.th.ThWorker;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
-import school.hei.asa.model.Worker;
-import school.hei.asa.model.WorkerLevelHistory;
+import school.hei.asa.model.*;
 import school.hei.asa.repository.WorkerLevelHistoryRepository;
 import school.hei.asa.repository.WorkerRepository;
 
@@ -39,11 +38,18 @@ public class WorkerController {
             : workerCode;
 
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-    List<WorkerLevelHistory> wlhList = workerLevelHistoryRepository.findAllByWorker(worker);
+    var wlhList = workerLevelHistoryRepository.findAllByWorker(worker);
 
-    var entranceInstant = wlhList.isEmpty() ? null : wlhList.getFirst().entranceInstant();
-    var level = wlhList.isEmpty() ? null : wlhList.getLast().level();
-    var levelEntranceInstant = wlhList.isEmpty() ? null : wlhList.getLast().entranceInstant();
+    var workerType = switch (worker) {
+      case PartnerContractor ignored -> "Prestataire";
+      case FullTimeEmployee ignored -> "Salarié";
+      default -> "Alternant";
+    };
+
+    var hasLevelHistory = !wlhList.isEmpty();
+    var entranceInstant = hasLevelHistory ? wlhList.getFirst().entranceInstant() : null;
+    var level = hasLevelHistory ? wlhList.getLast().level() : null;
+    var levelEntranceInstant = hasLevelHistory ? wlhList.getLast().entranceInstant() : null;
 
     model.addAttribute(
         "worker",
@@ -51,6 +57,7 @@ public class WorkerController {
             worker.code(),
             worker.name(),
             worker.email(),
+            workerType,
             entranceInstant,
             level,
             levelEntranceInstant));

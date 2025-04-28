@@ -4,7 +4,6 @@ import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import school.hei.asa.repository.model.JWorkerLevelEnum;
 
 @Accessors(fluent = true)
 @Getter
@@ -14,6 +13,6 @@ public class ThWorker {
   String name;
   String email;
   Instant entranceInstant;
-  JWorkerLevelEnum level;
+  String level;
   Instant levelEntranceInstant;
 }

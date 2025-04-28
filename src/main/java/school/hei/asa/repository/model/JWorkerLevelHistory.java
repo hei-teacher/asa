@@ -24,7 +24,7 @@ public class JWorkerLevelHistory {
 
   @JdbcTypeCode(NAMED_ENUM)
   @Column(nullable = false)
-  private JWorkerLevelEnum level;
+  private String level;
 
   @Column(name = "entrance_instant", nullable = false)
   private Instant entranceInstant;

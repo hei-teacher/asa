@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import school.hei.asa.repository.model.JWorkerLevelEnum;
 
 @Accessors(fluent = true)
 @Getter
@@ -13,6 +12,6 @@ import school.hei.asa.repository.model.JWorkerLevelEnum;
 @EqualsAndHashCode
 public class WorkerLevelHistory {
   private final Worker worker;
-  private final JWorkerLevelEnum level;
+  private final String level;
   private final Instant entranceInstant;
 }

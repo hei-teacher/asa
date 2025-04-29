@@ -19,9 +19,16 @@ public class JWorkerLevelHistory {
   @JoinColumn(name = "worker_code")
   private JWorker worker;
 
-  @Column(nullable = false)
-  private String level;
+  @ManyToOne
+  @JoinColumn(name = "id")
+  private JWorkerLevel level;
 
   @Column(name = "entrance_instant", nullable = false)
   private Instant entranceInstant;
+
+  @Column(name = "contract_type", nullable = false)
+  private String contractType;
+
+  @Column(name = "total_work_days")
+  private int totalWorkDays;
 }

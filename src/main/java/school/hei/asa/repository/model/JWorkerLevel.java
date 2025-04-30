@@ -9,6 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class JWorkerLevel {
-  @Id private String id;
+  @Id private String level_id;
   private String level;
 }

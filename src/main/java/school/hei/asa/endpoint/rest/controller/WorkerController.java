@@ -59,7 +59,7 @@ public class WorkerController {
             worker.email(),
             workerType,
             entranceInstant,
-            level,
+            "",
             levelEntranceInstant));
     return "worker";
   }

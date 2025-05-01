@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import school.hei.asa.endpoint.rest.controller.mapper.ThWorkerMapper;
 import school.hei.asa.endpoint.rest.model.th.ThWorker;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.*;
@@ -21,6 +22,7 @@ public class WorkerController {
   private final WorkerLevelHistoryRepository workerLevelHistoryRepository;
   private final WorkerFromAuthentication workerFromAuthentication;
   private final WorkerToModelAdder workerToModelAdder;
+  private final ThWorkerMapper thWorkerMapper;
 
   @GetMapping("/workers")
   public List<Worker> getWorkers() {
@@ -40,16 +42,18 @@ public class WorkerController {
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var wlhList = workerLevelHistoryRepository.findAllByWorker(worker);
 
-    var workerType = switch (worker) {
-      case PartnerContractor ignored -> "Prestataire";
-      case FullTimeEmployee ignored -> "Salarié";
+    var hasLevelHistory = !wlhList.isEmpty();
+    var entranceInstant = hasLevelHistory ? wlhList.getLast().entranceInstant() : null;
+    var level = hasLevelHistory ? wlhList.getFirst().level().getLevel() : null;
+    var levelEntranceInstant = hasLevelHistory ? wlhList.getFirst().entranceInstant() : null;
+    var contractType = hasLevelHistory ? wlhList.getFirst().contractType() : null;
+
+    var workerType = switch (contractType) {
+      case "partnerContractor" -> "Prestataire";
+      case "fullTimeEmployee" -> "Salarié";
+      case null -> "";
       default -> "Alternant";
     };
-
-    var hasLevelHistory = !wlhList.isEmpty();
-    var entranceInstant = hasLevelHistory ? wlhList.getFirst().entranceInstant() : null;
-    var level = hasLevelHistory ? wlhList.getLast().level() : null;
-    var levelEntranceInstant = hasLevelHistory ? wlhList.getLast().entranceInstant() : null;
 
     model.addAttribute(
         "worker",
@@ -59,7 +63,7 @@ public class WorkerController {
             worker.email(),
             workerType,
             entranceInstant,
-            "",
+            level,
             levelEntranceInstant));
     return "worker";
   }
@@ -75,7 +79,7 @@ public class WorkerController {
             : workerCode;
 
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-    List<WorkerLevelHistory> wlhList = workerLevelHistoryRepository.findAllByWorker(worker);
+    var wlhList = thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
 
     model.addAttribute("worker", worker);
     model.addAttribute("workerCode", workerCodeOrAuth);

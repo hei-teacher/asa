@@ -20,7 +20,7 @@ public class JWorkerLevelHistory {
   private JWorker worker;
 
   @ManyToOne
-  @JoinColumn(name = "level_id")
+  @JoinColumn(name = "level")
   private JWorkerLevel level;
 
   @Column(name = "entrance_instant", nullable = false)

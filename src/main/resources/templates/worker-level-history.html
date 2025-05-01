@@ -29,6 +29,8 @@
                 <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal text-center">
                     <th class="py-3 px-6">Level</th>
                     <th class="py-3 px-6">Entrance date</th>
+                    <th class="py-3 px-6">Contract Type</th>
+                    <th class="py-3 px-6">Total Work Days</th>
                 </tr>
                 </thead>
                 <tbody class="text-gray-700 text-sm font-light text-center">
@@ -36,6 +38,8 @@
                     class="border-b border-gray-200 hover:bg-gray-50 text-center">
                     <td class="py-3 px-6 text-center" th:text="${levelHistory.level}"></td>
                     <td class="py-3 px-6 text-center" th:text="${#dates.format(levelHistory.entranceInstant, 'dd MMM yyyy')}"></td>
+                    <td class="py-3 px-6 text-center" th:text="${levelHistory.contractType}"></td>
+                    <td class="py-3 px-6 text-center" th:text="${levelHistory.totalWorkDays}"></td>
                 </tr>
                 </tbody>
             </table>

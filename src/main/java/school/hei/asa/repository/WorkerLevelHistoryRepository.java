@@ -21,7 +21,7 @@ public class WorkerLevelHistoryRepository {
   @Transactional
   public List<WorkerLevelHistory> findAllByWorker(Worker worker) {
     return workerLevelHistoryMapper.toDomain(
-        jWorkerLevelHistoryRepository.findAllByWorkerOrderByEntranceInstantAsc(
+        jWorkerLevelHistoryRepository.findAllByWorkerOrderByEntranceInstantDesc(
             workerMapper.toEntity(worker)));
   }
 }

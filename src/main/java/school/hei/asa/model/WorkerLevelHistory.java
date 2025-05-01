@@ -15,4 +15,6 @@ public class WorkerLevelHistory {
   private final Worker worker;
   private final JWorkerLevel level;
   private final Instant entranceInstant;
+  private final String contractType;
+  private final int totalWorkDays;
 }

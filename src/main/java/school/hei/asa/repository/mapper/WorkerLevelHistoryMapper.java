@@ -25,6 +25,6 @@ public class WorkerLevelHistoryMapper {
         workerMapper.toDomain(
             cache.getOrDefault(JWorker.class, jWorkerCode, jWorkerLevelHistory.getWorker()), cache),
         jWorkerLevelHistory.getLevel(),
-        jWorkerLevelHistory.getEntranceInstant());
+        jWorkerLevelHistory.getEntranceInstant(), jWorkerLevelHistory.getContractType(), jWorkerLevelHistory.getTotalWorkDays());
   }
 }

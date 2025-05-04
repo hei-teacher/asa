@@ -1,5 +1,6 @@
 package school.hei.asa.repository.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import java.time.Instant;
 import lombok.Getter;
@@ -29,6 +30,7 @@ public class JWorkerLevelHistory {
   @Column(name = "contract_type", nullable = false)
   private String contractType;
 
+  @Nullable
   @Column(name = "total_work_days")
-  private int totalWorkDays;
+  private Integer totalWorkDays;
 }

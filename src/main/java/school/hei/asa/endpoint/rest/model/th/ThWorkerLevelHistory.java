@@ -1,10 +1,9 @@
 package school.hei.asa.endpoint.rest.model.th;
 
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-
-import java.time.Instant;
 
 @Accessors(fluent = true)
 @Getter

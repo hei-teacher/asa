@@ -10,5 +10,4 @@ import school.hei.asa.repository.model.JWorkerLevelHistory;
 public interface JWorkerLevelHistoryRepository extends JpaRepository<JWorkerLevelHistory, String> {
 
   List<JWorkerLevelHistory> findAllByWorkerOrderByEntranceInstantDesc(JWorker jWorker);
-
 }

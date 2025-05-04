@@ -35,7 +35,9 @@ public class MissionExecutionRepository {
   }
 
   @Transactional
-  public List<JMissionExecution> missionExecutionsByDateBetween(Worker worker, LocalDate startDate, LocalDate endDate) {
-    return jMissionExecutionRepository.findByWorkerCodeAndDateBetween(workerMapper.toEntity(worker).getCode(), startDate, endDate);
+  public List<JMissionExecution> missionExecutionsByDateBetween(
+      Worker worker, LocalDate startDate, LocalDate endDate) {
+    return jMissionExecutionRepository.findByWorkerCodeAndDateBetween(
+        workerMapper.toEntity(worker).getCode(), startDate, endDate);
   }
 }

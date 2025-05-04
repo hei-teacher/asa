@@ -48,12 +48,13 @@ public class WorkerController {
     var levelEntranceInstant = hasLevelHistory ? wlhList.getFirst().entranceInstant() : null;
     var contractType = hasLevelHistory ? wlhList.getFirst().contractType() : null;
 
-    var workerType = switch (contractType) {
-      case "partnerContractor" -> "Prestataire";
-      case "fullTimeEmployee" -> "Salarié";
-      case null -> "";
-      default -> "Alternant";
-    };
+    var workerType =
+        switch (contractType) {
+          case "partnerContractor" -> "Prestataire";
+          case "fullTimeEmployee" -> "Salarié";
+          case null -> "";
+          default -> "Alternant";
+        };
 
     model.addAttribute(
         "worker",

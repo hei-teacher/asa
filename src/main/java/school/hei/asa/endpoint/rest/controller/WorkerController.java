@@ -70,21 +70,21 @@ public class WorkerController {
   }
 
   @GetMapping("/worker-level-history")
-    public String getWorkersLevelHistory(
-            Model model,
-            Authentication authentication,
-            @RequestParam(required = false) String workerCode) {
-      var workerCodeOrAuth =
-              workerCode == null || workerCode.isBlank()
-                      ? workerFromAuthentication.apply(authentication).get().code()
-                      : workerCode;
+  public String getWorkersLevelHistory(
+      Model model,
+      Authentication authentication,
+      @RequestParam(required = false) String workerCode) {
+    var workerCodeOrAuth =
+        workerCode == null || workerCode.isBlank()
+            ? workerFromAuthentication.apply(authentication).get().code()
+            : workerCode;
 
-      var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-      var wlhList = thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
+    var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
+    var wlhList = thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
 
-      model.addAttribute("worker", worker);
-      model.addAttribute("workerCode", workerCodeOrAuth);
-      model.addAttribute("workerLevelHistory", wlhList);
-      return "worker-level-history";
+    model.addAttribute("worker", worker);
+    model.addAttribute("workerCode", workerCodeOrAuth);
+    model.addAttribute("workerLevelHistory", wlhList);
+    return "worker-level-history";
   }
 }

@@ -40,21 +40,15 @@ public class WorkerController {
             : workerCode;
 
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-    var wlhList = workerLevelHistoryRepository.findAllByWorker(worker);
+    var workerLevelHistories = workerLevelHistoryRepository.findAllByWorker(worker);
 
-    var hasLevelHistory = !wlhList.isEmpty();
-    var entranceInstant = hasLevelHistory ? wlhList.getLast().entranceInstant() : null;
-    var level = hasLevelHistory ? wlhList.getFirst().level().getLevel() : null;
-    var levelEntranceInstant = hasLevelHistory ? wlhList.getFirst().entranceInstant() : null;
-    var contractType = hasLevelHistory ? wlhList.getFirst().contractType() : null;
-
-    var workerType =
-        switch (contractType) {
-          case "partnerContractor" -> "Prestataire";
-          case "fullTimeEmployee" -> "Salarié";
-          case null -> "";
-          default -> "Alternant";
-        };
+    var hasLevelHistory = !workerLevelHistories.isEmpty();
+    var entranceInstant = hasLevelHistory ? workerLevelHistories.getLast().entranceInstant() : null;
+    var level = hasLevelHistory ? workerLevelHistories.getFirst().level().getLevel() : null;
+    var levelEntranceInstant =
+        hasLevelHistory ? workerLevelHistories.getFirst().entranceInstant() : null;
+    var contractType = hasLevelHistory ? workerLevelHistories.getFirst().contractType() : null;
+    var workerType = thWorkerMapper.toWorkerType(contractType);
 
     model.addAttribute(
         "worker",
@@ -80,11 +74,12 @@ public class WorkerController {
             : workerCode;
 
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-    var wlhList = thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
+    var workerLevelHistories =
+        thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
 
     model.addAttribute("worker", worker);
     model.addAttribute("workerCode", workerCodeOrAuth);
-    model.addAttribute("workerLevelHistory", wlhList);
+    model.addAttribute("workerLevelHistory", workerLevelHistories);
     return "worker-level-history";
   }
 }

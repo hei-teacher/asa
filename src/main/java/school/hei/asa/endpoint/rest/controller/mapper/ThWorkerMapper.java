@@ -1,7 +1,6 @@
 package school.hei.asa.endpoint.rest.controller.mapper;
 
 import static java.time.Instant.now;
-import static java.util.stream.IntStream.range;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -25,14 +24,13 @@ public class ThWorkerMapper {
   private final MissionMapper missionMapper;
 
   public List<ThWorkerLevelHistory> toTh(List<WorkerLevelHistory> workerLevelHistories) {
-    return range(0, workerLevelHistories.size())
-        .mapToObj(
-            i -> {
-              var current = workerLevelHistories.get(i);
+    ZoneId zoneId = ZoneId.of("UTC");
+    return workerLevelHistories.stream()
+        .map(
+            current -> {
+              int i = workerLevelHistories.indexOf(current);
               var nextEntrance =
                   (i == 0) ? now() : workerLevelHistories.get(i - 1).entranceInstant();
-
-              var zoneId = ZoneId.of("UTC");
 
               double totalDaysWorked =
                   missionExecutionPercentageSumByWorker(
@@ -40,13 +38,7 @@ public class ThWorkerMapper {
                       current.entranceInstant().atZone(zoneId).toLocalDate(),
                       nextEntrance.atZone(zoneId).toLocalDate());
 
-              var contractType =
-                  switch (current.contractType()) {
-                    case "partnerContractor" -> "Prestation";
-                    case "fullTimeEmployee" -> "Salariat";
-                    default -> "Alternance";
-                  };
-
+              var contractType = toWorkerType(current.contractType());
               var contractWithTotalWorkDays = "partnerContractor";
               var totalWorkDays =
                   contractWithTotalWorkDays.equals(current.contractType())
@@ -63,6 +55,15 @@ public class ThWorkerMapper {
         .toList();
   }
 
+  public String toWorkerType(String contractType) {
+    return switch (contractType) {
+      case "partnerContractor" -> "Prestataire";
+      case "fullTimeEmployee" -> "Salarié";
+      case null -> "";
+      default -> "Alternant";
+    };
+  }
+
   private Double missionExecutionPercentageSumByWorker(
       Worker worker, LocalDate startDate, LocalDate endDate) {
     return missionExecutionRepository
@@ -72,7 +73,6 @@ public class ThWorkerMapper {
             jme -> {
               var mission = missionMapper.toDomain(jme.getMission());
               boolean isCare = mission.isCare(careProductCodeSupplier.get());
-
               return !isCare;
             })
         .mapToDouble(JMissionExecution::getDayPercentage)

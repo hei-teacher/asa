@@ -9,6 +9,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class JWorkerLevel {
-  @Id private String level_id;
+  @Column(name = "level_id", nullable = false)
+  @Id
+  private String levelId;
+
   private String level;
 }

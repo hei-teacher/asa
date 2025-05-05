@@ -69,6 +69,7 @@ class WorkerControllerIT extends FacadeIT {
 
     verify(model).addAttribute(eq("worker"), any(Worker.class));
     verify(model).addAttribute(eq("workerCode"), eq("worker-code"));
+    verify(model).addAttribute(eq("workerLevelHistory"), anyList());
     assertEquals("worker-level-history", viewName);
   }
 
@@ -78,6 +79,7 @@ class WorkerControllerIT extends FacadeIT {
 
     verify(model).addAttribute(eq("worker"), any(Worker.class));
     verify(model).addAttribute(eq("workerCode"), eq("worker-code"));
+    verify(model).addAttribute(eq("workerLevelHistory"), anyList());
     assertEquals("worker-level-history", viewName);
   }
 }

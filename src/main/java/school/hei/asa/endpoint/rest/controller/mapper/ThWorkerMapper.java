@@ -4,6 +4,7 @@ import static java.time.Instant.now;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,40 +20,42 @@ import school.hei.asa.repository.model.JMissionExecution;
 @Component
 public class ThWorkerMapper {
 
+  public static final String CONTRACT_WITH_TOTAL_WORK_DAYS = "partnerContractor";
+
   private final MissionExecutionRepository missionExecutionRepository;
   private final CareProductCodeSupplier careProductCodeSupplier;
   private final MissionMapper missionMapper;
 
-  public List<ThWorkerLevelHistory> toTh(List<WorkerLevelHistory> workerLevelHistories) {
+  public List<ThWorkerLevelHistory> toTh(List<WorkerLevelHistory> histories) {
     ZoneId zoneId = ZoneId.of("UTC");
-    return workerLevelHistories.stream()
-        .map(
-            current -> {
-              int i = workerLevelHistories.indexOf(current);
-              var nextEntrance =
-                  (i == 0) ? now() : workerLevelHistories.get(i - 1).entranceInstant();
+    List<ThWorkerLevelHistory> result = new ArrayList<>();
 
-              double totalDaysWorked =
-                  missionExecutionPercentageSumByWorker(
-                      current.worker(),
-                      current.entranceInstant().atZone(zoneId).toLocalDate(),
-                      nextEntrance.atZone(zoneId).toLocalDate());
+    for (int i = 0; i < histories.size(); i++) {
+      var current = histories.get(i);
+      var nextEntrance = (i == 0) ? now() : histories.get(i - 1).entranceInstant();
 
-              var contractType = toWorkerType(current.contractType());
-              var contractWithTotalWorkDays = "partnerContractor";
-              var totalWorkDays =
-                  contractWithTotalWorkDays.equals(current.contractType())
-                      ? String.valueOf(current.totalWorkDays())
-                      : "-";
+      double totalDaysWorked =
+          missionExecutionPercentageSumByWorker(
+              current.worker(),
+              current.entranceInstant().atZone(zoneId).toLocalDate(),
+              nextEntrance.atZone(zoneId).toLocalDate());
 
-              return new ThWorkerLevelHistory(
-                  current.level().getLevel(),
-                  current.entranceInstant(),
-                  contractType,
-                  totalWorkDays,
-                  String.valueOf(totalDaysWorked));
-            })
-        .toList();
+      var contractType = toWorkerType(current.contractType());
+      var totalWorkDays =
+          CONTRACT_WITH_TOTAL_WORK_DAYS.equals(current.contractType())
+              ? String.valueOf(current.totalWorkDays())
+              : "-";
+
+      result.add(
+          new ThWorkerLevelHistory(
+              current.level().getLevel(),
+              current.entranceInstant(),
+              contractType,
+              totalWorkDays,
+              String.valueOf(totalDaysWorked)));
+    }
+
+    return result;
   }
 
   public String toWorkerType(String contractType) {

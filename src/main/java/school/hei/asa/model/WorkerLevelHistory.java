@@ -16,5 +16,5 @@ public class WorkerLevelHistory {
   private final JWorkerLevel level;
   private final Instant entranceInstant;
   private final String contractType;
-  private final Integer totalWorkDays;
+  private final Integer projectedDaysToWork;
 }

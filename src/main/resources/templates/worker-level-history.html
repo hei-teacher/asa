@@ -40,8 +40,8 @@
                     <td class="py-3 px-6 text-center" th:text="${levelHistory.level}"></td>
                     <td class="py-3 px-6 text-center" th:text="${#dates.format(levelHistory.entranceInstant, 'dd MMM yyyy')}"></td>
                     <td class="py-3 px-6 text-center" th:text="${levelHistory.contractType}"></td>
-                    <td class="py-3 px-6 text-center" th:text="${levelHistory.totalWorkDays}"></td>
-                    <td class="py-3 px-6 text-center" th:text="${levelHistory.totalDaysWorked}"></td>
+                    <td class="py-3 px-6 text-center" th:text="${levelHistory.projectedDaysToWork}"></td>
+                    <td class="py-3 px-6 text-center" th:text="${levelHistory.actualWorkedDay}"></td>
                 </tr>
                 </tbody>
             </table>

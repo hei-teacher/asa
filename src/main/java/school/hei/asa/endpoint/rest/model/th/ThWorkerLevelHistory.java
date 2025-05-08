@@ -12,6 +12,6 @@ public class ThWorkerLevelHistory {
   String level;
   Instant entranceInstant;
   String contractType;
-  String totalWorkDays;
-  String totalDaysWorked;
+  String projectedDaysToWork;
+  String actualWorkedDay;
 }

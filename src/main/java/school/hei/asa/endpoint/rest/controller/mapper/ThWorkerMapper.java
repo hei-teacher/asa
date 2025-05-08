@@ -43,7 +43,7 @@ public class ThWorkerMapper {
       var contractType = toWorkerType(current.contractType());
       var totalWorkDays =
           CONTRACT_WITH_TOTAL_WORK_DAYS.equals(current.contractType())
-              ? String.valueOf(current.totalWorkDays())
+              ? String.valueOf(current.projectedDaysToWork())
               : "-";
 
       result.add(

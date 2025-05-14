@@ -26,6 +26,7 @@ public class DailyExecutionRepository {
   private final JMissionExecutionRepository jMissionExecutionRepository;
   private final JWorkerRepository jWorkerRepository;
   private final JMissionRepository jMissionRepository;
+  private final PsMissionExecutionRepository psMissionExecutionRepository;
 
   private final MissionExecutionMapper missionExecutionMapper;
 
@@ -40,7 +41,7 @@ public class DailyExecutionRepository {
     dailyExecution
         .executions()
         .forEach(missionExecution -> toSave.add(missionExecutionMapper.toEntity(missionExecution)));
-    jMissionExecutionRepository.saveAll(toSave);
+    psMissionExecutionRepository.saveAll(toSave);
   }
 
   @Transactional

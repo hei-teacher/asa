@@ -7,7 +7,7 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.service.InvoicePDFGenerator;
 
@@ -24,9 +24,10 @@ public class InvoiceController {
 
   @SneakyThrows
   @GetMapping("/invoice")
-  public String getInvoicePage(Model model, @RequestParam(required = false) ThInvoiceForm invoiceForm){
+  public String getInvoicePage(Model model, @ModelAttribute ThInvoiceForm invoiceForm){
 
-    var invoiceData = invoiceForm == null ? new ThInvoiceForm("FAC00/00/0000", "00/00/0000", "", "0", "0 Ar", "0 Ar", "0 Ar") : invoiceForm;
+    var isEmpty = invoiceForm.reference() == null || invoiceForm.reference().isBlank();
+    var invoiceData = isEmpty ? new ThInvoiceForm("FAC00/00/0000", "00/00/0000", "", "0", "0 Ar", "0 Ar", "0 Ar") : invoiceForm;
 
     File data = invoicePDFGenerator.apply(invoiceData, "invoice");
     BufferedImage image;
@@ -40,6 +41,8 @@ public class InvoiceController {
     String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
 
     model.addAttribute("invoiceData", base64Image);
+    model.addAttribute("form", invoiceData);
+
     return "invoice-generator";
   }
 }

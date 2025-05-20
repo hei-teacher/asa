@@ -25,7 +25,8 @@
                         id="ref"
                         rows="1"
                         name="ref"
-                        placeholder="FAC2025/01/01"
+                        placeholder="FAC01/01/2025"
+                        th:text="${form.reference}"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
                 ></textarea>
             </div>
@@ -38,12 +39,51 @@
                             id="date"
                             name="date"
                             placeholder="Select a date"
+                            th:value="${form.issueDate}"
                             class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
                     />
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
                 <i class="material-icons">event</i>
             </span>
                 </div>
+            </div>
+        </div>
+
+        <div class="flex space-x-6 mb-6">
+            <div class="w-1/3">
+                <label for="qtt" class="block text-gray-800 font-semibold mb-1">Quantité :</label>
+                <textarea
+                        id="qtt"
+                        rows="1"
+                        name="ref"
+                        placeholder="10"
+                        th:text="${form.quantity}"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
+                ></textarea>
+            </div>
+
+            <div class="w-1/3">
+                <label for="px" class="block text-gray-800 font-semibold mb-1">Prix unitaire :</label>
+                <textarea
+                        id="px"
+                        rows="1"
+                        name="ref"
+                        placeholder="50 000 Ar"
+                        th:text="${form.unitPrice}"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
+                ></textarea>
+            </div>
+
+            <div class="w-1/3">
+                <label for="mtt" class="block text-gray-800 font-semibold mb-1">Montant :</label>
+                <textarea
+                        id="mtt"
+                        rows="1"
+                        name="ref"
+                        placeholder="500 000 Ar"
+                        th:text="${form.amount}"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
+                ></textarea>
             </div>
         </div>
 
@@ -55,47 +95,11 @@
                         rows="1"
                         name="ref"
                         placeholder="Consultant - Développeur Logiciel (1j)"
+                        th:text="${form.description}"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
                 ></textarea>
             </div>
 
-            <div class="w-1/2">
-                <label for="qtt" class="block text-gray-800 font-semibold mb-1">Quantité :</label>
-                <textarea
-                        id="qtt"
-                        rows="1"
-                        name="ref"
-                        placeholder="10"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
-                ></textarea>
-            </div>
-        </div>
-
-        <div class="flex space-x-6 mb-6">
-            <div class="w-1/2">
-                <label for="px" class="block text-gray-800 font-semibold mb-1">Prix unitaire :</label>
-                <textarea
-                        id="px"
-                        rows="1"
-                        name="ref"
-                        placeholder="50 000 Ar"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
-                ></textarea>
-            </div>
-
-            <div class="w-1/2">
-                <label for="mtt" class="block text-gray-800 font-semibold mb-1">Montant :</label>
-                <textarea
-                        id="mtt"
-                        rows="1"
-                        name="ref"
-                        placeholder="500 000 Ar"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
-                ></textarea>
-            </div>
-        </div>
-
-        <div class="flex space-x-6 mb-6">
             <div class="w-1/2">
                 <label for="tot" class="block text-gray-800 font-semibold mb-1">Total :</label>
                 <textarea
@@ -103,9 +107,28 @@
                         rows="1"
                         name="ref"
                         placeholder="500 000 Ar"
+                        th:text="${form.total}"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
                 ></textarea>
             </div>
+        </div>
+
+        <div class="mt-6">
+            <form method="get" action="/invoice" id="invoiceForm">
+                <input type="hidden" name="reference" id="form_ref">
+                <input type="hidden" name="issueDate" id="form_date">
+                <input type="hidden" name="description" id="form_desc">
+                <input type="hidden" name="quantity" id="form_qtt">
+                <input type="hidden" name="unitPrice" id="form_px">
+                <input type="hidden" name="amount" id="form_mtt">
+                <input type="hidden" name="total" id="form_tot">
+
+                <button type="button"
+                        onclick="updateInvoiceData()"
+                        class="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 transition">
+                    Mettre à jour la facture
+                </button>
+            </form>
         </div>
     </div>
 
@@ -128,21 +151,23 @@
         };
     }
 
-    async function updateInvoiceData() {
+    function updateInvoiceData() {
         const formData = getFormData();
-        window.location.href = `/invoice?invoiceForm=${formData}`;
+
+        document.getElementById("form_ref").value = formData.reference;
+        document.getElementById("form_date").value = formData.issueDate;
+        document.getElementById("form_desc").value = formData.description;
+        document.getElementById("form_qtt").value = formData.quantity;
+        document.getElementById("form_px").value = formData.unitPrice;
+        document.getElementById("form_mtt").value = formData.amount;
+        document.getElementById("form_tot").value = formData.total;
+
+        document.getElementById("invoiceForm").submit();
     }
 
-    document.querySelectorAll('textarea, input').forEach(el => {
-        el.addEventListener('input', updateInvoiceData);
-    });
-
     document.addEventListener("DOMContentLoaded", function () {
-        const currentYear = new Date().getFullYear();
         flatpickr("#date", {
-            minDate: `01/01/${currentYear}`,
-            maxDate: `31/12/${currentYear}`,
-            dateFormat: "d/m/Y"
+            dateFormat: "d/m/Y",
         });
     });
 </script>

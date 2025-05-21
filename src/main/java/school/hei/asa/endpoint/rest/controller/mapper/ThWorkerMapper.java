@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.asa.CareProductCodeSupplier;
@@ -37,10 +39,7 @@ public class ThWorkerMapper {
               nextEntrance.atZone(zoneId).toLocalDate());
 
       var contractType = toWorkerType(current.contractType());
-      var totalWorkDays =
-          current.projectedDaysToWork() == null
-              ? "-"
-              : String.valueOf(current.projectedDaysToWork());
+      var totalWorkDays = Objects.toString(current.projectedDaysToWork(), "-");
 
       result.add(
           new ThWorkerLevelHistory(

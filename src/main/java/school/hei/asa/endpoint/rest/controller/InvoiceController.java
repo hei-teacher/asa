@@ -27,7 +27,7 @@ public class InvoiceController {
   public String getInvoicePage(Model model, @ModelAttribute ThInvoiceForm invoiceForm){
 
     var isEmpty = invoiceForm.reference() == null || invoiceForm.reference().isBlank();
-    var invoiceData = isEmpty ? new ThInvoiceForm("FAC00/00/0000", "00/00/0000", "", "0", "0 Ar", "0 Ar", "0 Ar") : invoiceForm;
+    var invoiceData = isEmpty ? new ThInvoiceForm("FAC00/00/0000", "00/00/0000", "", "0", "0 Ar", "0 Ar", "0 Ar", false, "", "", "", "") : invoiceForm;
 
     File data = invoicePDFGenerator.apply(invoiceData, "invoice");
     BufferedImage image;

@@ -7,4 +7,9 @@ public record ThInvoiceForm(
     String quantity,
     String unitPrice,
     String amount,
-    String total) {}
+    String total,
+    Boolean hasBonus,
+    String bonusDescription,
+    String bonusQuantity,
+    String bonusUnitPrice,
+    String bonusAmount) {}

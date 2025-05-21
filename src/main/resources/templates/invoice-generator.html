@@ -114,6 +114,13 @@
         </div>
 
         <div class="mt-6">
+            <div class="mb-4">
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="bon" class="form-checkbox text-indigo-600">
+                    <span class="ml-2 text-gray-700">Inclure un bonus</span>
+                </label>
+            </div>
+
             <form method="get" action="/invoice" id="invoiceForm">
                 <input type="hidden" name="reference" id="form_ref">
                 <input type="hidden" name="issueDate" id="form_date">
@@ -122,6 +129,7 @@
                 <input type="hidden" name="unitPrice" id="form_px">
                 <input type="hidden" name="amount" id="form_mtt">
                 <input type="hidden" name="total" id="form_tot">
+                <input type="hidden" name="hasBonus" id="form_bon" />
 
                 <button type="button"
                         onclick="updateInvoiceData()"
@@ -147,7 +155,8 @@
             quantity: document.getElementById('qtt').value,
             unitPrice: document.getElementById('px').value,
             amount: document.getElementById('mtt').value,
-            total: document.getElementById('tot').value
+            total: document.getElementById('tot').value,
+            hasBonus : document.getElementById('bon').checked
         };
     }
 
@@ -161,6 +170,7 @@
         document.getElementById("form_px").value = formData.unitPrice;
         document.getElementById("form_mtt").value = formData.amount;
         document.getElementById("form_tot").value = formData.total;
+        document.getElementById("form_bon").value = formData.hasBonus;
 
         document.getElementById("invoiceForm").submit();
     }

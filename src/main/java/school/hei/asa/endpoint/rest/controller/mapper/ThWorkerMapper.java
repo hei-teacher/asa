@@ -19,8 +19,6 @@ import school.hei.asa.repository.MissionExecutionRepository;
 @Component
 public class ThWorkerMapper {
 
-  public static final String CONTRACT_WITH_TOTAL_WORK_DAYS = "partnerContractor";
-
   private final MissionExecutionRepository missionExecutionRepository;
   private final CareProductCodeSupplier careProductCodeSupplier;
 
@@ -40,9 +38,9 @@ public class ThWorkerMapper {
 
       var contractType = toWorkerType(current.contractType());
       var totalWorkDays =
-          CONTRACT_WITH_TOTAL_WORK_DAYS.equals(current.contractType())
-              ? String.valueOf(current.projectedDaysToWork())
-              : "-";
+          current.projectedDaysToWork() == null
+              ? "-"
+              : String.valueOf(current.projectedDaysToWork());
 
       result.add(
           new ThWorkerLevelHistory(

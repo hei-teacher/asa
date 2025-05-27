@@ -15,24 +15,24 @@
 
 <div class="flex flex-1 overflow-hidden">
     <!-- Left section -->
-    <div class="w-1/2 p-5 bg-gray-100 box-border">
-        <h1 class="text-4xl font-bold text-[#3F2F6A] mt-10 mb-10">Generate your monthly invoice</h1>
+    <div class="w-1/2 p-5 bg-gray-100 box-border h-full overflow-y-auto">
+    <h1 class="text-4xl font-bold text-[#3F2F6A] mt-10 mb-10">Generate your monthly invoice</h1>
 
         <div class="flex space-x-6 mb-6">
-            <div class="w-1/2">
-                <label for="ref" class="block text-gray-800 font-semibold mb-1">Référence :</label>
+            <div class="w-1/4">
+                <label for="ref" class="block text-gray-800 font-semibold mb-1 text-sm">Référence :</label>
                 <textarea
                         id="ref"
                         rows="1"
                         name="ref"
                         placeholder="FAC01/01/2025"
                         th:text="${form.reference}"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
+                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
                 ></textarea>
             </div>
 
-            <div class="w-1/2">
-                <label for="date" class="block text-gray-700 font-semibold mb-1">Date d'émission :</label>
+            <div class="w-1/4">
+                <label for="date" class="block text-gray-700 font-semibold mb-1 text-sm">Date d'émission :</label>
                 <div class="relative">
                     <input
                             type="text"
@@ -40,75 +40,73 @@
                             name="date"
                             placeholder="Select a date"
                             th:value="${form.issueDate}"
-                            class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
+                            class="w-full px-2 py-1 text-sm pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
                     />
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
                 <i class="material-icons">event</i>
             </span>
                 </div>
             </div>
-        </div>
 
-        <div class="flex space-x-6 mb-6">
-            <div class="w-1/3">
-                <label for="qtt" class="block text-gray-800 font-semibold mb-1">Quantité :</label>
-                <textarea
-                        id="qtt"
-                        rows="1"
-                        name="ref"
-                        placeholder="10"
-                        th:text="${form.quantity}"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
-                ></textarea>
-            </div>
-
-            <div class="w-1/3">
-                <label for="px" class="block text-gray-800 font-semibold mb-1">Prix unitaire :</label>
-                <textarea
-                        id="px"
-                        rows="1"
-                        name="ref"
-                        placeholder="50 000 Ar"
-                        th:text="${form.unitPrice}"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
-                ></textarea>
-            </div>
-
-            <div class="w-1/3">
-                <label for="mtt" class="block text-gray-800 font-semibold mb-1">Montant :</label>
-                <textarea
-                        id="mtt"
-                        rows="1"
-                        name="ref"
-                        placeholder="500 000 Ar"
-                        th:text="${form.amount}"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
-                ></textarea>
-            </div>
-        </div>
-
-        <div class="flex space-x-6 mb-6">
             <div class="w-1/2">
-                <label for="desc" class="block text-gray-800 font-semibold mb-1">Description :</label>
+                <label for="desc" class="block text-gray-800 font-semibold mb-1 text-sm">Description :</label>
                 <textarea
                         id="desc"
                         rows="1"
                         name="ref"
                         placeholder="Consultant - Développeur Logiciel (1j)"
                         th:text="${form.description}"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
+                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
+                ></textarea>
+            </div>
+        </div>
+
+        <div class="flex space-x-6 mb-6">
+            <div class="w-1/4">
+                <label for="qtt" class="block text-gray-800 font-semibold mb-1 text-sm">Quantité :</label>
+                <textarea
+                        id="qtt"
+                        rows="1"
+                        name="ref"
+                        placeholder="10"
+                        th:text="${form.quantity}"
+                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
                 ></textarea>
             </div>
 
-            <div class="w-1/2">
-                <label for="tot" class="block text-gray-800 font-semibold mb-1">Total :</label>
+            <div class="w-1/4">
+                <label for="px" class="block text-gray-800 font-semibold mb-1 text-sm">Prix unitaire :</label>
+                <textarea
+                        id="px"
+                        rows="1"
+                        name="ref"
+                        placeholder="50 000 Ar"
+                        th:text="${form.unitPrice}"
+                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
+                ></textarea>
+            </div>
+
+            <div class="w-1/4">
+                <label for="mtt" class="block text-gray-800 font-semibold mb-1 text-sm">Montant :</label>
+                <textarea
+                        id="mtt"
+                        rows="1"
+                        name="ref"
+                        placeholder="500 000 Ar"
+                        th:text="${form.amount}"
+                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
+                ></textarea>
+            </div>
+
+            <div class="w-1/4">
+                <label for="tot" class="block text-gray-800 font-semibold mb-1 text-sm">Total :</label>
                 <textarea
                         id="tot"
                         rows="1"
                         name="ref"
                         placeholder="500 000 Ar"
                         th:text="${form.total}"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
+                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
                 ></textarea>
             </div>
         </div>
@@ -116,11 +114,51 @@
         <div class="mt-6">
             <div class="mb-4">
                 <label class="inline-flex items-center">
-                    <input type="checkbox" name="bon" class="form-checkbox text-indigo-600">
-                    <span class="ml-2 text-gray-700">Inclure un bonus</span>
+                    <input type="checkbox" name="bon" class="form-checkbox text-indigo-600" th:checked="${form.hasBonus}">
+                    <span class="ml-2 text-gray-700">Include a bonus</span>
                 </label>
             </div>
+        </div>
 
+        <div id="bonusSection" class="space-y-4 hidden">
+            <div>
+                <label for="bonusDesc" class="block text-gray-800 font-semibold mb-1 text-sm">Description du bonus :</label>
+                <input type="text" id="bonusDesc" name="bonusDesc" placeholder="Produit"
+                       th:value="${form.bonusDescription}"
+                       class="w-1/2 px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400">
+            </div>
+
+            <div class="flex space-x-4">
+                <div class="w-1/3">
+                    <label for="bonusQtt" class="block text-gray-800 font-semibold mb-1 text-sm">Quantité :</label>
+                    <input type="text" id="bonusQtt" name="bonusQtt" placeholder="1"
+                           th:value="${form.bonusQuantity}"
+                           class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400">
+                </div>
+
+                <div class="w-1/3">
+                    <label for="bonusPx" class="block text-gray-800 font-semibold mb-1 text-sm">Prix unitaire :</label>
+                    <input type="text" id="bonusPx" name="bonusPx" placeholder="25 000 Ar"
+                           th:value="${form.bonusUnitPrice}"
+                           class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400">
+                </div>
+
+                <div class="w-1/3">
+                    <label for="bonusMtt" class="block text-gray-800 font-semibold mb-1 text-sm">Montant :</label>
+                    <input type="text" id="bonusMtt" name="bonusMtt" placeholder="25 000 Ar"
+                           th:value="${form.bonusAmount}"
+                           class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400">
+                </div>
+            </div>
+
+            <div class="flex space-x-4">
+                <div class="w-2/3">
+                    <p class="text-xs">*Don't forget to update the total amount</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6">
             <form method="get" action="/invoice" id="invoiceForm">
                 <input type="hidden" name="reference" id="form_ref">
                 <input type="hidden" name="issueDate" id="form_date">
@@ -130,11 +168,15 @@
                 <input type="hidden" name="amount" id="form_mtt">
                 <input type="hidden" name="total" id="form_tot">
                 <input type="hidden" name="hasBonus" id="form_bon" />
+                <input type="hidden" name="bonusDescription" id="form_bonus_desc">
+                <input type="hidden" name="bonusQuantity" id="form_bonus_qtt">
+                <input type="hidden" name="bonusUnitPrice" id="form_bonus_px">
+                <input type="hidden" name="bonusAmount" id="form_bonus_mtt">
 
                 <button type="button"
                         onclick="updateInvoiceData()"
-                        class="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 transition">
-                    Mettre à jour la facture
+                        class="bg-[#3F2F6A] text-white font-bold py-2 px-8 rounded hover:bg-blue-800 transition">
+                    Update
                 </button>
             </form>
         </div>
@@ -156,7 +198,12 @@
             unitPrice: document.getElementById('px').value,
             amount: document.getElementById('mtt').value,
             total: document.getElementById('tot').value,
-            hasBonus : document.getElementById('bon').checked
+            hasBonus: document.querySelector('input[name="bon"]').checked,
+
+            bonusDescription: document.getElementById('bonusDesc')?.value || "",
+            bonusQuantity: document.getElementById('bonusQtt')?.value || "",
+            bonusUnitPrice: document.getElementById('bonusPx')?.value || "",
+            bonusAmount: document.getElementById('bonusMtt')?.value || ""
         };
     }
 
@@ -172,13 +219,30 @@
         document.getElementById("form_tot").value = formData.total;
         document.getElementById("form_bon").value = formData.hasBonus;
 
+        document.getElementById("form_bonus_desc").value = formData.bonusDescription;
+        document.getElementById("form_bonus_qtt").value = formData.bonusQuantity;
+        document.getElementById("form_bonus_px").value = formData.bonusUnitPrice;
+        document.getElementById("form_bonus_mtt").value = formData.bonusAmount;
+
         document.getElementById("invoiceForm").submit();
     }
 
     document.addEventListener("DOMContentLoaded", function () {
         flatpickr("#date", {
             dateFormat: "d/m/Y",
+            defaultDate: "01/01/2025"
         });
+
+        const bonusCheckbox = document.querySelector('input[name="bon"]');
+        const bonusSection = document.getElementById("bonusSection");
+
+        bonusCheckbox.addEventListener("change", function () {
+            bonusSection.classList.toggle("hidden", !this.checked);
+        });
+
+        if (bonusCheckbox.checked) {
+            bonusSection.classList.remove("hidden");
+        }
     });
 </script>
 

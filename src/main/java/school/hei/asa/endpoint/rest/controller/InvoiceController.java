@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.service.InvoicePDFGenerator;
+import school.hei.asa.service.utils.ToWords;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -25,10 +26,16 @@ public class InvoiceController {
   @SneakyThrows
   @GetMapping("/invoice")
   public String getInvoicePage(Model model, @ModelAttribute ThInvoiceForm invoiceForm){
+      var toWords = new ToWords();
 
     var isEmpty = invoiceForm.reference() == null || invoiceForm.reference().isBlank();
-    var invoiceData = isEmpty ? new ThInvoiceForm("FAC00/00/0000", "00/00/0000", "", "0", "0 Ar", "0 Ar", "0 Ar", false, "", "", "", "") : invoiceForm;
-
+    var reference = isEmpty ? "FAC00/00/0000" : invoiceForm.reference();
+    var issueDate = isEmpty ? "00/00/0000" : invoiceForm.issueDate();
+    var amount = isEmpty ? "0 Ar" : invoiceForm.amount();
+    var total = isEmpty ? "0 Ar" : invoiceForm.total();
+    var hasBonus = !isEmpty && invoiceForm.hasBonus();
+    var parsedAmount = isEmpty ? "" : toWords.convertToWords(invoiceForm.total());
+    var invoiceData = new ThInvoiceForm(reference, issueDate, invoiceForm.description(), invoiceForm.quantity(), invoiceForm.unitPrice(), amount, total, hasBonus, invoiceForm.bonusDescription(), invoiceForm.bonusQuantity(), invoiceForm.bonusUnitPrice(), invoiceForm.bonusAmount(), parsedAmount);
     File data = invoicePDFGenerator.apply(invoiceData, "invoice");
     BufferedImage image;
 

@@ -12,4 +12,5 @@ public record ThInvoiceForm(
     String bonusDescription,
     String bonusQuantity,
     String bonusUnitPrice,
-    String bonusAmount) {}
+    String bonusAmount,
+    String parsedAmount) {}

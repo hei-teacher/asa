@@ -1,19 +1,18 @@
 package school.hei.asa.file;
 
+import static java.util.UUID.randomUUID;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Base64;
 import java.util.function.BiFunction;
-
-import static java.util.UUID.randomUUID;
+import javax.annotation.Nullable;
+import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
+import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor

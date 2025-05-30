@@ -1,5 +1,14 @@
 package school.hei.asa.endpoint.rest.controller;
 
+import static java.time.LocalDate.parse;
+import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.time.format.TextStyle.FULL;
+import static java.util.Locale.FRENCH;
+
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.Base64;
+import javax.imageio.ImageIO;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -17,16 +26,6 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.service.InvoicePDFGenerator;
 import school.hei.asa.service.utils.ToWords;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.Base64;
-
-import static java.time.LocalDate.parse;
-import static java.time.format.DateTimeFormatter.ofPattern;
-import static java.time.format.TextStyle.FULL;
-import static java.util.Locale.FRENCH;
-
 @AllArgsConstructor
 @Controller
 public class InvoiceController {
@@ -37,7 +36,8 @@ public class InvoiceController {
 
   @SneakyThrows
   @GetMapping("/invoice")
-  public String getInvoicePage(Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm){
+  public String getInvoicePage(
+      Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var invoiceData = extractInvoiceData(invoiceForm);
@@ -60,7 +60,8 @@ public class InvoiceController {
 
   @SneakyThrows
   @GetMapping("/invoice/download")
-  public ResponseEntity<byte[]> downloadInvoicePDF(Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm){
+  public ResponseEntity<byte[]> downloadInvoicePDF(
+      Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var invoiceData = extractInvoiceData(invoiceForm);
@@ -73,9 +74,9 @@ public class InvoiceController {
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();
 
     return ResponseEntity.ok()
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
-            .contentType(MediaType.APPLICATION_PDF)
-            .body(fileBytes);
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
+        .contentType(MediaType.APPLICATION_PDF)
+        .body(fileBytes);
   }
 
   private static ThInvoiceForm extractInvoiceData(ThInvoiceForm invoiceForm) {
@@ -88,6 +89,19 @@ public class InvoiceController {
     var hasBonus = !isEmpty && invoiceForm.hasBonus();
     var parsedAmount = isEmpty ? "" : toWords.convertToWords(invoiceForm.total());
 
-      return new ThInvoiceForm(reference, issueDate, invoiceForm.description(), invoiceForm.quantity(), invoiceForm.unitPrice(), amount, total, hasBonus, invoiceForm.bonusDescription(), invoiceForm.bonusQuantity(), invoiceForm.bonusUnitPrice(), invoiceForm.bonusAmount(), parsedAmount);
+    return new ThInvoiceForm(
+        reference,
+        issueDate,
+        invoiceForm.description(),
+        invoiceForm.quantity(),
+        invoiceForm.unitPrice(),
+        amount,
+        total,
+        hasBonus,
+        invoiceForm.bonusDescription(),
+        invoiceForm.bonusQuantity(),
+        invoiceForm.bonusUnitPrice(),
+        invoiceForm.bonusAmount(),
+        parsedAmount);
   }
 }

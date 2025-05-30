@@ -34,7 +34,16 @@ class WorkerControllerIT extends FacadeIT {
   @BeforeEach
   void setUp() {
     authentication = mock(Authentication.class);
-    authenticatedWorker = new PartnerContractor("worker-code", "Test Worker", "worker@example.com", "Full Worker Name", "address", "random city", "nif", "stat");
+    authenticatedWorker =
+        new PartnerContractor(
+            "worker-code",
+            "Test Worker",
+            "worker@example.com",
+            "Full Worker Name",
+            "address",
+            "random city",
+            "nif",
+            "stat");
     model = mock(Model.class);
 
     when(workerFromAuthentication.apply(authentication))

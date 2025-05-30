@@ -1,7 +1,15 @@
 package school.hei.asa.model;
 
 public final class StudentContractor extends Contractor {
-  public StudentContractor(String code, String name, String email, String fullname, String address, String city, String nif, String stat) {
+  public StudentContractor(
+      String code,
+      String name,
+      String email,
+      String fullname,
+      String address,
+      String city,
+      String nif,
+      String stat) {
     super(code, name, email, fullname, address, city, nif, stat);
   }
 }

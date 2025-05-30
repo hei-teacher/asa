@@ -1,11 +1,10 @@
 package school.hei.asa.file;
 
+import java.util.function.Function;
 import lombok.SneakyThrows;
 import org.apache.tika.Tika;
 import org.apache.tika.mime.MimeTypes;
 import org.springframework.stereotype.Component;
-
-import java.util.function.Function;
 
 @Component
 public class ExtensionGuesser implements Function<byte[], String> {

@@ -22,7 +22,9 @@ class ThDailyExecutionMapperTest {
     var product = new Product("pcode", "pname", "pdescription");
     var mission1 = new Mission("mission1-code", "title1", "description1", 10, product);
     var mission2 = new Mission("mission2-code", "title2", "description2", 2, product);
-    var worker = new PartnerContractor("worker-code", "name", "email", "full name", "address", "random city", "nif", "stat");
+    var worker =
+        new PartnerContractor(
+            "worker-code", "name", "email", "full name", "address", "random city", "nif", "stat");
     var me1 =
         new MissionExecution(
             mission1, worker, LocalDate.of(2025, 1, 15), 0.4, "comment1", Instant.now());

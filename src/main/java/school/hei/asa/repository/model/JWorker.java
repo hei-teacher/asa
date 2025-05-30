@@ -21,6 +21,11 @@ public class JWorker {
   @Id private String code;
   private String name;
   private String email;
+  private String fullname;
+  private String address;
+  private String city;
+  private String nif;
+  private String stat;
 
   @Enumerated(STRING)
   private WorkerType workerType;

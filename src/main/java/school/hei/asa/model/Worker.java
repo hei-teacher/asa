@@ -15,4 +15,9 @@ public abstract sealed class Worker permits Contractor, FullTimeEmployee {
   private final String code;
   private final String name;
   private final String email;
+  private final String fullname;
+  private final String address;
+  private final String city;
+  private final String nif;
+  private final String stat;
 }

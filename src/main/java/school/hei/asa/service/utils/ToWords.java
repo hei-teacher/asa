@@ -1,11 +1,13 @@
 package school.hei.asa.service.utils;
 
+import static com.ibm.icu.text.RuleBasedNumberFormat.SPELLOUT;
+import static java.util.Locale.FRENCH;
+
 import com.ibm.icu.text.RuleBasedNumberFormat;
-import java.util.Locale;
 
 public class ToWords {
   public String convertToWords(String amount) {
-    var formatter = new RuleBasedNumberFormat(Locale.FRENCH, RuleBasedNumberFormat.SPELLOUT);
+    var formatter = new RuleBasedNumberFormat(FRENCH, SPELLOUT);
 
     String numericOnly = amount.replaceAll("\\D", "");
     var parsedAmount = Long.parseLong(numericOnly);

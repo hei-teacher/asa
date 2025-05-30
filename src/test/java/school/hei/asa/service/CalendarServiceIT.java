@@ -161,16 +161,7 @@ class CalendarServiceIT extends FacadeIT {
 
   private Authentication authentication() {
     var authentication = mock(Authentication.class);
-    var authenticatedWorker =
-        new PartnerContractor(
-            authenticatedWorkerCode,
-            "name",
-            "email",
-            "full name",
-            "address",
-            "random city",
-            "nif",
-            "stat");
+    var authenticatedWorker = new PartnerContractor(authenticatedWorkerCode, "name", "email", "full name", "address", "random city", "nif", "stat");
     workerRepository.save(authenticatedWorker);
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));

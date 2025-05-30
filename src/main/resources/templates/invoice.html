@@ -139,10 +139,10 @@
     <table class="table-head">
         <tr>
             <td>
-                <p><strong>RATOVONANAHARY Lina Finaritra</strong></p>
-                <p>LOT VL 26 I Ampamantanana</p>
-                <p>101 Antananarivo, Madagascar</p>
-                <p class="text-justify">NIF:  3018 63 1269 -  STAT: 70209 11 2024 0 06259</p>
+                <p th:text="${worker.fullname}"><strong></strong></p>
+                <p th:text="${worker.address}"></p>
+                <p th:text="${worker.city}"></p>
+                <p th:text="${'NIF: ' + worker.nif + ' -  STAT: ' + worker.stat}" class="text-justify"></p>
             </td>
         </tr>
     </table>

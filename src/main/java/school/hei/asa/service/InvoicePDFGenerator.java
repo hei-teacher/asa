@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.xhtmlrenderer.pdf.ITextRenderer;
+import school.hei.asa.model.Worker;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -18,9 +19,9 @@ public class InvoicePDFGenerator {
   private final FileWriter fileWriter;
   private final TemplateResolverEngine templateResolverEngine;
 
-  public File apply(ThInvoiceForm thInvoiceForm, String template) {
+  public File apply(Worker worker, ThInvoiceForm thInvoiceForm, String template) {
     ITextRenderer renderer = new ITextRenderer();
-    loadStyle(renderer, thInvoiceForm,template);
+    loadStyle(renderer, worker, thInvoiceForm,template);
     renderer.layout();
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -34,20 +35,22 @@ public class InvoicePDFGenerator {
 
   private void loadStyle(
       ITextRenderer renderer,
+      Worker worker,
       ThInvoiceForm thInvoiceForm,
       String template) {
     renderer.setDocumentFromString(
-        parseInvoiceTemplateToString(thInvoiceForm, template));
+        parseInvoiceTemplateToString(worker, thInvoiceForm, template));
   }
 
-  private String parseInvoiceTemplateToString(ThInvoiceForm thInvoiceForm, String template) {
+  private String parseInvoiceTemplateToString(Worker worker, ThInvoiceForm thInvoiceForm, String template) {
     TemplateEngine templateEngine = templateResolverEngine.getTemplateEngine();
-    Context context = configureContext(thInvoiceForm);
+    Context context = configureContext(worker, thInvoiceForm);
     return templateEngine.process(template, context);
   }
 
-  private Context configureContext(ThInvoiceForm thInvoiceForm) {
+  private Context configureContext(Worker worker, ThInvoiceForm thInvoiceForm) {
     Context context = new Context();
+    context.setVariable("worker", worker);
     context.setVariable("invoice", thInvoiceForm);
 
     return context;

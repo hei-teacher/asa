@@ -28,35 +28,11 @@ public class WorkerMapper {
     var worker =
         switch (jWorker.getWorkerType()) {
           case partnerContractor ->
-              new PartnerContractor(
-                  code,
-                  jWorker.getName(),
-                  jWorker.getEmail(),
-                  jWorker.getFullname(),
-                  jWorker.getAddress(),
-                  jWorker.getCity(),
-                  jWorker.getNif(),
-                  jWorker.getStat());
+              new PartnerContractor(code, jWorker.getName(), jWorker.getEmail(), jWorker.getFullname(), jWorker.getAddress(), jWorker.getCity(), jWorker.getNif(), jWorker.getStat());
           case studentContractor ->
-              new StudentContractor(
-                  code,
-                  jWorker.getName(),
-                  jWorker.getEmail(),
-                  jWorker.getFullname(),
-                  jWorker.getAddress(),
-                  jWorker.getCity(),
-                  jWorker.getNif(),
-                  jWorker.getStat());
+              new StudentContractor(code, jWorker.getName(), jWorker.getEmail(), jWorker.getFullname(), jWorker.getAddress(), jWorker.getCity(), jWorker.getNif(), jWorker.getStat());
           case fullTimeEmployee ->
-              new FullTimeEmployee(
-                  code,
-                  jWorker.getName(),
-                  jWorker.getEmail(),
-                  jWorker.getFullname(),
-                  jWorker.getAddress(),
-                  jWorker.getCity(),
-                  jWorker.getNif(),
-                  jWorker.getStat());
+              new FullTimeEmployee(code, jWorker.getName(), jWorker.getEmail(), jWorker.getFullname(), jWorker.getAddress(), jWorker.getCity(), jWorker.getNif(), jWorker.getStat());
         };
     cache.put(code, worker, Worker.class);
 

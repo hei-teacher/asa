@@ -158,7 +158,7 @@
             </div>
         </div>
 
-        <div class="mt-6">
+        <div class="mt-6 flex gap-4">
             <form method="get" action="/invoice" id="invoiceForm">
                 <input type="hidden" name="reference" id="form_ref">
                 <input type="hidden" name="issueDate" id="form_date">
@@ -177,6 +177,27 @@
                         onclick="updateInvoiceData()"
                         class="bg-[#3F2F6A] text-white font-bold py-2 px-8 rounded hover:bg-blue-800 transition">
                     Update
+                </button>
+            </form>
+
+            <form method="get" action="/invoice/download" id="invoiceDownload">
+                <input type="hidden" name="reference" id="down_ref">
+                <input type="hidden" name="issueDate" id="down_date">
+                <input type="hidden" name="description" id="down_desc">
+                <input type="hidden" name="quantity" id="down_qtt">
+                <input type="hidden" name="unitPrice" id="down_px">
+                <input type="hidden" name="amount" id="down_mtt">
+                <input type="hidden" name="total" id="down_tot">
+                <input type="hidden" name="hasBonus" id="down_bon" />
+                <input type="hidden" name="bonusDescription" id="down_bonus_desc">
+                <input type="hidden" name="bonusQuantity" id="down_bonus_qtt">
+                <input type="hidden" name="bonusUnitPrice" id="down_bonus_px">
+                <input type="hidden" name="bonusAmount" id="down_bonus_mtt">
+
+                <button type="submit"
+                        onclick="downloadInvoiceData()"
+                        class="bg-[#3F2F6A] text-white font-bold py-2 px-8 rounded hover:bg-blue-800 transition">
+                    Download
                 </button>
             </form>
         </div>
@@ -227,10 +248,29 @@
         document.getElementById("invoiceForm").submit();
     }
 
+    function downloadInvoiceData() {
+        const formData = getFormData();
+
+        document.getElementById("down_ref").value = formData.reference;
+        document.getElementById("down_date").value = formData.issueDate;
+        document.getElementById("down_desc").value = formData.description;
+        document.getElementById("down_qtt").value = formData.quantity;
+        document.getElementById("down_px").value = formData.unitPrice;
+        document.getElementById("down_mtt").value = formData.amount;
+        document.getElementById("down_tot").value = formData.total;
+        document.getElementById("down_bon").value = formData.hasBonus;
+
+        document.getElementById("down_bonus_desc").value = formData.bonusDescription;
+        document.getElementById("down_bonus_qtt").value = formData.bonusQuantity;
+        document.getElementById("down_bonus_px").value = formData.bonusUnitPrice;
+        document.getElementById("down_bonus_mtt").value = formData.bonusAmount;
+
+        document.getElementById("invoiceDownload").submit();
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         flatpickr("#date", {
-            dateFormat: "d/m/Y",
-            defaultDate: "01/01/2025"
+            dateFormat: "d/m/Y"
         });
 
         const bonusCheckbox = document.querySelector('input[name="bon"]');

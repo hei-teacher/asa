@@ -24,6 +24,7 @@ import static java.util.Locale.FRENCH;
 @Service
 public class InvoiceService {
     private final InvoicePDFGenerator invoicePDFGenerator;
+    private final NumberConverter numberConverter;
 
     @SneakyThrows
   public String generateInvoiceImage(Worker worker, ThInvoiceForm invoiceForm) {
@@ -47,8 +48,7 @@ public class InvoiceService {
         return workerName + " - " + capitalizedMonth + ".pdf";
     }
 
-    public static ThInvoiceForm extractInvoiceData(ThInvoiceForm invoiceForm) {
-        var numberConverter = new NumberConverter();
+    public ThInvoiceForm extractInvoiceData(ThInvoiceForm invoiceForm) {
         var isEmpty = invoiceForm.reference() == null || invoiceForm.reference().isBlank();
         var reference = isEmpty ? "FAC00/00/0000" : invoiceForm.reference();
         var issueDate = isEmpty ? "01/01/2025" : invoiceForm.issueDate();

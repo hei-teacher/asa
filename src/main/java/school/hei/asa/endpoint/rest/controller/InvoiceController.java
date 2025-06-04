@@ -34,7 +34,7 @@ public class InvoiceController {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
 
-    var invoiceData = InvoiceService.extractInvoiceData(invoiceForm);
+    var invoiceData = invoiceService.extractInvoiceData(invoiceForm);
     var base64Image = invoiceService.generateInvoiceImage(worker, invoiceData);
 
     model.addAttribute("invoiceData", base64Image);
@@ -49,7 +49,7 @@ public class InvoiceController {
       Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-    var invoiceData = InvoiceService.extractInvoiceData(invoiceForm);
+    var invoiceData = invoiceService.extractInvoiceData(invoiceForm);
 
     File pdfFile = invoicePDFGenerator.apply(worker, invoiceData, "invoice");
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();

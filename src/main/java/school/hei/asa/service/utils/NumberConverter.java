@@ -5,7 +5,7 @@ import static java.util.Locale.FRENCH;
 
 import com.ibm.icu.text.RuleBasedNumberFormat;
 
-public class ToWords {
+public class NumberConverter {
   public String convertToWords(String amount) {
     var formatter = new RuleBasedNumberFormat(FRENCH, SPELLOUT);
 

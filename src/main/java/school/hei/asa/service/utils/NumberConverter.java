@@ -9,11 +9,9 @@ public class NumberConverter {
   public String convertToWords(String amount) {
     var formatter = new RuleBasedNumberFormat(FRENCH, SPELLOUT);
 
-    var cleanAmount = amount.replaceAll("[\\u00A0\\u202F\\s]", "").replace(',', '.');
-
-    var parsedAmount = Double.parseDouble(cleanAmount);
-    var entier = (long) parsedAmount;
-    var result = formatter.format(entier);
+    String numericOnly = amount.replaceAll("\\D", "");
+    var parsedAmount = Long.parseLong(numericOnly);
+    String result = formatter.format(parsedAmount);
 
     return result.substring(0, 1).toUpperCase() + result.substring(1);
   }

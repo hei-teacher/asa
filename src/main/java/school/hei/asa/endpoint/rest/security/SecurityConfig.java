@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
@@ -34,7 +35,14 @@ public class SecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(Customizer.withDefaults())
         .authorizeHttpRequests(
-            authz -> authz.requestMatchers("/").permitAll().anyRequest().authenticated())
+            authz ->
+                authz
+                    .requestMatchers("/casdoor-logout")
+                    .permitAll()
+                    .requestMatchers("/")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
         .oauth2Login(
             oauth2 ->
                 oauth2
@@ -48,13 +56,17 @@ public class SecurityConfig {
         .logout(
             logout ->
                 logout.logoutSuccessHandler(
-                    (request, response, authentication) ->
-                        response.sendRedirect(
-                            cognitoLogoutUrl
-                                + "?client_id="
-                                + cognitoClientId
-                                + "&logout_uri="
-                                + asaLogoutUrl)));
+                    (request, response, authentication) -> {
+                      var principal = (DefaultOidcUser) authentication.getPrincipal();
+                      String accessToken = (principal.getIdToken().getTokenValue());
+                      response.sendRedirect(
+                          "/casdoor-logout?id_token_hint="
+                              + accessToken
+                              + "&post_logout_redirect_uri="
+                              + asaLogoutUrl
+                              + "&logout_uri="
+                              + cognitoLogoutUrl);
+                    }));
     return http.build();
   }
 }

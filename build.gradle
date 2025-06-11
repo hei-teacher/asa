@@ -10,7 +10,7 @@ plugins {
 
     id 'jacoco'
 
-
+    
 }
 
 jacoco {
@@ -153,15 +153,15 @@ dependencies {
     implementation 'io.sentry:sentry-logback:7.6.0'
     implementation 'io.sentry:sentry-spring-boot-starter-jakarta:7.4.0'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-    implementation 'org.springframework.session:spring-session-jdbc'
-    implementation 'org.xhtmlrenderer:flying-saucer-pdf:9.1.22'
-    implementation 'ognl:ognl:3.2.21'
-    implementation 'org.apache.pdfbox:pdfbox:2.0.30'
-    implementation 'com.ibm.icu:icu4j:77.1'
+implementation 'org.springframework.boot:spring-boot-starter-security'
+implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+implementation 'org.springframework.session:spring-session-jdbc'
+implementation 'org.xhtmlrenderer:flying-saucer-pdf:9.1.22'
+implementation 'ognl:ognl:3.2.21'
+implementation 'org.apache.pdfbox:pdfbox:2.0.30'
+implementation 'com.ibm.icu:icu4j:77.1'
 
-
+    
 
 }

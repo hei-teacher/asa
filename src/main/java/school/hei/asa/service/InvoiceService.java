@@ -16,6 +16,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
+import school.hei.asa.model.Invoice;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.utils.NumberConverter;
 
@@ -26,7 +27,7 @@ public class InvoiceService {
   private final NumberConverter numberConverter;
 
   @SneakyThrows
-  public String generateInvoiceImage(Worker worker, ThInvoiceForm invoiceForm) {
+  public Invoice extractInvoice(Worker worker, ThInvoiceForm invoiceForm) {
     var invoiceData = extractInvoiceData(invoiceForm);
     File data = invoicePDFGenerator.apply(worker, invoiceData, "invoice");
 
@@ -36,7 +37,9 @@ public class InvoiceService {
 
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ImageIO.write(image, "png", baos);
-      return Base64.getEncoder().encodeToString(baos.toByteArray());
+      String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
+
+      return new Invoice(base64Image, invoiceData);
     }
   }
 
@@ -47,7 +50,7 @@ public class InvoiceService {
     return workerName + " - " + capitalizedMonth + ".pdf";
   }
 
-  public ThInvoiceForm extractInvoiceData(ThInvoiceForm invoiceForm) {
+  private ThInvoiceForm extractInvoiceData(ThInvoiceForm invoiceForm) {
     var isEmpty = invoiceForm.reference() == null || invoiceForm.reference().isBlank();
     var reference = isEmpty ? "FAC00/00/0000" : invoiceForm.reference();
     var issueDate = isEmpty ? "01/01/2025" : invoiceForm.issueDate();

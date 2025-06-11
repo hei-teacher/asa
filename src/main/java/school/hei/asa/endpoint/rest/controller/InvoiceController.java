@@ -33,11 +33,10 @@ public class InvoiceController {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
 
-    var invoiceData = invoiceService.extractInvoiceData(invoiceForm);
-    var base64Image = invoiceService.generateInvoiceImage(worker, invoiceData);
+    var invoice = invoiceService.extractInvoice(worker, invoiceForm);
 
-    model.addAttribute("invoiceData", base64Image);
-    model.addAttribute("form", invoiceData);
+    model.addAttribute("invoicePreview", invoice.base64Image());
+    model.addAttribute("form", invoice.invoiceData());
 
     return "invoice-generator";
   }
@@ -48,9 +47,9 @@ public class InvoiceController {
       Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-    var invoiceData = invoiceService.extractInvoiceData(invoiceForm);
+    var invoice = invoiceService.extractInvoice(worker, invoiceForm);
 
-    File pdfFile = invoicePDFGenerator.apply(worker, invoiceData, "invoice");
+    File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();
     var fileName = invoiceService.generateInvoiceFileName(invoiceForm.issueDate(), worker.name());
 

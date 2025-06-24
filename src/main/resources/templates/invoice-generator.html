@@ -19,19 +19,7 @@
     <h1 class="text-4xl font-bold text-[#3F2F6A] mt-10 mb-10">Generate your monthly invoice</h1>
 
         <div class="flex space-x-6 mb-6">
-            <div class="w-1/4">
-                <label for="ref" class="block text-gray-800 font-semibold mb-1 text-sm">Référence :</label>
-                <textarea
-                        id="ref"
-                        rows="1"
-                        name="ref"
-                        placeholder="FAC01/01/2025"
-                        th:text="${form.reference}"
-                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
-                ></textarea>
-            </div>
-
-            <div class="w-1/4">
+            <div class="w-1/3">
                 <label for="date" class="block text-gray-700 font-semibold mb-1 text-sm">Date d'émission :</label>
                 <div class="relative">
                     <input
@@ -48,7 +36,7 @@
                 </div>
             </div>
 
-            <div class="w-1/2">
+            <div class="w-2/3">
                 <label for="desc" class="block text-gray-800 font-semibold mb-1 text-sm">Description :</label>
                 <textarea
                         id="desc"
@@ -160,7 +148,6 @@
 
         <div class="mt-6 flex gap-4">
             <form method="get" action="/invoice" id="invoiceForm">
-                <input type="hidden" name="reference" id="form_ref">
                 <input type="hidden" name="issueDate" id="form_date">
                 <input type="hidden" name="description" id="form_desc">
                 <input type="hidden" name="quantity" id="form_qtt">
@@ -181,7 +168,6 @@
             </form>
 
             <form method="get" action="/invoice/download" id="invoiceDownload">
-                <input type="hidden" name="reference" id="down_ref">
                 <input type="hidden" name="issueDate" id="down_date">
                 <input type="hidden" name="description" id="down_desc">
                 <input type="hidden" name="quantity" id="down_qtt">
@@ -212,7 +198,6 @@
 <script>
     function getFormData() {
         return {
-            reference: document.getElementById('ref').value,
             issueDate: document.getElementById('date').value,
             description: document.getElementById('desc').value,
             quantity: document.getElementById('qtt').value,
@@ -231,7 +216,6 @@
     function updateInvoiceData() {
         const formData = getFormData();
 
-        document.getElementById("form_ref").value = formData.reference;
         document.getElementById("form_date").value = formData.issueDate;
         document.getElementById("form_desc").value = formData.description;
         document.getElementById("form_qtt").value = formData.quantity;
@@ -251,7 +235,6 @@
     function downloadInvoiceData() {
         const formData = getFormData();
 
-        document.getElementById("down_ref").value = formData.reference;
         document.getElementById("down_date").value = formData.issueDate;
         document.getElementById("down_desc").value = formData.description;
         document.getElementById("down_qtt").value = formData.quantity;

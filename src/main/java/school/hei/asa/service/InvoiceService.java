@@ -51,8 +51,8 @@ public class InvoiceService {
   }
 
   private ThInvoiceForm extractInvoiceData(ThInvoiceForm invoiceForm) {
-    var isEmpty = invoiceForm.reference() == null || invoiceForm.reference().isBlank();
-    var reference = isEmpty ? "FAC00/00/0000" : invoiceForm.reference();
+    var isEmpty = invoiceForm.issueDate() == null || invoiceForm.issueDate().isBlank();
+    var reference = isEmpty ? "FAC00/00/0000" : "FAC" + invoiceForm.issueDate();
     var issueDate = isEmpty ? "01/01/2025" : invoiceForm.issueDate();
     var amount = isEmpty ? "0 Ar" : invoiceForm.amount();
     var total = isEmpty ? "0 Ar" : invoiceForm.total();

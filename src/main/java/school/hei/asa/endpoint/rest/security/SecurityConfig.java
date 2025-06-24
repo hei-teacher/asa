@@ -14,19 +14,19 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 @EnableWebSecurity
 public class SecurityConfig {
 
-  private final String cognitoClientId;
-  private final String cognitoLogoutUrl;
+  private final String casdoorClientId;
+  private final String casdoorLogoutUrl;
   private final String asaLogoutUrl;
   private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
   public SecurityConfig(
-      @Value("${spring.security.oauth2.client.registration.cognito.clientid}")
-          String cognitoClientId,
-      @Value("${cognito.logout.url}") String cognitoLogoutUrl,
+      @Value("${spring.security.oauth2.client.registration.casdoor.clientid}")
+          String casdoorClientId,
+      @Value("${casdoor.logout.url}") String casdoorLogoutUrl,
       @Value("${asa.logout.url}") String asaLogoutUrl,
       OAuth2SuccessHandler oAuth2SuccessHandler) {
-    this.cognitoClientId = cognitoClientId;
-    this.cognitoLogoutUrl = cognitoLogoutUrl;
+    this.casdoorClientId = casdoorClientId;
+    this.casdoorLogoutUrl = casdoorLogoutUrl;
     this.asaLogoutUrl = asaLogoutUrl;
     this.oAuth2SuccessHandler = oAuth2SuccessHandler;
   }
@@ -48,11 +48,11 @@ public class SecurityConfig {
                 oauth2
                     .successHandler(oAuth2SuccessHandler)
                     .failureHandler(
-                        // On success redirection from Cognito hits amazonaws.com URL instead of
+                        // On success redirection from Casdoor URL instead of
                         // custom domain URL
                         // so it is incorrectly interpreted as authorization_request_not_found.
                         // Redo the call and it will be Ok.
-                        new SimpleUrlAuthenticationFailureHandler("/oauth2/authorization/cognito")))
+                        new SimpleUrlAuthenticationFailureHandler("/oauth2/authorization/casdoor")))
         .logout(
             logout ->
                 logout.logoutSuccessHandler(
@@ -65,7 +65,7 @@ public class SecurityConfig {
                               + "&post_logout_redirect_uri="
                               + asaLogoutUrl
                               + "&logout_uri="
-                              + cognitoLogoutUrl);
+                              + casdoorLogoutUrl);
                     }));
     return http.build();
   }

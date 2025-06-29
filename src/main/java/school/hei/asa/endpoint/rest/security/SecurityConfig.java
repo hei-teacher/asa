@@ -38,10 +38,6 @@ public class SecurityConfig {
         .oauth2Login(
             oauth2 ->
                 oauth2
-                    .authorizationEndpoint(
-                        authz ->
-                            authz.authorizationRequestRepository(
-                                new CookieOAuth2AuthorizationRequestRepository()))
                     .successHandler(oAuth2SuccessHandler)
                     .failureHandler(
                         // On success redirection from Cognito hits amazonaws.com URL instead of

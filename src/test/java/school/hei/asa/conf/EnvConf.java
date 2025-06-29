@@ -14,6 +14,8 @@ public class EnvConf {
     registry.add("spring.security.oauth2.client.provider.cognito.token-uri", () -> "dummy");
     registry.add("spring.security.oauth2.client.registration.cognito.provider", () -> "cognito");
     registry.add("spring.security.oauth2.client.registration.cognito.client-id", () -> "dummy");
+    registry.add("spring.security.oauth2.client.registration.cognito.client-secret", () -> "dummy");
+    registry.add("spring.security.oauth2.client.registration.cognito.scope", () -> "dummy");
     registry.add(
         "spring.security.oauth2.client.registration.cognito.redirect-uri",
         () -> "{baseUrl}/login/oauth2/code/cognito");

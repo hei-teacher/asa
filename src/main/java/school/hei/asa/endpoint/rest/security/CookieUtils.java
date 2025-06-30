@@ -20,8 +20,12 @@ public class CookieUtils {
     Cookie cookie = new Cookie(name, value);
     cookie.setPath("/");
     cookie.setHttpOnly(true);
+    cookie.setSecure(true);
     cookie.setMaxAge(maxAge);
-    response.addCookie(cookie);
+    response.addHeader(
+        "Set-Cookie",
+        String.format(
+            "%s=%s; Max-Age=%d; Path=/; HttpOnly; Secure; SameSite=None", name, value, maxAge));
   }
 
   public static void deleteCookie(

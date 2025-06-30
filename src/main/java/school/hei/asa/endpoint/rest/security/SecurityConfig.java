@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
@@ -39,9 +41,7 @@ public class SecurityConfig {
             oauth2 ->
                 oauth2
                     .authorizationEndpoint(
-                        endpoint ->
-                            endpoint.authorizationRequestRepository(
-                                new CookieOAuth2AuthorizationRequestRepository()))
+                        endpoint -> endpoint.authorizationRequestRepository(cookieRepository()))
                     .successHandler(oAuth2SuccessHandler)
                     .failureHandler(
                         // On success redirection from Cognito hits amazonaws.com URL instead of
@@ -60,5 +60,10 @@ public class SecurityConfig {
                                 + "&logout_uri="
                                 + asaLogoutUrl)));
     return http.build();
+  }
+
+  @Bean
+  public AuthorizationRequestRepository<OAuth2AuthorizationRequest> cookieRepository() {
+    return new CookieOAuth2AuthorizationRequestRepository();
   }
 }

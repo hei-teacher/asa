@@ -19,12 +19,14 @@ import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.model.Invoice;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.utils.NumberConverter;
+import school.hei.asa.service.utils.NumberParser;
 
 @AllArgsConstructor
 @Service
 public class InvoiceService {
   private final InvoicePDFGenerator invoicePDFGenerator;
   private final NumberConverter numberConverter;
+  private final NumberParser numberParser;
 
   @SneakyThrows
   public Invoice extractInvoice(Worker worker, ThInvoiceForm invoiceForm) {
@@ -54,24 +56,29 @@ public class InvoiceService {
     var isEmpty = invoiceForm.issueDate() == null || invoiceForm.issueDate().isBlank();
     var reference = isEmpty ? "FAC00/00/0000" : "FAC" + invoiceForm.issueDate();
     var issueDate = isEmpty ? "01/01/2025" : invoiceForm.issueDate();
-    var amount = isEmpty ? "0 Ar" : invoiceForm.amount();
-    var total = isEmpty ? "0 Ar" : invoiceForm.total();
+    var unitPrice = isEmpty ? "" : numberParser.parseToNumber(numberParser.parseToDouble(invoiceForm.unitPrice()));
+    var doubleAmount = isEmpty ? 0.0 : numberParser.parseToDouble(invoiceForm.quantity()) * numberParser.parseToDouble(invoiceForm.unitPrice());
+    var amount = numberParser.parseToNumber(doubleAmount);
     var hasBonus = !isEmpty && invoiceForm.hasBonus();
-    var parsedAmount = isEmpty ? "" : numberConverter.convertToWords(invoiceForm.total());
+    var bonusUnitPrice = !hasBonus ? "" : numberParser.parseToNumber(numberParser.parseToDouble(invoiceForm.bonusUnitPrice()));
+    var doubleBonusAmount = !hasBonus ? 0.0 : numberParser.parseToDouble(invoiceForm.bonusQuantity()) * numberParser.parseToDouble(invoiceForm.bonusUnitPrice());
+    var bonusAmount = numberParser.parseToNumber(doubleBonusAmount);
+    var total = numberParser.parseToNumber(doubleAmount + doubleBonusAmount);
+    var parsedAmount = isEmpty ? "" : numberConverter.convertToWords(total);
 
     return new ThInvoiceForm(
         reference,
         issueDate,
         invoiceForm.description(),
         invoiceForm.quantity(),
-        invoiceForm.unitPrice(),
+        unitPrice,
         amount,
         total,
         hasBonus,
         invoiceForm.bonusDescription(),
         invoiceForm.bonusQuantity(),
-        invoiceForm.bonusUnitPrice(),
-        invoiceForm.bonusAmount(),
+        bonusUnitPrice,
+        bonusAmount,
         parsedAmount);
   }
 }

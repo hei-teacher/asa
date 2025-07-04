@@ -10,12 +10,14 @@ public class NumberParser {
     }
 
     try {
-      String parsed =
-          amount.replaceAll("[^\\d,\\.]", "").replaceAll("\\s+", "").replaceAll(",", ".");
+      String parsed = amount
+              .replaceAll("[^\\d,\\.]", "")
+              .replaceAll("\\s+", "")
+              .replaceAll(",", ".");
 
       return Double.parseDouble(parsed);
     } catch (NumberFormatException e) {
-      throw new IllegalArgumentException("Incorrect amount format : " + amount);
+      throw new IllegalArgumentException("Impossible de parser '" + amount + "' en double.", e);
     }
   }
 

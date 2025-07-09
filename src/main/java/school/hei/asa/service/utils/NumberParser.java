@@ -17,7 +17,7 @@ public class NumberParser {
 
       return Double.parseDouble(parsed);
     } catch (NumberFormatException e) {
-      throw new IllegalArgumentException("Impossible de parser '" + amount + "' en double.", e);
+      throw new IllegalArgumentException("Incorrect amount format : " + amount);
     }
   }
 

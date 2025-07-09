@@ -1,6 +1,7 @@
 package school.hei.asa.service;
 
 import static java.time.LocalDate.parse;
+import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.time.format.TextStyle.FULL;
 import static java.util.Locale.FRENCH;
@@ -53,9 +54,12 @@ public class InvoiceService {
   }
 
   private ThInvoiceForm extractInvoiceData(ThInvoiceForm invoiceForm) {
+    var formatter = ofPattern("dd/MM/yyyy", FRENCH);
     var isEmpty = invoiceForm.issueDate() == null || invoiceForm.issueDate().isBlank();
-    var reference = isEmpty ? "FAC00/00/0000" : "FAC" + invoiceForm.issueDate();
-    var issueDate = isEmpty ? "01/01/2025" : invoiceForm.issueDate();
+    var today = now();
+    var firstDay = today.withDayOfYear(1);
+    var reference = isEmpty ? "FAC00/00/0000" : "FAC" + today.format(formatter);
+    var issueDate = isEmpty ? firstDay.format(formatter) : invoiceForm.issueDate();
     var unitPrice = isEmpty ? "" : numberParser.parseToNumber(numberParser.parseToDouble(invoiceForm.unitPrice()));
     var doubleAmount = isEmpty ? 0.0 : numberParser.parseToDouble(invoiceForm.quantity()) * numberParser.parseToDouble(invoiceForm.unitPrice());
     var amount = numberParser.parseToNumber(doubleAmount);

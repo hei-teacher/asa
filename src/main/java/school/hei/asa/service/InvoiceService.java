@@ -1,7 +1,7 @@
 package school.hei.asa.service;
 
-import static java.time.LocalDate.parse;
 import static java.time.LocalDate.now;
+import static java.time.LocalDate.parse;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.time.format.TextStyle.FULL;
 import static java.util.Locale.FRENCH;
@@ -60,12 +60,26 @@ public class InvoiceService {
     var firstDay = today.withDayOfYear(1);
     var reference = isEmpty ? "FAC00/00/0000" : "FAC" + today.format(formatter);
     var issueDate = isEmpty ? firstDay.format(formatter) : invoiceForm.issueDate();
-    var unitPrice = isEmpty ? "" : numberParser.parseToNumber(numberParser.parseToDouble(invoiceForm.unitPrice()));
-    var doubleAmount = isEmpty ? 0.0 : numberParser.parseToDouble(invoiceForm.quantity()) * numberParser.parseToDouble(invoiceForm.unitPrice());
+    var unitPrice =
+        isEmpty
+            ? ""
+            : numberParser.parseToNumber(numberParser.parseToDouble(invoiceForm.unitPrice()));
+    var doubleAmount =
+        isEmpty
+            ? 0.0
+            : numberParser.parseToDouble(invoiceForm.quantity())
+                * numberParser.parseToDouble(invoiceForm.unitPrice());
     var amount = numberParser.parseToNumber(doubleAmount);
     var hasBonus = !isEmpty && invoiceForm.hasBonus();
-    var bonusUnitPrice = !hasBonus ? "" : numberParser.parseToNumber(numberParser.parseToDouble(invoiceForm.bonusUnitPrice()));
-    var doubleBonusAmount = !hasBonus ? 0.0 : numberParser.parseToDouble(invoiceForm.bonusQuantity()) * numberParser.parseToDouble(invoiceForm.bonusUnitPrice());
+    var bonusUnitPrice =
+        !hasBonus
+            ? ""
+            : numberParser.parseToNumber(numberParser.parseToDouble(invoiceForm.bonusUnitPrice()));
+    var doubleBonusAmount =
+        !hasBonus
+            ? 0.0
+            : numberParser.parseToDouble(invoiceForm.bonusQuantity())
+                * numberParser.parseToDouble(invoiceForm.bonusUnitPrice());
     var bonusAmount = numberParser.parseToNumber(doubleBonusAmount);
     var total = numberParser.parseToNumber(doubleAmount + doubleBonusAmount);
     var parsedAmount = isEmpty ? "" : numberConverter.convertToWords(total);

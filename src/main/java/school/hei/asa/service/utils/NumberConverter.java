@@ -6,13 +6,17 @@ import static java.util.Locale.FRENCH;
 import com.ibm.icu.text.RuleBasedNumberFormat;
 
 public class NumberConverter {
-  public String convertToWords(String amount) {
-    var formatter = new RuleBasedNumberFormat(FRENCH, SPELLOUT);
+    public String convertToWords(String amount) {
+        var formatter = new RuleBasedNumberFormat(FRENCH, SPELLOUT);
 
-    String numericOnly = amount.replaceAll("\\D", "");
-    var parsedAmount = Long.parseLong(numericOnly);
-    String result = formatter.format(parsedAmount);
+        var cleanAmount = amount
+                .replaceAll("[\\u00A0\\u202F\\s]", "")
+                .replace(',', '.');
 
-    return result.substring(0, 1).toUpperCase() + result.substring(1);
-  }
+        var parsedAmount = Double.parseDouble(cleanAmount);
+        var entier = (long) parsedAmount;
+        var result = formatter.format(entier);
+
+        return result.substring(0, 1).toUpperCase() + result.substring(1);
+    }
 }

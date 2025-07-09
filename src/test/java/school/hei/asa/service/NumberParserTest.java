@@ -1,9 +1,9 @@
 package school.hei.asa.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import school.hei.asa.service.utils.NumberParser;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NumberParserTest {
 

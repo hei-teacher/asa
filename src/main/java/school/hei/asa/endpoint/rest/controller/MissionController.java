@@ -8,6 +8,8 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,6 +45,13 @@ public class MissionController {
     model.addAttribute("total", thProductsExecutedDaysSumByMonth);
     workerToModelAdder.apply(workerCode, model);
     return "missions";
+  }
+
+  @GetMapping("/chart")
+  public String showChart(Model model) {
+    var allThProducts = missionService.getAllProducts();
+    model.addAttribute("products", allThProducts);
+    return "chart";
   }
 
   @GetMapping("/mission-executions")

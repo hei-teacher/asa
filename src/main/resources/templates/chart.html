@@ -8,12 +8,15 @@
 </head>
 <body>
 <div align="center">
-    <h2>ThProduct Executed Days (Pie Chart)</h2>
     <div id="piechart" style="width: 900px; height: 500px;"></div>
+    <button onclick="downloadChart()">Download as PNG</button>
 </div>
 
 <script th:inline="javascript">
     let real_data = /*[[${chartData}]]*/ {};
+
+    let chartDataTable;
+    let chartInstance;
 
     $(document).ready(function () {
         google.charts.load('current', {
@@ -23,21 +26,38 @@
     });
 
     function drawPieChart() {
-        let data = new google.visualization.DataTable();
-        data.addColumn('string', 'ThProduct');
-        data.addColumn('number', 'Executed Days');
+        chartDataTable = new google.visualization.DataTable();
+        chartDataTable.addColumn('string', 'ThProduct');
+        chartDataTable.addColumn('number', 'Executed Days');
 
         Object.keys(real_data).forEach(function (key) {
-            data.addRow([key, real_data[key]]);
+            chartDataTable.addRow([key, real_data[key]]);
         });
 
-        let options = {
-            title: 'Executed Days per ThProduct',
-            pieHole: 0.3
+        const options = {
+            title: 'Time Spent per Product',
+            titleTextStyle: {
+                fontSize: 17
+            },
+            is3D: true,
+            legend: {
+                textStyle: {
+                    fontSize: 15
+                }
+            }
         };
 
-        let chart = new google.visualization.PieChart(document.getElementById('piechart'));
-        chart.draw(data, options);
+        chartInstance = new google.visualization.PieChart(document.getElementById('piechart'));
+        chartInstance.draw(chartDataTable, options);
+    }
+
+    function downloadChart() {
+        if (!chartInstance) return;
+        const imageURI = chartInstance.getImageURI();
+        const link = document.createElement('a');
+        link.href = imageURI;
+        link.download = 'products_chart.png';
+        link.click();
     }
 </script>
 </body>

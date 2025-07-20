@@ -8,6 +8,7 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
@@ -50,7 +51,13 @@ public class MissionController {
   @GetMapping("/chart")
   public String showChart(Model model) {
     var allThProducts = missionService.getAllProducts();
-    model.addAttribute("products", allThProducts);
+
+    Map<String, Double> chartData = new TreeMap<>();
+    for (var product : allThProducts) {
+      chartData.put(product.code() + " - " + product.name(), product.executedDays());
+    }
+
+    model.addAttribute("chartData", chartData);
     return "chart";
   }
 

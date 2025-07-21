@@ -78,9 +78,4 @@ public class MissionService {
         .mapToDouble(ThProduct::executedDays)
         .sum();
   }
-
-  /* public Double thTotalExecutedDaysSum(List<ThProduct> thProducts) {
-      return thProducts.stream()
-              .mapToDouble(ThProduct::executedDays).sum();
-  } */
 }

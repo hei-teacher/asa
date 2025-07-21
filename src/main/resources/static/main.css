@@ -60,3 +60,32 @@ th {
     padding-top: 0.5rem;
     padding-inline: 0.5rem;
 }
+
+.download-btn {
+    background-color: #d1d5db;
+    color: #1f2937;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.download-btn:hover {
+    background-color: #9ca3af;
+}
+
+.download-btn .icon {
+    fill: currentColor;
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+}
+
+#piechart {
+    width: 1000px;
+    height: 600px;
+}

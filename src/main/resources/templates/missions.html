@@ -5,6 +5,8 @@
     <link href="/main.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 
 <body class="bg-gray-50 text-gray-800">
@@ -92,5 +94,58 @@
     </script>
 </div>
 
+<div align="center">
+    <div id="piechart" style="width: 900px; height: 500px;"></div>
+    <button onclick="downloadChart()">Download as PNG</button>
+</div>
+
+<script th:inline="javascript">
+    let real_data = /*[[${chartData}]]*/ {};
+
+    let chartDataTable;
+    let chartInstance;
+
+    $(document).ready(function () {
+        google.charts.load('current', {
+            packages: ['corechart']
+        });
+        google.charts.setOnLoadCallback(drawPieChart);
+    });
+
+    function drawPieChart() {
+        chartDataTable = new google.visualization.DataTable();
+        chartDataTable.addColumn('string', 'ThProduct');
+        chartDataTable.addColumn('number', 'Executed Days');
+
+        Object.keys(real_data).forEach(function (key) {
+            chartDataTable.addRow([key, real_data[key]]);
+        });
+
+        const options = {
+            title: 'Time Spent per Product  (All workers)',
+            titleTextStyle: {
+                fontSize: 17
+            },
+            is3D: true,
+            legend: {
+                textStyle: {
+                    fontSize: 15
+                }
+            }
+        };
+
+        chartInstance = new google.visualization.PieChart(document.getElementById('piechart'));
+        chartInstance.draw(chartDataTable, options);
+    }
+
+    function downloadChart() {
+        if (!chartInstance) return;
+        const imageURI = chartInstance.getImageURI();
+        const link = document.createElement('a');
+        link.href = imageURI;
+        link.download = 'products_chart.png';
+        link.click();
+    }
+</script>
 </body>
 </html>

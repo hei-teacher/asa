@@ -40,25 +40,20 @@ public class MissionController {
     var thProductsExecutedDaysSumByMonth =
         missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode);
 
-    model.addAttribute("workerCode", workerCode);
-    model.addAttribute("months", thProductsByMonth);
-    model.addAttribute("products", thProductsByWorkerCode);
-    model.addAttribute("total", thProductsExecutedDaysSumByMonth);
-    workerToModelAdder.apply(workerCode, model);
-    return "missions";
-  }
-
-  @GetMapping("/chart")
-  public String showChart(Model model) {
     var allThProducts = missionService.getAllProducts();
-
     Map<String, Double> chartData = new TreeMap<>();
     for (var product : allThProducts) {
       chartData.put(product.code() + " - " + product.name(), product.executedDays());
     }
 
+    model.addAttribute("workerCode", workerCode);
+    model.addAttribute("months", thProductsByMonth);
+    model.addAttribute("products", thProductsByWorkerCode);
+    model.addAttribute("total", thProductsExecutedDaysSumByMonth);
+    workerToModelAdder.apply(workerCode, model);
     model.addAttribute("chartData", chartData);
-    return "chart";
+    
+    return "missions";
   }
 
   @GetMapping("/mission-executions")

@@ -92,101 +92,112 @@
 </div>
 
 <!-- Manomboka eto l fanaovana an'l graphe -->
-<h2 class="text-xl font-bold mt-10 mb-4 ml-6 mr-6">Graphique : Temps total passé par groupe de missions</h2>
+<h2 class="text-xl font-bold mt-10 mb-4 ml-6 mr-6">
+    Graphique : Temps total passé par groupe de missions
+</h2>
+
 <div class="ml-6 mr-6">
-    <svg id="missionsGraph" width="900" height="500"></svg>
-    <button id="downloadBtn" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Télécharger le graphe</button>
+    <!-- Nouveau conteneur pour ECharts -->
+    <div id="missionsChart" style="width: 100%; height: 500px;"></div>
+
+    <!-- Bouton pour télécharger -->
+    <button id="downloadBtn" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        Télécharger le graphe
+    </button>
 </div>
 
+<!-- Ajout de la lib ECharts -->
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+
+<!-- Script pour afficher le graphe -->
 <script th:inline="javascript">
     const groups = /*[[${totalByGroup}]]*/ [];
 
-    const svg = document.getElementById("missionsGraph");
-    const width = svg.clientWidth;
-    const height = svg.clientHeight;
-    const margin = {top: 20, right: 20, bottom: 120, left: 60};
-    const chartWidth = width - margin.left - margin.right;
-    const chartHeight = height - margin.top - margin.bottom;
+    const chartDom = document.getElementById('missionsChart');
 
-    if(groups.length === 0) {
+    if (groups.length === 0) {
+        chartDom.innerHTML = '<p style="text-align:center; padding:50px;">Aucune donnée à afficher</p>';
     } else {
-        const maxValue = Math.max(...groups.map(g => parseFloat(g.executedDays)));
+        const myChart = echarts.init(chartDom);
 
-        groups.forEach((group, index) => {
-            const value = parseFloat(group.executedDays);
-            const barWidth = chartWidth / groups.length;
-            const barHeight = (value / maxValue) * chartHeight;
-            const x = margin.left + index * barWidth;
-            const y = margin.top + (chartHeight - barHeight);
+        const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#14b8a6'];
 
-            const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            rect.setAttribute("x", x);
-            rect.setAttribute("y", y);
-            rect.setAttribute("width", barWidth - 2);
-            rect.setAttribute("height", barHeight);
-            rect.setAttribute("fill", "steelblue");
-            svg.appendChild(rect);
+        // Tri décroissant par executedDays
+        const sortedGroups = groups.slice().sort((a, b) => parseFloat(a.executedDays) - parseFloat(b.executedDays));
 
-            // eto n manisy an'l label ambanin'l barre
-            const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            label.setAttribute("x", x + barWidth / 2);
-            label.setAttribute("y", height - 40);
-            label.setAttribute("text-anchor", "middle");
-            label.setAttribute("font-size", "12");
-            label.setAttribute("transform", `rotate(45 ${x + barWidth / 2} ${height - 40})`);
-            label.textContent = group.groupName;
-            svg.appendChild(label);
+        const option = {
+            title: {
+                text: 'Jours de mission par groupe',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' },
+                formatter: function (params) {
+                    const data = params[0];
+                    return `<strong>${data.name}</strong><br/>Jours exécutés : ${data.value}`;
+                }
+            },
+            grid: {
+                left: '5%',
+                right: '5%',
+                bottom: '10%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value',
+                name: 'Jours'
+            },
+            yAxis: {
+                type: 'category',
+                data: sortedGroups.map(g => g.groupName),
+                axisLabel: {
+                    interval: 0,
+                    formatter: value => value.length > 20 ? value.slice(0, 20) + '…' : value
+                }
+            },
+            series: [{
+                type: 'bar',
+                data: sortedGroups.map((g, i) => ({
+                    value: parseFloat(g.executedDays),
+                    itemStyle: {
+                        color: colors[i % colors.length],
+                        borderRadius: [0, 6, 6, 0]
+                    }
+                })),
+                label: {
+                    show: true,
+                    position: 'right',
+                    formatter: '{c} j'
+                }
+            }]
+        };
 
-            // eto n manisy an'l valeur ambonin'ny graphe
-            const valueLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            valueLabel.setAttribute("x", x + barWidth / 2);
-            valueLabel.setAttribute("y", y - 5);
-            valueLabel.setAttribute("text-anchor", "middle");
-            valueLabel.setAttribute("font-size", "12");
-            valueLabel.textContent = value.toFixed(1);
-            svg.appendChild(valueLabel);
+        myChart.setOption(option);
+
+        // Responsive
+        window.addEventListener('resize', () => {
+            myChart.resize();
         });
-    }
 
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-        //eto n mamadika an'l svg ho png amzay afaka telechargena
-        const serializer = new XMLSerializer();
-        let source = serializer.serializeToString(svg);
-
-        if(!source.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)){
-            source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-        }
-        if(!source.match(/^<svg[^>]+"http:\/\/www\.w3\.org\/1999\/xlink"/)){
-            source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
-        }
-
-        const svgBlob = new Blob([source], {type:"image/svg+xml;charset=utf-8"});
-        const url = URL.createObjectURL(svgBlob);
-
-        const img = new Image();
-        img.onload = function() {
-            const canvas = document.createElement('canvas');
-            canvas.width = svg.clientWidth;
-            canvas.height = svg.clientHeight;
-            const context = canvas.getContext('2d');
-            context.fillStyle = 'white';
-            context.fillRect(0, 0, canvas.width, canvas.height);
-            context.drawImage(img, 0, 0);
-
-            const pngFile = canvas.toDataURL('image/png');
-
+        // Téléchargement PNG
+        document.getElementById('downloadBtn').addEventListener('click', () => {
             const a = document.createElement('a');
-            a.href = pngFile;
+            a.href = myChart.getDataURL({
+                type: 'png',
+                pixelRatio: 2,
+                backgroundColor: '#fff'
+            });
             a.download = 'missions_graph.png';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-
-            URL.revokeObjectURL(url);
-        };
-        img.src = url;
-    });
+        });
+    }
 </script>
+
+
+
 
 </body>
 </html>

@@ -2,8 +2,6 @@ package school.hei.asa.service;
 
 import java.time.Month;
 import java.util.*;
-import java.util.stream.Collectors;
-
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.rest.controller.mapper.ThProductMapper;
@@ -24,9 +22,9 @@ public class MissionService {
         : thProducts.stream().map(p -> p.filterByWorkerCode(workerCode)).toList();
   }
 
-  public List<ThProduct> getAllProducts(){
-      var thProducts = thProductMapper.toTh(productRepository.findAll());
-      return thProducts;
+  public List<ThProduct> getAllProducts() {
+    var thProducts = thProductMapper.toTh(productRepository.findAll());
+    return thProducts;
   }
 
   public Map<String, List<ThProduct>> thProductsByMonth(List<ThProduct> thProducts) {

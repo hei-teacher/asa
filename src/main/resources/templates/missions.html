@@ -5,6 +5,7 @@
     <link href="/main.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
 
 <body class="bg-gray-50 text-gray-800">
@@ -77,7 +78,6 @@
             </td>
         </tr>
         </tfoot>
-
     </table>
 
     <script>
@@ -91,6 +91,101 @@
         });
     </script>
 </div>
+
+<div class="ml-6 mr-6">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-semibold">Graph: Total time spent per mission group</h2>
+        <button id="downloadBtn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
+            Download
+        </button>
+    </div>
+    <div id="missionsChart" style="width: 100%; height: 500px;"></div>
+</div>
+
+<script th:inline="javascript">
+    const groups = /*[[${totalByGroup}]]*/ [];
+
+    const chartDom = document.getElementById('missionsChart');
+
+    if (groups.length === 0) {
+        chartDom.innerHTML = '<p style="text-align:center; padding:50px;">Aucune donnée à afficher</p>';
+    } else {
+        const myChart = echarts.init(chartDom);
+
+        const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#14b8a6'];
+
+        const sortedGroups = groups.slice().sort((a, b) => parseFloat(a.executedDays) - parseFloat(b.executedDays));
+
+        const option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' },
+                formatter: function (params) {
+                    const data = params[0];
+                    return `<strong>${data.name}</strong><br/>Jours exécutés : ${data.value}`;
+                }
+            },
+            grid: {
+                left: '5%',
+                right: '5%',
+                bottom: '10%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value',
+                name: 'Days'
+            },
+            yAxis: {
+                type: 'category',
+                data: sortedGroups.map(g => g.groupName),
+                axisLabel: {
+                    interval: 0,
+                    formatter: value => value.length > 20 ? value.slice(0, 20) + '…' : value
+                }
+            },
+            series: [{
+                type: 'bar',
+                data: sortedGroups.map((g, i) => ({
+                    value: parseFloat(parseFloat(g.executedDays).toFixed(1)),
+                    itemStyle: {
+                        color: colors[i % colors.length],
+                        borderRadius: [0, 6, 6, 0]
+                    }
+                })),
+                label: {
+                    show: true,
+                    position: 'right',
+                    formatter: function (params) {
+                        return parseFloat(params.value).toFixed(1);
+                    }
+                }
+            }]
+        };
+
+        myChart.setOption(option);
+
+        window.addEventListener('resize', () => {
+            myChart.resize();
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const a = document.createElement('a');
+            a.href = myChart.getDataURL({
+                type: 'png',
+                pixelRatio: 2,
+                backgroundColor: '#fff'
+            });
+            a.download = 'missions_graph.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+    }
+</script>
+
+
+
+
 
 </body>
 </html>

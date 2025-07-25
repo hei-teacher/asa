@@ -35,7 +35,7 @@ public class MissionController {
     var thProductsByWorkerCode = missionService.filterThProductsByWorkerCode(workerCode);
     var thProductsByMonth = missionService.thProductsByMonth(thProductsByWorkerCode);
     var thProductsExecutedDaysSumByMonth =
-            missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode);
+        missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode);
 
     model.addAttribute("workerCode", workerCode);
     model.addAttribute("months", thProductsByMonth);
@@ -46,12 +46,12 @@ public class MissionController {
     var totalByGroup = new ArrayList<Map<String, Object>>();
     for (var product : thProductsByWorkerCode) {
       double sumExecutedDays =
-              product.missions().stream().mapToDouble(mission -> mission.executedDays()).sum();
+          product.missions().stream().mapToDouble(mission -> mission.executedDays()).sum();
       totalByGroup.add(
-              Map.of(
-                      "groupCode", product.code(),
-                      "groupName", product.name(),
-                      "executedDays", sumExecutedDays));
+          Map.of(
+              "groupCode", product.code(),
+              "groupName", product.name(),
+              "executedDays", sumExecutedDays));
     }
     model.addAttribute("totalByGroup", totalByGroup);
 
@@ -60,20 +60,20 @@ public class MissionController {
 
   @GetMapping("/mission-executions")
   public String getMissionExecutions(
-          Model model,
-          @RequestParam(required = false) String workerCode,
-          @RequestParam(required = false) String yearMonth) {
+      Model model,
+      @RequestParam(required = false) String workerCode,
+      @RequestParam(required = false) String yearMonth) {
     YearMonth month =
-            (yearMonth == null || yearMonth.isBlank()) ? YearMonth.now() : YearMonth.parse(yearMonth);
+        (yearMonth == null || yearMonth.isBlank()) ? YearMonth.now() : YearMonth.parse(yearMonth);
 
     var dailyExecutionsByYearMonth = dailyExecutionsByDate(workerCode, month);
     var thDailyExecutions = new ArrayList<ThDailyExecution>();
     dailyExecutionsByYearMonth.forEach(
-            (date, deList) -> thDailyExecutions.add(thDailyExecutionMapper.toTh(date, deList)));
+        (date, deList) -> thDailyExecutions.add(thDailyExecutionMapper.toTh(date, deList)));
 
     model.addAttribute(
-            "dailyExecutions",
-            thDailyExecutions.stream().sorted(comparing(ThDailyExecution::date).reversed()).toList());
+        "dailyExecutions",
+        thDailyExecutions.stream().sorted(comparing(ThDailyExecution::date).reversed()).toList());
     model.addAttribute("careProductCode", careProductCodeSupplier.get());
     model.addAttribute("month", month.toString());
     model.addAttribute("workerCode", workerCode);
@@ -83,18 +83,18 @@ public class MissionController {
   }
 
   private Map<LocalDate, List<DailyExecution>> dailyExecutionsByDate(
-          String workerCode, YearMonth month) {
+      String workerCode, YearMonth month) {
     LocalDate startDate = month.atDay(1);
     LocalDate endDate = month.atEndOfMonth();
 
     if (workerCode == null || workerCode.isBlank()) {
       return dailyExecutionRepository.findByDateBetween(startDate, endDate).stream()
-              .collect(groupingBy(DailyExecution::date));
+          .collect(groupingBy(DailyExecution::date));
     } else {
       return dailyExecutionRepository
-              .findByWorkerCodeAndDateBetween(workerCode, startDate, endDate)
-              .stream()
-              .collect(groupingBy(DailyExecution::date));
+          .findByWorkerCodeAndDateBetween(workerCode, startDate, endDate)
+          .stream()
+          .collect(groupingBy(DailyExecution::date));
     }
   }
 }

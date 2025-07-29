@@ -153,7 +153,11 @@
         const imageURI = chartInstance.getImageURI();
         const link = document.createElement('a');
         link.href = imageURI;
-        link.download = 'products_chart.png';
+
+        const now = new Date();
+        const timestamp = now.toISOString().slice(0, 10);
+
+        link.download = `products_chart_${timestamp}.png`;
         link.click();
     }
 </script>

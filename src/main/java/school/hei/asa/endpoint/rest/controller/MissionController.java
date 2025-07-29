@@ -39,9 +39,9 @@ public class MissionController {
     List<Map<String, Object>> executedDaysByProduct = new ArrayList<>();
     for (var product : thProductsByWorkerCode) {
       Map<String, Object> dataPoint = new HashMap<>();
-      dataPoint.put("code", product.code());
-      dataPoint.put("name", product.name());
-      dataPoint.put("executedDays", product.executedDays());
+      dataPoint.put("productCode", product.code());
+      dataPoint.put("productName", product.name());
+      dataPoint.put("executedDaysByProduct", product.executedDays());
       executedDaysByProduct.add(dataPoint);
     }
 

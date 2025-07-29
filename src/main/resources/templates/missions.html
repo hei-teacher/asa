@@ -124,8 +124,8 @@
         chartDataTable.addColumn('number', 'Executed Days');
 
         productChartData.forEach(function (item) {
-            const label = item.code + ' - ' + item.name;
-            chartDataTable.addRow([label, item.executedDays]);
+            const label = item.productCode + ' - ' + item.productName;
+            chartDataTable.addRow([label, item.executedDaysByProduct]);
         });
 
         const options = {

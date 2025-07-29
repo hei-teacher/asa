@@ -83,7 +83,7 @@
     <script>
         function updateFilters() {
             const workerCode = document.getElementById("worker").value;
-            window.location.href = /missions?workerCode=${workerCode};
+            window.location.href = `/missions?workerCode=${workerCode}`;
         }
 
         document.addEventListener("DOMContentLoaded", function() {

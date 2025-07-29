@@ -106,7 +106,7 @@
 </div>
 
 <script th:inline="javascript">
-    let real_data = /*[[${executedDaysByProduct}]]*/ {};
+    let productChartData = /*[[${executedDaysByProduct}]]*/ {};
 
     let chartDataTable;
     let chartInstance;
@@ -123,7 +123,7 @@
         chartDataTable.addColumn('string', 'ThProduct');
         chartDataTable.addColumn('number', 'Executed Days');
 
-        real_data.forEach(function (item) {
+        productChartData.forEach(function (item) {
             const label = item.code + ' - ' + item.name;
             chartDataTable.addRow([label, item.executedDays]);
         });

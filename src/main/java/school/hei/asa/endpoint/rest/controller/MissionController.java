@@ -5,10 +5,8 @@ import static java.util.stream.Collectors.groupingBy;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,9 +36,13 @@ public class MissionController {
     var thProductsExecutedDaysSumByMonth =
         missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode);
 
-    Map<String, Double> chartData = new TreeMap<>();
+    List<Map<String, Object>> executedDaysByProduct = new ArrayList<>();
     for (var product : thProductsByWorkerCode) {
-      chartData.put(product.code() + " - " + product.name(), product.executedDays());
+      Map<String, Object> dataPoint = new HashMap<>();
+      dataPoint.put("code", product.code());
+      dataPoint.put("name", product.name());
+      dataPoint.put("executedDays", product.executedDays());
+      executedDaysByProduct.add(dataPoint);
     }
 
     model.addAttribute("workerCode", workerCode);
@@ -48,7 +50,7 @@ public class MissionController {
     model.addAttribute("products", thProductsByWorkerCode);
     model.addAttribute("total", thProductsExecutedDaysSumByMonth);
     workerToModelAdder.apply(workerCode, model);
-    model.addAttribute("chartData", chartData);
+    model.addAttribute("executedDaysByProduct", executedDaysByProduct);
 
     return "missions";
   }

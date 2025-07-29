@@ -38,9 +38,8 @@ public class MissionController {
     var thProductsExecutedDaysSumByMonth =
         missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode);
 
-    var allThProducts = missionService.getAllProducts();
     Map<String, Double> chartData = new TreeMap<>();
-    for (var product : allThProducts) {
+    for (var product : thProductsByWorkerCode) {
       chartData.put(product.code() + " - " + product.name(), product.executedDays());
     }
 

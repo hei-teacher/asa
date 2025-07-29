@@ -22,11 +22,6 @@ public class MissionService {
         : thProducts.stream().map(p -> p.filterByWorkerCode(workerCode)).toList();
   }
 
-  public List<ThProduct> getAllProducts() {
-    var thProducts = thProductMapper.toTh(productRepository.findAll());
-    return thProducts;
-  }
-
   public Map<String, List<ThProduct>> thProductsByMonth(List<ThProduct> thProducts) {
     EnumSet<Month> months = EnumSet.allOf(Month.class);
     Map<String, List<ThProduct>> res = new LinkedHashMap<>();

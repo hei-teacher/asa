@@ -12,63 +12,81 @@ import school.hei.asa.repository.ProductRepository;
 @Service
 public class MissionService {
 
-  private final ProductRepository productRepository;
-  private final ThProductMapper thProductMapper;
+    private final ProductRepository productRepository;
+    private final ThProductMapper thProductMapper;
 
-  public List<ThProduct> filterThProductsByWorkerCode(String workerCode) {
-    var thProducts = thProductMapper.toTh(productRepository.findAll());
-    return workerCode == null || workerCode.isBlank()
-        ? thProducts
-        : thProducts.stream().map(p -> p.filterByWorkerCode(workerCode)).toList();
-  }
+    public List<ThProduct> filterThProductsByWorkerCode(String workerCode) {
+        var thProducts = thProductMapper.toTh(productRepository.findAll());
+        return workerCode == null || workerCode.isBlank()
+                ? thProducts
+                : thProducts.stream().map(p -> p.filterByWorkerCode(workerCode)).toList();
+    }
 
-  public Map<String, List<ThProduct>> thProductsByMonth(List<ThProduct> thProducts) {
-    EnumSet<Month> months = EnumSet.allOf(Month.class);
-    Map<String, List<ThProduct>> res = new LinkedHashMap<>();
-    months.forEach(
-        (month) -> {
-          List<ThProduct> monthProducts =
-              thProducts.stream()
-                  .map(p -> p.filterByMonth(month))
-                  .filter(Objects::nonNull)
-                  .toList();
+    public Map<String, List<ThProduct>> thProductsByMonth(List<ThProduct> thProducts) {
+        EnumSet<Month> months = EnumSet.allOf(Month.class);
+        Map<String, List<ThProduct>> res = new LinkedHashMap<>();
+        months.forEach(
+                (month) -> {
+                    List<ThProduct> monthProducts =
+                            thProducts.stream()
+                                    .map(p -> p.filterByMonth(month))
+                                    .filter(Objects::nonNull)
+                                    .toList();
 
-          var hasExecutedDays =
-              monthProducts.stream().mapToDouble(ThProduct::executedDays).sum() > 0;
+                    var hasExecutedDays =
+                            monthProducts.stream().mapToDouble(ThProduct::executedDays).sum() > 0;
 
-          if (hasExecutedDays) {
-            res.putIfAbsent(month.toString().toLowerCase(), monthProducts);
-          }
-        });
-    return res;
-  }
+                    if (hasExecutedDays) {
+                        res.putIfAbsent(month.toString().toLowerCase(), monthProducts);
+                    }
+                });
+        return res;
+    }
 
-  public Map<String, Double> thProductsExecutedDaysSumByMonth(List<ThProduct> thProducts) {
-    EnumSet<Month> months = EnumSet.allOf(Month.class);
-    Map<String, Double> res = new LinkedHashMap<>();
-    months.forEach(
-        (month) -> {
-          List<ThProduct> monthProducts =
-              thProducts.stream()
-                  .map(p -> p.filterByMonth(month))
-                  .filter(Objects::nonNull)
-                  .toList();
+    public Map<String, Double> thProductsExecutedDaysSumByMonth(List<ThProduct> thProducts) {
+        EnumSet<Month> months = EnumSet.allOf(Month.class);
+        Map<String, Double> res = new LinkedHashMap<>();
+        months.forEach(
+                (month) -> {
+                    List<ThProduct> monthProducts =
+                            thProducts.stream()
+                                    .map(p -> p.filterByMonth(month))
+                                    .filter(Objects::nonNull)
+                                    .toList();
 
-          var hasExecutedDays =
-              monthProducts.stream().mapToDouble(ThProduct::executedDays).sum() > 0;
+                    var hasExecutedDays =
+                            monthProducts.stream().mapToDouble(ThProduct::executedDays).sum() > 0;
 
-          if (hasExecutedDays) {
-            res.putIfAbsent(
-                month.toString().toLowerCase(), thProductsExecutedDaysSum(monthProducts, month));
-          }
-        });
-    return res;
-  }
+                    if (hasExecutedDays) {
+                        res.putIfAbsent(
+                                month.toString().toLowerCase(), thProductsExecutedDaysSum(monthProducts, month));
+                    }
+                });
+        return res;
+    }
 
-  public Double thProductsExecutedDaysSum(List<ThProduct> thProducts, Month month) {
-    return thProducts.stream()
-        .map(p -> p.filterByMonth(month))
-        .mapToDouble(ThProduct::executedDays)
-        .sum();
-  }
+    public List<Map<String, Object>> calculateExecutedDaysByGroup(List<ThProduct> products) {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (var product : products) {
+            double sumExecutedDays = product.missions().stream()
+                    .mapToDouble(mission -> mission.executedDays())
+                    .sum();
+
+            result.add(Map.of(
+                    "groupCode", product.code(),
+                    "groupName", product.name(),
+                    "executedDaysByProduct", sumExecutedDays
+            ));
+        }
+
+        return result;
+    }
+
+    public Double thProductsExecutedDaysSum(List<ThProduct> thProducts, Month month) {
+        return thProducts.stream()
+                .map(p -> p.filterByMonth(month))
+                .mapToDouble(ThProduct::executedDays)
+                .sum();
+    }
 }

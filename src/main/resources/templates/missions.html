@@ -24,14 +24,14 @@
             </p>
         </div>
 
-        <button id="showGraphBtn" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-2.5 px-5 rounded-lg flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-            </svg>
+        <button id="showGraphBtn"
+                class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded shadow">
             Show Graph
         </button>
+
     </div>
 </div>
+
 
 <div class="ml-6 mr-6 flex gap-6">
     <ul class="ml-6 mt-9 list-disc w-1/2">
@@ -107,7 +107,6 @@
     </script>
 </div>
 
-
 <div id="graphModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
     <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white">
         <div class="mt-3">
@@ -124,8 +123,8 @@
                 </button>
             </div>
             <div class="text-center">
-                <div id="piechart" style="width: 100%; min-height: 400px;"></div>
-                <button class="mt-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center gap-2 mx-auto" onclick="downloadChart()">
+                <div id="piechart" style="width: 100%; min-height: 500px;"></div>
+                <button class="mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center gap-2 mx-auto" onclick="downloadChart()">
                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                         <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/>
                     </svg>
@@ -135,7 +134,6 @@
         </div>
     </div>
 </div>
-
 
 <script>
     function updateFilters() {
@@ -148,14 +146,13 @@
         if (workerSelect) {
             workerSelect.addEventListener("change", updateFilters);
         }
-
         const showGraphBtn = document.getElementById("showGraphBtn");
         const graphModal = document.getElementById("graphModal");
         const closeModal = document.getElementById("closeModal");
 
         showGraphBtn.addEventListener("click", function() {
             graphModal.classList.remove("hidden");
-            setTimeout(drawPieChart, 100);
+            setTimeout(drawPieChart, 200);
         });
 
         closeModal.addEventListener("click", function() {
@@ -185,8 +182,8 @@
 </script>
 
 <script th:inline="javascript">
-    let executedDaysData = /*[[${executedDaysByProduct}]]*/ {};
-    let workerCode = /*[[${workerCode}]]*/ {};
+    let productChartData = /*[[${executedDaysByProduct}]]*/ {};
+    let workerCode = /*[[${workerCode}]]*/ {} ;
 
     let chartDataTable;
     let chartInstance;
@@ -204,12 +201,14 @@
         chartDataTable.addColumn('string', 'ThProduct');
         chartDataTable.addColumn('number', 'Executed Days');
 
-        executedDaysData.forEach(function (item) {
+        productChartData.forEach(function (item) {
             const label = item.productCode + ' - ' + item.productName;
             chartDataTable.addRow([label, item.executedDaysByProduct]);
         });
+
         const container = document.getElementById('piechart');
         const containerWidth = container.offsetWidth;
+
         const legendPosition = containerWidth < 768 ? 'bottom' : 'right';
         const chartHeight = containerWidth < 768 ? 600 : 500;
 
@@ -222,7 +221,7 @@
                 position: legendPosition,
                 alignment: 'center',
                 textStyle: {
-                    fontSize: containerWidth  < 768 ? 12 : 14,
+                    fontSize: containerWidth < 768 ? 12 : 14,
                     bold: true,
                     color: '#4a5568',
                     fontName: 'Arial'
@@ -235,6 +234,7 @@
                 height: containerWidth < 768 ? '60%' : '80%'
             }
         };
+
         if (!chartInstance) {
             chartInstance = new google.visualization.PieChart(container);
         }
@@ -249,11 +249,9 @@
 
         const now = new Date();
         const timestamp = now.toISOString().slice(0, 10);
-
         const code = (workerCode && workerCode.trim()) ? workerCode.trim() : 'all_workers';
 
         link.download = `products_chart_${code}_${timestamp}.png`;
-
         link.click();
     }
 </script>

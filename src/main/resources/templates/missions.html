@@ -107,6 +107,7 @@
 
 <script th:inline="javascript">
     let productChartData = /*[[${executedDaysByProduct}]]*/ {};
+    let workerCode = /*[[${workerCode}]]*/ {};
 
     let chartDataTable;
     let chartInstance;
@@ -133,6 +134,7 @@
             titleTextStyle: {
                 fontSize: 17
             },
+            pieSliceText: 'label',
             is3D: true,
             backgroundColor: '#f9f9f9',
             width: 1000,
@@ -156,8 +158,9 @@
 
         const now = new Date();
         const timestamp = now.toISOString().slice(0, 10);
+        const code = (workerCode && workerCode.trim()) ? workerCode.trim() : 'all_workers';
 
-        link.download = `products_chart_${timestamp}.png`;
+        link.download = `products_chart_${code}_${timestamp}.png`;
         link.click();
     }
 </script>

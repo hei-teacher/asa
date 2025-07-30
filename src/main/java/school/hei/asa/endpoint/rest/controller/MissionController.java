@@ -6,7 +6,6 @@ import static java.util.stream.Collectors.groupingBy;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
-
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

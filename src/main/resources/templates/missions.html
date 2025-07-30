@@ -186,6 +186,7 @@
 
 <script th:inline="javascript">
     let executedDaysData = /*[[${executedDaysByProduct}]]*/ {};
+    let workerCode = /*[[${workerCode}]]*/ {};
 
     let chartDataTable;
     let chartInstance;
@@ -249,7 +250,10 @@
         const now = new Date();
         const timestamp = now.toISOString().slice(0, 10);
 
-        link.download = `products_chart_${timestamp}.png`;
+        const code = (workerCode && workerCode.trim()) ? workerCode.trim() : 'all_workers';
+
+        link.download = `products_chart_${code}_${timestamp}.png`;
+
         link.click();
     }
 </script>

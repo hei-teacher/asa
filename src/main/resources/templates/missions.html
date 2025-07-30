@@ -19,7 +19,7 @@
         <button id="openModalBtn"
                 class="px-5 py-2 bg-blue-900 text-white font-semibold rounded-lg shadow-md transition-all duration-300 hover:bg-blue-700 hover:scale-105 hover:shadow-xl"
                 style="border: 2px solid white;">
-            🚀 Show Graph
+             Show Graphic
         </button>
     </div>
 
@@ -154,10 +154,12 @@
                     type: 'pie',
                     radius: '70%',
                     center: ['60%', '50%'],
-                    data: groups.map(g => ({
-                        name: g.groupName,
-                        value: parseFloat(parseFloat(g.executedDaysByProduct).toFixed(1))
-                    })),
+                    data: groups
+                        .filter(g => parseFloat(g.executedDaysByProduct) > 0)
+                        .map(g => ({
+                            name: g.groupName,
+                            value: parseFloat(parseFloat(g.executedDaysByProduct).toFixed(1))
+                        })),
                     label: {
                         formatter: '{b}: {c} j',
                         fontSize: 14

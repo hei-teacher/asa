@@ -65,7 +65,7 @@ public class MissionService {
     return res;
   }
 
-    public List<Map<String, Object>> calculateExecutedDaysByProduct(List<ThProduct> products) {
+  public List<Map<String, Object>> calculateExecutedDaysByProduct(List<ThProduct> products) {
     List<Map<String, Object>> result = new ArrayList<>();
 
     for (var product : products) {

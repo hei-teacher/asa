@@ -60,3 +60,20 @@ th {
     padding-top: 0.5rem;
     padding-inline: 0.5rem;
 }
+
+.btn-primary {
+    padding: 0.5rem 1.25rem; /* px-5 py-2 */
+    background-color: #1e3a8a; /* bg-blue-900 */
+    color: white; /* text-white */
+    font-weight: 600; /* font-semibold */
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* shadow-md */
+    transition: all 0.3s ease; /* transition-all duration-300 */
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8; /* hover:bg-blue-700 */
+    transform: scale(1.05); /* hover:scale-105 */
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3); /* hover:shadow-xl */
+}
+

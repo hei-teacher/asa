@@ -43,8 +43,8 @@ public class MissionController {
     model.addAttribute("total", thProductsExecutedDaysSumByMonth);
     workerToModelAdder.apply(workerCode, model);
 
-    var totalByGroup = missionService.calculateExecutedDaysByGroup(thProductsByWorkerCode);
-    model.addAttribute("totalByGroup", totalByGroup);
+    var executedDaysByProduct = missionService.calculateExecutedDaysByProduct(thProductsByWorkerCode);
+    model.addAttribute("executedDaysByProduct", executedDaysByProduct);
 
     return "missions";
   }

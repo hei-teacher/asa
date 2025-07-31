@@ -84,18 +84,18 @@ th {
     margin-left: auto;
     margin-right: auto;
     padding: 1.25rem;
-    border: 1px solid #e5e7eb; /* Tailwind's gray-200 */
+    border: 1px solid #e5e7eb;
     width: 91.666667%;
     max-width: 56rem;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -4px rgba(0, 0, 0, 0.1); /* shadow-lg */
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
     border-radius: 0.375rem;
     background-color: white;
 }
 
 .download-btn {
     margin-top: 1rem;
-    background-color: #16a34a; /* green-600 */
+    background-color: #16a34a;
     color: white;
     font-weight: bold;
     padding: 0.5rem 1rem;
@@ -111,7 +111,7 @@ th {
 }
 
 .download-btn:hover {
-    background-color: #15803d; /* green-700 */
+    background-color: #15803d;
 }
 
 

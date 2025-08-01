@@ -4,8 +4,15 @@ import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -32,13 +39,32 @@ public class InvoiceController {
       Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-
     var invoice = invoiceService.extractInvoice(worker, invoiceForm);
 
-    model.addAttribute("invoicePreview", invoice.base64Image());
+    File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
+    var fileUri = pdfFile.toURI().toString();
+
+    model.addAttribute("invoicePreview", fileUri);
     model.addAttribute("form", invoice.invoiceData());
 
     return "invoice-generator";
+  }
+
+  @SneakyThrows
+  @GetMapping("/invoice/preview")
+  public ResponseEntity<Resource> previewInvoice(Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
+    var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
+    var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
+    var invoice = invoiceService.extractInvoice(worker, invoiceForm);
+
+    File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
+    Path path = pdfFile.toPath();
+    ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+
+    return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_PDF)
+            .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=invoice.pdf")
+            .body(resource);
   }
 
   @SneakyThrows

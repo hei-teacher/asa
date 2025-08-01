@@ -46,7 +46,7 @@ public class ChartPieService {
     }
 
     try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-      ChartUtils.writeChartAsPNG(out, chart, 1200, 900);
+      ChartUtils.writeChartAsPNG(out, chart, 900, 600);
 
       File chartFile = new File(tempDirPath, fileName);
       ChartUtils.saveChartAsPNG(chartFile, chart, 900, 600);

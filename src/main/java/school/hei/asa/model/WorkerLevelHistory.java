@@ -1,5 +1,6 @@
 package school.hei.asa.model;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -17,4 +18,7 @@ public class WorkerLevelHistory {
   private final Instant entranceInstant;
   private final String contractType;
   private final Integer projectedDaysToWork;
+  private final BigDecimal salary;
+  private final String jobTitle;
+  private final Integer contractDuration;
 }

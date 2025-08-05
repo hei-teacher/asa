@@ -41,10 +41,6 @@ public class InvoiceController {
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var invoice = invoiceService.extractInvoice(worker, invoiceForm);
 
-    File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
-    var fileUri = pdfFile.toURI().toString();
-
-    model.addAttribute("invoicePreview", fileUri);
     model.addAttribute("form", invoice.invoiceData());
 
     return "invoice-generator";

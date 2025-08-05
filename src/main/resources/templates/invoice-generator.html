@@ -20,20 +20,23 @@
     <h1 class="text-4xl font-bold text-[#3F2F6A] mt-10 mb-10">Generate your monthly invoice</h1>
 
         <div class="flex space-x-6 mb-6">
-            <div class="w-full">
-                <label for="desc" class="block text-gray-800 font-semibold mb-1 text-sm">Description :</label>
-                <textarea
-                        id="desc"
-                        rows="1"
-                        name="ref"
-                        placeholder="Consultant - Développeur Logiciel (1j)"
-                        th:text="${form.description}"
-                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
-                ></textarea>
+            <div class="w-1/3">
+                <label for="date" class="block text-gray-700 font-semibold mb-1 text-sm">Réference :</label>
+                <div class="relative">
+                    <input
+                            type="text"
+                            id="ref"
+                            name="date"
+                            placeholder="Select a date"
+                            th:value="${form.reference}"
+                            class="w-full px-2 py-1 text-sm pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
+                    />
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+                <i class="material-icons">event</i>
+            </span>
+                </div>
             </div>
-        </div>
 
-        <div class="flex space-x-6 mb-6">
             <div class="w-1/3">
                 <label for="date" class="block text-gray-700 font-semibold mb-1 text-sm">Date d'émission :</label>
                 <div class="relative">
@@ -51,77 +54,12 @@
                 </div>
             </div>
 
-            <div class="w-1/3">
-                <label for="qtt" class="block text-gray-800 font-semibold mb-1 text-sm">Quantité :</label>
-                <textarea
-                        id="qtt"
-                        rows="1"
-                        name="ref"
-                        placeholder="10"
-                        th:text="${form.quantity}"
-                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
-                ></textarea>
-            </div>
-
-            <div class="w-1/3">
-                <label for="px" class="block text-gray-800 font-semibold mb-1 text-sm">Prix unitaire :</label>
-                <textarea
-                        id="px"
-                        rows="1"
-                        name="ref"
-                        placeholder="50000"
-                        th:text="${form.unitPrice}"
-                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none"
-                ></textarea>
-            </div>
-
-        </div>
-
-        <div class="mt-6">
-            <div class="mb-4">
-                <label class="inline-flex items-center">
-                    <input type="checkbox" name="bon" class="form-checkbox text-indigo-600 accent-[#3F2F6A]" th:checked="${form.hasBonus}">
-                    <span class="ml-2 text-gray-700">Include a bonus</span>
-                </label>
-            </div>
-        </div>
-
-        <div id="bonusSection" class="space-y-4 hidden">
-            <div class="flex space-x-4">
-                <div class="w-2/4">
-                    <label for="bonusDesc" class="block text-gray-800 font-semibold mb-1 text-sm">Description du bonus :</label>
-                    <input type="text" id="bonusDesc" name="bonusDesc" placeholder="Produit"
-                           th:value="${form.bonusDescription}"
-                           class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400">
-                </div>
-
-                <div class="w-1/4">
-                    <label for="bonusQtt" class="block text-gray-800 font-semibold mb-1 text-sm">Quantité :</label>
-                    <input type="text" id="bonusQtt" name="bonusQtt" placeholder="1"
-                           th:value="${form.bonusQuantity}"
-                           class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400">
-                </div>
-
-                <div class="w-1/4">
-                    <label for="bonusPx" class="block text-gray-800 font-semibold mb-1 text-sm">Prix unitaire :</label>
-                    <input type="text" id="bonusPx" name="bonusPx" placeholder="25000"
-                           th:value="${form.bonusUnitPrice}"
-                           class="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400">
-                </div>
-            </div>
-
         </div>
 
         <div class="mt-6 flex gap-4">
             <form method="get" action="/invoice" id="invoiceForm">
                 <input type="hidden" name="issueDate" id="form_date">
-                <input type="hidden" name="description" id="form_desc">
-                <input type="hidden" name="quantity" id="form_qtt">
-                <input type="hidden" name="unitPrice" id="form_px">
-                <input type="hidden" name="hasBonus" id="form_bon" />
-                <input type="hidden" name="bonusDescription" id="form_bonus_desc">
-                <input type="hidden" name="bonusQuantity" id="form_bonus_qtt">
-                <input type="hidden" name="bonusUnitPrice" id="form_bonus_px">
+                <input type="hidden" name="reference" id="form_ref">
 
                 <button type="button"
                         onclick="updateInvoiceData()"
@@ -132,13 +70,7 @@
 
             <form method="get" action="/invoice/download" id="invoiceDownload">
                 <input type="hidden" name="issueDate" id="down_date">
-                <input type="hidden" name="description" id="down_desc">
-                <input type="hidden" name="quantity" id="down_qtt">
-                <input type="hidden" name="unitPrice" id="down_px">
-                <input type="hidden" name="hasBonus" id="down_bon" />
-                <input type="hidden" name="bonusDescription" id="down_bonus_desc">
-                <input type="hidden" name="bonusQuantity" id="down_bonus_qtt">
-                <input type="hidden" name="bonusUnitPrice" id="down_bonus_px">
+                <input type="hidden" name="reference" id="down_ref">
 
                 <button type="submit"
                         onclick="downloadInvoiceData()"
@@ -159,14 +91,7 @@
     function getFormData() {
         return {
             issueDate: document.getElementById('date').value,
-            description: document.getElementById('desc').value,
-            quantity: document.getElementById('qtt').value,
-            unitPrice: document.getElementById('px').value,
-            hasBonus: document.querySelector('input[name="bon"]').checked,
-
-            bonusDescription: document.getElementById('bonusDesc')?.value || "",
-            bonusQuantity: document.getElementById('bonusQtt')?.value || "",
-            bonusUnitPrice: document.getElementById('bonusPx')?.value || "",
+            reference: document.getElementById('ref').value,
         };
     }
 
@@ -174,14 +99,7 @@
         const formData = getFormData();
 
         document.getElementById("form_date").value = formData.issueDate;
-        document.getElementById("form_desc").value = formData.description;
-        document.getElementById("form_qtt").value = formData.quantity;
-        document.getElementById("form_px").value = formData.unitPrice;
-        document.getElementById("form_bon").value = formData.hasBonus;
-
-        document.getElementById("form_bonus_desc").value = formData.bonusDescription;
-        document.getElementById("form_bonus_qtt").value = formData.bonusQuantity;
-        document.getElementById("form_bonus_px").value = formData.bonusUnitPrice;
+        document.getElementById("form_ref").value = formData.reference;
 
         document.getElementById("invoiceForm").submit();
     }
@@ -190,59 +108,63 @@
         const formData = getFormData();
 
         document.getElementById("down_date").value = formData.issueDate;
-        document.getElementById("down_desc").value = formData.description;
-        document.getElementById("down_qtt").value = formData.quantity;
-        document.getElementById("down_px").value = formData.unitPrice;
-        document.getElementById("down_bon").value = formData.hasBonus;
-
-        document.getElementById("down_bonus_desc").value = formData.bonusDescription;
-        document.getElementById("down_bonus_qtt").value = formData.bonusQuantity;
-        document.getElementById("down_bonus_px").value = formData.bonusUnitPrice;
+        document.getElementById("down_ref").value = formData.reference;
 
         document.getElementById("invoiceDownload").submit();
+
+        loadPreview();
     }
 
     document.addEventListener("DOMContentLoaded", function () {
         flatpickr("#date", {
             dateFormat: "d/m/Y"
         });
-
-        const bonusCheckbox = document.querySelector('input[name="bon"]');
-        const bonusSection = document.getElementById("bonusSection");
-
-        bonusCheckbox.addEventListener("change", function () {
-            bonusSection.classList.toggle("hidden", !this.checked);
-        });
-
-        if (bonusCheckbox.checked) {
-            bonusSection.classList.remove("hidden");
-        }
-    });
-
-    const url = /*[[${'/invoice/preview'}]]*/ '/invoice/preview';
-
-    const loadingTask = pdfjsLib.getDocument(url);
-    loadingTask.promise.then(function(pdf) {
-
-        pdf.getPage(1).then(function(page) {
-
-            const scale = 1.2;
-            const viewport = page.getViewport({ scale });
-
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-
-            document.getElementById('pdf-viewer').appendChild(canvas);
-
-            const renderContext = {
-                canvasContext: context,
-                viewport: viewport
-            };
-            page.render(renderContext);
+        flatpickr("#ref", {
+            dateFormat: "d/m/Y"
         });
     });
+
+    function loadPreview() {
+        const formData = getFormData();
+        const params = new URLSearchParams({
+            issueDate: formData.issueDate,
+            reference: formData.reference
+        });
+
+        const url = `/invoice/preview?${params.toString()}`;
+
+        const viewer = document.getElementById('pdf-viewer');
+        viewer.innerHTML = '';
+
+        const loadingTask = pdfjsLib.getDocument(url);
+        loadingTask.promise.then(function (pdf) {
+            pdf.getPage(1).then(function (page) {
+                const scale = 1.2;
+                const viewport = page.getViewport({ scale });
+
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                viewer.appendChild(canvas);
+
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                page.render(renderContext);
+            });
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        flatpickr("#date", { dateFormat: "d/m/Y" });
+        flatpickr("#ref", { dateFormat: "d/m/Y" });
+
+        loadPreview();
+    });
+
 </script>
 
 </body>

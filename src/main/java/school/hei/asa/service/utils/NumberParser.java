@@ -1,10 +1,10 @@
 package school.hei.asa.service.utils;
 
 import static java.lang.Math.round;
+import static java.util.Locale.FRANCE;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
-import java.util.Locale;
 
 public class NumberParser {
   public double parseToDouble(String amount) {
@@ -23,7 +23,7 @@ public class NumberParser {
   }
 
   public String parseToNumber(BigDecimal number) {
-    NumberFormat formatter = NumberFormat.getInstance(Locale.FRANCE);
+    NumberFormat formatter = NumberFormat.getInstance(FRANCE);
     formatter.setMinimumFractionDigits(0);
     String formatted = formatter.format(round(number.doubleValue()));
     return formatted.replaceAll("[\\u00A0\\u202F]", " ");

@@ -1,17 +1,15 @@
 package school.hei.asa.endpoint.rest.controller;
 
+import static java.time.LocalDateTime.now;
+import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -45,21 +43,21 @@ public class InvoiceController {
     return "invoice-generator";
   }
 
-  @SneakyThrows
   @GetMapping("/invoice/preview")
   public ResponseEntity<Resource> previewInvoice(
       Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var invoice = invoiceService.extractInvoice(worker, invoiceForm);
+    var timestamp = now().format(ofPattern("yyyyMMdd-HHmmss"));
+    String fileName = "invoice-" + worker.code() + "-" + timestamp + ".pdf";
 
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
-    Path path = pdfFile.toPath();
-    ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+    FileSystemResource resource = new FileSystemResource(pdfFile);
 
     return ResponseEntity.ok()
-        .contentType(MediaType.APPLICATION_PDF)
-        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=invoice.pdf")
+        .contentType(APPLICATION_PDF)
+        .header(CONTENT_DISPOSITION, "inline; filename=" + fileName)
         .body(resource);
   }
 

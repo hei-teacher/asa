@@ -112,10 +112,10 @@ public class InvoiceService {
         amount,
         amount,
         false,
-        "",
-        "",
-        "",
-        "",
+        invoiceForm.bonusDescription(),
+        invoiceForm.bonusQuantity(),
+        invoiceForm.unitPrice(),
+        invoiceForm.bonusAmount(),
         parsedAmount);
   }
 

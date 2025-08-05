@@ -2,7 +2,6 @@ package school.hei.asa.repository.model;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import lombok.Getter;

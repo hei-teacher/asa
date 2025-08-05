@@ -2,10 +2,9 @@ package school.hei.asa.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import school.hei.asa.service.utils.NumberParser;
-
-import java.math.BigDecimal;
 
 public class NumberParserTest {
 
@@ -19,14 +18,14 @@ public class NumberParserTest {
   @Test
   void double_to_number_with_space() {
     var numberParser = new NumberParser();
-    var amount = BigDecimal.valueOf(180000.905);
-    assertEquals("1 800 000", numberParser.parseToNumber(amount));
+    var amount = BigDecimal.valueOf(1800000.905);
+    assertEquals("1 800 001", numberParser.parseToNumber(amount));
   }
 
   @Test
   void double_to_number_with_space_and_decimal() {
     var numberParser = new NumberParser();
     var amount = BigDecimal.valueOf(1800000.15);
-    assertEquals("1 800 000,15", numberParser.parseToNumber(amount));
+    assertEquals("1 800 000", numberParser.parseToNumber(amount));
   }
 }

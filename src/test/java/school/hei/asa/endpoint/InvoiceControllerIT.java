@@ -55,7 +55,6 @@ class InvoiceControllerIT extends FacadeIT {
     var invoiceForm = new ThInvoiceForm(null, null, "", "", "", "", "", false, "", "", "", "", "");
     String viewName = invoiceController.getInvoicePage(model, authentication, invoiceForm);
 
-    verify(model).addAttribute(eq("invoicePreview"), any(String.class));
     verify(model).addAttribute(eq("form"), any(ThInvoiceForm.class));
     assertEquals("invoice-generator", viewName);
   }

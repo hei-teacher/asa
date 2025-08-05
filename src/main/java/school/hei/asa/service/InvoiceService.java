@@ -78,27 +78,28 @@ public class InvoiceService {
     var workerLevelHistories = workerLevelHistoryRepository.findAllByWorker(worker);
     var hasLevelHistory = !workerLevelHistories.isEmpty();
     var salary = hasLevelHistory ? workerLevelHistories.getFirst().salary() : ZERO;
-    var dateReference = LocalDate.parse(isEmpty ? "01/01/2025" : invoiceForm.reference(), formatter);
+    var dateReference =
+        LocalDate.parse(isEmpty ? "01/01/2025" : invoiceForm.reference(), formatter);
     var reference = dateReference.format(formatter);
     var firstCurrentMonthDay = dateReference.withDayOfMonth(1);
     var ym = YearMonth.from(dateReference);
     var lastCurrentMonthDay = ym.atEndOfMonth();
     var totalDaysWorked =
-            missionExecutionPercentageSumByWorker(
-                    worker,
-                    firstCurrentMonthDay,
-                    lastCurrentMonthDay);
-    var contractType = hasLevelHistory ? workerLevelHistories.getFirst().contractType() : ContractType.STUDENT_CONTRACTOR.getValue();
+        missionExecutionPercentageSumByWorker(worker, firstCurrentMonthDay, lastCurrentMonthDay);
+    var contractType =
+        hasLevelHistory
+            ? workerLevelHistories.getFirst().contractType()
+            : ContractType.STUDENT_CONTRACTOR.getValue();
     var isStudentContractor =
-            Objects.equals(contractType, ContractType.STUDENT_CONTRACTOR.getValue());
-    var unitValue = isStudentContractor ? DAYS_TO_BE_WORKED_BY_STUDENT : DAYS_TO_BE_WORKED_BY_PARTNER;
-    var unitPriceValue = salary.divide(
-            valueOf(unitValue),
-            2,
-            HALF_UP
-    );
+        Objects.equals(contractType, ContractType.STUDENT_CONTRACTOR.getValue());
+    var unitValue =
+        isStudentContractor ? DAYS_TO_BE_WORKED_BY_STUDENT : DAYS_TO_BE_WORKED_BY_PARTNER;
+    var unitPriceValue = salary.divide(valueOf(unitValue), 2, HALF_UP);
     var unitPrice = numberParser.parseToNumber(unitPriceValue);
-    var amount = isStudentContractor ? numberParser.parseToNumber(salary) : numberParser.parseToNumber(unitPriceValue.multiply(valueOf(totalDaysWorked)));
+    var amount =
+        isStudentContractor
+            ? numberParser.parseToNumber(salary)
+            : numberParser.parseToNumber(unitPriceValue.multiply(valueOf(totalDaysWorked)));
     var parsedAmount = isEmpty ? "" : numberConverter.convertToWords(amount);
     var description = hasLevelHistory ? workerLevelHistories.getFirst().jobTitle() : "";
 
@@ -119,13 +120,13 @@ public class InvoiceService {
   }
 
   private Double missionExecutionPercentageSumByWorker(
-          Worker worker, LocalDate startDate, LocalDate endDate) {
+      Worker worker, LocalDate startDate, LocalDate endDate) {
     return missionExecutionRepository
-            .missionExecutionsByDateBetween(worker, startDate, endDate)
-            .stream()
-            .filter(me -> !isCare(me))
-            .mapToDouble(MissionExecution::dayPercentage)
-            .sum();
+        .missionExecutionsByDateBetween(worker, startDate, endDate)
+        .stream()
+        .filter(me -> !isCare(me))
+        .mapToDouble(MissionExecution::dayPercentage)
+        .sum();
   }
 
   private boolean isCare(MissionExecution me) {

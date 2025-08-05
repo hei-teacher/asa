@@ -28,8 +28,8 @@ public class WorkerLevelHistoryMapper {
         jWorkerLevelHistory.getEntranceInstant(),
         jWorkerLevelHistory.getContractType(),
         jWorkerLevelHistory.getTotalWorkDays(),
-            jWorkerLevelHistory.getSalary(),
-            jWorkerLevelHistory.getJobTitle(),
-            jWorkerLevelHistory.getContractDuration());
+        jWorkerLevelHistory.getSalary(),
+        jWorkerLevelHistory.getJobTitle(),
+        jWorkerLevelHistory.getContractDuration());
   }
 }

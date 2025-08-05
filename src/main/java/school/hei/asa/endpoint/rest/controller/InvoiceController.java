@@ -6,7 +6,6 @@ import static org.springframework.http.MediaType.APPLICATION_PDF;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.core.io.ByteArrayResource;
@@ -48,7 +47,8 @@ public class InvoiceController {
 
   @SneakyThrows
   @GetMapping("/invoice/preview")
-  public ResponseEntity<Resource> previewInvoice(Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
+  public ResponseEntity<Resource> previewInvoice(
+      Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var invoice = invoiceService.extractInvoice(worker, invoiceForm);
@@ -58,9 +58,9 @@ public class InvoiceController {
     ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
 
     return ResponseEntity.ok()
-            .contentType(MediaType.APPLICATION_PDF)
-            .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=invoice.pdf")
-            .body(resource);
+        .contentType(MediaType.APPLICATION_PDF)
+        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=invoice.pdf")
+        .body(resource);
   }
 
   @SneakyThrows

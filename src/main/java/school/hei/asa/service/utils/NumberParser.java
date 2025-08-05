@@ -1,10 +1,10 @@
 package school.hei.asa.service.utils;
 
+import static java.lang.Math.round;
+
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Locale;
-
-import static java.lang.Math.round;
 
 public class NumberParser {
   public double parseToDouble(String amount) {

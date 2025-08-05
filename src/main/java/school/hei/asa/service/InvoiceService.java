@@ -42,6 +42,9 @@ public class InvoiceService {
   private final MissionExecutionRepository missionExecutionRepository;
   private final CareProductCodeSupplier careProductCodeSupplier;
 
+  private static final int DAYS_TO_BE_WORKED_BY_PARTNER = 18;
+  private static final int DAYS_TO_BE_WORKED_BY_STUDENT = 10;
+
   @SneakyThrows
   public Invoice extractInvoice(Worker worker, ThInvoiceForm invoiceForm) {
     var invoiceData = extractInvoiceData(worker, invoiceForm);
@@ -85,16 +88,16 @@ public class InvoiceService {
                     worker,
                     firstCurrentMonthDay,
                     lastCurrentMonthDay);
-    var quantity = totalDaysWorked == 0 ? 1 : totalDaysWorked;
+    var contractType = hasLevelHistory ? workerLevelHistories.getFirst().contractType() : ContractType.STUDENT_CONTRACTOR.getValue();
+    var isStudentContractor =
+            Objects.equals(contractType, ContractType.STUDENT_CONTRACTOR.getValue());
+    var unitValue = isStudentContractor ? DAYS_TO_BE_WORKED_BY_STUDENT : DAYS_TO_BE_WORKED_BY_PARTNER;
     var unitPriceValue = salary.divide(
-            valueOf(quantity),
+            valueOf(unitValue),
             2,
             HALF_UP
     );
     var unitPrice = numberParser.parseToNumber(unitPriceValue);
-    var contractType = hasLevelHistory ? workerLevelHistories.getFirst().contractType() : ContractType.STUDENT_CONTRACTOR.getValue();
-    var isStudentContractor =
-            Objects.equals(contractType, ContractType.STUDENT_CONTRACTOR.getValue());
     var amount = isStudentContractor ? numberParser.parseToNumber(salary) : numberParser.parseToNumber(unitPriceValue.multiply(valueOf(totalDaysWorked)));
     var parsedAmount = isEmpty ? "" : numberConverter.convertToWords(amount);
     var description = hasLevelHistory ? workerLevelHistories.getFirst().jobTitle() : "";

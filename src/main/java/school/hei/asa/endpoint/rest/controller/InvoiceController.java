@@ -30,15 +30,9 @@ public class InvoiceController {
   private final InvoicePDFGenerator invoicePDFGenerator;
   private final InvoiceService invoiceService;
 
-  @SneakyThrows
   @GetMapping("/invoice")
-  public String getInvoicePage(
-      Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
-    var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
-    var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-    var invoice = invoiceService.extractInvoice(worker, invoiceForm);
-
-    model.addAttribute("form", invoice.invoiceData());
+  public String getInvoicePage(Model model, @ModelAttribute ThInvoiceForm invoiceForm) {
+    model.addAttribute("dateReference", invoiceForm.reference());
 
     return "invoice-generator";
   }
@@ -71,7 +65,7 @@ public class InvoiceController {
 
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();
-    var fileName = invoiceService.generateInvoiceFileName(invoiceForm.issueDate(), worker.name());
+    var fileName = invoiceService.generateInvoiceFileName(invoiceForm.reference(), worker.name());
 
     return ResponseEntity.ok()
         .header(CONTENT_DISPOSITION, "attachment; filename=" + fileName)

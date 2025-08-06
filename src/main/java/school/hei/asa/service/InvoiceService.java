@@ -71,15 +71,15 @@ public class InvoiceService {
 
   private ThInvoiceForm extractInvoiceData(Worker worker, ThInvoiceForm invoiceForm) {
     var formatter = ofPattern("dd/MM/yyyy", FRENCH);
-    var isEmpty = invoiceForm.issueDate() == null || invoiceForm.issueDate().isBlank();
+    var isEmpty = invoiceForm.reference() == null || invoiceForm.reference().isBlank();
     var today = now();
     var firstDay = today.withDayOfYear(1);
-    var issueDate = isEmpty ? firstDay.format(formatter) : invoiceForm.issueDate();
     var workerLevelHistories = workerLevelHistoryRepository.findAllByWorker(worker);
     var hasLevelHistory = !workerLevelHistories.isEmpty();
     var salary = hasLevelHistory ? workerLevelHistories.getFirst().salary() : ZERO;
     var dateReference =
-        LocalDate.parse(isEmpty ? "01/01/2025" : invoiceForm.reference(), formatter);
+        LocalDate.parse(isEmpty ? firstDay.format(formatter) : invoiceForm.reference(), formatter);
+    var issueDate = dateReference.plusDays(3).format(formatter);
     var reference = dateReference.format(formatter);
     var firstCurrentMonthDay = dateReference.withDayOfMonth(1);
     var ym = YearMonth.from(dateReference);

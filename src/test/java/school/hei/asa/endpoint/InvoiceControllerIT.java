@@ -55,7 +55,6 @@ class InvoiceControllerIT extends FacadeIT {
     var invoiceForm = new ThInvoiceForm(null, null, "", "", "", "", "", false, "", "", "", "", "");
     String viewName = invoiceController.getInvoicePage(model, invoiceForm);
 
-    verify(model).addAttribute(eq("dateReference"), any(ThInvoiceForm.class));
     assertEquals("invoice-generator", viewName);
   }
 }

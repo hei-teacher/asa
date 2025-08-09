@@ -1,5 +1,8 @@
 package school.hei.asa.service;
 
+import static java.math.BigDecimal.ZERO;
+import static java.math.BigDecimal.valueOf;
+import static java.math.RoundingMode.HALF_UP;
 import static java.time.LocalDate.now;
 import static java.time.LocalDate.parse;
 import static java.time.format.DateTimeFormatter.ofPattern;
@@ -9,6 +12,8 @@ import static java.util.Locale.FRENCH;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.*;
 import javax.imageio.ImageIO;
 import lombok.AllArgsConstructor;
@@ -16,9 +21,14 @@ import lombok.SneakyThrows;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
+import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
+import school.hei.asa.model.ContractType;
 import school.hei.asa.model.Invoice;
+import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
+import school.hei.asa.repository.MissionExecutionRepository;
+import school.hei.asa.repository.WorkerLevelHistoryRepository;
 import school.hei.asa.service.utils.NumberConverter;
 import school.hei.asa.service.utils.NumberParser;
 
@@ -28,10 +38,16 @@ public class InvoiceService {
   private final InvoicePDFGenerator invoicePDFGenerator;
   private final NumberConverter numberConverter;
   private final NumberParser numberParser;
+  private final WorkerLevelHistoryRepository workerLevelHistoryRepository;
+  private final MissionExecutionRepository missionExecutionRepository;
+  private final CareProductCodeSupplier careProductCodeSupplier;
+
+  private static final int DAYS_TO_BE_WORKED_BY_PARTNER = 18;
+  private static final int DAYS_TO_BE_WORKED_BY_STUDENT = 10;
 
   @SneakyThrows
   public Invoice extractInvoice(Worker worker, ThInvoiceForm invoiceForm) {
-    var invoiceData = extractInvoiceData(invoiceForm);
+    var invoiceData = extractInvoiceData(worker, invoiceForm);
     File data = invoicePDFGenerator.apply(worker, invoiceData, "invoice");
 
     try (PDDocument document = PDDocument.load(data)) {
@@ -53,50 +69,68 @@ public class InvoiceService {
     return workerName + " - " + capitalizedMonth + ".pdf";
   }
 
-  private ThInvoiceForm extractInvoiceData(ThInvoiceForm invoiceForm) {
+  private ThInvoiceForm extractInvoiceData(Worker worker, ThInvoiceForm invoiceForm) {
     var formatter = ofPattern("dd/MM/yyyy", FRENCH);
-    var isEmpty = invoiceForm.issueDate() == null || invoiceForm.issueDate().isBlank();
+    var isEmpty = invoiceForm.reference() == null || invoiceForm.reference().isBlank();
     var today = now();
     var firstDay = today.withDayOfYear(1);
-    var reference = isEmpty ? "FAC00/00/0000" : "FAC" + today.format(formatter);
-    var issueDate = isEmpty ? firstDay.format(formatter) : invoiceForm.issueDate();
-    var unitPrice =
-        isEmpty
-            ? ""
-            : numberParser.parseToNumber(numberParser.parseToDouble(invoiceForm.unitPrice()));
-    var doubleAmount =
-        isEmpty
-            ? 0.0
-            : numberParser.parseToDouble(invoiceForm.quantity())
-                * numberParser.parseToDouble(invoiceForm.unitPrice());
-    var amount = numberParser.parseToNumber(doubleAmount);
-    var hasBonus = !isEmpty && invoiceForm.hasBonus();
-    var bonusUnitPrice =
-        !hasBonus
-            ? ""
-            : numberParser.parseToNumber(numberParser.parseToDouble(invoiceForm.bonusUnitPrice()));
-    var doubleBonusAmount =
-        !hasBonus
-            ? 0.0
-            : numberParser.parseToDouble(invoiceForm.bonusQuantity())
-                * numberParser.parseToDouble(invoiceForm.bonusUnitPrice());
-    var bonusAmount = numberParser.parseToNumber(doubleBonusAmount);
-    var total = numberParser.parseToNumber(doubleAmount + doubleBonusAmount);
-    var parsedAmount = isEmpty ? "" : numberConverter.convertToWords(total);
+    var workerLevelHistories = workerLevelHistoryRepository.findAllByWorker(worker);
+    var hasLevelHistory = !workerLevelHistories.isEmpty();
+    var salary = hasLevelHistory ? workerLevelHistories.getFirst().salary() : ZERO;
+    var dateReference =
+        LocalDate.parse(isEmpty ? firstDay.format(formatter) : invoiceForm.reference(), formatter);
+    var issueDate = dateReference.plusDays(3).format(formatter);
+    var reference = dateReference.format(formatter);
+    var firstCurrentMonthDay = dateReference.withDayOfMonth(1);
+    var ym = YearMonth.from(dateReference);
+    var lastCurrentMonthDay = ym.atEndOfMonth();
+    var totalDaysWorked =
+        missionExecutionPercentageSumByWorker(worker, firstCurrentMonthDay, lastCurrentMonthDay);
+    var contractType =
+        hasLevelHistory
+            ? workerLevelHistories.getFirst().contractType()
+            : ContractType.STUDENT_CONTRACTOR.getValue();
+    var isStudentContractor =
+        Objects.equals(contractType, ContractType.STUDENT_CONTRACTOR.getValue());
+    var unitValue =
+        isStudentContractor ? DAYS_TO_BE_WORKED_BY_STUDENT : DAYS_TO_BE_WORKED_BY_PARTNER;
+    var unitPriceValue = salary.divide(valueOf(unitValue), 2, HALF_UP);
+    var unitPrice = numberParser.parseToNumber(unitPriceValue);
+    var amount =
+        isStudentContractor
+            ? numberParser.parseToNumber(salary)
+            : numberParser.parseToNumber(unitPriceValue.multiply(valueOf(totalDaysWorked)));
+    var parsedAmount = isEmpty ? "" : numberConverter.convertToWords(amount);
+    var description = hasLevelHistory ? workerLevelHistories.getFirst().jobTitle() : "";
 
     return new ThInvoiceForm(
         reference,
         issueDate,
-        invoiceForm.description(),
-        invoiceForm.quantity(),
+        description,
+        String.valueOf(totalDaysWorked),
         unitPrice,
         amount,
-        total,
-        hasBonus,
+        amount,
+        false,
         invoiceForm.bonusDescription(),
         invoiceForm.bonusQuantity(),
-        bonusUnitPrice,
-        bonusAmount,
+        invoiceForm.unitPrice(),
+        invoiceForm.bonusAmount(),
         parsedAmount);
+  }
+
+  private Double missionExecutionPercentageSumByWorker(
+      Worker worker, LocalDate startDate, LocalDate endDate) {
+    return missionExecutionRepository
+        .missionExecutionsByDateBetween(worker, startDate, endDate)
+        .stream()
+        .filter(me -> !isCare(me))
+        .mapToDouble(MissionExecution::dayPercentage)
+        .sum();
+  }
+
+  private boolean isCare(MissionExecution me) {
+    var mission = me.mission();
+    return mission.isCare(careProductCodeSupplier.get());
   }
 }

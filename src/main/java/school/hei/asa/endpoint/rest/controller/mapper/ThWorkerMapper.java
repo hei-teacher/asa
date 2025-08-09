@@ -46,7 +46,10 @@ public class ThWorkerMapper {
               current.entranceInstant(),
               contractType,
               totalWorkDays,
-              String.valueOf(totalDaysWorked)));
+              String.valueOf(totalDaysWorked),
+              current.salary(),
+              current.jobTitle(),
+              current.contractDuration()));
     }
 
     return result;

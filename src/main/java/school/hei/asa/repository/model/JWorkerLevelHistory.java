@@ -2,6 +2,7 @@ package school.hei.asa.repository.model;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,4 +34,13 @@ public class JWorkerLevelHistory {
   @Nullable
   @Column(name = "total_work_days")
   private Integer totalWorkDays;
+
+  @Column(name = "salary", precision = 15, scale = 2)
+  private BigDecimal salary;
+
+  @Column(name = "job_title")
+  private String jobTitle;
+
+  @Column(name = "contract_duration")
+  private Integer contractDuration;
 }

@@ -1,96 +1,304 @@
-<!DOCTYPE html>
+<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
+  <head>
     <title>Asa - Missions by Products</title>
-    <link href="/main.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link href="/main.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-</head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+  </head>
 
-<body class="bg-gray-50 text-gray-800">
-<div th:replace="fragments/header :: header"></div>
+  <body class="bg-gray-50 text-gray-800">
+    <div th:replace="fragments/header :: header"></div>
 
-<div class="ml-6 mr-6 mt-6">
-    <h2 class="text-xl font-bold mb-2">Worker</h2>
-    <div th:replace="fragments/workerSelector :: workerSelector(missions, All)"></div>
+    <div class="ml-6 mr-6 mt-6">
+      <h2 class="text-xl font-bold mb-2">Worker</h2>
+      <div
+        th:replace="fragments/workerSelector :: workerSelector(missions, All)"
+      ></div>
 
-    <h2 class="text-xl font-bold mt-6" th:text="'Missions by Products - ' + ${worker == null ? 'All' : worker.name()}"></h2>
-    <strong>"st="</strong> refers to days executed by a <strong>st</strong>udent worker.
-</div>
+      <div class="flex justify-between items-center mt-6">
+        <div>
+          <h2
+            class="text-xl font-bold"
+            th:text="'Missions by Products - ' + ${worker == null ? 'All' : worker.name()}"
+          ></h2>
+          <p class="text-sm text-gray-600 mt-1">
+            <strong>"st="</strong> refers to days executed by a
+            <strong>st</strong>udent worker.
+          </p>
+        </div>
 
-<div class="ml-6 mr-6 flex gap-6">
-    <ul class="ml-6 mt-9 list-disc w-1/2">
+        <button
+          id="showGraphBtn"
+          class="bg-[#2D2D5A] hover:bg-[#4D4D7A] text-white py-2 px-4 rounded shadow"
+        >
+          Show Graph
+        </button>
+      </div>
+    </div>
+
+    <div class="ml-6 mr-6 flex gap-6">
+      <ul class="ml-6 mt-9 list-disc w-1/2">
         <li th:each="p: ${products}" class="mb-4">
-            <strong class="text-lg font-semibold"
-                    th:text="${p.code()} + ': ' + ${p.name()} + ' (' + ${#numbers.formatDecimal(p.executedDays(), 1, 2)} + ' | st=' + ${#numbers.formatDecimal(p.studentExecutedDays(), 1, 2)} + ')' "
-                    th:title="${p.description()}">
-            </strong>
-            <ul class="ml-6 list-disc">
-                <li th:each="m: ${p.missions()}"
-                    class="ml-4 text-sm"
-                    th:text="${m.getCode()} + ': ' + ${m.getTitle()} + ' (' + ${#numbers.formatDecimal(m.executedDays(), 1, 2)}  + ' | st=' + ${#numbers.formatDecimal(m.studentExecutedDays(), 1, 2)} + ')' "
-                    th:title="${m.getDescription()}">
-                </li>
-            </ul>
+          <strong
+            class="text-lg font-semibold"
+            th:text="${p.code()} + ': ' + ${p.name()} + ' (' + ${#numbers.formatDecimal(p.executedDays(), 1, 2)} + ' | st=' + ${#numbers.formatDecimal(p.studentExecutedDays(), 1, 2)} + ')' "
+            th:title="${p.description()}"
+          >
+          </strong>
+          <ul class="ml-6 list-disc">
+            <li
+              th:each="m: ${p.missions()}"
+              class="ml-4 text-sm"
+              th:text="${m.getCode()} + ': ' + ${m.getTitle()} + ' (' + ${#numbers.formatDecimal(m.executedDays(), 1, 2)}  + ' | st=' + ${#numbers.formatDecimal(m.studentExecutedDays(), 1, 2)} + ')' "
+              th:title="${m.getDescription()}"
+            ></li>
+          </ul>
         </li>
-    </ul>
+      </ul>
 
-    <table class="w-1/2">
+      <table class="w-1/2">
         <thead>
-        <tr>
-            <th th:each="month : ${months.keySet()}"
-                style="text-align:center" class="w-1/12 text-center"
-                th:text="${#strings.capitalize(month)}">
-            </th>
-        </tr>
+          <tr>
+            <th
+              th:each="month : ${months.keySet()}"
+              style="text-align: center"
+              class="w-1/12 text-center"
+              th:text="${#strings.capitalize(month)}"
+            ></th>
+          </tr>
         </thead>
         <tbody>
-        <tr>
-            <td class="w-1/12 text-center"
-                th:each="month : ${T(java.time.Month).values()}">
-                <ul class="list-none text-center">
-                    <li th:each="p : ${months[month.toString().toLowerCase()]}" class="mb-4 text-center">
-                        <strong class="text-lg font-semibold"
-                                th:text="${p.executedDays() > 0 ? #numbers.formatDecimal(p.executedDays(), 1, 2) : '-'}">
-                        </strong>
-                        <ul class="list-none text-center">
-                            <li th:each="m: ${p.missions()}" class="text-sm text-center"
-                                th:text="${m.executedDays() > 0 ? #numbers.formatDecimal(m.executedDays(), 1, 2) : '-'}">
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+          <tr>
+            <td
+              class="w-1/12 text-center"
+              th:each="month : ${T(java.time.Month).values()}"
+            >
+              <ul class="list-none text-center">
+                <li
+                  th:each="p : ${months[month.toString().toLowerCase()]}"
+                  class="mb-4 text-center"
+                >
+                  <strong
+                    class="text-lg font-semibold"
+                    th:text="${p.executedDays() > 0 ? #numbers.formatDecimal(p.executedDays(), 1, 2) : '-'}"
+                  >
+                  </strong>
+                  <ul class="list-none text-center">
+                    <li
+                      th:each="m: ${p.missions()}"
+                      class="text-sm text-center"
+                      th:text="${m.executedDays() > 0 ? #numbers.formatDecimal(m.executedDays(), 1, 2) : '-'}"
+                    ></li>
+                  </ul>
+                </li>
+              </ul>
             </td>
-        </tr>
+          </tr>
         </tbody>
         <tfoot>
-        <tr>
-            <td class="w-1/12 text-center font-bold"
-                th:each="month : ${T(java.time.Month).values()}">
-                <ul class="list-none text-center">
-                    <li th:each="t : ${total[month.toString().toLowerCase()]}" class="mb-4 text-center">
-                        <strong class="text-lg font-semibold"
-                                th:text="${#numbers.formatDecimal(t, 1, 2)}">
-                        </strong>
-                    </li>
-                </ul>
+          <tr>
+            <td
+              class="w-1/12 text-center font-bold"
+              th:each="month : ${T(java.time.Month).values()}"
+            >
+              <ul class="list-none text-center">
+                <li
+                  th:each="t : ${total[month.toString().toLowerCase()]}"
+                  class="mb-4 text-center"
+                >
+                  <strong
+                    class="text-lg font-semibold"
+                    th:text="${#numbers.formatDecimal(t, 1, 2)}"
+                  >
+                  </strong>
+                </li>
+              </ul>
             </td>
-        </tr>
+          </tr>
         </tfoot>
+      </table>
 
-    </table>
-
-    <script>
+      <script>
         function updateFilters() {
-            const workerCode = document.getElementById("worker").value;
-            window.location.href = `/missions?workerCode=${workerCode}`;
+          const workerCode = document.getElementById("worker").value;
+          const startDate = document.getElementById("startDate").value || "";
+          const endDate = document.getElementById("endDate").value || startDate;
+          window.location.href = `/missions?workerCode=${workerCode}&startDate=${startDate}&endDate=${startDate}`;
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById("worker").addEventListener("change", updateFilters);
+        document.addEventListener("DOMContentLoaded", function () {
+          document
+            .getElementById("worker")
+            .addEventListener("change", updateFilters);
         });
-    </script>
-</div>
+      </script>
+    </div>
 
-</body>
+    <div id="graphModal" class="hidden z-50">
+      <div class="container">
+        <div class="mt-3">
+          <div class="flex justify-between items-center mb-4">
+            <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+          </div>
+          <div class="flex flex-row align-bottom gap-4 m-4">
+            <div class="flex flex-col">
+              <label class="block text-gray-700 font-medium mb-2"
+                >Select Start Date</label
+              >
+              <input
+                id="startDate"
+                type="date"
+                th:value="${startDate}"
+                class="w-64 p-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div class="flex flex-col">
+              <label class="block text-gray-700 font-medium mb-2"
+                >Select End Date</label
+              >
+              <input
+                id="endDate"
+                type="date"
+                th:value="${endDate}"
+                class="w-64 p-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <button
+              class="cursor-pointer bg-[#2D2D5A] hover:bg-[#4D4D7A] self-end text-white py-2 px-4 rounded shadow h-1/2"
+              onclick="updateFilters()"
+            >
+              Update Date Filter
+            </button>
+          </div>
+
+          <div class="text-center grid grid-cols-2 gap-8">
+            <div class="w-full">
+              <div id="chart-1" style="width: 100%; min-height: 500px"></div>
+              <button
+                class="download-btn"
+                onclick="downloadChart(chartInstances[0])"
+              >
+                <svg
+                  class="w-5 h-5 fill-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+                </svg>
+                <span>Download chart</span>
+              </button>
+            </div>
+            <div class="w-full">
+              <div id="chart-2" style="width: 100%; min-height: 500px"></div>
+              <button
+                class="download-btn"
+                onclick="downloadChart(chartInstances[1])"
+              >
+                <svg
+                  class="w-5 h-5 fill-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+                </svg>
+                <span>Download chart</span>
+              </button>
+            </div>
+
+            <div class="w-full">
+              <div id="chart-3" style="width: 100%; min-height: 500px"></div>
+              <button
+                class="download-btn"
+                onclick="downloadChart(chartInstances[2])"
+              >
+                <svg
+                  class="w-5 h-5 fill-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+                </svg>
+                <span>Download chart</span>
+              </button>
+            </div>
+            <div class="w-full">
+              <div id="chart-4" style="width: 100%; min-height: 500px"></div>
+              <button
+                class="download-btn"
+                onclick="downloadChart(chartInstances[3])"
+              >
+                <svg
+                  class="w-5 h-5 fill-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+                </svg>
+                <span>Download chart</span>
+              </button>
+            </div>
+            <div class="w-full">
+              <div id="chart-5" style="width: 100%; min-height: 500px"></div>
+              <button
+                class="download-btn"
+                onclick="downloadChart(chartInstances[4])"
+              >
+                <svg
+                  class="w-5 h-5 fill-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+                </svg>
+                <span>Download chart</span>
+              </button>
+            </div>
+            <div class="w-full">
+              <div id="chart-6" style="width: 100%; min-height: 500px"></div>
+              <button
+                class="download-btn"
+                onclick="downloadChart(chartInstances[5])"
+              >
+                <svg
+                  class="w-5 h-5 fill-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+                </svg>
+                <span>Download chart</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript" th:src="@{/js/drawChart.js}"></script>
+    <script type="text/javascript" th:src="@{/js/eventHandler.js}"></script>
+    <script type="text/javascript" th:src="@{/js/download.js}"></script>
+    <script th:inline="javascript">
+      let productChartData = /*[[${executedDaysByProduct}]]*/ {};
+      let missionChartData = /*[[${executedDaysByMission}]]*/ {};
+      let missionPerProductChartData =
+        /*[[${executedDaysByProductMission}]]*/ {};
+      let workerCode = /*[[${workerCode}]]*/ "";
+      const workerName = /*[[${workerName}]]*/ "";
+    </script>
+  </body>
 </html>

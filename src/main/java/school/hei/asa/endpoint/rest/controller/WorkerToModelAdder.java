@@ -20,6 +20,7 @@ public class WorkerToModelAdder implements BiFunction<String, Model, Worker> {
     var worker =
         workerCode == null || workerCode.isBlank() ? null : workerRepository.findByCode(workerCode);
     model.addAttribute("worker", worker);
+    model.addAttribute("workerName", worker == null ? "All workers" : worker.name());
     model.addAttribute(
         "workers", workerRepository.findAll().stream().sorted(comparing(Worker::name)));
     return worker;

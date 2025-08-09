@@ -5,10 +5,9 @@ import static java.util.stream.Collectors.groupingBy;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +19,7 @@ import school.hei.asa.model.DailyExecution;
 import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.service.MissionService;
 
+@Slf4j
 @Controller
 @AllArgsConstructor
 public class MissionController {
@@ -31,17 +31,62 @@ public class MissionController {
   private final MissionService missionService;
 
   @GetMapping("/missions")
-  public String getMissions(Model model, @RequestParam(required = false) String workerCode) {
-    var thProductsByWorkerCode = missionService.filterThProductsByWorkerCode(workerCode);
+  public String getMissions(
+      Model model,
+      @RequestParam(required = false) String workerCode,
+      @RequestParam(required = false) String startDate,
+      @RequestParam(required = false) String endDate) {
+
+    var thProductsByWorkerCode =
+        missionService.filterThProductByWorkerCodeAndDateBetween(workerCode, startDate, endDate);
     var thProductsByMonth = missionService.thProductsByMonth(thProductsByWorkerCode);
     var thProductsExecutedDaysSumByMonth =
         missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode);
+    var thMissionsPerProductsByWorkerCode =
+        missionService.filterThMissionsByWorkerCode(thProductsByWorkerCode);
+    var thMissionsByWorkerCode = missionService.thMissionsByWorkerCode(thProductsByWorkerCode);
+
+    List<Map<String, Object>> executedDaysByProduct = new ArrayList<>();
+    for (var product : thProductsByWorkerCode) {
+      Map<String, Object> dataPoint = new HashMap<>();
+      dataPoint.put("code", product.code());
+      dataPoint.put("name", product.name());
+      dataPoint.put("executedDays", product.executedDays());
+      dataPoint.put("studentExecutedDays", product.studentExecutedDays());
+      executedDaysByProduct.add(dataPoint);
+    }
+
+    List<Map<String, Object>> executedDaysByProductMission = new ArrayList<>();
+    for (var mission : thMissionsPerProductsByWorkerCode) {
+      Map<String, Object> dataPoint = new HashMap<>();
+      dataPoint.put("code", mission.getCode());
+      dataPoint.put("name", mission.getTitle());
+      dataPoint.put("executedDays", mission.executedDays());
+      dataPoint.put("studentExecutedDays", mission.studentExecutedDays());
+      executedDaysByProductMission.add(dataPoint);
+    }
+
+    List<Map<String, Object>> executedDaysByMission = new ArrayList<>();
+    for (var mission : thMissionsByWorkerCode) {
+      Map<String, Object> dataPoint = new HashMap<>();
+      dataPoint.put("code", mission.getCode());
+      dataPoint.put("name", mission.getTitle());
+      dataPoint.put("executedDays", mission.executedDays());
+      dataPoint.put("studentExecutedDays", mission.studentExecutedDays());
+      executedDaysByMission.add(dataPoint);
+    }
 
     model.addAttribute("workerCode", workerCode);
+    model.addAttribute("startDate", startDate);
+    model.addAttribute("endDate", endDate);
     model.addAttribute("months", thProductsByMonth);
     model.addAttribute("products", thProductsByWorkerCode);
     model.addAttribute("total", thProductsExecutedDaysSumByMonth);
     workerToModelAdder.apply(workerCode, model);
+    model.addAttribute("executedDaysByProduct", executedDaysByProduct);
+    model.addAttribute("executedDaysByProductMission", executedDaysByProductMission);
+    model.addAttribute("executedDaysByMission", executedDaysByMission);
+
     return "missions";
   }
 

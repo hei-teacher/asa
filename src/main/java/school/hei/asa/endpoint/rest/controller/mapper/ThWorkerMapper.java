@@ -2,6 +2,7 @@ package school.hei.asa.endpoint.rest.controller.mapper;
 
 import static java.time.Instant.now;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -27,26 +28,50 @@ public class ThWorkerMapper {
     ZoneId zoneId = ZoneId.of("UTC");
     List<ThWorkerLevelHistory> result = new ArrayList<>();
 
+    if (histories.isEmpty()) {
+      return result;
+    }
+
+    LocalDate minDate = histories.stream()
+            .map(h -> h.entranceInstant().atZone(zoneId).toLocalDate())
+            .min(LocalDate::compareTo)
+            .orElse(LocalDate.now());
+
+    LocalDate maxDate = LocalDate.now();
+
+    Worker worker = histories.get(0).worker();
+
+    List<MissionExecution> allMissions = missionExecutionRepository
+            .missionExecutionsByDateBetween(worker, minDate, maxDate)
+            .stream()
+            .filter(me -> !isCare(me))
+            .toList();
+
     for (int i = 0; i < histories.size(); i++) {
       var current = histories.get(i);
-      var nextEntrance = (i == 0) ? now() : histories.get(i - 1).entranceInstant();
+      var nextEntrance = (i == 0) ? Instant.now() : histories.get(i - 1).entranceInstant();
 
-      double totalDaysWorked =
-          missionExecutionPercentageSumByWorker(
-              current.worker(),
-              current.entranceInstant().atZone(zoneId).toLocalDate(),
-              nextEntrance.atZone(zoneId).toLocalDate());
+      LocalDate start = current.entranceInstant().atZone(zoneId).toLocalDate();
+      LocalDate end = nextEntrance.atZone(zoneId).toLocalDate();
+
+      double totalDaysWorked = allMissions.stream()
+              .filter(me -> !me.date().isBefore(start) && !me.date().isAfter(end))
+              .mapToDouble(MissionExecution::dayPercentage)
+              .sum();
 
       var contractType = toWorkerType(current.contractType());
       var totalWorkDays = Objects.toString(current.projectedDaysToWork(), "-");
 
       result.add(
-          new ThWorkerLevelHistory(
-              current.level().getLevel(),
-              current.entranceInstant(),
-              contractType,
-              totalWorkDays,
-              String.valueOf(totalDaysWorked)));
+              new ThWorkerLevelHistory(
+                      current.level().getLevel(),
+                      current.entranceInstant(),
+                      contractType,
+                      totalWorkDays,
+                      String.valueOf(totalDaysWorked),
+                      current.salary(),
+                      current.jobTitle(),
+                      current.contractDuration()));
     }
 
     return result;
@@ -59,16 +84,6 @@ public class ThWorkerMapper {
       case null -> "";
       default -> "Alternant";
     };
-  }
-
-  private Double missionExecutionPercentageSumByWorker(
-      Worker worker, LocalDate startDate, LocalDate endDate) {
-    return missionExecutionRepository
-        .missionExecutionsByDateBetween(worker, startDate, endDate)
-        .stream()
-        .filter(me -> !isCare(me))
-        .mapToDouble(MissionExecution::dayPercentage)
-        .sum();
   }
 
   private boolean isCare(MissionExecution me) {

@@ -1,5 +1,6 @@
 package school.hei.asa.endpoint.rest.model.th;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,4 +15,7 @@ public class ThWorkerLevelHistory {
   String contractType;
   String projectedDaysToWork;
   String actualWorkedDay;
+  BigDecimal salary;
+  String jobTitle;
+  Integer contractDuration;
 }

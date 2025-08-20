@@ -4,9 +4,8 @@ import static java.time.Instant.now;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.asa.CareProductCodeSupplier;
@@ -24,32 +23,53 @@ public class ThWorkerMapper {
   private final CareProductCodeSupplier careProductCodeSupplier;
 
   public List<ThWorkerLevelHistory> toTh(List<WorkerLevelHistory> histories) {
+    if (histories.isEmpty()) {
+      return List.of();
+    }
+
     ZoneId zoneId = ZoneId.of("UTC");
+    Worker worker = histories.get(0).worker();
+
+    LocalDate minDate = histories.stream()
+            .map(h -> h.entranceInstant().atZone(zoneId).toLocalDate())
+            .min(LocalDate::compareTo)
+            .orElse(LocalDate.now());
+
+    LocalDate maxDate = LocalDate.now();
+
+    Map<LocalDate, Double> missionByDate = missionExecutionRepository
+            .missionExecutionsByDateBetween(worker, minDate, maxDate)
+            .stream()
+            .filter(me -> !isCare(me))
+            .collect(Collectors.groupingBy(
+                    MissionExecution::date,
+                    Collectors.summingDouble(MissionExecution::dayPercentage)
+            ));
+
     List<ThWorkerLevelHistory> result = new ArrayList<>();
 
     for (int i = 0; i < histories.size(); i++) {
       var current = histories.get(i);
       var nextEntrance = (i == 0) ? now() : histories.get(i - 1).entranceInstant();
 
-      double totalDaysWorked =
-          missionExecutionPercentageSumByWorker(
-              current.worker(),
-              current.entranceInstant().atZone(zoneId).toLocalDate(),
-              nextEntrance.atZone(zoneId).toLocalDate());
+      LocalDate start = current.entranceInstant().atZone(zoneId).toLocalDate();
+      LocalDate end = nextEntrance.atZone(zoneId).toLocalDate();
 
-      var contractType = toWorkerType(current.contractType());
-      var totalWorkDays = Objects.toString(current.projectedDaysToWork(), "-");
+      double totalDaysWorked = missionByDate.entrySet().stream()
+              .filter(e -> !e.getKey().isBefore(start) && !e.getKey().isAfter(end))
+              .mapToDouble(Map.Entry::getValue)
+              .sum();
 
-      result.add(
-          new ThWorkerLevelHistory(
+      result.add(new ThWorkerLevelHistory(
               current.level().getLevel(),
               current.entranceInstant(),
-              contractType,
-              totalWorkDays,
+              toWorkerType(current.contractType()),
+              Objects.toString(current.projectedDaysToWork(), "-"),
               String.valueOf(totalDaysWorked),
               current.salary(),
               current.jobTitle(),
-              current.contractDuration()));
+              current.contractDuration()
+      ));
     }
 
     return result;
@@ -64,18 +84,7 @@ public class ThWorkerMapper {
     };
   }
 
-  private Double missionExecutionPercentageSumByWorker(
-      Worker worker, LocalDate startDate, LocalDate endDate) {
-    return missionExecutionRepository
-        .missionExecutionsByDateBetween(worker, startDate, endDate)
-        .stream()
-        .filter(me -> !isCare(me))
-        .mapToDouble(MissionExecution::dayPercentage)
-        .sum();
-  }
-
   private boolean isCare(MissionExecution me) {
-    var mission = me.mission();
-    return mission.isCare(careProductCodeSupplier.get());
+    return me.mission().isCare(careProductCodeSupplier.get());
   }
 }

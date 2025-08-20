@@ -30,21 +30,21 @@ public class ThWorkerMapper {
     ZoneId zoneId = ZoneId.of("UTC");
     Worker worker = histories.get(0).worker();
 
-    LocalDate minDate = histories.stream()
+    LocalDate minDate =
+        histories.stream()
             .map(h -> h.entranceInstant().atZone(zoneId).toLocalDate())
             .min(LocalDate::compareTo)
             .orElse(LocalDate.now());
 
     LocalDate maxDate = LocalDate.now();
 
-    Map<LocalDate, Double> missionByDate = missionExecutionRepository
-            .missionExecutionsByDateBetween(worker, minDate, maxDate)
-            .stream()
+    Map<LocalDate, Double> missionByDate =
+        missionExecutionRepository.missionExecutionsByDateBetween(worker, minDate, maxDate).stream()
             .filter(me -> !isCare(me))
-            .collect(Collectors.groupingBy(
+            .collect(
+                Collectors.groupingBy(
                     MissionExecution::date,
-                    Collectors.summingDouble(MissionExecution::dayPercentage)
-            ));
+                    Collectors.summingDouble(MissionExecution::dayPercentage)));
 
     List<ThWorkerLevelHistory> result = new ArrayList<>();
 
@@ -55,12 +55,14 @@ public class ThWorkerMapper {
       LocalDate start = current.entranceInstant().atZone(zoneId).toLocalDate();
       LocalDate end = nextEntrance.atZone(zoneId).toLocalDate();
 
-      double totalDaysWorked = missionByDate.entrySet().stream()
+      double totalDaysWorked =
+          missionByDate.entrySet().stream()
               .filter(e -> !e.getKey().isBefore(start) && !e.getKey().isAfter(end))
               .mapToDouble(Map.Entry::getValue)
               .sum();
 
-      result.add(new ThWorkerLevelHistory(
+      result.add(
+          new ThWorkerLevelHistory(
               current.level().getLevel(),
               current.entranceInstant(),
               toWorkerType(current.contractType()),
@@ -68,8 +70,7 @@ public class ThWorkerMapper {
               String.valueOf(totalDaysWorked),
               current.salary(),
               current.jobTitle(),
-              current.contractDuration()
-      ));
+              current.contractDuration()));
     }
 
     return result;

@@ -1,6 +1,5 @@
 package school.hei.asa.endpoint.rest.controller.mapper;
 
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;

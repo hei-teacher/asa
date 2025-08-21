@@ -5,9 +5,8 @@ import static java.time.Instant.now;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.asa.CareProductCodeSupplier;
@@ -47,6 +46,11 @@ public class ThWorkerMapper {
             .filter(me -> !isCare(me))
             .toList();
 
+    Map<LocalDate, Double> workedDaysByDate = new HashMap<>();
+    for (MissionExecution me : allMissions) {
+      workedDaysByDate.merge(me.date(), me.dayPercentage(), Double::sum);
+    }
+
     for (int i = 0; i < histories.size(); i++) {
       var current = histories.get(i);
       var nextEntrance = (i == 0) ? Instant.now() : histories.get(i - 1).entranceInstant();
@@ -54,9 +58,9 @@ public class ThWorkerMapper {
       LocalDate start = current.entranceInstant().atZone(zoneId).toLocalDate();
       LocalDate end = nextEntrance.atZone(zoneId).toLocalDate();
 
-      double totalDaysWorked = allMissions.stream()
-              .filter(me -> !me.date().isBefore(start) && !me.date().isAfter(end))
-              .mapToDouble(MissionExecution::dayPercentage)
+      double totalDaysWorked = workedDaysByDate.entrySet().stream()
+              .filter(e -> !e.getKey().isBefore(start) && !e.getKey().isAfter(end))
+              .mapToDouble(Map.Entry::getValue)
               .sum();
 
       var contractType = toWorkerType(current.contractType());
@@ -71,7 +75,9 @@ public class ThWorkerMapper {
                       String.valueOf(totalDaysWorked),
                       current.salary(),
                       current.jobTitle(),
-                      current.contractDuration()));
+                      current.contractDuration()
+              )
+      );
     }
 
     return result;

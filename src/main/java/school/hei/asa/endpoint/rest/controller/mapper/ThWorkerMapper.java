@@ -1,12 +1,10 @@
 package school.hei.asa.endpoint.rest.controller.mapper;
 
-import static java.time.Instant.now;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
-
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.asa.CareProductCodeSupplier;
@@ -31,7 +29,8 @@ public class ThWorkerMapper {
       return result;
     }
 
-    LocalDate minDate = histories.stream()
+    LocalDate minDate =
+        histories.stream()
             .map(h -> h.entranceInstant().atZone(zoneId).toLocalDate())
             .min(LocalDate::compareTo)
             .orElse(LocalDate.now());
@@ -40,9 +39,8 @@ public class ThWorkerMapper {
 
     Worker worker = histories.get(0).worker();
 
-    List<MissionExecution> allMissions = missionExecutionRepository
-            .missionExecutionsByDateBetween(worker, minDate, maxDate)
-            .stream()
+    List<MissionExecution> allMissions =
+        missionExecutionRepository.missionExecutionsByDateBetween(worker, minDate, maxDate).stream()
             .filter(me -> !isCare(me))
             .toList();
 
@@ -58,7 +56,8 @@ public class ThWorkerMapper {
       LocalDate start = current.entranceInstant().atZone(zoneId).toLocalDate();
       LocalDate end = nextEntrance.atZone(zoneId).toLocalDate();
 
-      double totalDaysWorked = workedDaysByDate.entrySet().stream()
+      double totalDaysWorked =
+          workedDaysByDate.entrySet().stream()
               .filter(e -> !e.getKey().isBefore(start) && !e.getKey().isAfter(end))
               .mapToDouble(Map.Entry::getValue)
               .sum();
@@ -67,17 +66,15 @@ public class ThWorkerMapper {
       var totalWorkDays = Objects.toString(current.projectedDaysToWork(), "-");
 
       result.add(
-              new ThWorkerLevelHistory(
-                      current.level().getLevel(),
-                      current.entranceInstant(),
-                      contractType,
-                      totalWorkDays,
-                      String.valueOf(totalDaysWorked),
-                      current.salary(),
-                      current.jobTitle(),
-                      current.contractDuration()
-              )
-      );
+          new ThWorkerLevelHistory(
+              current.level().getLevel(),
+              current.entranceInstant(),
+              contractType,
+              totalWorkDays,
+              String.valueOf(totalDaysWorked),
+              current.salary(),
+              current.jobTitle(),
+              current.contractDuration()));
     }
 
     return result;

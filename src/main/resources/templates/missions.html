@@ -1,259 +1,274 @@
-<!DOCTYPE html>
+<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
+  <head>
     <title>Asa - Missions by Products</title>
-    <link href="/main.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link href="/main.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://www.gstatic.com/charts/loader.js"></script>
-</head>
+  </head>
 
-<body class="bg-gray-50 text-gray-800">
-<div th:replace="fragments/header :: header"></div>
+  <body class="bg-gray-50 text-gray-800">
+    <div th:replace="fragments/header :: header"></div>
 
-<div class="ml-6 mr-6 mt-6">
-    <h2 class="text-xl font-bold mb-2">Worker</h2>
-    <div th:replace="fragments/workerSelector :: workerSelector(missions, All)"></div>
+    <div class="ml-6 mr-6 mt-6">
+      <h2 class="text-xl font-bold mb-2">Worker</h2>
+      <div
+        th:replace="fragments/workerSelector :: workerSelector(missions, All)"
+      ></div>
 
-    <div class="flex justify-between items-center mt-6">
+      <div class="flex justify-between items-center mt-6">
         <div>
-            <h2 class="text-xl font-bold" th:text="'Missions by Products - ' + ${worker == null ? 'All' : worker.name()}"></h2>
-            <p class="text-sm text-gray-600 mt-1">
-                <strong>"st="</strong> refers to days executed by a <strong>st</strong>udent worker.
-            </p>
+          <h2
+            class="text-xl font-bold"
+            th:text="'Missions by Products - ' + ${worker == null ? 'All' : worker.name()}"
+          ></h2>
+          <p class="text-sm text-gray-600 mt-1">
+            <strong>"st="</strong> refers to days executed by a
+            <strong>st</strong>udent worker.
+          </p>
         </div>
 
-        <button id="showGraphBtn"
-                class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded shadow">
-            Show Graph
+        <button
+          id="showGraphBtn"
+          class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded shadow"
+        >
+          Show Graph
         </button>
-
+      </div>
     </div>
-</div>
 
-
-<div class="ml-6 mr-6 flex gap-6">
-    <ul class="ml-6 mt-9 list-disc w-1/2">
+    <div class="ml-6 mr-6 flex gap-6">
+      <ul class="ml-6 mt-9 list-disc w-1/2">
         <li th:each="p: ${products}" class="mb-4">
-            <strong class="text-lg font-semibold"
-                    th:text="${p.code()} + ': ' + ${p.name()} + ' (' + ${#numbers.formatDecimal(p.executedDays(), 1, 2)} + ' | st=' + ${#numbers.formatDecimal(p.studentExecutedDays(), 1, 2)} + ')' "
-                    th:title="${p.description()}">
-            </strong>
-            <ul class="ml-6 list-disc">
-                <li th:each="m: ${p.missions()}"
-                    class="ml-4 text-sm"
-                    th:text="${m.getCode()} + ': ' + ${m.getTitle()} + ' (' + ${#numbers.formatDecimal(m.executedDays(), 1, 2)}  + ' | st=' + ${#numbers.formatDecimal(m.studentExecutedDays(), 1, 2)} + ')' "
-                    th:title="${m.getDescription()}">
-                </li>
-            </ul>
+          <strong
+            class="text-lg font-semibold"
+            th:text="${p.code()} + ': ' + ${p.name()} + ' (' + ${#numbers.formatDecimal(p.executedDays(), 1, 2)} + ' | st=' + ${#numbers.formatDecimal(p.studentExecutedDays(), 1, 2)} + ')' "
+            th:title="${p.description()}"
+          >
+          </strong>
+          <ul class="ml-6 list-disc">
+            <li
+              th:each="m: ${p.missions()}"
+              class="ml-4 text-sm"
+              th:text="${m.getCode()} + ': ' + ${m.getTitle()} + ' (' + ${#numbers.formatDecimal(m.executedDays(), 1, 2)}  + ' | st=' + ${#numbers.formatDecimal(m.studentExecutedDays(), 1, 2)} + ')' "
+              th:title="${m.getDescription()}"
+            ></li>
+          </ul>
         </li>
-    </ul>
+      </ul>
 
-    <table class="w-1/2">
+      <table class="w-1/2">
         <thead>
-        <tr>
-            <th th:each="month : ${months.keySet()}"
-                style="text-align:center" class="w-1/12 text-center"
-                th:text="${#strings.capitalize(month)}">
-            </th>
-        </tr>
+          <tr>
+            <th
+              th:each="month : ${months.keySet()}"
+              style="text-align: center"
+              class="w-1/12 text-center"
+              th:text="${#strings.capitalize(month)}"
+            ></th>
+          </tr>
         </thead>
         <tbody>
-        <tr>
-            <td class="w-1/12 text-center"
-                th:each="month : ${T(java.time.Month).values()}">
-                <ul class="list-none text-center">
-                    <li th:each="p : ${months[month.toString().toLowerCase()]}" class="mb-4 text-center">
-                        <strong class="text-lg font-semibold"
-                                th:text="${p.executedDays() > 0 ? #numbers.formatDecimal(p.executedDays(), 1, 2) : '-'}">
-                        </strong>
-                        <ul class="list-none text-center">
-                            <li th:each="m: ${p.missions()}" class="text-sm text-center"
-                                th:text="${m.executedDays() > 0 ? #numbers.formatDecimal(m.executedDays(), 1, 2) : '-'}">
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+          <tr>
+            <td
+              class="w-1/12 text-center"
+              th:each="month : ${T(java.time.Month).values()}"
+            >
+              <ul class="list-none text-center">
+                <li
+                  th:each="p : ${months[month.toString().toLowerCase()]}"
+                  class="mb-4 text-center"
+                >
+                  <strong
+                    class="text-lg font-semibold"
+                    th:text="${p.executedDays() > 0 ? #numbers.formatDecimal(p.executedDays(), 1, 2) : '-'}"
+                  >
+                  </strong>
+                  <ul class="list-none text-center">
+                    <li
+                      th:each="m: ${p.missions()}"
+                      class="text-sm text-center"
+                      th:text="${m.executedDays() > 0 ? #numbers.formatDecimal(m.executedDays(), 1, 2) : '-'}"
+                    ></li>
+                  </ul>
+                </li>
+              </ul>
             </td>
-        </tr>
+          </tr>
         </tbody>
         <tfoot>
-        <tr>
-            <td class="w-1/12 text-center font-bold"
-                th:each="month : ${T(java.time.Month).values()}">
-                <ul class="list-none text-center">
-                    <li th:each="t : ${total[month.toString().toLowerCase()]}" class="mb-4 text-center">
-                        <strong class="text-lg font-semibold"
-                                th:text="${#numbers.formatDecimal(t, 1, 2)}">
-                        </strong>
-                    </li>
-                </ul>
+          <tr>
+            <td
+              class="w-1/12 text-center font-bold"
+              th:each="month : ${T(java.time.Month).values()}"
+            >
+              <ul class="list-none text-center">
+                <li
+                  th:each="t : ${total[month.toString().toLowerCase()]}"
+                  class="mb-4 text-center"
+                >
+                  <strong
+                    class="text-lg font-semibold"
+                    th:text="${#numbers.formatDecimal(t, 1, 2)}"
+                  >
+                  </strong>
+                </li>
+              </ul>
             </td>
-        </tr>
+          </tr>
         </tfoot>
+      </table>
 
-    </table>
-
-    <script>
+      <script>
         function updateFilters() {
-            const workerCode = document.getElementById("worker").value;
-            window.location.href = `/missions?workerCode=${workerCode}`;
+          const workerCode = document.getElementById("worker").value;
+          window.location.href = `/missions?workerCode=${workerCode}`;
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById("worker").addEventListener("change", updateFilters);
+        document.addEventListener("DOMContentLoaded", function () {
+          document
+            .getElementById("worker")
+            .addEventListener("change", updateFilters);
         });
-    </script>
-</div>
-
-<div id="graphModal" class="hidden z-50">
-    <div class="container">
-        <div class="mt-3">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold text-gray-800">
-                    Time Spent per Product
-                    <span th:if="${worker != null}" th:text="'for ' + ${worker.name()}"></span>
-                    <span th:if="${worker == null}">(All workers)</span>
-                </h2>
-                <button id="closeModal" class="text-gray-400 hover:text-gray-600">
-                    <svg class="w-6 h-6" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            <div class="text-center">
-                <div id="piechart" style="width: 100%; min-height: 500px;"></div>
-                <button class="download-btn" onclick="downloadChart()">
-                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                        <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/>
-                    </svg>
-                    <span>Download chart</span>
-                </button>
-            </div>
-        </div>
+      </script>
     </div>
-</div>
 
-<script>
-    function updateFilters() {
-        const workerCode = document.getElementById("worker").value;
-        window.location.href = `/missions?workerCode=${workerCode}`;
-    }
+    <div id="graphModal" class="hidden z-50">
+      <div class="container">
+        <div class="mt-3">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold text-gray-800">
+              Time Spent per Product
+              <span
+                th:if="${worker != null}"
+                th:text="'for ' + ${worker.name()}"
+              ></span>
+              <span th:if="${worker == null}">(All workers)</span>
+            </h2>
+            <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+          </div>
+          <div class="text-center grid grid-rows-2 gap-8">
+            <div class="w-full">
+              <div id="piechart" style="width: 100%; min-height: 500px"></div>
+              <button class="download-btn" onclick="downloadPieChart()">
+                <svg
+                  class="w-5 h-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+                </svg>
+                <span>Download chart</span>
+              </button>
+            </div>
+            <div class="w-full">
+              <div id="barchart" style="width: 100%; min-height: 500px"></div>
+              <button class="download-btn" onclick="downloadColumnChart()">
+                <svg
+                  class="w-5 h-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+                </svg>
+                <span>Download chart</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const workerSelect = document.getElementById("worker");
-        if (workerSelect) {
-            workerSelect.addEventListener("change", updateFilters);
-        }
-        const showGraphBtn = document.getElementById("showGraphBtn");
-        const graphModal = document.getElementById("graphModal");
-        const closeModal = document.getElementById("closeModal");
+    <script type="text/javascript" th:src="@{/js/eventHandler.js}"></script>
+    <script type="text/javascript" th:src="@{/js/download.js}"></script>
+    <script th:inline="javascript">
+      let productChartData = /*[[${executedDaysByProduct}]]*/ {};
+      let workerCode = /*[[${workerCode}]]*/ {};
 
-        showGraphBtn.addEventListener("click", function() {
-            graphModal.classList.remove("hidden");
-            setTimeout(drawPieChart, 200);
-        });
+      let chartDataTable;
+      let pieChartInstance;
+      let barChartInstance;
 
-        closeModal.addEventListener("click", function() {
-            graphModal.classList.add("hidden");
-        });
-        graphModal.addEventListener("click", function(e) {
-            if (e.target === graphModal) {
-                graphModal.classList.add("hidden");
-            }
-        });
-
-        document.addEventListener("keydown", function(e) {
-            if (e.key === "Escape" && !graphModal.classList.contains("hidden")) {
-                graphModal.classList.add("hidden");
-            }
-        });
-        let resizeTimeout;
-        window.addEventListener('resize', function() {
-            if (!graphModal.classList.contains("hidden")) {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(function() {
-                    drawPieChart();
-                }, 250);
-            }
-        });
-    });
-</script>
-
-<script th:inline="javascript">
-    let productChartData = /*[[${executedDaysByProduct}]]*/ {};
-    let workerCode = /*[[${workerCode}]]*/ {} ;
-
-    let chartDataTable;
-    let chartInstance;
-
-    $(document).ready(function () {
-        google.charts.load('current', {
-            packages: ['corechart']
-        });
-        google.charts.setOnLoadCallback(function() {
-        });
-    });
-
-    function drawPieChart() {
-        chartDataTable = new google.visualization.DataTable();
-        chartDataTable.addColumn('string', 'ThProduct');
-        chartDataTable.addColumn('number', 'Executed Days');
+      $(document).ready(function () {
+        google.charts.load("current", { packages: ["corechart", "bar"] });
+        google.charts.setOnLoadCallback();
+      });
+      function drawColColors() {
+        var data = new google.visualization.DataTable();
+        data.addColumn("string", "Product");
+        data.addColumn("number", "Executed days");
+        data.addColumn("number", "Student executed days");
 
         productChartData.forEach(function (item) {
-            const label = item.productCode + ' - ' + item.productName;
-            chartDataTable.addRow([label, item.executedDaysByProduct]);
+          const label = item.productCode + " - " + item.productName;
+          data.addRow([
+            label,
+            item.executedDaysByProduct,
+            item.studentExecutedDaysByProduct,
+          ]);
         });
 
-        const container = document.getElementById('piechart');
-        const containerWidth = container.offsetWidth;
+        const container = document.getElementById("barchart");
 
-        const legendPosition = containerWidth < 768 ? 'bottom' : 'right';
-        const chartHeight = containerWidth < 768 ? 600 : 500;
-
-        const options = {
-            backgroundColor: '#f9f9f9',
-            width: containerWidth,
-            height: chartHeight,
-            legend: {
-                position: legendPosition,
-                alignment: 'center',
-                textStyle: {
-                    fontSize: containerWidth < 768 ? 12 : 14,
-                    bold: true,
-                    color: '#4a5568',
-                    fontName: 'Arial'
-                }
-            },
-            chartArea: {
-                left: containerWidth < 768 ? 20 : 50,
-                top: 50,
-                width: containerWidth < 768 ? '90%' : '70%',
-                height: containerWidth < 768 ? '60%' : '80%'
-            }
+        var options = {
+          backgroundColor: "#f9f9f9",
+          title: "Executed days for each Product",
+          colors: ["#d52257", "#138cf1"],
         };
 
-        if (!chartInstance) {
-            chartInstance = new google.visualization.PieChart(container);
+        if (!barChartInstance) {
+          barChartInstance = new google.visualization.ColumnChart(container);
         }
-        chartInstance.draw(chartDataTable, options);
-    }
+        barChartInstance.draw(data, options);
+      }
+      function drawPieChart() {
+        chartDataTable = new google.visualization.DataTable();
+        chartDataTable.addColumn("string", "ThProduct");
+        chartDataTable.addColumn("number", "Executed Days");
 
-    function downloadChart() {
-        if (!chartInstance) return;
-        const imageURI = chartInstance.getImageURI();
-        const link = document.createElement('a');
-        link.href = imageURI;
+        productChartData.forEach(function (item) {
+          const label = item.productCode + " - " + item.productName;
+          chartDataTable.addRow([label, item.executedDaysByProduct]);
+        });
 
-        const now = new Date();
-        const timestamp = now.toISOString().slice(0, 10);
-        const code = (workerCode && workerCode.trim()) ? workerCode.trim() : 'all_workers';
+        const container = document.getElementById("piechart");
+        const containerWidth = container.offsetWidth;
 
-        link.download = `products_chart_${code}_${timestamp}.png`;
-        link.click();
-    }
-</script>
+        const legendPosition = containerWidth < 768 ? "bottom" : "right";
 
-</body>
+        const options = {
+          backgroundColor: "#f9f9f9",
+          legend: {
+            position: legendPosition,
+            alignment: "center",
+            textStyle: {
+              fontSize: containerWidth < 768 ? 12 : 14,
+              bold: true,
+              color: "#4a5568",
+              fontName: "Arial",
+            },
+          },
+        };
+
+        if (!pieChartInstance) {
+          pieChartInstance = new google.visualization.PieChart(container);
+        }
+        pieChartInstance.draw(chartDataTable, options);
+      }
+    </script>
+  </body>
 </html>

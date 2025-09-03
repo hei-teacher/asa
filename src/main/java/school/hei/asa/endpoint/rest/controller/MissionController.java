@@ -41,6 +41,7 @@ public class MissionController {
       dataPoint.put("productCode", product.code());
       dataPoint.put("productName", product.name());
       dataPoint.put("executedDaysByProduct", product.executedDays());
+      dataPoint.put("studentExecutedDaysByProduct", product.studentExecutedDays());
       executedDaysByProduct.add(dataPoint);
     }
 

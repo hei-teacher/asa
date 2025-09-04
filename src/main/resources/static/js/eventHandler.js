@@ -14,8 +14,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
   showGraphBtn.addEventListener("click", function () {
     graphModal.classList.remove("hidden");
-    setTimeout(drawPieChart, 200);
-    setTimeout(drawColColors, 200);
+    setTimeout(() => {
+      drawPieChart(
+        productChartData,
+        pieChartProductContainer,
+        productTitle,
+        pieChartProductInstance,
+      );
+      drawPieChart(
+        missionChartData,
+        pieChartMissionContainer,
+        missionTitle,
+        pieChartMissionInstance,
+      );
+      drawBarChart(
+        productChartData,
+        barChartProductContainer,
+        productTitle,
+        barChartProductInstance,
+      );
+      drawBarChart(
+        missionChartData,
+        barChartMissionContainer,
+        missionTitle,
+        barChartMissionInstance,
+      );
+    }, 200);
   });
 
   closeModal.addEventListener("click", function () {
@@ -37,8 +61,30 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!graphModal.classList.contains("hidden")) {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(function () {
-        drawPieChart();
-        drawColColors();
+        drawPieChart(
+          productChartData,
+          pieChartProductContainer,
+          productTitle,
+          pieChartProductInstance,
+        );
+        drawPieChart(
+          missionChartData,
+          pieChartMissionContainer,
+          missionTitle,
+          pieChartMissionInstance,
+        );
+        drawBarChart(
+          productChartData,
+          barChartProductContainer,
+          productTitle,
+          barChartProductInstance,
+        );
+        drawBarChart(
+          missionChartData,
+          barChartMissionContainer,
+          missionTitle,
+          barChartMissionInstance,
+        );
       }, 250);
     }
   });

@@ -153,9 +153,13 @@
               </svg>
             </button>
           </div>
+
           <div class="text-center grid grid-cols-2 gap-8">
             <div class="w-full">
-              <div id="piechart" style="width: 100%; min-height: 500px"></div>
+              <div
+                id="pie-chart-product"
+                style="width: 100%; min-height: 500px"
+              ></div>
               <button class="download-btn" onclick="downloadPieChart()">
                 <svg
                   class="w-5 h-5 fill-white"
@@ -168,8 +172,50 @@
               </button>
             </div>
             <div class="w-full">
-              <div id="barchart" style="width: 100%; min-height: 500px"></div>
-              <button class="download-btn" onclick="downloadColumnChart()">
+              <div
+                id="bar-chart-product"
+                style="width: 100%; min-height: 500px"
+              ></div>
+              <button
+                class="download-btn"
+                onclick="downloadBarChart(barChartProductInstance)"
+              >
+                <svg
+                  class="w-5 h-5 fill-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+                </svg>
+                <span>Download chart</span>
+              </button>
+            </div>
+
+            <div class="w-full">
+              <div
+                id="pie-chart-mission"
+                style="width: 100%; min-height: 500px"
+              ></div>
+              <button class="download-btn" onclick="downloadPieChart()">
+                <svg
+                  class="w-5 h-5 fill-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+                </svg>
+                <span>Download chart</span>
+              </button>
+            </div>
+            <div class="w-full">
+              <div
+                id="bar-chart-mission"
+                style="width: 100%; min-height: 500px"
+              ></div>
+              <button
+                class="download-btn"
+                onclick="downloadBarChart(barChartMissionInstance)"
+              >
                 <svg
                   class="w-5 h-5 fill-white"
                   xmlns="http://www.w3.org/2000/svg"
@@ -185,83 +231,32 @@
       </div>
     </div>
 
+    <script type="text/javascript" th:src="@{/js/drawChart.js}"></script>
     <script type="text/javascript" th:src="@{/js/eventHandler.js}"></script>
     <script type="text/javascript" th:src="@{/js/download.js}"></script>
     <script th:inline="javascript">
       let productChartData = /*[[${executedDaysByProduct}]]*/ {};
+      let missionChartData = /*[[${executedDaysByMission}]]*/ {};
       let worker = /*[[${worker}]]*/ {};
       let workerCode = /*[[${workerCode}]]*/ {};
-      const title = worker ? worker.name() : "All Worker";
+      const workerName = worker ? worker.name() : "All Worker";
 
-      let chartDataTable;
-      let pieChartInstance;
-      let barChartInstance;
+      const pieChartProductContainer =
+        document.getElementById("pie-chart-product");
+      const barChartProductContainer =
+        document.getElementById("bar-chart-product");
+      const pieChartMissionContainer =
+        document.getElementById("pie-chart-mission");
+      const barChartMissionContainer =
+        document.getElementById("bar-chart-mission");
 
-      $(document).ready(function () {
-        google.charts.load("current", { packages: ["corechart", "bar"] });
-        google.charts.setOnLoadCallback();
-      });
-      function drawColColors() {
-        var data = new google.visualization.DataTable();
-        data.addColumn("string", "Product");
-        data.addColumn("number", "Executed days");
-        data.addColumn("number", "Student executed days");
+      const productTitle = `Executed Days for each Product - ${workerName}`;
+      const missionTitle = `Executed Days for each Mission - ${workerName}`;
 
-        productChartData.forEach(function (item) {
-          const label = item.productCode + " - " + item.productName;
-          data.addRow([
-            label,
-            item.executedDaysByProduct,
-            item.studentExecutedDaysByProduct,
-          ]);
-        });
-
-        const container = document.getElementById("barchart");
-
-        var options = {
-          backgroundColor: "#f9f9f9",
-          title: `Executed days for each Product - ${title}`,
-          colors: ["#d52257", "#138cf1"],
-        };
-
-        if (!barChartInstance) {
-          barChartInstance = new google.visualization.ColumnChart(container);
-        }
-        barChartInstance.draw(data, options);
-      }
-      function drawPieChart() {
-        chartDataTable = new google.visualization.DataTable();
-        chartDataTable.addColumn("string", "ThProduct");
-        chartDataTable.addColumn("number", "Executed Days");
-
-        productChartData.forEach(function (item) {
-          const label = item.productCode + " - " + item.productName;
-          chartDataTable.addRow([label, item.executedDaysByProduct]);
-        });
-
-        const container = document.getElementById("piechart");
-        const containerWidth = container.offsetWidth;
-
-        const options = {
-          backgroundColor: "#f9f9f9",
-          title: `Executed days for each Product - ${title}`,
-          legend: {
-            position: "right",
-            alignment: "center",
-            textStyle: {
-              fontSize: 11,
-              bold: true,
-              color: "#4a5568",
-              fontName: "Arial",
-            },
-          },
-        };
-
-        if (!pieChartInstance) {
-          pieChartInstance = new google.visualization.PieChart(container);
-        }
-        pieChartInstance.draw(chartDataTable, options);
-      }
+      let pieChartProductInstance;
+      let barChartProductInstance;
+      let pieChartMissionInstance;
+      let barChartMissionInstance;
     </script>
   </body>
 </html>

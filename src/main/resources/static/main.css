@@ -100,9 +100,9 @@ th {
 }
 
 .container {
-    position: absolute;
+    position: relative;
     /* top: 5rem; */
-    bottom: 0;
+    top: 0;
     padding: 1.25rem;
     border: 1px solid #e5e7eb;
     min-width: 100dvw;

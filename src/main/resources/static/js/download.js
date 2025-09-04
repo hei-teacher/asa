@@ -1,6 +1,7 @@
 function downloadPieChart() {
-  if (!pieChartInstance) return;
-  const imageURI = pieChartInstance.getImageURI();
+  console.log(pieChartProductInstance);
+  if (!pieChartProductInstance) return;
+  const imageURI = pieChartProductInstance.getImageURI();
   const link = document.createElement("a");
   link.href = imageURI;
 
@@ -9,11 +10,11 @@ function downloadPieChart() {
   const code =
     workerCode && workerCode.trim() ? workerCode.trim() : "all_workers";
 
-  link.download = `products_pie_chart_${code}_${timestamp}.png`;
+  link.download = `pie_chart_${code}_${timestamp}.png`;
   link.click();
 }
 
-function downloadColumnChart() {
+function downloadBarChart(barChartInstance) {
   if (!barChartInstance) return;
   const imageURI = barChartInstance.getImageURI();
   const link = document.createElement("a");
@@ -24,6 +25,6 @@ function downloadColumnChart() {
   const code =
     workerCode && workerCode.trim() ? workerCode.trim() : "all_workers";
 
-  link.download = `products_bar_chart_${code}_${timestamp}.png`;
+  link.download = `bar_chart_${code}_${timestamp}.png`;
   link.click();
 }

@@ -36,8 +36,10 @@ public class MissionController {
     var thProductsByMonth = missionService.thProductsByMonth(thProductsByWorkerCode);
     var thProductsExecutedDaysSumByMonth =
         missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode);
-    var thMissionsByWorkerCode = missionService.filterThMissionsByWorkerCode(thProductsByWorkerCode);
-    var thMissionsExecutedDaysSumByMont = missionService.thMissionsExecutedDaysSumByMonth(thMissionsByWorkerCode);
+    var thMissionsByWorkerCode =
+        missionService.filterThMissionsByWorkerCode(thProductsByWorkerCode);
+    var thMissionsExecutedDaysSumByMont =
+        missionService.thMissionsExecutedDaysSumByMonth(thMissionsByWorkerCode);
 
     List<Map<String, Object>> executedDaysByProduct = new ArrayList<>();
     for (var product : thProductsByWorkerCode) {
@@ -58,7 +60,7 @@ public class MissionController {
       dataPoint.put("studentExecutedDays", mission.studentExecutedDays());
       executedDaysByMission.add(dataPoint);
     }
-    log.debug("executedDaysByMission ==> {}",executedDaysByMission);
+    log.debug("executedDaysByMission ==> {}", executedDaysByMission);
 
     model.addAttribute("workerCode", workerCode);
     model.addAttribute("months", thProductsByMonth);

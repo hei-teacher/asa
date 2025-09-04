@@ -26,7 +26,8 @@ table {
     border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
     width: 20px;
     border: 0;
     text-align: center;
@@ -46,12 +47,29 @@ th {
     color: white;
 }
 
-.text-NS { color: #8A2BE2; }
-.text-JC { color: #FFD700; }
-.text-HM { color: #DFA408; }
-.text-HL { color: #DFA408; }
-.text-AA { color: #02dc02; }
-.text-CA { color: #FF6F61; }
+.text-NS {
+    color: #8A2BE2;
+}
+
+.text-JC {
+    color: #FFD700;
+}
+
+.text-HM {
+    color: #DFA408;
+}
+
+.text-HL {
+    color: #DFA408;
+}
+
+.text-AA {
+    color: #02dc02;
+}
+
+.text-CA {
+    color: #FF6F61;
+}
 
 .btn-group button {
     border: 1px solid;
@@ -62,7 +80,10 @@ th {
 }
 
 #piechart {
-    width: 1000px;
+    height: 600px;
+}
+
+#barchart {
     height: 600px;
 }
 
@@ -79,23 +100,21 @@ th {
 }
 
 .container {
-    position: relative;
-    top: 5rem;
-    margin-left: auto;
-    margin-right: auto;
+    position: absolute;
+    /* top: 5rem; */
+    bottom: 0;
     padding: 1.25rem;
     border: 1px solid #e5e7eb;
-    width: 91.666667%;
-    max-width: 56rem;
+    min-width: 100dvw;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        0 4px 6px -4px rgba(0, 0, 0, 0.1);
     border-radius: 0.375rem;
     background-color: white;
 }
 
 .download-btn {
     margin-top: 1rem;
-    background-color: #16a34a;
+    background-color: #2D2D5A;
     color: white;
     font-weight: bold;
     padding: 0.5rem 1rem;
@@ -111,7 +130,5 @@ th {
 }
 
 .download-btn:hover {
-    background-color: #15803d;
+    background-color: #4D4D7A;
 }
-
-

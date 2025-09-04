@@ -35,7 +35,7 @@
 
         <button
           id="showGraphBtn"
-          class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded shadow"
+          class="bg-[#2D2D5A] hover:bg-[#4D4D7A] text-white py-2 px-4 rounded shadow"
         >
           Show Graph
         </button>
@@ -142,14 +142,6 @@
       <div class="container">
         <div class="mt-3">
           <div class="flex justify-between items-center mb-4">
-            <h2 class="text-2xl font-bold text-gray-800">
-              Time Spent per Product
-              <span
-                th:if="${worker != null}"
-                th:text="'for ' + ${worker.name()}"
-              ></span>
-              <span th:if="${worker == null}">(All workers)</span>
-            </h2>
             <button id="closeModal" class="text-gray-400 hover:text-gray-600">
               <svg class="w-6 h-6" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -161,12 +153,12 @@
               </svg>
             </button>
           </div>
-          <div class="text-center grid grid-rows-2 gap-8">
+          <div class="text-center grid grid-cols-2 gap-8">
             <div class="w-full">
               <div id="piechart" style="width: 100%; min-height: 500px"></div>
               <button class="download-btn" onclick="downloadPieChart()">
                 <svg
-                  class="w-5 h-5"
+                  class="w-5 h-5 fill-white"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                 >
@@ -179,7 +171,7 @@
               <div id="barchart" style="width: 100%; min-height: 500px"></div>
               <button class="download-btn" onclick="downloadColumnChart()">
                 <svg
-                  class="w-5 h-5"
+                  class="w-5 h-5 fill-white"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                 >
@@ -197,7 +189,9 @@
     <script type="text/javascript" th:src="@{/js/download.js}"></script>
     <script th:inline="javascript">
       let productChartData = /*[[${executedDaysByProduct}]]*/ {};
+      let worker = /*[[${worker}]]*/ {};
       let workerCode = /*[[${workerCode}]]*/ {};
+      const title = worker ? worker.name() : "All Worker";
 
       let chartDataTable;
       let pieChartInstance;
@@ -226,7 +220,7 @@
 
         var options = {
           backgroundColor: "#f9f9f9",
-          title: "Executed days for each Product",
+          title: `Executed days for each Product - ${title}`,
           colors: ["#d52257", "#138cf1"],
         };
 
@@ -248,15 +242,14 @@
         const container = document.getElementById("piechart");
         const containerWidth = container.offsetWidth;
 
-        const legendPosition = containerWidth < 768 ? "bottom" : "right";
-
         const options = {
           backgroundColor: "#f9f9f9",
+          title: `Executed days for each Product - ${title}`,
           legend: {
-            position: legendPosition,
+            position: "right",
             alignment: "center",
             textStyle: {
-              fontSize: containerWidth < 768 ? 12 : 14,
+              fontSize: 11,
               bold: true,
               color: "#4a5568",
               fontName: "Arial",

@@ -64,7 +64,7 @@ public class SecurityConfig {
                         // so it is incorrectly interpreted as authorization_request_not_found.
                         // Redo the call and it will be Ok.
                         (request, response, exception) -> {
-                          log.error("❌ OAuth2 login FAILURE");
+                          log.error("❌ OAuth2 login FAILURE", exception);
                           log.error("Message: {}", exception.getMessage());
                           new SimpleUrlAuthenticationFailureHandler("/oauth2/authorization/casdoor")
                               .onAuthenticationFailure(request, response, exception);

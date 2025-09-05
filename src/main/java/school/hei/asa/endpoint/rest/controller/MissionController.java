@@ -36,10 +36,10 @@ public class MissionController {
     var thProductsByMonth = missionService.thProductsByMonth(thProductsByWorkerCode);
     var thProductsExecutedDaysSumByMonth =
         missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode);
-    var thMissionsByWorkerCode =
+    var thMissionsPerProductsByWorkerCode =
         missionService.filterThMissionsByWorkerCode(thProductsByWorkerCode);
-    var thMissionsExecutedDaysSumByMont =
-        missionService.thMissionsExecutedDaysSumByMonth(thMissionsByWorkerCode);
+    var thMissionsByWorkerCode =
+        missionService.thMissionsByWorkerCode(thProductsByWorkerCode);
 
     List<Map<String, Object>> executedDaysByProduct = new ArrayList<>();
     for (var product : thProductsByWorkerCode) {
@@ -49,6 +49,16 @@ public class MissionController {
       dataPoint.put("executedDays", product.executedDays());
       dataPoint.put("studentExecutedDays", product.studentExecutedDays());
       executedDaysByProduct.add(dataPoint);
+    }
+
+    List<Map<String, Object>> executedDaysByProductMission = new ArrayList<>();
+    for (var mission : thMissionsPerProductsByWorkerCode) {
+      Map<String, Object> dataPoint = new HashMap<>();
+      dataPoint.put("code", mission.getCode());
+      dataPoint.put("name", mission.getTitle());
+      dataPoint.put("executedDays", mission.executedDays());
+      dataPoint.put("studentExecutedDays", mission.studentExecutedDays());
+      executedDaysByProductMission.add(dataPoint);
     }
 
     List<Map<String, Object>> executedDaysByMission = new ArrayList<>();
@@ -61,12 +71,14 @@ public class MissionController {
       executedDaysByMission.add(dataPoint);
     }
 
+
     model.addAttribute("workerCode", workerCode);
     model.addAttribute("months", thProductsByMonth);
     model.addAttribute("products", thProductsByWorkerCode);
     model.addAttribute("total", thProductsExecutedDaysSumByMonth);
     workerToModelAdder.apply(workerCode, model);
     model.addAttribute("executedDaysByProduct", executedDaysByProduct);
+    model.addAttribute("executedDaysByProductMission", executedDaysByProductMission);
     model.addAttribute("executedDaysByMission", executedDaysByMission);
 
     return "missions";

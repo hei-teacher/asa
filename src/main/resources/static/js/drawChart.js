@@ -5,6 +5,7 @@ $(document).ready(function () {
 function drawChart() {
   const productTitle = `Executed Days for each Product - ${workerName}`;
   const missionTitle = `Executed Days for each Mission - ${workerName}`;
+  const missionProductTitle = `Executed Days for each Mission of each Product - ${workerName}`;
 
   const data1 = new google.visualization.DataTable();
   data1.addColumn("string", "Product");
@@ -59,11 +60,11 @@ function drawChart() {
   const data5 = new google.visualization.DataTable();
   data5.addColumn("string", "Product");
   data5.addColumn("number", "Executed days");
-  missionChartData.forEach(function (item) {
+  missionPerProductChartData.forEach(function (item) {
     const label = item.code + " - " + item.name;
     data5.addRow([label, item.executedDays]);
   });
-  const options5 = getPieChartOptions(missionTitle);
+  const options5 = getPieChartOptions(missionProductTitle);
   const container5 = document.getElementById("chart-5");
   chartInstance5 = new google.visualization.PieChart(container5);
   chartInstance5.draw(data5, options5);
@@ -72,11 +73,11 @@ function drawChart() {
   data6.addColumn("string", "Product");
   data6.addColumn("number", "Executed days");
   data6.addColumn("number", "Student executed days");
-  missionChartData.forEach(function (item) {
+  missionPerProductChartData.forEach(function (item) {
     const label = item.code + " - " + item.name;
     data6.addRow([label, item.executedDays, item.studentExecutedDays]);
   });
-  const options6 = getPieChartOptions(missionTitle);
+  const options6 = getBarChartOptions(missionProductTitle);
   const container6 = document.getElementById("chart-6");
   chartInstance6 = new google.visualization.ColumnChart(container6);
   chartInstance6.draw(data6, options6);

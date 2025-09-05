@@ -9,6 +9,6 @@ function downloadChart(instance) {
   const code =
     workerCode && workerCode.trim() ? workerCode.trim() : "all_workers";
 
-  link.download = `bar_chart_${code}_${timestamp}.png`;
+  link.download = `chart_${code}_${timestamp}.png`;
   link.click();
 }

@@ -160,7 +160,10 @@
                 id="pie-chart-product"
                 style="width: 100%; min-height: 500px"
               ></div>
-              <button class="download-btn" onclick="downloadPieChart()">
+              <button
+                class="download-btn"
+                onclick="downloadPieChart(pieChartProductInstance)"
+              >
                 <svg
                   class="w-5 h-5 fill-white"
                   xmlns="http://www.w3.org/2000/svg"
@@ -196,7 +199,10 @@
                 id="pie-chart-mission"
                 style="width: 100%; min-height: 500px"
               ></div>
-              <button class="download-btn" onclick="downloadPieChart()">
+              <button
+                class="download-btn"
+                onclick="downloadPieChart(pieChartMissionInstance)"
+              >
                 <svg
                   class="w-5 h-5 fill-white"
                   xmlns="http://www.w3.org/2000/svg"
@@ -237,9 +243,8 @@
     <script th:inline="javascript">
       let productChartData = /*[[${executedDaysByProduct}]]*/ {};
       let missionChartData = /*[[${executedDaysByMission}]]*/ {};
-      let worker = /*[[${worker}]]*/ {};
-      let workerCode = /*[[${workerCode}]]*/ {};
-      const workerName = worker ? worker.name() : "All Worker";
+      let workerCode = /*[[${workerCode}]]*/ "";
+      const workerName = /*[[${workerName}]]*/ "";
 
       const pieChartProductContainer =
         document.getElementById("pie-chart-product");

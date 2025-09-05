@@ -60,7 +60,6 @@ public class MissionController {
       dataPoint.put("studentExecutedDays", mission.studentExecutedDays());
       executedDaysByMission.add(dataPoint);
     }
-    log.debug("executedDaysByMission ==> {}", executedDaysByMission);
 
     model.addAttribute("workerCode", workerCode);
     model.addAttribute("months", thProductsByMonth);

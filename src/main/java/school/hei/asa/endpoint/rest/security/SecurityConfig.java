@@ -68,6 +68,7 @@ public class SecurityConfig {
                           log.error("Message: {}", exception.getMessage());
                           new SimpleUrlAuthenticationFailureHandler("/oauth2/authorization/casdoor")
                               .onAuthenticationFailure(request, response, exception);
+                          log.info("🔄 Forced redirect to /oauth2/authorization/casdoor executed");
                         }))
         .logout(
             logout ->

@@ -1,3 +1,4 @@
+var chartInstances = [];
 function updateFilters() {
   const workerCode = document.getElementById("worker").value;
   window.location.href = `/missions?workerCode=${workerCode}`;
@@ -15,30 +16,8 @@ document.addEventListener("DOMContentLoaded", function () {
   showGraphBtn.addEventListener("click", function () {
     graphModal.classList.remove("hidden");
     setTimeout(() => {
-      drawPieChart(
-        productChartData,
-        pieChartProductContainer,
-        productTitle,
-        pieChartProductInstance,
-      );
-      drawPieChart(
-        missionChartData,
-        pieChartMissionContainer,
-        missionTitle,
-        pieChartMissionInstance,
-      );
-      drawBarChart(
-        productChartData,
-        barChartProductContainer,
-        productTitle,
-        barChartProductInstance,
-      );
-      drawBarChart(
-        missionChartData,
-        barChartMissionContainer,
-        missionTitle,
-        barChartMissionInstance,
-      );
+      chartInstances = drawChart();
+      console.log(chartInstances);
     }, 200);
   });
 
@@ -61,30 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!graphModal.classList.contains("hidden")) {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(function () {
-        drawPieChart(
-          productChartData,
-          pieChartProductContainer,
-          productTitle,
-          pieChartProductInstance,
-        );
-        drawPieChart(
-          missionChartData,
-          pieChartMissionContainer,
-          missionTitle,
-          pieChartMissionInstance,
-        );
-        drawBarChart(
-          productChartData,
-          barChartProductContainer,
-          productTitle,
-          barChartProductInstance,
-        );
-        drawBarChart(
-          missionChartData,
-          barChartMissionContainer,
-          missionTitle,
-          barChartMissionInstance,
-        );
+        chartInstances = drawChart();
       }, 250);
     }
   });

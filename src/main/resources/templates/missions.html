@@ -156,13 +156,10 @@
 
           <div class="text-center grid grid-cols-2 gap-8">
             <div class="w-full">
-              <div
-                id="pie-chart-product"
-                style="width: 100%; min-height: 500px"
-              ></div>
+              <div id="chart-1" style="width: 100%; min-height: 500px"></div>
               <button
                 class="download-btn"
-                onclick="downloadPieChart(pieChartProductInstance)"
+                onclick="downloadChart(chartInstances[0])"
               >
                 <svg
                   class="w-5 h-5 fill-white"
@@ -175,13 +172,10 @@
               </button>
             </div>
             <div class="w-full">
-              <div
-                id="bar-chart-product"
-                style="width: 100%; min-height: 500px"
-              ></div>
+              <div id="chart-2" style="width: 100%; min-height: 500px"></div>
               <button
                 class="download-btn"
-                onclick="downloadBarChart(barChartProductInstance)"
+                onclick="downloadChart(chartInstances[1])"
               >
                 <svg
                   class="w-5 h-5 fill-white"
@@ -195,13 +189,10 @@
             </div>
 
             <div class="w-full">
-              <div
-                id="pie-chart-mission"
-                style="width: 100%; min-height: 500px"
-              ></div>
+              <div id="chart-3" style="width: 100%; min-height: 500px"></div>
               <button
                 class="download-btn"
-                onclick="downloadPieChart(pieChartMissionInstance)"
+                onclick="downloadChart(chartInstances[2])"
               >
                 <svg
                   class="w-5 h-5 fill-white"
@@ -214,13 +205,42 @@
               </button>
             </div>
             <div class="w-full">
-              <div
-                id="bar-chart-mission"
-                style="width: 100%; min-height: 500px"
-              ></div>
+              <div id="chart-4" style="width: 100%; min-height: 500px"></div>
               <button
                 class="download-btn"
-                onclick="downloadBarChart(barChartMissionInstance)"
+                onclick="downloadChart(chartInstances[3])"
+              >
+                <svg
+                  class="w-5 h-5 fill-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+                </svg>
+                <span>Download chart</span>
+              </button>
+            </div>
+            <div class="w-full">
+              <div id="chart-5" style="width: 100%; min-height: 500px"></div>
+              <button
+                class="download-btn"
+                onclick="downloadChart(chartInstances[4])"
+              >
+                <svg
+                  class="w-5 h-5 fill-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+                </svg>
+                <span>Download chart</span>
+              </button>
+            </div>
+            <div class="w-full">
+              <div id="chart-6" style="width: 100%; min-height: 500px"></div>
+              <button
+                class="download-btn"
+                onclick="downloadChart(chartInstances[5])"
               >
                 <svg
                   class="w-5 h-5 fill-white"
@@ -245,23 +265,6 @@
       let missionChartData = /*[[${executedDaysByMission}]]*/ {};
       let workerCode = /*[[${workerCode}]]*/ "";
       const workerName = /*[[${workerName}]]*/ "";
-
-      const pieChartProductContainer =
-        document.getElementById("pie-chart-product");
-      const barChartProductContainer =
-        document.getElementById("bar-chart-product");
-      const pieChartMissionContainer =
-        document.getElementById("pie-chart-mission");
-      const barChartMissionContainer =
-        document.getElementById("bar-chart-mission");
-
-      const productTitle = `Executed Days for each Product - ${workerName}`;
-      const missionTitle = `Executed Days for each Mission - ${workerName}`;
-
-      let pieChartProductInstance;
-      let barChartProductInstance;
-      let pieChartMissionInstance;
-      let barChartMissionInstance;
     </script>
   </body>
 </html>

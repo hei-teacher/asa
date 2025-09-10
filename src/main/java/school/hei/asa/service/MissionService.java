@@ -2,13 +2,16 @@ package school.hei.asa.service;
 
 import static java.util.Comparator.naturalOrder;
 
+import java.time.LocalDate;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.rest.controller.mapper.ThProductMapper;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
+import school.hei.asa.endpoint.rest.model.th.ThMissionExecution;
 import school.hei.asa.endpoint.rest.model.th.ThProduct;
 import school.hei.asa.repository.ProductRepository;
 
@@ -20,7 +23,7 @@ public class MissionService {
   private final ProductRepository productRepository;
   private final ThProductMapper thProductMapper;
 
-  public List<ThProduct> filterThProductsByWorkerCode(String workerCode) {
+  private List<ThProduct> filterThProductsByWorkerCode(String workerCode) {
     var thProducts = thProductMapper.toTh(productRepository.findAll());
     return workerCode == null || workerCode.isBlank()
         ? thProducts.stream()
@@ -30,6 +33,55 @@ public class MissionService {
             .map(p -> p.filterByWorkerCode(workerCode))
             .sorted(Comparator.comparing(ThProduct::executedDays, naturalOrder()).reversed())
             .toList();
+  }
+
+  public List<ThProduct> filterThProductByWorkerCodeAndDateBetween(
+      String workerCode, String startDate, String endDate) {
+    var thProducts = filterThProductsByWorkerCode(workerCode);
+    if (startDate == null || startDate.isBlank() || endDate == null || endDate.isBlank()) {
+      return thProducts;
+    }
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    var startLocalDate = LocalDate.parse(startDate, formatter);
+    var endLocalDate = LocalDate.parse(endDate, formatter);
+    if (endLocalDate.isBefore(startLocalDate)) {
+      return thProducts;
+    }
+    log.info("filtering by date...");
+
+    List<ThProduct> result = new ArrayList<>();
+    thProducts.forEach(
+        p -> {
+          var missions = p.missions();
+          List<ThMission> newMissions = new ArrayList<>();
+          missions.forEach(
+              m -> {
+                List<ThMissionExecution> newMissionExecution =
+                    m.getMissionExecutions().stream()
+                        .filter(
+                            me -> {
+                              var isBetween =
+                                  me.getDate().isAfter(startLocalDate)
+                                      && me.getDate().isBefore(endLocalDate);
+                              return isBetween
+                                  || me.getDate().isEqual(startLocalDate)
+                                  || me.getDate().isEqual(endLocalDate);
+                            })
+                        .toList();
+                newMissions.add(
+                    new ThMission(
+                        m.getCode(),
+                        m.getTitle(),
+                        m.getDescription(),
+                        newMissionExecution,
+                        m.isCare()));
+              });
+          result.add(new ThProduct(p.code(), p.name(), p.description(), newMissions, p.isCare()));
+        });
+    return result.stream()
+        .map(p -> p.filterByWorkerCode(workerCode))
+        .sorted(Comparator.comparing(ThProduct::executedDays, naturalOrder()).reversed())
+        .toList();
   }
 
   public Map<String, List<ThProduct>> thProductsByMonth(List<ThProduct> thProducts) {

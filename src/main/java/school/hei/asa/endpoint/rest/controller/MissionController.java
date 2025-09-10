@@ -31,8 +31,14 @@ public class MissionController {
   private final MissionService missionService;
 
   @GetMapping("/missions")
-  public String getMissions(Model model, @RequestParam(required = false) String workerCode) {
-    var thProductsByWorkerCode = missionService.filterThProductsByWorkerCode(workerCode);
+  public String getMissions(
+      Model model,
+      @RequestParam(required = false) String workerCode,
+      @RequestParam(required = false) String startDate,
+      @RequestParam(required = false) String endDate) {
+
+    var thProductsByWorkerCode =
+        missionService.filterThProductByWorkerCodeAndDateBetween(workerCode, startDate, endDate);
     var thProductsByMonth = missionService.thProductsByMonth(thProductsByWorkerCode);
     var thProductsExecutedDaysSumByMonth =
         missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode);
@@ -71,6 +77,8 @@ public class MissionController {
     }
 
     model.addAttribute("workerCode", workerCode);
+    model.addAttribute("startDate", startDate);
+    model.addAttribute("endDate", endDate);
     model.addAttribute("months", thProductsByMonth);
     model.addAttribute("products", thProductsByWorkerCode);
     model.addAttribute("total", thProductsExecutedDaysSumByMonth);

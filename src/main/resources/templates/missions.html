@@ -127,7 +127,9 @@
       <script>
         function updateFilters() {
           const workerCode = document.getElementById("worker").value;
-          window.location.href = `/missions?workerCode=${workerCode}`;
+          const startDate = document.getElementById("startDate").value || "";
+          const endDate = document.getElementById("endDate").value || startDate;
+          window.location.href = `/missions?workerCode=${workerCode}&startDate=${startDate}&endDate=${startDate}`;
         }
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -151,6 +153,36 @@
                   d="M6 18L18 6M6 6l12 12"
                 ></path>
               </svg>
+            </button>
+          </div>
+          <div class="flex flex-row align-bottom gap-4 m-4">
+            <div class="flex flex-col">
+              <label class="block text-gray-700 font-medium mb-2"
+                >Select Start Date</label
+              >
+              <input
+                id="startDate"
+                type="date"
+                th:value="${startDate}"
+                class="w-64 p-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div class="flex flex-col">
+              <label class="block text-gray-700 font-medium mb-2"
+                >Select End Date</label
+              >
+              <input
+                id="endDate"
+                type="date"
+                th:value="${endDate}"
+                class="w-64 p-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <button
+              class="cursor-pointer bg-[#2D2D5A] hover:bg-[#4D4D7A] self-end text-white py-2 px-4 rounded shadow h-1/2"
+              onclick="updateFilters()"
+            >
+              Update Date Filter
             </button>
           </div>
 

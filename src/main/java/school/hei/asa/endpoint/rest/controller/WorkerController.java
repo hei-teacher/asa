@@ -75,7 +75,7 @@ public class WorkerController {
 
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var workerLevelHistories =
-        thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
+        thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker), worker);
 
     model.addAttribute("worker", worker);
     model.addAttribute("workerCode", workerCodeOrAuth);

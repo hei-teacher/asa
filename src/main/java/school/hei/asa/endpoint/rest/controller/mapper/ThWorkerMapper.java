@@ -1,7 +1,5 @@
 package school.hei.asa.endpoint.rest.controller.mapper;
 
-import static java.time.Instant.now;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -10,32 +8,56 @@ import java.util.Objects;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.asa.CareProductCodeSupplier;
+import school.hei.asa.PaidCareMissionCodesSupplier;
 import school.hei.asa.endpoint.rest.model.th.ThWorkerLevelHistory;
+import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.WorkerLevelHistory;
-import school.hei.asa.repository.MissionExecutionRepository;
+import school.hei.asa.repository.DailyExecutionRepository;
 
 @AllArgsConstructor
 @Component
 public class ThWorkerMapper {
 
-  private final MissionExecutionRepository missionExecutionRepository;
   private final CareProductCodeSupplier careProductCodeSupplier;
+  private final PaidCareMissionCodesSupplier paidCareMissionCodesSupplier;
+  private final DailyExecutionRepository dailyExecutionRepository;
 
-  public List<ThWorkerLevelHistory> toTh(List<WorkerLevelHistory> histories) {
+  public List<ThWorkerLevelHistory> toTh(List<WorkerLevelHistory> histories, Worker worker) {
     ZoneId zoneId = ZoneId.of("UTC");
     List<ThWorkerLevelHistory> result = new ArrayList<>();
 
+    if (histories.isEmpty()) return result;
+
     for (int i = 0; i < histories.size(); i++) {
       var current = histories.get(i);
-      var nextEntrance = (i == 0) ? now() : histories.get(i - 1).entranceInstant();
+      var startDate = current.entranceInstant().atZone(zoneId).toLocalDate();
+      var endDate =
+          (i == 0)
+              ? LocalDate.now()
+              : histories.get(i - 1).entranceInstant().atZone(zoneId).toLocalDate();
 
-      double totalDaysWorked =
-          missionExecutionPercentageSumByWorker(
-              current.worker(),
-              current.entranceInstant().atZone(zoneId).toLocalDate(),
-              nextEntrance.atZone(zoneId).toLocalDate());
+      var dailyExecutions =
+          dailyExecutionRepository.findByWorkerCodeAndDateBetween(
+              worker.code(), startDate, endDate);
+
+      double totalDaysWorked = 0;
+
+      for (DailyExecution dailyExecution : dailyExecutions) {
+        switch (dailyExecution.type(careProductCodeSupplier.get())) {
+          case fullWork -> {
+            totalDaysWorked += 1.0;
+          }
+          case mixedWorkAndCare -> {
+            totalDaysWorked +=
+                dailyExecution.executions().stream()
+                    .filter(me -> !me.mission().isPaidCare(paidCareMissionCodesSupplier.get()))
+                    .mapToDouble(MissionExecution::dayPercentage)
+                    .sum();
+          }
+        }
+      }
 
       var contractType = toWorkerType(current.contractType());
       var totalWorkDays = Objects.toString(current.projectedDaysToWork(), "-");
@@ -62,16 +84,6 @@ public class ThWorkerMapper {
       case null -> "";
       default -> "Alternant";
     };
-  }
-
-  private Double missionExecutionPercentageSumByWorker(
-      Worker worker, LocalDate startDate, LocalDate endDate) {
-    return missionExecutionRepository
-        .missionExecutionsByDateBetween(worker, startDate, endDate)
-        .stream()
-        .filter(me -> !isCare(me))
-        .mapToDouble(MissionExecution::dayPercentage)
-        .sum();
   }
 
   private boolean isCare(MissionExecution me) {

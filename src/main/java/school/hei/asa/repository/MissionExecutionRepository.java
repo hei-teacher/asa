@@ -24,6 +24,14 @@ public class MissionExecutionRepository {
   }
 
   @Transactional
+  public List<MissionExecution> missionExecutionsOrderByDate(Worker worker) {
+    var jmeList =
+        jMissionExecutionRepository.findAllByWorkerCodeOrderByDateAsc(
+            workerMapper.toEntity(worker).getCode());
+    return missionExecutionMapper.toDomain(jmeList);
+  }
+
+  @Transactional
   public List<MissionExecution> missionExecutionsByDateBetween(
       Worker worker, LocalDate startDate, LocalDate endDate) {
     var jmeList =

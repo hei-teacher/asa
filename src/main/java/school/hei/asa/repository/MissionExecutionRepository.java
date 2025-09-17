@@ -10,6 +10,7 @@ import school.hei.asa.model.Worker;
 import school.hei.asa.repository.jrepository.JMissionExecutionRepository;
 import school.hei.asa.repository.mapper.MissionExecutionMapper;
 import school.hei.asa.repository.mapper.WorkerMapper;
+import school.hei.asa.repository.model.WorkerDayPercentageSummary;
 
 @AllArgsConstructor
 @Component
@@ -30,5 +31,12 @@ public class MissionExecutionRepository {
         jMissionExecutionRepository.findByWorkerCodeAndDateBetween(
             workerMapper.toEntity(worker).getCode(), startDate, endDate);
     return missionExecutionMapper.toDomain(jmeList);
+  }
+
+  @Transactional
+  public List<WorkerDayPercentageSummary> dayPercentageSummary(
+      Worker worker, LocalDate startDate, LocalDate endDate) {
+    return jMissionExecutionRepository.findWorkerDayPercentageSummary(
+        worker.code(), startDate, endDate);
   }
 }

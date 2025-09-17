@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.session.SessionManagementFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -22,17 +23,20 @@ public class SecurityConfig {
   private final String casdoorLogoutUrl;
   private final String asaLogoutUrl;
   private final OAuth2SuccessHandler oAuth2SuccessHandler;
+  private final ForceSessionSaveFilter forceSessionSaveFilter;
 
   public SecurityConfig(
       @Value("${spring.security.oauth2.client.registration.casdoor.clientid}")
           String casdoorClientId,
       @Value("${casdoor.logout.url}") String casdoorLogoutUrl,
       @Value("${asa.logout.url}") String asaLogoutUrl,
-      OAuth2SuccessHandler oAuth2SuccessHandler) {
+      OAuth2SuccessHandler oAuth2SuccessHandler,
+      ForceSessionSaveFilter forceSessionSaveFilter) {
     this.casdoorClientId = casdoorClientId;
     this.casdoorLogoutUrl = casdoorLogoutUrl;
     this.asaLogoutUrl = asaLogoutUrl;
     this.oAuth2SuccessHandler = oAuth2SuccessHandler;
+    this.forceSessionSaveFilter = forceSessionSaveFilter;
   }
 
   @Bean
@@ -47,6 +51,7 @@ public class SecurityConfig {
                     .permitAll()
                     .anyRequest()
                     .authenticated())
+        .addFilterBefore(forceSessionSaveFilter, SessionManagementFilter.class)
         .oauth2Login(
             oauth2 ->
                 oauth2
@@ -63,6 +68,7 @@ public class SecurityConfig {
                         // custom domain URL
                         // so it is incorrectly interpreted as authorization_request_not_found.
                         // Redo the call and it will be Ok.
+
                         (request, response, exception) -> {
                           log.error("❌ OAuth2 login FAILURE", exception);
                           log.error("Message: {}", exception.getMessage());
@@ -75,7 +81,7 @@ public class SecurityConfig {
                 logout.logoutSuccessHandler(
                     (request, response, authentication) -> {
                       var principal = (DefaultOidcUser) authentication.getPrincipal();
-                      String accessToken = (principal.getIdToken().getTokenValue());
+                      String accessToken = principal.getIdToken().getTokenValue();
                       log.info("🔒 Logout SUCCESS for user {}", principal.getEmail());
                       response.sendRedirect(
                           "/casdoor-logout?id_token_hint="

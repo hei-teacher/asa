@@ -1,5 +1,6 @@
 package school.hei.asa.service;
 
+import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 
 import java.time.LocalDate;
@@ -10,10 +11,15 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.rest.controller.mapper.ThProductMapper;
+import school.hei.asa.endpoint.rest.controller.mapper.ThWorkerMapper;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
 import school.hei.asa.endpoint.rest.model.th.ThMissionExecution;
 import school.hei.asa.endpoint.rest.model.th.ThProduct;
+import school.hei.asa.endpoint.rest.model.th.ThWorkerLevelHistory;
+import school.hei.asa.model.Worker;
 import school.hei.asa.repository.ProductRepository;
+import school.hei.asa.repository.WorkerLevelHistoryRepository;
+import school.hei.asa.repository.WorkerRepository;
 
 @Slf4j
 @AllArgsConstructor
@@ -22,16 +28,19 @@ public class MissionService {
 
   private final ProductRepository productRepository;
   private final ThProductMapper thProductMapper;
+  private final WorkerRepository workerRepository;
+  private final WorkerLevelHistoryRepository workerLevelHistoryRepository;
+  private final ThWorkerMapper thWorkerMapper;
 
   private List<ThProduct> filterThProductsByWorkerCode(String workerCode) {
     var thProducts = thProductMapper.toTh(productRepository.findAll());
     return workerCode == null || workerCode.isBlank()
         ? thProducts.stream()
-            .sorted(Comparator.comparing(ThProduct::executedDays, naturalOrder()).reversed())
+            .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
             .toList()
         : thProducts.stream()
             .map(p -> p.filterByWorkerCode(workerCode))
-            .sorted(Comparator.comparing(ThProduct::executedDays, naturalOrder()).reversed())
+            .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
             .toList();
   }
 
@@ -80,7 +89,7 @@ public class MissionService {
         });
     return result.stream()
         .map(p -> p.filterByWorkerCode(workerCode))
-        .sorted(Comparator.comparing(ThProduct::executedDays, naturalOrder()).reversed())
+        .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
         .toList();
   }
 
@@ -138,7 +147,7 @@ public class MissionService {
     List<ThMission> missions = new ArrayList<>();
     thProducts.forEach(p -> missions.addAll(p.missions()));
     return missions.stream()
-        .sorted(Comparator.comparing(ThMission::executedDays, naturalOrder()).reversed())
+        .sorted(comparing(ThMission::executedDays, naturalOrder()).reversed())
         .toList();
   }
 
@@ -178,7 +187,29 @@ public class MissionService {
                   });
         });
     return missions.stream()
-        .sorted(Comparator.comparing(ThMission::executedDays, naturalOrder()).reversed())
+        .sorted(comparing(ThMission::executedDays, naturalOrder()).reversed())
         .toList();
+  }
+
+  public Map<String, List<ThWorkerLevelHistory>> totalWorkDaysPerWorker(String workerCode) {
+
+    Map<String, List<ThWorkerLevelHistory>> result = new HashMap<>();
+    if (workerCode == null || workerCode.isBlank()) {
+      var workers = workerRepository.findAll().stream().sorted(comparing(Worker::name));
+      workers.forEach(
+          worker -> {
+            var workerLevelHistories =
+                thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
+            var workerName = worker.name();
+            result.put(workerName, workerLevelHistories);
+          });
+    } else {
+      var worker = workerRepository.findByCode(workerCode);
+      var workerLevelHistories =
+          thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
+      var workerName = worker.name();
+      result.put(workerName, workerLevelHistories);
+    }
+    return result;
   }
 }

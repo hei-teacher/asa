@@ -53,8 +53,8 @@ public class MissionController {
     var thProductsExecutedDaysSumByMonth =
         missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode);
     var thMissionsPerProductsByWorkerCode =
-        missionService.filterThMissionsByWorkerCode(thProductsByWorkerCode);
-    var thMissionsByWorkerCode = missionService.thMissionsByWorkerCode(thProductsByWorkerCode);
+        missionService.thMissionsPerProducts(thProductsByWorkerCode);
+    var thMissionsByWorkerCode = missionService.thMissionsFromProducts(thProductsByWorkerCode);
 
     List<Map<String, Object>> executedDaysByProduct = new ArrayList<>();
     for (var product : thProductsByWorkerCode) {
@@ -101,9 +101,7 @@ public class MissionController {
   }
 
   @GetMapping("/missions/export-to-csv")
-  public ResponseEntity<ByteArrayResource> exportToCSV(
-      Model model, @RequestParam String workerCode) {
-
+  public ResponseEntity<ByteArrayResource> exportToCSV(@RequestParam String workerCode) {
     var totalWorkDaysPerWorker = missionService.totalWorkDaysPerWorker(workerCode);
     String filePath = System.getProperty("java.io.tmpdir");
     String fileName =

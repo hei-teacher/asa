@@ -144,8 +144,8 @@ public class MissionService {
   }
 
   /*
-  * this will consider each mission as a unique mission
-  * */
+   * this will consider each mission as a unique mission
+   * */
   public List<ThMission> thMissionsPerProducts(List<ThProduct> thProducts) {
     List<ThMission> missions = new ArrayList<>();
     thProducts.forEach(p -> missions.addAll(p.missions()));
@@ -155,9 +155,9 @@ public class MissionService {
   }
 
   /*
-  * this will group missions with the same title
-  * and consider them as one mission
-  * */
+   * this will group missions with the same title
+   * and consider them as one mission
+   * */
   public List<ThMission> thMissionsFromProducts(List<ThProduct> thProducts) {
     List<ThMission> missions = new ArrayList<>();
 

@@ -198,24 +198,22 @@ public class MissionService {
         .toList();
   }
 
-  public Map<String, List<ThWorkerLevelHistory>> totalWorkDaysPerWorker(String workerCode) {
+  public Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysPerWorker(String workerCode) {
 
-    Map<String, List<ThWorkerLevelHistory>> result = new HashMap<>();
+    Map<Worker, List<ThWorkerLevelHistory>> result = new HashMap<>();
     if (workerCode == null || workerCode.isBlank()) {
       var workers = workerRepository.findAll().stream().sorted(comparing(Worker::name));
       workers.forEach(
           worker -> {
             var workerLevelHistories =
                 thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
-            var workerName = worker.name();
-            result.put(workerName, workerLevelHistories);
+            result.put(worker, workerLevelHistories);
           });
     } else {
       var worker = workerRepository.findByCode(workerCode);
       var workerLevelHistories =
           thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
-      var workerName = worker.name();
-      result.put(workerName, workerLevelHistories);
+      result.put(worker, workerLevelHistories);
     }
     return result;
   }

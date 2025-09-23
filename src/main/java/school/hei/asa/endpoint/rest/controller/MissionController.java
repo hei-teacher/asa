@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
@@ -112,19 +113,45 @@ public class MissionController {
                 + ".csv";
     File file = new File(filePath, fileName);
     try (FileWriter fileWriter = new FileWriter(file)) {
-      fileWriter.write("worker,total_work_days,worker_level" + System.lineSeparator());
+      fileWriter.write(
+          "code,worker,worker level,start date,"
+              + "end date,contract duration (in days),"
+              + "total days worked,remaining days"
+              + System.lineSeparator());
       fileWriter.flush();
       totalWorkDaysPerWorker.forEach(
-          (workerName, totalWorkdays) -> {
-            totalWorkdays.forEach(
+          (worker, thWorkerLevelHistories) -> {
+            thWorkerLevelHistories.forEach(
                 thWorkerLevelHistory -> {
                   try {
+                    String remainingDays;
+                    if (thWorkerLevelHistory.projectedDaysToWork().equals("-")) {
+                      remainingDays = "-";
+                    } else {
+                      var number =
+                          (Double.parseDouble(thWorkerLevelHistory.projectedDaysToWork())
+                              - Double.parseDouble(thWorkerLevelHistory.actualWorkedDay()));
+                      var numberFormat = new DecimalFormat("#.0");
+                      remainingDays = numberFormat.format(number);
+                    }
+                    var actualWorkedDays =
+                        Double.parseDouble(thWorkerLevelHistory.actualWorkedDay()) == 0.0d
+                            ? "-"
+                            : thWorkerLevelHistory.actualWorkedDay();
                     fileWriter.write(
-                        workerName
+                        worker.code()
                             + ","
-                            + thWorkerLevelHistory.projectedDaysToWork()
+                            + worker.name()
                             + ","
                             + thWorkerLevelHistory.level()
+                            + ","
+                            + thWorkerLevelHistory.entranceInstant()
+                            + ",,"
+                            + thWorkerLevelHistory.projectedDaysToWork()
+                            + ","
+                            + actualWorkedDays
+                            + ","
+                            + remainingDays
                             + System.lineSeparator());
                     fileWriter.flush();
                   } catch (IOException e) {

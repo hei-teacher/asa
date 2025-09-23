@@ -121,43 +121,44 @@ public class MissionController {
       fileWriter.flush();
       totalWorkDaysPerWorker.forEach(
           (worker, thWorkerLevelHistories) -> {
-            thWorkerLevelHistories.forEach(
-                thWorkerLevelHistory -> {
-                  try {
-                    String remainingDays;
-                    if (thWorkerLevelHistory.projectedDaysToWork().equals("-")) {
-                      remainingDays = "-";
-                    } else {
-                      var number =
-                          (Double.parseDouble(thWorkerLevelHistory.projectedDaysToWork())
-                              - Double.parseDouble(thWorkerLevelHistory.actualWorkedDay()));
-                      var numberFormat = new DecimalFormat("#.0");
-                      remainingDays = numberFormat.format(number);
-                    }
-                    var actualWorkedDays =
-                        Double.parseDouble(thWorkerLevelHistory.actualWorkedDay()) == 0.0d
-                            ? "-"
-                            : thWorkerLevelHistory.actualWorkedDay();
-                    fileWriter.write(
-                        worker.code()
-                            + ","
-                            + worker.name()
-                            + ","
-                            + thWorkerLevelHistory.level()
-                            + ","
-                            + thWorkerLevelHistory.entranceInstant()
-                            + ",,"
-                            + thWorkerLevelHistory.projectedDaysToWork()
-                            + ","
-                            + actualWorkedDays
-                            + ","
-                            + remainingDays
-                            + System.lineSeparator());
-                    fileWriter.flush();
-                  } catch (IOException e) {
-                    throw new RuntimeException(e);
-                  }
-                });
+            thWorkerLevelHistories.parallelStream()
+                .forEach(
+                    thWorkerLevelHistory -> {
+                      try {
+                        String remainingDays;
+                        if (thWorkerLevelHistory.projectedDaysToWork().equals("-")) {
+                          remainingDays = "-";
+                        } else {
+                          var number =
+                              (Double.parseDouble(thWorkerLevelHistory.projectedDaysToWork())
+                                  - Double.parseDouble(thWorkerLevelHistory.actualWorkedDay()));
+                          var numberFormat = new DecimalFormat("#.0");
+                          remainingDays = numberFormat.format(number);
+                        }
+                        var actualWorkedDays =
+                            Double.parseDouble(thWorkerLevelHistory.actualWorkedDay()) == 0.0d
+                                ? "-"
+                                : thWorkerLevelHistory.actualWorkedDay();
+                        fileWriter.write(
+                            worker.code()
+                                + ","
+                                + worker.name()
+                                + ","
+                                + thWorkerLevelHistory.level()
+                                + ","
+                                + thWorkerLevelHistory.entranceInstant()
+                                + ",,"
+                                + thWorkerLevelHistory.projectedDaysToWork()
+                                + ","
+                                + actualWorkedDays
+                                + ","
+                                + remainingDays
+                                + System.lineSeparator());
+                        fileWriter.flush();
+                      } catch (IOException e) {
+                        throw new RuntimeException(e);
+                      }
+                    });
           });
       ByteArrayResource resource =
           new ByteArrayResource(Files.readAllBytes(Path.of(file.getAbsolutePath())));

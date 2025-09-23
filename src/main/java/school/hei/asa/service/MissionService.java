@@ -202,13 +202,14 @@ public class MissionService {
 
     Map<Worker, List<ThWorkerLevelHistory>> result = new HashMap<>();
     if (workerCode == null || workerCode.isBlank()) {
-      var workers = workerRepository.findAll().stream().sorted(comparing(Worker::name));
-      workers.forEach(
-          worker -> {
-            var workerLevelHistories =
-                thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
-            result.put(worker, workerLevelHistories);
-          });
+      var workers = workerRepository.findAll().stream().sorted(comparing(Worker::name)).toList();
+      workers.parallelStream()
+          .forEach(
+              worker -> {
+                var workerLevelHistories =
+                    thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
+                result.put(worker, workerLevelHistories);
+              });
     } else {
       var worker = workerRepository.findByCode(workerCode);
       var workerLevelHistories =

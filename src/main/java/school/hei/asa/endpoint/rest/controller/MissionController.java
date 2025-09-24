@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -146,7 +147,10 @@ public class MissionController {
                                 + ","
                                 + thWorkerLevelHistory.level()
                                 + ","
-                                + thWorkerLevelHistory.entranceInstant()
+                                + thWorkerLevelHistory
+                                    .entranceInstant()
+                                    .atZone(ZoneId.of("UTC"))
+                                    .toLocalDate()
                                 + ",,"
                                 + thWorkerLevelHistory.projectedDaysToWork()
                                 + ","

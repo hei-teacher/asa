@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
@@ -37,13 +37,12 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.csrf(Customizer.withDefaults())
+
+    http.csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(
             authz ->
                 authz
-                    .requestMatchers("/casdoor-logout")
-                    .permitAll()
-                    .requestMatchers("/")
+                    .requestMatchers("/casdoor-logout", "/login", "/error", "/")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
@@ -59,13 +58,8 @@ public class SecurityConfig {
                               request, response, authentication);
                         })
                     .failureHandler(
-                        // On success redirection from Casdoor URL instead of
-                        // custom domain URL
-                        // so it is incorrectly interpreted as authorization_request_not_found.
-                        // Redo the call and it will be Ok.
                         (request, response, exception) -> {
                           log.error("❌ OAuth2 login FAILURE", exception);
-                          log.error("Message: {}", exception.getMessage());
                           new SimpleUrlAuthenticationFailureHandler("/oauth2/authorization/casdoor")
                               .onAuthenticationFailure(request, response, exception);
                           log.info("🔄 Forced redirect to /oauth2/authorization/casdoor executed");
@@ -74,17 +68,23 @@ public class SecurityConfig {
             logout ->
                 logout.logoutSuccessHandler(
                     (request, response, authentication) -> {
-                      var principal = (DefaultOidcUser) authentication.getPrincipal();
-                      String accessToken = (principal.getIdToken().getTokenValue());
-                      log.info("🔒 Logout SUCCESS for user {}", principal.getEmail());
-                      response.sendRedirect(
-                          "/casdoor-logout?id_token_hint="
-                              + accessToken
-                              + "&post_logout_redirect_uri="
-                              + asaLogoutUrl
-                              + "&logout_uri="
-                              + casdoorLogoutUrl);
-                    }));
+                      if (authentication != null
+                          && authentication.getPrincipal() instanceof DefaultOidcUser principal) {
+                        String accessToken = principal.getIdToken().getTokenValue();
+                        log.info("🔒 Logout SUCCESS for user {}", principal.getEmail());
+                        response.sendRedirect(
+                            "/casdoor-logout?id_token_hint="
+                                + accessToken
+                                + "&post_logout_redirect_uri="
+                                + asaLogoutUrl
+                                + "&logout_uri="
+                                + casdoorLogoutUrl);
+                      } else {
+                        response.sendRedirect(asaLogoutUrl);
+                      }
+                    }))
+        .sessionManagement(session -> session.maximumSessions(1).maxSessionsPreventsLogin(false));
+
     return http.build();
   }
 }

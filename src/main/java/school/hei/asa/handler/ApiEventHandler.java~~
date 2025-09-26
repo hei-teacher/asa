@@ -6,12 +6,18 @@ import com.amazonaws.serverless.proxy.model.HttpApiV2ProxyRequest;
 import com.amazonaws.serverless.proxy.spring.SpringBootLambdaContainerHandler;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+<<<<<<< HEAD
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+=======
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sentry.Sentry;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.Duration;
+>>>>>>> refs/rewritten/onto
 import school.hei.asa.PojaApplication;
 import school.hei.asa.PojaGenerated;
 
@@ -19,7 +25,14 @@ import school.hei.asa.PojaGenerated;
 public class ApiEventHandler implements RequestStreamHandler {
   private static final SpringBootLambdaContainerHandler<HttpApiV2ProxyRequest, AwsProxyResponse>
       handler;
+<<<<<<< HEAD
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
+=======
+<<<<<<< HEAD
+=======
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
+>>>>>>> refs/rewritten/onto
+>>>>>>> feat/export-csv
 
   static {
     try {
@@ -32,6 +45,12 @@ public class ApiEventHandler implements RequestStreamHandler {
   @Override
   public void handleRequest(InputStream input, OutputStream output, Context context)
       throws IOException {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    handler.proxyStream(input, output, context);
+=======
+>>>>>>> feat/export-csv
     var inputStream = OBJECT_MAPPER.readValue(input, HttpApiV2ProxyRequest.class);
     try {
       var response = handler.proxy(inputStream, context);
@@ -43,5 +62,9 @@ public class ApiEventHandler implements RequestStreamHandler {
     } finally {
       Sentry.flush(Duration.ofSeconds(5).toMillis());
     }
+<<<<<<< HEAD
+=======
+>>>>>>> refs/rewritten/onto
+>>>>>>> feat/export-csv
   }
 }

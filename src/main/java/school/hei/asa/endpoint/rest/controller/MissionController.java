@@ -3,11 +3,22 @@ package school.hei.asa.endpoint.rest.controller;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +36,7 @@ import school.hei.asa.service.MissionService;
 public class MissionController {
 
   private final DailyExecutionRepository dailyExecutionRepository;
+
   private final CareProductCodeSupplier careProductCodeSupplier;
   private final ThDailyExecutionMapper thDailyExecutionMapper;
   private final WorkerToModelAdder workerToModelAdder;
@@ -43,8 +55,8 @@ public class MissionController {
     var thProductsExecutedDaysSumByMonth =
         missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode);
     var thMissionsPerProductsByWorkerCode =
-        missionService.filterThMissionsByWorkerCode(thProductsByWorkerCode);
-    var thMissionsByWorkerCode = missionService.thMissionsByWorkerCode(thProductsByWorkerCode);
+        missionService.thMissionsPerProducts(thProductsByWorkerCode);
+    var thMissionsByWorkerCode = missionService.thMissionsFromProducts(thProductsByWorkerCode);
 
     List<Map<String, Object>> executedDaysByProduct = new ArrayList<>();
     for (var product : thProductsByWorkerCode) {
@@ -88,6 +100,84 @@ public class MissionController {
     model.addAttribute("executedDaysByMission", executedDaysByMission);
 
     return "missions";
+  }
+
+  @GetMapping("/missions/export-to-csv")
+  public ResponseEntity<ByteArrayResource> exportToCSV(@RequestParam String workerCode) {
+    var totalWorkDaysPerWorker = missionService.totalWorkDaysPerWorker(workerCode);
+    String filePath = System.getProperty("java.io.tmpdir");
+    String fileName =
+        workerCode == null || workerCode.isBlank()
+            ? "total_work_days-All.csv"
+            : "total_work_days-"
+                + totalWorkDaysPerWorker.keySet().stream().findFirst().get()
+                + ".csv";
+    File file = new File(filePath, fileName);
+    try (FileWriter fileWriter = new FileWriter(file)) {
+      fileWriter.write(
+          "code,worker,worker level,start date,"
+              + "contract duration (in days),"
+              + "total days worked,remaining days"
+              + System.lineSeparator());
+      fileWriter.flush();
+      totalWorkDaysPerWorker.forEach(
+          (worker, thWorkerLevelHistories) -> {
+            thWorkerLevelHistories.parallelStream()
+                .forEach(
+                    thWorkerLevelHistory -> {
+                      try {
+                        String remainingDays;
+                        if (thWorkerLevelHistory.projectedDaysToWork().equals("-")) {
+                          remainingDays = "-";
+                        } else {
+                          var number =
+                              (Double.parseDouble(thWorkerLevelHistory.projectedDaysToWork())
+                                  - Double.parseDouble(thWorkerLevelHistory.actualWorkedDay()));
+                          var numberFormat = new DecimalFormat("#.0");
+                          remainingDays = numberFormat.format(number);
+                        }
+                        var actualWorkedDays =
+                            Double.parseDouble(thWorkerLevelHistory.actualWorkedDay()) == 0.0d
+                                ? "-"
+                                : thWorkerLevelHistory.actualWorkedDay();
+                        fileWriter.write(
+                            worker.code()
+                                + ","
+                                + worker.name()
+                                + ","
+                                + thWorkerLevelHistory.level()
+                                + ","
+                                + thWorkerLevelHistory
+                                    .entranceInstant()
+                                    .atZone(ZoneId.of("UTC"))
+                                    .toLocalDate()
+                                + ","
+                                + thWorkerLevelHistory.projectedDaysToWork()
+                                + ","
+                                + actualWorkedDays
+                                + ","
+                                + remainingDays
+                                + System.lineSeparator());
+                        fileWriter.flush();
+                      } catch (IOException e) {
+                        throw new RuntimeException(e);
+                      }
+                    });
+          });
+      ByteArrayResource resource =
+          new ByteArrayResource(Files.readAllBytes(Path.of(file.getAbsolutePath())));
+      HttpHeaders header = new HttpHeaders();
+      header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+
+      return ResponseEntity.ok()
+          .headers(header)
+          .contentLength(file.length())
+          .contentType(MediaType.parseMediaType("application/octet-stream"))
+          .body(resource);
+
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @GetMapping("/mission-executions")

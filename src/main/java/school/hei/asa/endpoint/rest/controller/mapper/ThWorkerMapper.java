@@ -8,14 +8,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.endpoint.rest.model.th.ThWorkerLevelHistory;
-import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.WorkerLevelHistory;
 import school.hei.asa.repository.MissionExecutionRepository;
+import school.hei.asa.repository.model.WorkerDayPercentageSummary;
 
+@Slf4j
 @AllArgsConstructor
 @Component
 public class ThWorkerMapper {
@@ -63,16 +65,13 @@ public class ThWorkerMapper {
 
   private Double missionExecutionPercentageSumByWorker(
       Worker worker, LocalDate startDate, LocalDate endDate) {
-    return missionExecutionRepository
-        .missionExecutionsByDateBetween(worker, startDate, endDate)
-        .stream()
-        .filter(me -> !isCare(me))
-        .mapToDouble(MissionExecution::dayPercentage)
+    return missionExecutionRepository.dayPercentageSummary(worker, startDate, endDate).stream()
+        .filter(w -> !isCare(w.getMissionCode()))
+        .mapToDouble(WorkerDayPercentageSummary::getTotalDayPercentage)
         .sum();
   }
 
-  private boolean isCare(MissionExecution me) {
-    var mission = me.mission();
-    return mission.isCare(careProductCodeSupplier.get());
+  private boolean isCare(String code) {
+    return code.startsWith(careProductCodeSupplier.get());
   }
 }

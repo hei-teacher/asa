@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.List;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
@@ -16,6 +17,7 @@ import org.hibernate.annotations.BatchSize;
 @Entity
 @Table(name = "worker")
 @Getter
+@EqualsAndHashCode(of = "code")
 @Setter
 public class JWorker {
   @Id private String code;

@@ -41,9 +41,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             authz ->
                 authz
-                    .requestMatchers("/casdoor-logout")
-                    .permitAll()
-                    .requestMatchers("/")
+                    .requestMatchers("/", "/casdoor-logout", "/test-session")
                     .permitAll()
                     .anyRequest()
                     .authenticated())

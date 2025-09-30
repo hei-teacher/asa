@@ -33,14 +33,6 @@ public class ApiEventHandler implements RequestStreamHandler {
   public void handleRequest(InputStream input, OutputStream output, Context context)
       throws IOException {
     var inputStream = OBJECT_MAPPER.readValue(input, HttpApiV2ProxyRequest.class);
-
-    if (inputStream.getHeaders() != null) {
-      System.out.println("🍪 Headers = " + inputStream.getHeaders());
-    }
-    if (inputStream.getCookies() != null) {
-      System.out.println("🍪 Cookies = " + inputStream.getCookies());
-    }
-
     try {
       var response = handler.proxy(inputStream, context);
       OBJECT_MAPPER.writeValue(output, response);

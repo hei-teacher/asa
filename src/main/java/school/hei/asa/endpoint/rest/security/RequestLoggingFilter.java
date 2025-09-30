@@ -19,8 +19,9 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
     String cookieHeader = request.getHeader("Cookie");
+    String setCookie = response.getHeader("Set-Cookie");
     log.info("🍪 Cookie header: {}", cookieHeader);
-
+    log.info("🍪 Response Set-Cookie: {}", setCookie);
     filterChain.doFilter(request, response);
   }
 }

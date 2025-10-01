@@ -2,6 +2,8 @@ package school.hei.asa.endpoint;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
@@ -32,19 +34,17 @@ public class LenientStateAuthorizationRequestRepository
   @Override
   public OAuth2AuthorizationRequest removeAuthorizationRequest(
       HttpServletRequest request, HttpServletResponse response) {
-    String state = request.getParameter("state");
-    if (state == null) return null;
 
-    String matchedKey =
-        cache.keySet().stream()
-            .filter(key -> state.startsWith(key) || key.startsWith(state))
-            .findFirst()
-            .orElse(null);
+    String incomingState = request.getParameter("state");
+    if (incomingState == null) return null;
 
-    if (matchedKey != null) {
-      return cache.remove(matchedKey);
+    for (String key : cache.keySet()) {
+      String decodedKey = URLDecoder.decode(key, StandardCharsets.UTF_8);
+      String decodedState = URLDecoder.decode(incomingState, StandardCharsets.UTF_8);
+      if (decodedKey.equals(decodedState)) {
+        return cache.remove(key);
+      }
     }
-
     return null;
   }
 }

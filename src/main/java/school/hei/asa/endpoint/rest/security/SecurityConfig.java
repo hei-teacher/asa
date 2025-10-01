@@ -8,9 +8,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import school.hei.asa.endpoint.LenientStateAuthorizationRequestRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -35,6 +38,13 @@ public class SecurityConfig {
     this.oAuth2SuccessHandler = oAuth2SuccessHandler;
   }
 
+  /** Lenient repository to handle state decoding issues behind API Gateway */
+  @Bean
+  public AuthorizationRequestRepository<OAuth2AuthorizationRequest>
+      authorizationRequestRepository() {
+    return new LenientStateAuthorizationRequestRepository();
+  }
+
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(Customizer.withDefaults())
@@ -48,6 +58,9 @@ public class SecurityConfig {
         .oauth2Login(
             oauth2 ->
                 oauth2
+                    .authorizationEndpoint(
+                        auth ->
+                            auth.authorizationRequestRepository(authorizationRequestRepository()))
                     .successHandler(
                         (request, response, authentication) -> {
                           log.info("✅ OAuth2 login SUCCESS");

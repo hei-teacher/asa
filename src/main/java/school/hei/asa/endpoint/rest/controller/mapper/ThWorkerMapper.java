@@ -74,7 +74,7 @@ public class ThWorkerMapper {
         .sum();
   }
 
-  private boolean isCare(String code) {
-    return code.startsWith(careProductCodeSupplier.get());
+  private boolean isCare(String missionCode) {
+    return missionCode.startsWith(careProductCodeSupplier.get());
   }
 }

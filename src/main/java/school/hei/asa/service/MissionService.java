@@ -160,10 +160,7 @@ public class MissionService {
         .sum();
   }
 
-  /*
-   * this will consider each mission as a unique mission
-   * */
-  public List<ThMission> thMissionsPerProducts(List<ThProduct> thProducts) {
+  public List<ThMission> getUniqueMissionsByTitle(List<ThProduct> thProducts) {
     List<ThMission> missions = new ArrayList<>();
     thProducts.forEach(p -> missions.addAll(p.missions()));
     return missions.stream()
@@ -171,11 +168,7 @@ public class MissionService {
         .toList();
   }
 
-  /*
-   * this will group missions with the same title
-   * and consider them as one mission
-   * */
-  public List<ThMission> thMissionsFromProducts(List<ThProduct> thProducts) {
+  public List<ThMission> getAllMissionsFromProducts(List<ThProduct> thProducts) {
     List<ThMission> missions = new ArrayList<>();
 
     thProducts.forEach(
@@ -220,7 +213,7 @@ public class MissionService {
     Map<Worker, List<ThWorkerLevelHistory>> result = new HashMap<>();
     if (workerCode == null || workerCode.isBlank()) {
       var workers = workerRepository.findAll().stream().sorted(comparing(Worker::name)).toList();
-      workers.parallelStream()
+      workers.stream()
           .forEach(
               worker -> {
                 var workerLevelHistories =
@@ -262,7 +255,7 @@ public class MissionService {
       fileWriter.flush();
       totalWorkDaysPerWorker.forEach(
           (worker, thWorkerLevelHistories) -> {
-            thWorkerLevelHistories.parallelStream()
+            thWorkerLevelHistories.stream()
                 .forEach(
                     thWorkerLevelHistory -> {
                       try {

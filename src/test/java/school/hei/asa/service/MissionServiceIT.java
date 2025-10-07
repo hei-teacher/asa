@@ -75,7 +75,7 @@ class MissionServiceIT extends FacadeIT {
             new ThProduct("code3", "product3", "description", List.of(mission3), false),
             new ThProduct("code4", "product4", "description", List.of(mission4), false));
 
-    var thMissions = missionService.thMissionsPerProducts(thProducts);
+    var thMissions = missionService.getUniqueMissionsByTitle(thProducts);
 
     assertEquals(4, thMissions.size());
   }
@@ -109,7 +109,7 @@ class MissionServiceIT extends FacadeIT {
             new ThProduct("code3", "product3", "description", List.of(mission3), false),
             new ThProduct("code4", "product4", "description", List.of(mission4), false));
 
-    var thMissions = missionService.thMissionsFromProducts(thProducts);
+    var thMissions = missionService.getAllMissionsFromProducts(thProducts);
 
     assertEquals(2, thMissions.size());
   }

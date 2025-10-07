@@ -51,8 +51,8 @@ public class MissionController {
     var thProductsExecutedDaysSumByMonth =
         missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode);
     var thMissionsPerProductsByWorkerCode =
-        missionService.thMissionsPerProducts(thProductsByWorkerCode);
-    var thMissionsByWorkerCode = missionService.thMissionsFromProducts(thProductsByWorkerCode);
+        missionService.getUniqueMissionsByTitle(thProductsByWorkerCode);
+    var thMissionsByWorkerCode = missionService.getAllMissionsFromProducts(thProductsByWorkerCode);
 
     List<Map<String, Object>> executedDaysByProduct = new ArrayList<>();
     for (var product : thProductsByWorkerCode) {

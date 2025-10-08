@@ -129,7 +129,7 @@
           const workerCode = document.getElementById("worker").value;
           const startDate = document.getElementById("startDate").value || "";
           const endDate = document.getElementById("endDate").value || startDate;
-          window.location.href = `/missions?workerCode=${workerCode}&startDate=${startDate}&endDate=${startDate}`;
+          window.location.href = `/missions?workerCode=${workerCode}&startDate=${startDate}&endDate=${endDate}`;
         }
 
         document.addEventListener("DOMContentLoaded", function () {

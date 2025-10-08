@@ -78,6 +78,11 @@ public class MissionService {
               });
           result.add(new ThProduct(p.code(), p.name(), p.description(), newMissions, p.isCare()));
         });
+    if (workerCode.isBlank() || workerCode == null) {
+      return result.stream()
+          .sorted(Comparator.comparing(ThProduct::executedDays, naturalOrder()).reversed())
+          .toList();
+    }
     return result.stream()
         .map(p -> p.filterByWorkerCode(workerCode))
         .sorted(Comparator.comparing(ThProduct::executedDays, naturalOrder()).reversed())

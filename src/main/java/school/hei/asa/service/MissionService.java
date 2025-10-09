@@ -209,30 +209,33 @@ public class MissionService {
         .toList();
   }
 
-    public Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysForOneWorker(String workerCode) {
-        Map<Worker, List<ThWorkerLevelHistory>> result = new HashMap<>();
-            var worker = workerRepository.findByCode(workerCode);
-            var workerLevelHistories =
-                    thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
-            result.put(worker, workerLevelHistories);
-        return result;
-    }
+  public Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysForOneWorker(String workerCode) {
+    Map<Worker, List<ThWorkerLevelHistory>> result = new HashMap<>();
+    var worker = workerRepository.findByCode(workerCode);
+    var workerLevelHistories =
+        thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
+    result.put(worker, workerLevelHistories);
+    return result;
+  }
 
   public Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysPerWorker() {
     Map<Worker, List<ThWorkerLevelHistory>> result = new HashMap<>();
-      var workers = workerRepository.findAll().stream().sorted(comparing(Worker::name)).toList();
-      workers.parallelStream()
-          .forEach(
-              worker -> {
-                var workerLevelHistories =
-                    thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
-                result.put(worker, workerLevelHistories);
-              });
+    var workers = workerRepository.findAll().stream().sorted(comparing(Worker::name)).toList();
+    workers.parallelStream()
+        .forEach(
+            worker -> {
+              var workerLevelHistories =
+                  thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
+              result.put(worker, workerLevelHistories);
+            });
     return result;
   }
 
   public File generateCSV(String workerCode) {
-    var totalWorkDaysPerWorker = workerCode == null || workerCode.isBlank()?totalWorkDaysPerWorker() : totalWorkDaysForOneWorker(workerCode);
+    var totalWorkDaysPerWorker =
+        workerCode == null || workerCode.isBlank()
+            ? totalWorkDaysPerWorker()
+            : totalWorkDaysForOneWorker(workerCode);
     String filePath = System.getProperty("java.io.tmpdir");
     String fileName =
         workerCode == null || workerCode.isBlank()

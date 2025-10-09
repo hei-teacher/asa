@@ -24,16 +24,15 @@ public interface JMissionExecutionRepository extends JpaRepository<JMissionExecu
       String workerCode, LocalDate startDate, LocalDate endDate);
 
   @Query(
-          "SELECT new school.hei.asa.repository.model.WorkerDayPercentageSummary(" +
-                  "me.worker_code, " +
-                  "SUM(me.dayPercentage), " +
-                  "me.reportedAt, " +
-                  "me.mission_code) " +
-                  "FROM JMissionExecution me " +
-                  "WHERE me.reportedAt BETWEEN :startDate AND :endDate " +
-                  "AND me.worker_code = :workerCode " +
-                  "GROUP BY me.worker_code, me.reportedAt, me.mission_code"
-      )
+      "SELECT new school.hei.asa.repository.model.WorkerDayPercentageSummary("
+          + "me.worker_code, "
+          + "SUM(me.dayPercentage), "
+          + "me.reportedAt, "
+          + "me.mission_code) "
+          + "FROM JMissionExecution me "
+          + "WHERE me.reportedAt BETWEEN :startDate AND :endDate "
+          + "AND me.worker_code = :workerCode "
+          + "GROUP BY me.worker_code, me.reportedAt, me.mission_code")
   List<WorkerDayPercentageSummary> findWorkerDayPercentageSummary(
       @Param("workerCode") String workerCode,
       @Param("startDate") Instant startDate,

@@ -12,6 +12,7 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -208,29 +209,30 @@ public class MissionService {
         .toList();
   }
 
-  public Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysPerWorker(String workerCode) {
+    public Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysForOneWorker(String workerCode) {
+        Map<Worker, List<ThWorkerLevelHistory>> result = new HashMap<>();
+            var worker = workerRepository.findByCode(workerCode);
+            var workerLevelHistories =
+                    thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
+            result.put(worker, workerLevelHistories);
+        return result;
+    }
 
+  public Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysPerWorker() {
     Map<Worker, List<ThWorkerLevelHistory>> result = new HashMap<>();
-    if (workerCode == null || workerCode.isBlank()) {
       var workers = workerRepository.findAll().stream().sorted(comparing(Worker::name)).toList();
-      workers.stream()
+      workers.parallelStream()
           .forEach(
               worker -> {
                 var workerLevelHistories =
                     thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
                 result.put(worker, workerLevelHistories);
               });
-    } else {
-      var worker = workerRepository.findByCode(workerCode);
-      var workerLevelHistories =
-          thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
-      result.put(worker, workerLevelHistories);
-    }
     return result;
   }
 
   public File generateCSV(String workerCode) {
-    var totalWorkDaysPerWorker = totalWorkDaysPerWorker(workerCode);
+    var totalWorkDaysPerWorker = workerCode == null || workerCode.isBlank()?totalWorkDaysPerWorker() : totalWorkDaysForOneWorker(workerCode);
     String filePath = System.getProperty("java.io.tmpdir");
     String fileName =
         workerCode == null || workerCode.isBlank()
@@ -255,7 +257,7 @@ public class MissionService {
       fileWriter.flush();
       totalWorkDaysPerWorker.forEach(
           (worker, thWorkerLevelHistories) -> {
-            thWorkerLevelHistories.stream()
+            thWorkerLevelHistories.parallelStream()
                 .forEach(
                     thWorkerLevelHistory -> {
                       try {

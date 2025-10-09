@@ -3,6 +3,7 @@ package school.hei.asa.repository.mapper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static school.hei.asa.repository.model.WorkerType.studentContractor;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import school.hei.asa.model.StudentContractor;
@@ -35,13 +36,23 @@ public class WorkerLevelHistoryMapperTest {
     jWorkerLevelHistory.setEntranceInstant(newInstant());
     jWorkerLevelHistory.setContractType(String.valueOf(studentContractor));
     jWorkerLevelHistory.setTotalWorkDays(100);
+    jWorkerLevelHistory.setSalary(BigDecimal.valueOf(50_000d));
+    jWorkerLevelHistory.setJobTitle("job title");
+    jWorkerLevelHistory.setContractDuration(24);
 
     return jWorkerLevelHistory;
   }
 
   private WorkerLevelHistory newModel() {
     return new WorkerLevelHistory(
-        newWorker(), newJWorkerLevel(), newInstant(), String.valueOf(studentContractor), 100);
+        newWorker(),
+        newJWorkerLevel(),
+        newInstant(),
+        String.valueOf(studentContractor),
+        100,
+        BigDecimal.valueOf(50_000d),
+        "job title",
+        24);
   }
 
   private JWorker newJWorker() {

@@ -1,13 +1,9 @@
 package school.hei.asa.repository.model;
 
+import lombok.Data;
+
 import java.time.Instant;
 
-public interface WorkerDayPercentageSummary {
-  String getWorkerCode();
-
-  Double getTotalDayPercentage();
-
-  Instant getCreationInstant();
-
-  String getMissionCode();
+public record WorkerDayPercentageSummary(String workerCode, Double totalDayPercentage,
+                                         Instant creationInstant, String missionCode ) {
 }

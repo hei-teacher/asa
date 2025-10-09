@@ -1,6 +1,8 @@
 package school.hei.asa.repository;
 
 import jakarta.transaction.Transactional;
+
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -35,7 +37,7 @@ public class MissionExecutionRepository {
 
   @Transactional
   public List<WorkerDayPercentageSummary> dayPercentageSummary(
-      Worker worker, LocalDate startDate, LocalDate endDate) {
+          Worker worker, Instant startDate, Instant endDate) {
     return jMissionExecutionRepository.findWorkerDayPercentageSummary(
         worker.code(), startDate, endDate);
   }

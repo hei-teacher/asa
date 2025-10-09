@@ -68,9 +68,12 @@ public class ThWorkerMapper {
 
   private Double missionExecutionPercentageSumByWorker(
       Worker worker, LocalDate startDate, LocalDate endDate) {
-    return missionExecutionRepository.dayPercentageSummary(worker, startDate, endDate).stream()
-        .filter(w -> !isCare(w.getMissionCode()))
-        .mapToDouble(WorkerDayPercentageSummary::getTotalDayPercentage)
+    ZoneId zoneId = ZoneId.of("UTC");
+    var startInstant =startDate.atStartOfDay(zoneId).toInstant();
+    var endInstant =endDate.atStartOfDay(zoneId).toInstant();
+    return missionExecutionRepository.dayPercentageSummary(worker, startInstant, endInstant).stream()
+        .filter(w -> !isCare(w.missionCode()))
+        .mapToDouble(WorkerDayPercentageSummary::totalDayPercentage)
         .sum();
   }
 

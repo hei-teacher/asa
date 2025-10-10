@@ -2,8 +2,7 @@ package school.hei.asa.endpoint.rest.controller.mapper;
 
 import static java.time.Instant.now;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,7 +25,6 @@ public class ThWorkerMapper {
   private final CareProductCodeSupplier careProductCodeSupplier;
 
   public List<ThWorkerLevelHistory> toTh(List<WorkerLevelHistory> histories) {
-    ZoneId zoneId = ZoneId.of("UTC");
     List<ThWorkerLevelHistory> result = new ArrayList<>();
 
     for (int i = 0; i < histories.size(); i++) {
@@ -35,9 +33,7 @@ public class ThWorkerMapper {
 
       double totalDaysWorked =
           missionExecutionPercentageSumByWorker(
-              current.worker(),
-              current.entranceInstant().atZone(zoneId).toLocalDate(),
-              nextEntrance.atZone(zoneId).toLocalDate());
+              current.worker(), current.entranceInstant(), nextEntrance);
 
       var contractType = toWorkerType(current.contractType());
       var totalWorkDays = Objects.toString(current.projectedDaysToWork(), "-");
@@ -67,13 +63,8 @@ public class ThWorkerMapper {
   }
 
   private Double missionExecutionPercentageSumByWorker(
-      Worker worker, LocalDate startDate, LocalDate endDate) {
-    ZoneId zoneId = ZoneId.of("UTC");
-    var startInstant = startDate.atStartOfDay(zoneId).toInstant();
-    var endInstant = endDate.atStartOfDay(zoneId).toInstant();
-    return missionExecutionRepository
-        .dayPercentageSummary(worker, startInstant, endInstant)
-        .stream()
+      Worker worker, Instant startDate, Instant endDate) {
+    return missionExecutionRepository.dayPercentageSummary(worker, startDate, endDate).stream()
         .filter(w -> !isCare(w.missionCode()))
         .mapToDouble(WorkerDayPercentageSummary::totalDayPercentage)
         .sum();

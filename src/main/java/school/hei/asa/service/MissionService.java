@@ -215,6 +215,7 @@ public class MissionService {
     var workerLevelHistories =
         thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
     result.put(worker, workerLevelHistories);
+      log.info("result be like = {}", result);
     return result;
   }
 
@@ -241,7 +242,7 @@ public class MissionService {
         workerCode == null || workerCode.isBlank()
             ? "total_work_days-All.csv"
             : "total_work_days-"
-                + totalWorkDaysPerWorker.keySet().stream().findFirst().get()
+                + totalWorkDaysPerWorker.keySet().stream().findFirst().get().name()
                 + ".csv";
     File file = new File(filePath, fileName);
     writeToFile(file, totalWorkDaysPerWorker);

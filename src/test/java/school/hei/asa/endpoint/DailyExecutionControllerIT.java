@@ -4,7 +4,10 @@ import static java.time.Month.DECEMBER;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -18,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
+import org.springframework.ui.Model;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.controller.CalendarController;
 import school.hei.asa.endpoint.rest.controller.DailyExecutionController;
@@ -47,6 +51,7 @@ class DailyExecutionControllerIT extends FacadeIT {
 
   Authentication authentication;
   Worker authenticatedWorker;
+  Model model;
 
   @BeforeEach
   void setUp() {
@@ -62,6 +67,7 @@ class DailyExecutionControllerIT extends FacadeIT {
     var mission1 = new Mission("mission1-code", "title1", "description1", 10, product);
     var mission2 = new Mission("mission2-code", "title2", "description2", 2, product);
     missionRepository.saveAll(List.of(mission1, mission2));
+    model = mock(Model.class);
   }
 
   @Test
@@ -189,6 +195,16 @@ class DailyExecutionControllerIT extends FacadeIT {
     assertEquals(1, successCount);
 
     executor.shutdown();
+  }
+
+  @Test
+  void can_get_daily_execution_form() {
+    setUp();
+    var viewName = dailyExecutionController.getDailyExecutionForm(model);
+
+    verify(model).addAttribute(eq("missions"), any(List.class));
+
+    assertEquals("daily-execution", viewName);
   }
 
   private String getFutureResult(Future<String> future) {

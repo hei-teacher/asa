@@ -2,8 +2,12 @@ package school.hei.asa.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import school.hei.asa.conf.FacadeIT;
@@ -154,5 +158,74 @@ class MissionServiceIT extends FacadeIT {
 
     assertEquals(0, result.getFirst().missions().getFirst().getMissionExecutions().size());
     assertEquals(1, result.getLast().missions().getFirst().getMissionExecutions().size());
+  }
+
+  @Test
+  void filter_product_by_date_between() {
+    var missionExecution1 =
+        new ThMissionExecution(
+            "mission0-code",
+            "W-P-2024-01",
+            LocalDate.parse("2024-07-01"),
+            0.5,
+            "comment3",
+            false,
+            false);
+    var missionExecution2 =
+        new ThMissionExecution(
+            "mission0-code",
+            "W-P-2024-01",
+            LocalDate.parse("2024-07-01"),
+            0.5,
+            "comment4",
+            false,
+            false);
+    var mission =
+        new ThMission(
+            "mission0-code",
+            "a mission",
+            "a description",
+            List.of(missionExecution1, missionExecution2),
+            false);
+    var expected = new ThProduct("pCode0", "pname0", "pDescription0", List.of(mission), false);
+
+    var actual =
+        missionService
+            .filterThProductByWorkerCodeAndDateBetween("W-P-2024-01", "2024-06-01", "2024-08-01")
+            .getFirst();
+
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  @SneakyThrows
+  void export_worker_level_history_for_one_worker() {
+    var actualCSV = missionService.generateCSV("W-P-2024-01");
+
+    var actualContent = Files.readString(actualCSV.toPath());
+
+    var expectedCSV = expectedFile();
+    var expectedContent = Files.readString(expectedCSV.toPath());
+
+    assertEquals(expectedContent, actualContent);
+  }
+
+  private File expectedFile() {
+    String filePath = System.getProperty("java.io.tmpdir");
+    File file = new File(filePath, "test.csv");
+    try (FileWriter fileWriter = new FileWriter(file)) {
+      fileWriter.write(
+          "code,worker,worker level,start date,"
+              + "contract duration (in days),"
+              + "total days worked,remaining days"
+              + System.lineSeparator());
+      fileWriter.flush();
+      fileWriter.write(
+          "W-P-2024-01,Lita Andria,L5," + "2023-01-01,13,2.8,10.2" + System.lineSeparator());
+      fileWriter.flush();
+      return file;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 }

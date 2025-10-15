@@ -3,12 +3,16 @@ package school.hei.asa.endpoint.rest.model.th;
 import java.time.Month;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Accessors(fluent = true)
 @Getter
 @AllArgsConstructor
+@ToString
+@EqualsAndHashCode
 public class ThProduct {
   String code;
   String name;

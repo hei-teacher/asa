@@ -215,7 +215,7 @@ public class MissionService {
     var workerLevelHistories =
         thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
     result.put(worker, workerLevelHistories);
-      log.info("result be like = {}", result);
+    log.info("result be like = {}", result);
     return result;
   }
 

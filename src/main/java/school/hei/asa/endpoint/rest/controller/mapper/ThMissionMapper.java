@@ -1,9 +1,13 @@
 package school.hei.asa.endpoint.rest.controller.mapper;
 
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.naturalOrder;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
+import school.hei.asa.endpoint.rest.model.th.ThMissionExecution;
 import school.hei.asa.model.Mission;
 
 @AllArgsConstructor
@@ -19,7 +23,10 @@ public class ThMissionMapper {
         mission.code(),
         mission.title(),
         mission.description(),
-        mission.executions().stream().map(me -> missionExecutionMapper.toTh(me, isCare)).toList(),
+        mission.executions().stream()
+            .map(me -> missionExecutionMapper.toTh(me, isCare))
+            .sorted(comparing(ThMissionExecution::getComment, naturalOrder()))
+            .toList(),
         isCare);
   }
 }

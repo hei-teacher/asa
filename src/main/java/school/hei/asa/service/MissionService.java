@@ -1,19 +1,38 @@
 package school.hei.asa.service;
 
+import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.rest.controller.mapper.ThProductMapper;
+import school.hei.asa.endpoint.rest.controller.mapper.ThWorkerMapper;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
 import school.hei.asa.endpoint.rest.model.th.ThMissionExecution;
 import school.hei.asa.endpoint.rest.model.th.ThProduct;
+import school.hei.asa.endpoint.rest.model.th.ThWorkerLevelHistory;
+import school.hei.asa.model.Worker;
 import school.hei.asa.repository.ProductRepository;
+import school.hei.asa.repository.WorkerLevelHistoryRepository;
+import school.hei.asa.repository.WorkerRepository;
 
 @Slf4j
 @AllArgsConstructor
@@ -22,16 +41,19 @@ public class MissionService {
 
   private final ProductRepository productRepository;
   private final ThProductMapper thProductMapper;
+  private final WorkerRepository workerRepository;
+  private final WorkerLevelHistoryRepository workerLevelHistoryRepository;
+  private final ThWorkerMapper thWorkerMapper;
 
   private List<ThProduct> filterThProductsByWorkerCode(String workerCode) {
     var thProducts = thProductMapper.toTh(productRepository.findAll());
     return workerCode == null || workerCode.isBlank()
         ? thProducts.stream()
-            .sorted(Comparator.comparing(ThProduct::executedDays, naturalOrder()).reversed())
+            .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
             .toList()
         : thProducts.stream()
             .map(p -> p.filterByWorkerCode(workerCode))
-            .sorted(Comparator.comparing(ThProduct::executedDays, naturalOrder()).reversed())
+            .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
             .toList();
   }
 
@@ -85,7 +107,7 @@ public class MissionService {
     }
     return result.stream()
         .map(p -> p.filterByWorkerCode(workerCode))
-        .sorted(Comparator.comparing(ThProduct::executedDays, naturalOrder()).reversed())
+        .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
         .toList();
   }
 
@@ -139,15 +161,15 @@ public class MissionService {
         .sum();
   }
 
-  public List<ThMission> filterThMissionsByWorkerCode(List<ThProduct> thProducts) {
+  public List<ThMission> getUniqueMissionsByTitle(List<ThProduct> thProducts) {
     List<ThMission> missions = new ArrayList<>();
     thProducts.forEach(p -> missions.addAll(p.missions()));
     return missions.stream()
-        .sorted(Comparator.comparing(ThMission::executedDays, naturalOrder()).reversed())
+        .sorted(comparing(ThMission::executedDays, naturalOrder()).reversed())
         .toList();
   }
 
-  public List<ThMission> thMissionsByWorkerCode(List<ThProduct> thProducts) {
+  public List<ThMission> getAllMissionsFromProducts(List<ThProduct> thProducts) {
     List<ThMission> missions = new ArrayList<>();
 
     thProducts.forEach(
@@ -183,7 +205,113 @@ public class MissionService {
                   });
         });
     return missions.stream()
-        .sorted(Comparator.comparing(ThMission::executedDays, naturalOrder()).reversed())
+        .sorted(comparing(ThMission::executedDays, naturalOrder()).reversed())
         .toList();
+  }
+
+  public Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysForOneWorker(String workerCode) {
+    Map<Worker, List<ThWorkerLevelHistory>> result = new HashMap<>();
+    var worker = workerRepository.findByCode(workerCode);
+    var workerLevelHistories =
+        thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
+    result.put(worker, workerLevelHistories);
+    log.info("result be like = {}", result);
+    return result;
+  }
+
+  public Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysPerWorker() {
+    Map<Worker, List<ThWorkerLevelHistory>> result = new HashMap<>();
+    var workers = workerRepository.findAll().stream().sorted(comparing(Worker::name)).toList();
+    workers.parallelStream()
+        .forEach(
+            worker -> {
+              var workerLevelHistories =
+                  thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
+              result.put(worker, workerLevelHistories);
+            });
+    return result;
+  }
+
+  public File generateCSV(String workerCode) {
+    var totalWorkDaysPerWorker =
+        workerCode == null || workerCode.isBlank()
+            ? totalWorkDaysPerWorker()
+            : totalWorkDaysForOneWorker(workerCode);
+    String filePath = System.getProperty("java.io.tmpdir");
+    String fileName =
+        workerCode == null || workerCode.isBlank()
+            ? "total_work_days-All.csv"
+            : "total_work_days-"
+                + totalWorkDaysPerWorker.keySet().stream().findFirst().get().name()
+                + ".csv";
+    File file = new File(filePath, fileName);
+    writeToFile(file, totalWorkDaysPerWorker);
+    return file;
+  }
+
+  @SneakyThrows
+  private void writeToFile(
+      File file, Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysPerWorker) {
+    try (FileWriter fileWriter = new FileWriter(file)) {
+      fileWriter.write(
+          "code,worker,worker level,start date,"
+              + "contract duration (in days),"
+              + "total days worked,remaining days"
+              + System.lineSeparator());
+      fileWriter.flush();
+      totalWorkDaysPerWorker.forEach(
+          (worker, thWorkerLevelHistories) -> {
+            thWorkerLevelHistories.parallelStream()
+                .forEach(
+                    thWorkerLevelHistory -> {
+                      try {
+                        String remainingDays = remainingDaysToString(thWorkerLevelHistory);
+                        String actualWorkedDays = actualWorkedDaysToString(thWorkerLevelHistory);
+                        String startDate =
+                            thWorkerLevelHistory
+                                .entranceInstant()
+                                .atZone(ZoneId.of("UTC"))
+                                .toLocalDate()
+                                .toString();
+                        String textToWrite =
+                            String.format(
+                                "%s,%s,%s,%s,%s,%s,%s",
+                                worker.code(),
+                                worker.name(),
+                                thWorkerLevelHistory.level(),
+                                startDate,
+                                thWorkerLevelHistory.projectedDaysToWork(),
+                                actualWorkedDays,
+                                remainingDays);
+
+                        fileWriter.write(textToWrite + System.lineSeparator());
+                        fileWriter.flush();
+                      } catch (IOException e) {
+                        throw new RuntimeException(e);
+                      }
+                    });
+          });
+
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private String remainingDaysToString(ThWorkerLevelHistory thWorkerLevelHistory) {
+    if (thWorkerLevelHistory.projectedDaysToWork().equals("-")) {
+      return "-";
+    } else {
+      var number =
+          (Double.parseDouble(thWorkerLevelHistory.projectedDaysToWork())
+              - Double.parseDouble(thWorkerLevelHistory.actualWorkedDay()));
+      var numberFormat = new DecimalFormat("#.0");
+      return numberFormat.format(number);
+    }
+  }
+
+  private String actualWorkedDaysToString(ThWorkerLevelHistory thWorkerLevelHistory) {
+    return Double.parseDouble(thWorkerLevelHistory.actualWorkedDay()) == 0.0d
+        ? "-"
+        : thWorkerLevelHistory.actualWorkedDay();
   }
 }

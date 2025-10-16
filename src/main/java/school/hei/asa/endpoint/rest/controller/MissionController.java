@@ -3,11 +3,18 @@ package school.hei.asa.endpoint.rest.controller;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +32,7 @@ import school.hei.asa.service.MissionService;
 public class MissionController {
 
   private final DailyExecutionRepository dailyExecutionRepository;
+
   private final CareProductCodeSupplier careProductCodeSupplier;
   private final ThDailyExecutionMapper thDailyExecutionMapper;
   private final WorkerToModelAdder workerToModelAdder;
@@ -43,8 +51,8 @@ public class MissionController {
     var thProductsExecutedDaysSumByMonth =
         missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode);
     var thMissionsPerProductsByWorkerCode =
-        missionService.filterThMissionsByWorkerCode(thProductsByWorkerCode);
-    var thMissionsByWorkerCode = missionService.thMissionsByWorkerCode(thProductsByWorkerCode);
+        missionService.getUniqueMissionsByTitle(thProductsByWorkerCode);
+    var thMissionsByWorkerCode = missionService.getAllMissionsFromProducts(thProductsByWorkerCode);
 
     List<Map<String, Object>> executedDaysByProduct = new ArrayList<>();
     for (var product : thProductsByWorkerCode) {
@@ -88,6 +96,22 @@ public class MissionController {
     model.addAttribute("executedDaysByMission", executedDaysByMission);
 
     return "missions";
+  }
+
+  @SneakyThrows
+  @GetMapping("/missions/export-to-csv")
+  public ResponseEntity<ByteArrayResource> exportToCSV(@RequestParam String workerCode) {
+    var file = missionService.generateCSV(workerCode);
+    ByteArrayResource resource =
+        new ByteArrayResource(Files.readAllBytes(Path.of(file.getAbsolutePath())));
+    HttpHeaders header = new HttpHeaders();
+    header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
+
+    return ResponseEntity.ok()
+        .headers(header)
+        .contentLength(file.length())
+        .contentType(MediaType.parseMediaType("application/octet-stream"))
+        .body(resource);
   }
 
   @GetMapping("/mission-executions")

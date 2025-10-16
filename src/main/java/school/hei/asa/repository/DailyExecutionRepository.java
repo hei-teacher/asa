@@ -57,6 +57,7 @@ public class DailyExecutionRepository {
     return dailyExecutions;
   }
 
+  @Transactional
   public List<DailyExecution> findByDateBetween(LocalDate startDate, LocalDate endDate) {
     var jWorkers = jWorkerRepository.findAll();
     var jMissions = jMissionRepository.findAll();

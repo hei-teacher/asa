@@ -1,8 +1,10 @@
 package school.hei.asa.endpoint;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,5 +58,15 @@ class InvoiceControllerIT extends FacadeIT {
     String viewName = invoiceController.getInvoicePage(model, invoiceForm);
 
     assertEquals("invoice-generator", viewName);
+  }
+
+  @Test
+  void can_preview_invoice() {
+    setUp();
+    var invoiceForm = new ThInvoiceForm(null, null, "", "", "", "", "", false, "", "", "", "", "");
+    var invoicePreview = invoiceController.previewInvoice(model, authentication, invoiceForm);
+
+    assertEquals(OK, invoicePreview.getStatusCode());
+    assertTrue(invoicePreview.hasBody());
   }
 }

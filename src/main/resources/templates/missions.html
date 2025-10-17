@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
   <head>
     <title>Asa - Missions by Products</title>
@@ -134,21 +134,6 @@
           </tr>
         </tfoot>
       </table>
-
-      <script>
-        function updateFilters() {
-          const workerCode = document.getElementById("worker").value;
-          const startDate = document.getElementById("startDate").value || "";
-          const endDate = document.getElementById("endDate").value || startDate;
-          window.location.href = `/missions?workerCode=${workerCode}&startDate=${startDate}&endDate=${endDate}`;
-        }
-
-        document.addEventListener("DOMContentLoaded", function () {
-          document
-            .getElementById("worker")
-            .addEventListener("change", updateFilters);
-        });
-      </script>
     </div>
 
     <div id="graphModal" class="hidden z-50">

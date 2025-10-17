@@ -1,20 +1,61 @@
-<form th:fragment="workerSelector(targetEndpoint, defaultOption)"
-      th:action="@{'/' + ${targetEndpoint}}" method="get"
-      class="bg-gray-50 flex flex-col gap-4">
-
-    <div class="flex flex-col">
-        <label for="worker" class="block text-gray-700 font-medium mb-2">Select a Worker</label>
-        <div class="flex items-center gap-4">
-            <select id="worker" name="workerCode"
-                    class="w-64 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#9933CC] focus:outline-none">
-                <option th:text="${defaultOption}" value=""
-                        th:selected="${workerCode == null or workerCode.isBlank()}"
-                        class="text-gray-500"></option>
-                <option th:each="worker : ${workers}"
-                        th:value="${worker.code()}"
-                        th:text="${worker.name()}"
-                        th:selected="${worker.code() == workerCode}"></option>
-            </select>
-        </div>
+<form
+  th:fragment="workerSelector(targetEndpoint, defaultOption)"
+  th:action="@{'/' + ${targetEndpoint}}"
+  method="get"
+  class="bg-gray-50 flex flex-row align-center gap-4"
+>
+  <div class="flex flex-col">
+    <label for="worker" class="block text-gray-700 font-medium mb-2"
+      >Select a Worker</label
+    >
+    <div class="flex items-center gap-4">
+      <select
+        id="worker"
+        name="workerCode"
+        class="w-64 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#9933CC] focus:outline-none"
+      >
+        <option
+          th:text="${defaultOption}"
+          value=""
+          th:selected="${workerCode == null or workerCode.isBlank()}"
+          class="text-gray-500"
+        ></option>
+        <option
+          th:each="worker : ${workers}"
+          th:value="${worker.code()}"
+          th:text="${worker.name()}"
+          th:selected="${worker.code() == workerCode}"
+        ></option>
+      </select>
     </div>
+  </div>
+  <div class="flex flex-col">
+    <label class="block text-gray-700 font-medium mb-2"
+      >Select Start Date</label
+    >
+    <input
+      id="startDate"
+      name="startDate"
+      type="date"
+      th:value="${startDate}"
+      class="w-64 p-2 border border-gray-300 rounded-lg"
+    />
+  </div>
+  <div class="flex flex-col">
+    <label class="block text-gray-700 font-medium mb-2">Select End Date</label>
+    <input
+      id="endDate"
+      name="endDate"
+      type="date"
+      th:value="${endDate}"
+      class="w-64 p-2 border border-gray-300 rounded-lg"
+    />
+  </div>
+  <button
+    class="cursor-pointer bg-[#2D2D5A] hover:bg-[#4D4D7A] self-end text-white py-2 px-4 rounded shadow h-1/2"
+    type="button"
+    onclick="updateFilters()"
+  >
+    Update Date Filter
+  </button>
 </form>

@@ -2,18 +2,12 @@ var chartInstances = [];
 
 function updateFilters() {
   const workerCode = document.getElementById("worker").value || "";
-
   const startDate = document.getElementById("startDate").value || "";
   const endDate = document.getElementById("endDate").value || startDate;
   window.location.href = `/missions?workerCode=${workerCode}&startDate=${startDate}&endDate=${endDate}`;
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  const workerSelect = document.getElementById("worker");
-  if (workerSelect) {
-    workerSelect.addEventListener("change", updateFilters);
-  }
-
   const showGraphBtn = document.getElementById("showGraphBtn");
   const graphModal = document.getElementById("graphModal");
   const closeModal = document.getElementById("closeModal");

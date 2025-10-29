@@ -28,7 +28,7 @@ public class WorkerLevelHistoryMapper {
         jWorkerLevelHistory.getEntranceInstant(),
         jWorkerLevelHistory.getContractType(),
         jWorkerLevelHistory.getTotalWorkDays(),
-        jWorkerLevelHistory.getSalary(),
+        jWorkerLevelHistory.getCompensation(),
         jWorkerLevelHistory.getJobTitle(),
         jWorkerLevelHistory.getContractDuration());
   }

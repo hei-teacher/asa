@@ -76,7 +76,7 @@ public class InvoiceService {
     var firstDay = today.withDayOfYear(1);
     var workerLevelHistories = workerLevelHistoryRepository.findAllByWorker(worker);
     var hasLevelHistory = !workerLevelHistories.isEmpty();
-    var salary = hasLevelHistory ? workerLevelHistories.getFirst().salary() : ZERO;
+    var compensation = hasLevelHistory ? workerLevelHistories.getFirst().compensation() : ZERO;
     var dateReference =
         LocalDate.parse(isEmpty ? firstDay.format(formatter) : invoiceForm.reference(), formatter);
     var issueDate = dateReference.plusDays(3).format(formatter);
@@ -94,11 +94,11 @@ public class InvoiceService {
         Objects.equals(contractType, ContractType.STUDENT_CONTRACTOR.getValue());
     var unitValue =
         isStudentContractor ? DAYS_TO_BE_WORKED_BY_STUDENT : DAYS_TO_BE_WORKED_BY_PARTNER;
-    var unitPriceValue = salary.divide(valueOf(unitValue), 2, HALF_UP);
+    var unitPriceValue = compensation.divide(valueOf(unitValue), 2, HALF_UP);
     var unitPrice = numberParser.parseToNumber(unitPriceValue);
     var amount =
         isStudentContractor
-            ? numberParser.parseToNumber(salary)
+            ? numberParser.parseToNumber(compensation)
             : numberParser.parseToNumber(unitPriceValue.multiply(valueOf(totalDaysWorked)));
     var parsedAmount = isEmpty ? "" : numberConverter.convertToWords(amount);
     var description = hasLevelHistory ? workerLevelHistories.getFirst().jobTitle() : "";

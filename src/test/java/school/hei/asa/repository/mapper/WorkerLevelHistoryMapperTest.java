@@ -36,7 +36,7 @@ public class WorkerLevelHistoryMapperTest {
     jWorkerLevelHistory.setEntranceInstant(newInstant());
     jWorkerLevelHistory.setContractType(String.valueOf(studentContractor));
     jWorkerLevelHistory.setTotalWorkDays(100);
-    jWorkerLevelHistory.setSalary(BigDecimal.valueOf(50_000d));
+    jWorkerLevelHistory.setCompensation(BigDecimal.valueOf(50_000d));
     jWorkerLevelHistory.setJobTitle("job title");
     jWorkerLevelHistory.setContractDuration(24);
 

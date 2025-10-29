@@ -18,7 +18,7 @@ public class WorkerLevelHistory {
   private final Instant entranceInstant;
   private final String contractType;
   private final Integer projectedDaysToWork;
-  private final BigDecimal salary;
+  private final BigDecimal compensation;
   private final String jobTitle;
   private final Integer contractDuration;
 }

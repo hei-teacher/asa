@@ -35,8 +35,8 @@ public class JWorkerLevelHistory {
   @Column(name = "total_work_days")
   private Integer totalWorkDays;
 
-  @Column(name = "salary", precision = 15, scale = 2)
-  private BigDecimal salary;
+  @Column(name = "compensation", precision = 15, scale = 2)
+  private BigDecimal compensation;
 
   @Column(name = "job_title")
   private String jobTitle;

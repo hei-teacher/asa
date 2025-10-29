@@ -15,7 +15,7 @@ public class ThWorkerLevelHistory {
   String contractType;
   String projectedDaysToWork;
   String actualWorkedDay;
-  BigDecimal salary;
+  BigDecimal compensation;
   String jobTitle;
   Integer contractDuration;
 }

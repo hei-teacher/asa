@@ -13,6 +13,7 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.*;
 import school.hei.asa.repository.WorkerLevelHistoryRepository;
 import school.hei.asa.repository.WorkerRepository;
+import school.hei.asa.service.DownloadService;
 
 @Controller
 @AllArgsConstructor
@@ -23,6 +24,7 @@ public class WorkerController {
   private final WorkerFromAuthentication workerFromAuthentication;
   private final WorkerToModelAdder workerToModelAdder;
   private final ThWorkerMapper thWorkerMapper;
+  private final DownloadService downloadService;
 
   @GetMapping("/workers")
   public List<Worker> getWorkers() {

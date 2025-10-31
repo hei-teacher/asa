@@ -30,6 +30,7 @@ public class WorkerLevelHistoryMapper {
         jWorkerLevelHistory.getTotalWorkDays(),
         jWorkerLevelHistory.getCompensation(),
         jWorkerLevelHistory.getJobTitle(),
-        jWorkerLevelHistory.getContractDuration());
+        jWorkerLevelHistory.getContractDuration(),
+        jWorkerLevelHistory.getContractReference());
   }
 }

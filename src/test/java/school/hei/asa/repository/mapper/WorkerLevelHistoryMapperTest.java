@@ -39,6 +39,7 @@ public class WorkerLevelHistoryMapperTest {
     jWorkerLevelHistory.setCompensation(BigDecimal.valueOf(50_000d));
     jWorkerLevelHistory.setJobTitle("job title");
     jWorkerLevelHistory.setContractDuration(24);
+    jWorkerLevelHistory.setContractBucketKey("DUMMY_BUCKET");
 
     return jWorkerLevelHistory;
   }
@@ -52,7 +53,8 @@ public class WorkerLevelHistoryMapperTest {
         100,
         BigDecimal.valueOf(50_000d),
         "job title",
-        24);
+        24,
+        "DUMMY_BUCKET");
   }
 
   private JWorker newJWorker() {

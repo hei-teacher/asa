@@ -21,5 +21,5 @@ public class WorkerLevelHistory {
   private final BigDecimal compensation;
   private final String jobTitle;
   private final Integer contractDuration;
-  private final String contractReference;
+  private final String contractBucketKey;
 }

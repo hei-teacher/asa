@@ -31,6 +31,6 @@ public class WorkerLevelHistoryMapper {
         jWorkerLevelHistory.getCompensation(),
         jWorkerLevelHistory.getJobTitle(),
         jWorkerLevelHistory.getContractDuration(),
-        jWorkerLevelHistory.getContractReference());
+        jWorkerLevelHistory.getContractBucketKey());
   }
 }

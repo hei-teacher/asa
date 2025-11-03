@@ -45,5 +45,5 @@ public class JWorkerLevelHistory {
   private Integer contractDuration;
 
   @Column(name = "contract_bucket_key")
-  private String contractReference;
+  private String contractBucketKey;
 }

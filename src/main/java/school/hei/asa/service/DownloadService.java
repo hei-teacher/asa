@@ -11,7 +11,6 @@ public class DownloadService {
   private final BucketComponent bucketComponent;
 
   public String presign(String bucketKey) {
-    if (bucketKey == null || bucketKey.isBlank()) return null;
     return bucketComponent.presign(bucketKey, Duration.ofMinutes(5)).toString();
   }
 }

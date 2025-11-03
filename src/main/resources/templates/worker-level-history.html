@@ -32,6 +32,7 @@
                     <th class="py-3 px-6">Contract Type</th>
                     <th class="py-3 px-6">Projected Days To Work</th>
                     <th class="py-3 px-6">Actual Worked Day</th>
+                    <th class="py-3 px-6">Contract</th>
                 </tr>
                 </thead>
                 <tbody class="text-gray-700 text-sm font-light text-center">
@@ -43,13 +44,13 @@
                     <td class="py-3 px-6 text-center" th:text="${levelHistory.projectedDaysToWork}"></td>
                     <td class="py-3 px-6 text-center" th:text="${levelHistory.actualWorkedDay}"></td>
                     <td class="py-3 px-6 text-center">
-                        <a th:if="${levelHistory.contractReference != null}"
-                           th:href="${downloadService.presign(levelHistory.contractReference)}"
+                        <a th:if="${levelHistory.contractBucketKey() != null}"
+                           th:href="@{/download-contract(contractBucketKey=${levelHistory.contractBucketKey()})}"
                            target="_blank"
                            class="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-800 text-white font-semibold py-1 px-3 rounded transition">
                             <i class="material-icons">download</i> Download
                         </a>
-                        <span th:if="${levelHistory.contractReference == null}" class="text-gray-400">N/A</span>
+                        <strong th:if="${levelHistory.contractBucketKey() == null}" class="">No Contract</strong>
                     </td>
                 </tr>
                 </tbody>

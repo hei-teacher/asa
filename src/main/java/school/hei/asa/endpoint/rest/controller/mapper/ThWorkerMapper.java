@@ -48,8 +48,7 @@ public class ThWorkerMapper {
               current.compensation(),
               current.jobTitle(),
               current.contractDuration(),
-                  current.contractReference())
-              );
+              current.contractBucketKey()));
     }
 
     return result;

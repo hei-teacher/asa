@@ -18,5 +18,5 @@ public class ThWorkerLevelHistory {
   BigDecimal compensation;
   String jobTitle;
   Integer contractDuration;
-  String contractReference;
+  String contractBucketKey;
 }

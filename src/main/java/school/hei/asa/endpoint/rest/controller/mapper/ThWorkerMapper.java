@@ -47,7 +47,9 @@ public class ThWorkerMapper {
               String.valueOf(totalDaysWorked),
               current.compensation(),
               current.jobTitle(),
-              current.contractDuration()));
+              current.contractDuration(),
+                  current.contractReference())
+              );
     }
 
     return result;

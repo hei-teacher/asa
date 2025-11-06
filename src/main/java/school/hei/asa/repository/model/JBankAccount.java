@@ -14,24 +14,24 @@ import lombok.Setter;
 @Getter
 @Setter
 public class JBankAccount {
-    @Id private String id;
+  @Id private String id;
 
-    @Column(insertable = false, updatable = false, name = "banque")
-    private String bank;
+  @Column(insertable = false, updatable = false, name = "banque")
+  private String bank;
 
-    @Column(insertable = false, updatable = false, name = "agence")
-    private String agency;
+  @Column(insertable = false, updatable = false, name = "agence")
+  private String agency;
 
-    @Column(insertable = false, updatable = false, name = "compte")
-    private String account;
+  @Column(insertable = false, updatable = false, name = "compte")
+  private String account;
 
-    @Column(insertable = false, updatable = false, name = "cle")
-    private String key;
+  @Column(insertable = false, updatable = false, name = "cle")
+  private String key;
 
-    @Column(insertable = false, updatable = false, name = "IBAN")
-    private String iban;
+  @Column(insertable = false, updatable = false, name = "IBAN")
+  private String iban;
 
-    @OneToOne
-    @JoinColumn(name = "worker_code")
-    private JWorker worker;
+  @OneToOne
+  @JoinColumn(name = "worker_code")
+  private JWorker worker;
 }

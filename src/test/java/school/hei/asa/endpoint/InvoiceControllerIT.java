@@ -29,8 +29,7 @@ class InvoiceControllerIT extends FacadeIT {
 
   @MockBean WorkerFromAuthentication workerFromAuthentication;
   @MockBean WorkerToModelAdder workerToModelAdder;
-  @MockBean
-    BankAccountRepository bankAccountRepository;
+  @MockBean BankAccountRepository bankAccountRepository;
 
   Authentication authentication;
   Worker authenticatedWorker;
@@ -50,7 +49,7 @@ class InvoiceControllerIT extends FacadeIT {
             "random city",
             "nif",
             "stat");
-    bankAccount = new BankAccount("","","","","",authenticatedWorker);
+    bankAccount = new BankAccount("", "", "", "", "", authenticatedWorker);
     model = mock(Model.class);
 
     when(workerFromAuthentication.apply(authentication))
@@ -61,7 +60,8 @@ class InvoiceControllerIT extends FacadeIT {
 
   @Test
   void can_get_invoice() {
-    var invoiceForm = new ThInvoiceForm(null, null, "", "", "", "", "", false, "", "", "", "", "", "");
+    var invoiceForm =
+        new ThInvoiceForm(null, null, "", "", "", "", "", false, "", "", "", "", "", "");
     String viewName = invoiceController.getInvoicePage(model, invoiceForm);
 
     assertEquals("invoice-generator", viewName);
@@ -70,7 +70,8 @@ class InvoiceControllerIT extends FacadeIT {
   @Test
   void can_preview_invoice() {
     setUp();
-    var invoiceForm = new ThInvoiceForm(null, null, "", "", "", "", "", false, "", "", "", "", "", "");
+    var invoiceForm =
+        new ThInvoiceForm(null, null, "", "", "", "", "", false, "", "", "", "", "", "");
     var invoicePreview = invoiceController.previewInvoice(model, authentication, invoiceForm);
 
     assertEquals(OK, invoicePreview.getStatusCode());

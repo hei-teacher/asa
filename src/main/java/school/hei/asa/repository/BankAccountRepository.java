@@ -10,11 +10,11 @@ import school.hei.asa.repository.mapper.BankAccountMapper;
 @AllArgsConstructor
 @Component
 public class BankAccountRepository {
-    private final JBankAccountRepository jBankAccountRepository;
-    private final BankAccountMapper bankAccountMapper;
+  private final JBankAccountRepository jBankAccountRepository;
+  private final BankAccountMapper bankAccountMapper;
 
-    @Transactional
-    public BankAccount findByWorkerCode (String workerCode){
-        return bankAccountMapper.toDomain(jBankAccountRepository.findByWorkerCode(workerCode));
-    }
+  @Transactional
+  public BankAccount findByWorkerCode(String workerCode) {
+    return bankAccountMapper.toDomain(jBankAccountRepository.findByWorkerCode(workerCode));
+  }
 }

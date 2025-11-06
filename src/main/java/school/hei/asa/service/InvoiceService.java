@@ -120,7 +120,7 @@ public class InvoiceService {
         invoiceForm.unitPrice(),
         invoiceForm.bonusAmount(),
         parsedAmount,
-            bankAccount.toString());
+        bankAccount.toString());
   }
 
   private Double missionExecutionPercentageSumByWorker(

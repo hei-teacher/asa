@@ -27,6 +27,7 @@ import school.hei.asa.model.ContractType;
 import school.hei.asa.model.Invoice;
 import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
+import school.hei.asa.repository.BankAccountRepository;
 import school.hei.asa.repository.MissionExecutionRepository;
 import school.hei.asa.repository.WorkerLevelHistoryRepository;
 import school.hei.asa.service.utils.NumberConverter;
@@ -40,6 +41,7 @@ public class InvoiceService {
   private final NumberParser numberParser;
   private final WorkerLevelHistoryRepository workerLevelHistoryRepository;
   private final MissionExecutionRepository missionExecutionRepository;
+  private final BankAccountRepository bankAccountRepository;
   private final CareProductCodeSupplier careProductCodeSupplier;
 
   private static final int DAYS_TO_BE_WORKED_BY_PARTNER = 18;
@@ -102,6 +104,7 @@ public class InvoiceService {
             : numberParser.parseToNumber(unitPriceValue.multiply(valueOf(totalDaysWorked)));
     var parsedAmount = isEmpty ? "" : numberConverter.convertToWords(amount);
     var description = hasLevelHistory ? workerLevelHistories.getFirst().jobTitle() : "";
+    var bankAccount = bankAccountRepository.findByWorkerCode(worker.code());
 
     return new ThInvoiceForm(
         reference,
@@ -116,7 +119,8 @@ public class InvoiceService {
         invoiceForm.bonusQuantity(),
         invoiceForm.unitPrice(),
         invoiceForm.bonusAmount(),
-        parsedAmount);
+        parsedAmount,
+            bankAccount.toString());
   }
 
   private Double missionExecutionPercentageSumByWorker(

@@ -8,4 +8,9 @@ public record BankAccount(
         String iban,
         Worker worker
         ) {
+
+    @Override
+    public String toString() {
+        return String.format("%s-%s-%s-%s", bank, agency, account, key);
+    }
 }

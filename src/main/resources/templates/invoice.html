@@ -206,6 +206,13 @@
             <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 700;" th:text="${invoice.parsedAmount + ' Ariary'}"></span>
         </div>
 
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <span style="font-family: 'EB Garamond', serif; font-size: 14px; font-weight: 400;">
+                Mode de paiement : Virement bancaire vers le compte :
+            </span>
+            <span style="font-family: 'EB Garamond', serif; font-size: 15px;" th:text="${invoice.rib}"></span>
+        </div>
+
         <div style="margin-top: 60px; display: flex; gap: 8px; align-items: center;">
             <span style="font-family: 'EB Garamond', serif; font-size: 14px; font-weight: 400;">
                 Signature

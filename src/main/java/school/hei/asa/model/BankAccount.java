@@ -5,6 +5,7 @@ public record BankAccount(
 
   @Override
   public String toString() {
-    return String.format("%s-%s-%s-%s", bank, agency, account, key);
+    return String.format(
+        "Banque: %s, Agence: %s, Compte: %s, Clé: %s, IBAN: %s", bank, agency, account, key, iban);
   }
 }

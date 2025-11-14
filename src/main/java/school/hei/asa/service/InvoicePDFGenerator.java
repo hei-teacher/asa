@@ -3,6 +3,8 @@ package school.hei.asa.service;
 import com.lowagie.text.DocumentException;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.Locale;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
@@ -11,6 +13,10 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.file.FileWriter;
 import school.hei.asa.model.Worker;
+
+import static java.time.LocalDateTime.now;
+import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Locale.FRENCH;
 
 @Component
 @AllArgsConstructor
@@ -46,6 +52,7 @@ public class InvoicePDFGenerator {
 
   private Context configureContext(Worker worker, ThInvoiceForm thInvoiceForm) {
     Context context = new Context();
+    context.setVariable("creationDate",now().format(ofPattern("dd LLLL yyyy à HH:mm:ss", FRENCH)));
     context.setVariable("worker", worker);
     context.setVariable("invoice", thInvoiceForm);
 

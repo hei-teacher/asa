@@ -25,7 +25,7 @@ public class InvoiceDetailsMapper {
     jInvoiceDetails.setId(invoiceDetails.id());
     jInvoiceDetails.setWorker(workerMapper.toEntity(invoiceDetails.worker()));
     jInvoiceDetails.setYearMonth(invoiceDetails.yearMonth().toString());
-    jInvoiceDetails.setReference(jInvoiceDetails.getReference());
+    jInvoiceDetails.setReference(invoiceDetails.reference());
     return jInvoiceDetails;
   }
 }

@@ -1,6 +1,7 @@
 package school.hei.asa.endpoint.rest.model.th;
 
 public record ThInvoiceForm(
+    String yearMonth,
     String reference,
     String issueDate,
     String description,
@@ -8,10 +9,5 @@ public record ThInvoiceForm(
     String unitPrice,
     String amount,
     String total,
-    Boolean hasBonus,
-    String bonusDescription,
-    String bonusQuantity,
-    String bonusUnitPrice,
-    String bonusAmount,
     String parsedAmount,
     String rib) {}

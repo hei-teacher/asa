@@ -191,12 +191,6 @@
                 <td class="text-center" th:text="${invoice.unitPrice}"></td>
                 <td class="text-right" th:text="${invoice.amount}"></td>
             </tr>
-            <tr th:if="${invoice.hasBonus}">
-                <td class="text-left" style="width: 230px; word-wrap: break-word;" th:text="${invoice.bonusDescription}"></td>
-                <td class="text-center" th:text="${invoice.bonusQuantity}"></td>
-                <td class="text-center" th:text="${invoice.bonusUnitPrice}"></td>
-                <td class="text-right" th:text="${invoice.bonusAmount}"></td>
-            </tr>
             <tr>
                 <td colspan="2" style="border-bottom: none;"></td>
                 <td class="text-left" style="font-size: 15px; font-family: 'EB Garamond', serif; font-weight: 700;"> Total</td>

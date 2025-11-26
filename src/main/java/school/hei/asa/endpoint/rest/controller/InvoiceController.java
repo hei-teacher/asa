@@ -6,6 +6,9 @@ import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
 import java.io.*;
+import java.time.Month;
+import java.util.EnumSet;
+
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.core.io.FileSystemResource;
@@ -32,7 +35,7 @@ public class InvoiceController {
 
   @GetMapping("/invoice")
   public String getInvoicePage(Model model, @ModelAttribute ThInvoiceForm invoiceForm) {
-    model.addAttribute("dateReference", invoiceForm.reference());
+    model.addAttribute("yearMonthReference", invoiceForm.yearMonth());
 
     return "invoice-generator";
   }

@@ -14,10 +14,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import javax.imageio.ImageIO;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,7 @@ import school.hei.asa.repository.WorkerLevelHistoryRepository;
 import school.hei.asa.service.utils.NumberConverter;
 import school.hei.asa.service.utils.NumberParser;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 public class InvoiceService {
@@ -73,18 +76,15 @@ public class InvoiceService {
 
   private ThInvoiceForm extractInvoiceData(Worker worker, ThInvoiceForm invoiceForm) {
     var formatter = ofPattern("dd/MM/yyyy", FRENCH);
-    var isEmpty = invoiceForm.reference() == null || invoiceForm.reference().isBlank();
-    var today = now();
-    var firstDay = today.withDayOfYear(1);
+    var isEmpty = invoiceForm.yearMonth() == null || invoiceForm.yearMonth().isBlank();
     var workerLevelHistories = workerLevelHistoryRepository.findAllByWorker(worker);
     var hasLevelHistory = !workerLevelHistories.isEmpty();
     var compensation = hasLevelHistory ? workerLevelHistories.getFirst().compensation() : ZERO;
-    var dateReference =
-        LocalDate.parse(isEmpty ? firstDay.format(formatter) : invoiceForm.reference(), formatter);
+    var dateReference = now();
     var issueDate = dateReference.plusDays(3).format(formatter);
     var reference = dateReference.format(formatter);
-    var firstCurrentMonthDay = dateReference.withDayOfMonth(1);
-    var ym = YearMonth.from(dateReference);
+      var ym = isEmpty? YearMonth.from(dateReference): YearMonth.parse(invoiceForm.yearMonth(), ofPattern("yyyy-MM"));
+    var firstCurrentMonthDay = ym.atDay(1);
     var lastCurrentMonthDay = ym.atEndOfMonth();
     var totalDaysWorked =
         missionExecutionPercentageSumByWorker(worker, firstCurrentMonthDay, lastCurrentMonthDay);
@@ -105,8 +105,10 @@ public class InvoiceService {
     var parsedAmount = isEmpty ? "" : numberConverter.convertToWords(amount);
     var description = hasLevelHistory ? workerLevelHistories.getFirst().jobTitle() : "";
     var bankAccount = bankAccountRepository.findByWorkerCode(worker.code());
+    log.info("this is your thInvoiceForm: {}", invoiceForm);
 
     return new ThInvoiceForm(
+        ym.format(ofPattern("yyyy-MM")),
         reference,
         issueDate,
         description,
@@ -114,11 +116,6 @@ public class InvoiceService {
         unitPrice,
         amount,
         amount,
-        false,
-        invoiceForm.bonusDescription(),
-        invoiceForm.bonusQuantity(),
-        invoiceForm.unitPrice(),
-        invoiceForm.bonusAmount(),
         parsedAmount,
         bankAccount.toString());
   }

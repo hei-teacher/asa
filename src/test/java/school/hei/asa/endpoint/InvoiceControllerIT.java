@@ -61,8 +61,8 @@ class InvoiceControllerIT extends FacadeIT {
   @Test
   void can_get_invoice() {
     var invoiceForm =
-        new ThInvoiceForm(null, null, "", "", "", "", "", false, "", "", "", "", "", "");
-    String viewName = invoiceController.getInvoicePage(model, invoiceForm);
+        new ThInvoiceForm(null, null, "", "", "", "", "", false, "", "", "", "", "", "", "");
+    String viewName = invoiceController.getInvoicePage(model, authentication, invoiceForm);
 
     assertEquals("invoice-generator", viewName);
   }
@@ -71,7 +71,7 @@ class InvoiceControllerIT extends FacadeIT {
   void can_preview_invoice() {
     setUp();
     var invoiceForm =
-        new ThInvoiceForm(null, null, "", "", "", "", "", false, "", "", "", "", "", "");
+        new ThInvoiceForm(null, null, "", "", "", "", "", false, "", "", "", "", "", "", "");
     var invoicePreview = invoiceController.previewInvoice(model, authentication, invoiceForm);
 
     assertEquals(OK, invoicePreview.getStatusCode());

@@ -64,7 +64,6 @@ public class InvoiceController {
 
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     FileSystemResource resource = new FileSystemResource(pdfFile);
-
     return ResponseEntity.ok()
         .contentType(APPLICATION_PDF)
         .header(CONTENT_DISPOSITION, "inline; filename=" + fileName)

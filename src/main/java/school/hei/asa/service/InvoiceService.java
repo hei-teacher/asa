@@ -1,5 +1,6 @@
 package school.hei.asa.service;
 
+import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
 import static java.time.LocalDate.now;
 import static java.time.ZoneOffset.UTC;
@@ -139,10 +140,10 @@ public class InvoiceService {
     }
     var totalDaysWorked =
         missionExecutionPercentageSumByWorker(worker, firstCurrentMonthDay, lastCurrentMonthDay);
-    var unitPrice = workerLevelHistories.getFirst().compensation();
+    var unitPrice = hasLevelHistory ? workerLevelHistories.getFirst().compensation() : ZERO;
     var amount = numberParser.parseToNumber(unitPrice.multiply(valueOf(totalDaysWorked)));
     var parsedAmount = numberConverter.convertToWords(amount);
-    var description = workerLevelHistories.getFirst().jobTitle();
+    var description = hasLevelHistory ? workerLevelHistories.getFirst().jobTitle() : "";
     var bankAccount = bankAccountRepository.findByWorkerCode(worker.code());
     log.info("this is your thInvoiceForm: {}", invoiceForm);
 

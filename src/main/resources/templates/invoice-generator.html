@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+     <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
 </head>
 <body class="m-0 h-screen flex flex-col">
 
@@ -35,17 +36,73 @@
                     </span>
                 </div>
             </div>
+            <!-- Modal -->
+            <el-dialog>
+                <dialog id="dialog" aria-labelledby="dialog-title" class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent">
+                    <el-dialog-backdrop class="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"></el-dialog-backdrop>
+
+                    <div tabindex="0" class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0">
+                        <el-dialog-panel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95">
+                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div class="sm:flex sm:items-start">
+                                    <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:size-10">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" data-slot="icon" aria-hidden="true" class="size-6 text-red-600">
+                                            <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                        <h3 id="dialog-title" class="text-base font-semibold text-gray-900">Warning</h3>
+                                        <div class="mt-2">
+                                            <p class="text-sm text-gray-500">Please note that you can only generate the invoice once.</p>
+                                            <p class="text-sm text-gray-500">Make sure you have reported all your days worked for the corresponding month.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                <form method="get" action="/invoice/generate" id="invoiceGenerate">
+                                    <input type="hidden" name="yearMonth" id="gen_ref">
+                                    <button type="submit" onclick="generateInvoice()" command="close" commandfor="dialog" class="inline-flex w-full justify-center rounded-md bg-[#3f2f6a] px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-800 sm:ml-3 sm:w-auto">Generate</button>
+                                    <button type="button" command="close" commandfor="dialog" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs inset-ring inset-ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
+                                </form>
+                            </div>
+                        </el-dialog-panel>
+                    </div>
+                </dialog>
+            </el-dialog>
 
             <div class="w-1/3">
-                <form method="get" action="/invoice/download" id="invoiceDownload">
-                    <input type="hidden" name="yearMonth" id="down_ref">
-
-                    <button type="submit"
-                            onclick="downloadInvoiceData()"
-                            class="bg-[#3F2F6A] text-white mt-4 font-bold py-2 px-6 rounded hover:bg-blue-800 transition">
-                        Download
-                    </button>
-                </form>
+                <div th:if="${invoiceDetails.isEmpty()}">
+                        <button command="show-modal"
+                                commandfor="dialog"
+                                class="rounded bg-[#3f2f6a] px-6 py-2 font-semibold text-white hover:bg-blue-800"
+                        >
+                            Generate
+                        </button>
+                        <button type="submit"
+                                class="bg-[#D9D9D9] mt-4 font-bold py-2 px-6 rounded transition"
+                                disabled
+                        >
+                            Download
+                        </button>
+                </div>
+                <div th:if="${!invoiceDetails.isEmpty()}">
+                    <input type="hidden" id="bucketKey" th:value="${invoiceDetails.get().reference()}">
+                    <form method="get" action="/download-invoice" id="invoiceDownload">
+                        <input type="hidden" name="invoiceBucketKey" id="down_ref">
+                        <button disabled
+                                class="bg-[#D9D9D9] text-white mt-4 font-bold py-2 px-6 rounded transition"
+                        >
+                            Generate
+                        </button>
+                        <button type="submit"
+                                class="bg-[#3f2f6a] text-white mt-4 font-bold py-2 px-6 rounded hover:bg-blue-800 transition"
+                                onclick="downloadInvoice()"
+                        >
+                            Download
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -62,12 +119,21 @@
             yearMonth: document.getElementById('ref').value,
         };
     }
+     function getBucketKey(){
+          return {
+            invoiceBucketKey: document.getElementById('bucketKey').value,
+        };
+     }
 
-    function downloadInvoiceData() {
+    function generateInvoice(){
         const formData = getFormData();
+        document.getElementById("gen_ref").value = formData.yearMonth;
+        document.getElementById("invoiceGenerate").submit();
+    }
 
-        document.getElementById("down_ref").value = formData.yearMonth;
-
+    function downloadInvoice() {
+        const formData = getBucketKey();
+        document.getElementById("down_ref").value = formData.invoiceBucketKey;
         document.getElementById("invoiceDownload").submit();
     }
 
@@ -93,7 +159,6 @@
 
         loadPreview();
     });
-
 </script>
 
 </body>

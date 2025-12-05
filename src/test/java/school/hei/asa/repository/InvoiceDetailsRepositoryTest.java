@@ -34,14 +34,15 @@ public class InvoiceDetailsRepositoryTest extends FacadeIT {
   }
 
   @Test
-    void save_invoice_details_for_worker(){
-      var worker = new PartnerContractor("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
-      var expected = new InvoiceDetails("id5", YearMonth.parse("2025-05", ofPattern("yyyy-MM")), "ref5", worker);
+  void save_invoice_details_for_worker() {
+    var worker = new PartnerContractor("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
+    var expected =
+        new InvoiceDetails("id5", YearMonth.parse("2025-05", ofPattern("yyyy-MM")), "ref5", worker);
 
-      invoiceDetailsRepository.saveInvoiceDetails(expected);
+    invoiceDetailsRepository.saveInvoiceDetails(expected);
 
-      var actual = invoiceDetailsRepository.findInvoiceDetailsByWorker(worker);
+    var actual = invoiceDetailsRepository.findInvoiceDetailsByWorker(worker);
 
-      assertTrue(actual.contains(expected));
+    assertTrue(actual.contains(expected));
   }
 }

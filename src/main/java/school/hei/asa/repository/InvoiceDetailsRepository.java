@@ -23,7 +23,7 @@ public class InvoiceDetailsRepository {
   }
 
   @Transactional
-    public void saveInvoiceDetails(InvoiceDetails invoiceDetails){
-      jInvoiceDetailsRepository.save(invoiceDetailsMapper.toEntity(invoiceDetails));
+  public void saveInvoiceDetails(InvoiceDetails invoiceDetails) {
+    jInvoiceDetailsRepository.save(invoiceDetailsMapper.toEntity(invoiceDetails));
   }
 }

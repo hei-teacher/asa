@@ -69,11 +69,8 @@ public class InvoiceService {
     }
   }
 
-  public String generateInvoiceFileName(String invoiceIssueDate, String workerName) {
-    var invoiceDate = parse(invoiceIssueDate, ofPattern("dd/MM/yyyy", FRENCH));
-    String month = invoiceDate.getMonth().getDisplayName(FULL, FRENCH);
-    String capitalizedMonth = month.substring(0, 1).toUpperCase() + month.substring(1);
-    return workerName + " - " + capitalizedMonth + ".pdf";
+  public String generateInvoiceFileName(String yearMonth, String workerCode) {
+    return String.format("FAC-NUMERMG-%s-%s.pdf",workerCode, yearMonth);
   }
 
   private ThInvoiceForm extractInvoiceData(Worker worker, ThInvoiceForm invoiceForm) {

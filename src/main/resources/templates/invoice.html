@@ -191,6 +191,12 @@
                 <td class="text-center" th:text="${invoice.unitPrice}"></td>
                 <td class="text-right" th:text="${invoice.amount}"></td>
             </tr>
+            <tr th:if="${invoice.hasUpgradedLevel}">
+                <td class="text-left" style="width: 230px; word-wrap: break-word;" th:text="${invoice.extraDescription}"></td>
+                <td class="text-center" th:text="${invoice.extraQuantity}"></td>
+                <td class="text-center" th:text="${invoice.extraUnitPrice}"></td>
+                <td class="text-right" th:text="${invoice.extraAmount}"></td>
+            </tr>
             <tr>
                 <td colspan="2" style="border-bottom: none;"></td>
                 <td class="text-left" style="font-size: 15px; font-family: 'EB Garamond', serif; font-weight: 700;"> Total</td>

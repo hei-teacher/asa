@@ -8,6 +8,11 @@ public record ThInvoiceForm(
     String quantity,
     String unitPrice,
     String amount,
+    Boolean hasUpgradedLevel,
+    String extraDescription,
+    String extraQuantity,
+    String extraUnitPrice,
+    String extraAmount,
     String total,
     String parsedAmount,
     String rib) {}

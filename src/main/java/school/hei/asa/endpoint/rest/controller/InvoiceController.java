@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
+import school.hei.asa.file.bucket.BucketComponent;
 import school.hei.asa.service.InvoicePDFGenerator;
 import school.hei.asa.service.InvoiceService;
 
@@ -32,6 +33,7 @@ public class InvoiceController {
   private final WorkerToModelAdder workerToModelAdder;
   private final InvoicePDFGenerator invoicePDFGenerator;
   private final InvoiceService invoiceService;
+  private final BucketComponent bucketComponent;
 
   @GetMapping("/invoice")
   public String getInvoicePage(Model model, @ModelAttribute ThInvoiceForm invoiceForm) {
@@ -68,7 +70,8 @@ public class InvoiceController {
 
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();
-    var fileName = invoiceService.generateInvoiceFileName(invoiceForm.reference(), worker.name());
+    var fileName = invoiceService.generateInvoiceFileName(invoice.invoiceData().reference(), worker.name());
+    bucketComponent.upload(pdfFile, fileName);
 
     return ResponseEntity.ok()
         .header(CONTENT_DISPOSITION, "attachment; filename=" + fileName)

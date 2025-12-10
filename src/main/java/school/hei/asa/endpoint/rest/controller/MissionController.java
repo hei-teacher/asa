@@ -49,8 +49,10 @@ public class MissionController {
     model.addAttribute("startDate", startDate);
     model.addAttribute("endDate", endDate);
 
+    var noUnpaidCareMissions = true;
     var thProductsByWorkerCode =
-        missionService.filterThProductByWorkerCodeAndDateBetween(workerCode, startDate, endDate);
+        missionService.filterThProductByWorkerCodeAndDateBetween(
+            workerCode, startDate, endDate, true);
     model.addAttribute("products", thProductsByWorkerCode);
 
     List<Map<String, Object>> executedDaysByProduct = new ArrayList<>();
@@ -78,7 +80,8 @@ public class MissionController {
     model.addAttribute("executedDaysByMission", executedDaysByMission);
 
     var thProductsExecutedDaysSumByMonth =
-        missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode, true);
+        missionService.thProductsExecutedDaysSumByMonth(
+            thProductsByWorkerCode, noUnpaidCareMissions);
     model.addAttribute("total", thProductsExecutedDaysSumByMonth);
 
     workerToModelAdder.apply(workerCode, model);

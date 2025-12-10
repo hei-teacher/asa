@@ -12,7 +12,6 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -45,8 +44,21 @@ public class MissionService {
   private final WorkerLevelHistoryRepository workerLevelHistoryRepository;
   private final ThWorkerMapper thWorkerMapper;
 
-  private List<ThProduct> filterThProductsByWorkerCode(String workerCode) {
-    var thProducts = thProductMapper.toTh(productRepository.findAll());
+  private List<ThProduct> filterThProductsByWorkerCode(
+      String workerCode, boolean noUnpaidCareMissions) {
+    var thProducts =
+        thProductMapper.toTh(productRepository.findAll()).stream()
+            .map(
+                p ->
+                    new ThProduct(
+                        p.code(),
+                        p.name(),
+                        p.description(),
+                        p.missions().stream()
+                            .filter(m -> !m.isUnpaidCare() || !noUnpaidCareMissions)
+                            .toList(),
+                        p.isCare()))
+            .toList();
     return workerCode == null || workerCode.isBlank()
         ? thProducts.stream()
             .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
@@ -58,8 +70,8 @@ public class MissionService {
   }
 
   public List<ThProduct> filterThProductByWorkerCodeAndDateBetween(
-      String workerCode, String startDate, String endDate) {
-    var thProducts = filterThProductsByWorkerCode(workerCode);
+      String workerCode, String startDate, String endDate, boolean noUnpaidCareMissions) {
+    var thProducts = filterThProductsByWorkerCode(workerCode, noUnpaidCareMissions);
     if (startDate == null || startDate.isBlank() || endDate == null || endDate.isBlank()) {
       return thProducts;
     }
@@ -103,7 +115,7 @@ public class MissionService {
         });
     if (workerCode.isBlank() || workerCode == null) {
       return result.stream()
-          .sorted(Comparator.comparing(ThProduct::executedDays, naturalOrder()).reversed())
+          .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
           .toList();
     }
     return result.stream()

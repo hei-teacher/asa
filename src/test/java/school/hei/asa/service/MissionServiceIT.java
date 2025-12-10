@@ -129,7 +129,8 @@ class MissionServiceIT extends FacadeIT {
 
   @Test
   void fetch_product_from_database() {
-    var thProducts = missionService.filterThProductByWorkerCodeAndDateBetween(null, null, null);
+    var thProducts =
+        missionService.filterThProductByWorkerCodeAndDateBetween(null, null, null, true);
 
     assertTrue(thProducts.size() == 1 || thProducts.size() == 2);
   }
@@ -205,7 +206,8 @@ class MissionServiceIT extends FacadeIT {
 
     var actual =
         missionService
-            .filterThProductByWorkerCodeAndDateBetween("W-P-2024-01", "2024-06-01", "2024-08-01")
+            .filterThProductByWorkerCodeAndDateBetween(
+                "W-P-2024-01", "2024-06-01", "2024-08-01", true)
             .getFirst();
 
     assertEquals(expected, actual);

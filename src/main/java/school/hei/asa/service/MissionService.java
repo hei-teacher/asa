@@ -96,7 +96,8 @@ public class MissionService {
                         m.getTitle(),
                         m.getDescription(),
                         newMissionExecution,
-                        m.isCare()));
+                        m.isCare(),
+                        m.isUnpaidCare()));
               });
           result.add(new ThProduct(p.code(), p.name(), p.description(), newMissions, p.isCare()));
         });
@@ -132,7 +133,8 @@ public class MissionService {
     return res;
   }
 
-  public Map<String, Double> thProductsExecutedDaysSumByMonth(List<ThProduct> thProducts) {
+  public Map<String, Double> thProductsExecutedDaysSumByMonth(
+      List<ThProduct> thProducts, boolean noUnpaidCareMissions) {
     EnumSet<Month> months = EnumSet.allOf(Month.class);
     Map<String, Double> res = new LinkedHashMap<>();
     months.forEach(
@@ -148,16 +150,20 @@ public class MissionService {
 
           if (hasExecutedDays) {
             res.putIfAbsent(
-                month.toString().toLowerCase(), thProductsExecutedDaysSum(monthProducts, month));
+                month.toString().toLowerCase(),
+                thProductsExecutedDaysSum(monthProducts, month, noUnpaidCareMissions));
           }
         });
     return res;
   }
 
-  public Double thProductsExecutedDaysSum(List<ThProduct> thProducts, Month month) {
+  public Double thProductsExecutedDaysSum(
+      List<ThProduct> thProducts, Month month, boolean noUnpaidCareMissions) {
     return thProducts.stream()
         .map(p -> p.filterByMonth(month))
-        .mapToDouble(ThProduct::executedDays)
+        .flatMap(p -> p.missions().stream())
+        .filter(m -> !m.isUnpaidCare() || !noUnpaidCareMissions)
+        .mapToDouble(ThMission::executedDays)
         .sum();
   }
 
@@ -188,7 +194,8 @@ public class MissionService {
                               m.getTitle(),
                               m.getDescription(),
                               m.getMissionExecutions(),
-                              m.isCare());
+                              m.isCare(),
+                              m.isUnpaidCare());
                       missions.add(newMission);
                     } else {
                       try {

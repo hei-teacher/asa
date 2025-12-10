@@ -30,6 +30,7 @@
           <p class="text-sm text-gray-600 mt-1">
             <strong>"st="</strong> refers to days executed by a
             <strong>st</strong>udent worker.
+            <i style="color: red">Grand total excludes unpaid care missions.</i>
           </p>
         </div>
 
@@ -123,11 +124,10 @@
                   th:each="t : ${total[month.toString().toLowerCase()]}"
                   class="mb-4 text-center"
                 >
-                  <strong
-                    class="text-lg font-semibold"
+                  <i style="color: red"
                     th:text="${#numbers.formatDecimal(t, 1, 2)}"
                   >
-                  </strong>
+                  </i>
                 </li>
               </ul>
             </td>

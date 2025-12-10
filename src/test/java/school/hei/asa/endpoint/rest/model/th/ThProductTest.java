@@ -14,7 +14,7 @@ class ThProductTest {
     var execution1 = new ThMissionExecution("mcode", "wc1", now(), 0.1, "ecomment1", true, true);
     var execution2 = new ThMissionExecution("mcode", "wc2", now(), 0.2, "ecomment2", true, true);
     var thMission =
-        new ThMission("mcode", "mtitle", "mdesc", List.of(execution1, execution2), true);
+        new ThMission("mcode", "mtitle", "mdesc", List.of(execution1, execution2), true, true);
     var thProduct = new ThProduct("pcode", "pname", "pdesc", List.of(thMission), true);
 
     assertEquals(0.2, thProduct.filterByWorkerCode("wc2").executedDays());
@@ -29,7 +29,7 @@ class ThProductTest {
         new ThMissionExecution(
             "mcode", "wc2", LocalDate.of(2025, 1, 1), 0.2, "ecomment2", true, true);
     var thMission =
-        new ThMission("mcode", "mtitle", "mdesc", List.of(execution1, execution2), true);
+        new ThMission("mcode", "mtitle", "mdesc", List.of(execution1, execution2), true, true);
 
     var thProduct = new ThProduct("pcode", "pname", "pdesc", List.of(thMission), true);
 
@@ -45,7 +45,7 @@ class ThProductTest {
         new ThMissionExecution(
             "mcode", "wc2", LocalDate.of(2025, 1, 1), 0.2, "ecomment2", true, true);
     var thMission =
-        new ThMission("mcode", "mtitle", "mdesc", List.of(execution1, execution2), true);
+        new ThMission("mcode", "mtitle", "mdesc", List.of(execution1, execution2), true, true);
 
     var thProduct = new ThProduct("pcode", "pname", "pdesc", List.of(thMission), true);
     assertTrue(thProduct.studentExecutedDays() < thProduct.executedDays());

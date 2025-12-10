@@ -15,7 +15,7 @@ class ThMissionTest {
     var execution2 =
         new ThMissionExecution("me-code", "wc2", LocalDate.now(), 0.3, "comment2", true, true);
     var thMission =
-        new ThMission("mcode", "mtitle", "mdesc", List.of(execution1, execution2), true);
+        new ThMission("mcode", "mtitle", "mdesc", List.of(execution1, execution2), true, true);
 
     assertEquals(0.8, thMission.executedDays());
   }
@@ -30,7 +30,7 @@ class ThMissionTest {
         new ThMissionExecution("me-code", "wc1", LocalDate.now(), 0.3, "comment3", true, true);
     var thMission =
         new ThMission(
-            "mcode", "mtitle", "mdesc", List.of(execution1, execution2, execution3), true);
+            "mcode", "mtitle", "mdesc", List.of(execution1, execution2, execution3), true, true);
 
     var filteredMission = thMission.filterByWorkerCode("wc1");
 

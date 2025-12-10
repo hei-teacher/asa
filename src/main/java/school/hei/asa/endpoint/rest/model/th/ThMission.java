@@ -15,6 +15,7 @@ public class ThMission {
   String description;
   List<ThMissionExecution> missionExecutions;
   boolean isCare;
+  boolean isUnpaidCare;
 
   public double executedDays() {
     return missionExecutions.stream().mapToDouble(ThMissionExecution::getDayPercentage).sum();
@@ -30,12 +31,12 @@ public class ThMission {
   public ThMission filterByWorkerCode(String workerCode) {
     var filteredExecutions =
         missionExecutions.stream().filter(me -> workerCode.equals(me.workerCode)).toList();
-    return new ThMission(code, title, description, filteredExecutions, isCare);
+    return new ThMission(code, title, description, filteredExecutions, isCare, isUnpaidCare);
   }
 
   public ThMission filterByMonth(Month month) {
     var filteredExecutions =
         missionExecutions.stream().filter(me -> me.getDate().getMonth() == month).toList();
-    return new ThMission(code, title, description, filteredExecutions, isCare);
+    return new ThMission(code, title, description, filteredExecutions, isCare, isUnpaidCare);
   }
 }

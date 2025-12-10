@@ -78,7 +78,7 @@ public class MissionController {
     model.addAttribute("executedDaysByMission", executedDaysByMission);
 
     var thProductsExecutedDaysSumByMonth =
-        missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode);
+        missionService.thProductsExecutedDaysSumByMonth(thProductsByWorkerCode, true);
     model.addAttribute("total", thProductsExecutedDaysSumByMonth);
 
     workerToModelAdder.apply(workerCode, model);

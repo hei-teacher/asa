@@ -102,7 +102,8 @@ public class InvoiceService {
     }
     var totalDaysWorked =
         missionExecutionPercentageSumByWorker(worker, firstCurrentMonthDay, lastCurrentMonthDay);
-    var tempResult = generateInvoiceFormFrom(totalDaysWorked, workerLevelHistories.getFirst());
+    var workerLevelhistory = hasLevelHistory? workerLevelHistories.getFirst() : null;
+    var tempResult = generateInvoiceFormFrom(totalDaysWorked, workerLevelhistory);
     return new InvoiceForm(
             yearMonth,
             referenceDate,
@@ -123,6 +124,9 @@ public class InvoiceService {
   }
 
   private InvoiceForm generateInvoiceFormFrom(Double totalDaysWorked, WorkerLevelHistory workerLevelHistory){
+      if (workerLevelHistory == null){
+          return new InvoiceForm(null,null,null,null,null,null,null,null,null,null,null,null,null,null,null);
+      }
       var unitPrice = workerLevelHistory.compensation();
       var amount = unitPrice.multiply(valueOf(totalDaysWorked));
       var parsedAmount = numberConverter.convertToWords(numberParser.parseToNumber(amount));

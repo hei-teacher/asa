@@ -45,16 +45,16 @@ public class ThInvoiceFormMapper {
     }
 
     public InvoiceForm toDomain(ThInvoiceForm invoiceForm){
-        var yearMonth = !invoiceForm.yearMonth().isBlank() ?YearMonth.parse(invoiceForm.yearMonth(), yearMonthFormatter):null;
-        var reference = invoiceForm.reference() != null ?LocalDate.parse(invoiceForm.reference(), localDateFormatter):null;
-        var issueDate =  invoiceForm.issueDate()!= null  ?LocalDate.parse(invoiceForm.issueDate(), localDateFormatter):null;
-        var quantity = invoiceForm.quantity() != null ? parseDouble(invoiceForm.quantity()):null;
-        var unitPrice =invoiceForm.unitPrice() != null ? new BigDecimal(invoiceForm.unitPrice()) : null;
-        var amount =invoiceForm.amount() != null ? new BigDecimal(invoiceForm.amount()) : null;
-        var extraQuantity = invoiceForm.extraQuantity() != null ? parseDouble(invoiceForm.extraQuantity()):null;
-        var extraUnitPrice =invoiceForm.extraUnitPrice() != null ? new BigDecimal(invoiceForm.extraUnitPrice()) : null;
-        var extraAmount =invoiceForm.extraAmount() != null ? new BigDecimal(invoiceForm.extraAmount()) : null;
-        var total = invoiceForm.total() != null ? new BigDecimal(invoiceForm.total()) : null;
+        var yearMonth = invoiceForm.yearMonth() != null && !invoiceForm.yearMonth().isBlank() ?YearMonth.parse(invoiceForm.yearMonth(), yearMonthFormatter):null;
+        var reference = invoiceForm.reference() != null && !invoiceForm.reference().isBlank()?LocalDate.parse(invoiceForm.reference(), localDateFormatter):null;
+        var issueDate =  invoiceForm.issueDate()!= null && !invoiceForm.issueDate().isBlank() ?LocalDate.parse(invoiceForm.issueDate(), localDateFormatter):null;
+        var quantity = invoiceForm.quantity() != null && !invoiceForm.quantity().isBlank()? parseDouble(invoiceForm.quantity()):null;
+        var unitPrice =invoiceForm.unitPrice() != null&& !invoiceForm.unitPrice().isBlank() ? new BigDecimal(invoiceForm.unitPrice()) : null;
+        var amount =invoiceForm.amount() != null && !invoiceForm.amount().isBlank()? new BigDecimal(invoiceForm.amount()) : null;
+        var extraQuantity = invoiceForm.extraQuantity() != null && !invoiceForm.extraQuantity().isBlank()? parseDouble(invoiceForm.extraQuantity()):null;
+        var extraUnitPrice =invoiceForm.extraUnitPrice() != null && !invoiceForm.extraUnitPrice().isBlank()? new BigDecimal(invoiceForm.extraUnitPrice()) : null;
+        var extraAmount =invoiceForm.extraAmount() != null && !invoiceForm.extraAmount().isBlank()? new BigDecimal(invoiceForm.extraAmount()) : null;
+        var total = invoiceForm.total() != null && !invoiceForm.total().isBlank()? new BigDecimal(invoiceForm.total()) : null;
 
         return new InvoiceForm(
                 yearMonth,

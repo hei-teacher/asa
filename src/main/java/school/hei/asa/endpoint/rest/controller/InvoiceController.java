@@ -59,8 +59,7 @@ public class InvoiceController {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var invoice = invoiceService.extractInvoice(worker, invoiceForm);
-    var timestamp = now().format(ofPattern("yyyyMMdd-HHmmss"));
-    String fileName = "invoice-" + worker.code() + "-" + timestamp + ".pdf";
+    var fileName = invoiceService.generateInvoiceFileName(invoice.invoiceData().yearMonth(), worker.code());
 
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     FileSystemResource resource = new FileSystemResource(pdfFile);
@@ -80,8 +79,7 @@ public class InvoiceController {
 
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();
-    var fileName =
-        invoiceService.generateInvoiceFileName(invoice.invoiceData().yearMonth(), worker.code());
+    var fileName = invoiceService.generateInvoiceFileName(invoice.invoiceData().yearMonth(), worker.code());
     invoiceService.saveInvoice(fileName, invoice.invoiceData(), worker);
     bucketComponent.upload(pdfFile, fileName);
 

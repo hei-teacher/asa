@@ -4,27 +4,18 @@ import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
 import static java.time.LocalDate.now;
 import static java.time.ZoneOffset.UTC;
-import static java.time.format.DateTimeFormatter.ofPattern;
-import static java.util.Locale.FRENCH;
 import static java.util.UUID.randomUUID;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import javax.imageio.ImageIO;
+
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
 import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
-import school.hei.asa.model.Invoice;
 import school.hei.asa.model.InvoiceDetails;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.MissionExecution;
@@ -40,7 +31,6 @@ import school.hei.asa.service.utils.NumberParser;
 @AllArgsConstructor
 @Service
 public class InvoiceService {
-  private final InvoicePDFGenerator invoicePDFGenerator;
   private final NumberConverter numberConverter;
   private final NumberParser numberParser;
   private final WorkerLevelHistoryRepository workerLevelHistoryRepository;
@@ -58,28 +48,7 @@ public class InvoiceService {
         .findFirst();
   }
 
-  @SneakyThrows
-  public Invoice extractInvoice(Worker worker, ThInvoiceForm invoiceForm) {
-    var invoiceData = extractInvoiceData(worker, invoiceForm);
-    File data = invoicePDFGenerator.apply(worker, invoiceData, "invoice");
-
-    try (PDDocument document = PDDocument.load(data)) {
-      PDFRenderer pdfRenderer = new PDFRenderer(document);
-      BufferedImage image = pdfRenderer.renderImageWithDPI(0, 150);
-
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      ImageIO.write(image, "png", baos);
-      String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
-
-      return new Invoice(base64Image, invoiceData);
-    }
-  }
-
-  public String generateInvoiceFileName(String yearMonth, String workerCode) {
-    return String.format("FAC-NUMERMG-%s-%s.pdf", workerCode, yearMonth);
-  }
-
-  private InvoiceForm extractInvoiceData(Worker worker, InvoiceForm invoiceForm) {
+  public InvoiceForm extractInvoiceData(Worker worker, InvoiceForm invoiceForm) {
     var isEmpty = invoiceForm.yearMonth() == null ;
     var workerLevelHistories = workerLevelHistoryRepository.findAllByWorker(worker);
     var hasLevelHistory = !workerLevelHistories.isEmpty();

@@ -5,7 +5,8 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
+import school.hei.asa.endpoint.rest.service.ThInvoiceService;
 import school.hei.asa.file.bucket.BucketComponent;
 import school.hei.asa.service.InvoicePDFGenerator;
 import school.hei.asa.service.InvoiceService;
@@ -35,6 +37,7 @@ public class InvoiceController {
   private final InvoicePDFGenerator invoicePDFGenerator;
   private final InvoiceService invoiceService;
   private final BucketComponent bucketComponent;
+  private final ThInvoiceService thInvoiceService;
 
   @GetMapping("/invoice")
   public String getInvoicePage(
@@ -58,8 +61,8 @@ public class InvoiceController {
       Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-    var invoice = invoiceService.extractInvoice(worker, invoiceForm);
-    var fileName = invoiceService.generateInvoiceFileName(invoice.invoiceData().yearMonth(), worker.code());
+    var invoice = thInvoiceService.extractInvoice(worker, invoiceForm);
+    var fileName = thInvoiceService.generateInvoiceFileName(invoice.invoiceData().yearMonth(), worker.code());
 
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     FileSystemResource resource = new FileSystemResource(pdfFile);
@@ -75,11 +78,11 @@ public class InvoiceController {
       Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-    var invoice = invoiceService.extractInvoice(worker, invoiceForm);
+    var invoice = thInvoiceService.extractInvoice(worker, invoiceForm);
 
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();
-    var fileName = invoiceService.generateInvoiceFileName(invoice.invoiceData().yearMonth(), worker.code());
+    var fileName = thInvoiceService.generateInvoiceFileName(invoice.invoiceData().yearMonth(), worker.code());
     invoiceService.saveInvoice(fileName, invoice.invoiceData(), worker);
     bucketComponent.upload(pdfFile, fileName);
 

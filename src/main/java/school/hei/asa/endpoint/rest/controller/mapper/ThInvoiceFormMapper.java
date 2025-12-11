@@ -1,10 +1,10 @@
 package school.hei.asa.endpoint.rest.controller.mapper;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.model.InvoiceForm;
-import school.hei.asa.service.utils.NumberConverter;
 import school.hei.asa.service.utils.NumberParser;
 
 import java.math.BigDecimal;
@@ -16,6 +16,7 @@ import static java.lang.Double.parseDouble;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Locale.FRENCH;
 
+@Slf4j
 @AllArgsConstructor
 @Component
 public class ThInvoiceFormMapper {
@@ -44,20 +45,31 @@ public class ThInvoiceFormMapper {
     }
 
     public InvoiceForm toDomain(ThInvoiceForm invoiceForm){
+        var yearMonth = !invoiceForm.yearMonth().isBlank() ?YearMonth.parse(invoiceForm.yearMonth(), yearMonthFormatter):null;
+        var reference = invoiceForm.reference() != null ?LocalDate.parse(invoiceForm.reference(), localDateFormatter):null;
+        var issueDate =  invoiceForm.issueDate()!= null  ?LocalDate.parse(invoiceForm.issueDate(), localDateFormatter):null;
+        var quantity = invoiceForm.quantity() != null ? parseDouble(invoiceForm.quantity()):null;
+        var unitPrice =invoiceForm.unitPrice() != null ? new BigDecimal(invoiceForm.unitPrice()) : null;
+        var amount =invoiceForm.amount() != null ? new BigDecimal(invoiceForm.amount()) : null;
+        var extraQuantity = invoiceForm.extraQuantity() != null ? parseDouble(invoiceForm.extraQuantity()):null;
+        var extraUnitPrice =invoiceForm.extraUnitPrice() != null ? new BigDecimal(invoiceForm.extraUnitPrice()) : null;
+        var extraAmount =invoiceForm.extraAmount() != null ? new BigDecimal(invoiceForm.extraAmount()) : null;
+        var total = invoiceForm.total() != null ? new BigDecimal(invoiceForm.total()) : null;
+
         return new InvoiceForm(
-            YearMonth.parse(invoiceForm.yearMonth(), yearMonthFormatter),
-                LocalDate.parse(invoiceForm.reference(), localDateFormatter),
-                LocalDate.parse(invoiceForm.issueDate(), localDateFormatter),
+                yearMonth,
+                reference,
+                issueDate,
                 invoiceForm.description(),
-                parseDouble(invoiceForm.quantity()),
-                new BigDecimal(invoiceForm.unitPrice()),
-                new BigDecimal(invoiceForm.amount()),
+                quantity,
+                unitPrice,
+                amount,
                 invoiceForm.hasUpgradedLevel(),
                 invoiceForm.extraDescription(),
-                parseDouble(invoiceForm.extraQuantity()),
-                new BigDecimal(invoiceForm.extraUnitPrice()),
-                new BigDecimal(invoiceForm.extraAmount()),
-                new BigDecimal(invoiceForm.total()),
+                extraQuantity,
+                extraUnitPrice,
+                extraAmount,
+                total,
                 invoiceForm.parsedAmount(),
                 invoiceForm.rib()
                 );

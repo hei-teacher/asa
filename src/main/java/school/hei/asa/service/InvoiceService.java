@@ -121,7 +121,7 @@ public class InvoiceService {
               totalDaysWorked,
               unitPrice,
               amount,
-              true,
+              false,
               null,
               null,
               null,

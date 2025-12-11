@@ -1,6 +1,5 @@
 package school.hei.asa.service;
 
-import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
 import static java.time.LocalDate.now;
 import static java.time.ZoneOffset.UTC;
@@ -20,6 +19,7 @@ import school.hei.asa.model.InvoiceDetails;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
+import school.hei.asa.model.WorkerLevelHistory;
 import school.hei.asa.repository.BankAccountRepository;
 import school.hei.asa.repository.InvoiceDetailsRepository;
 import school.hei.asa.repository.MissionExecutionRepository;
@@ -40,7 +40,6 @@ public class InvoiceService {
   private final InvoiceDetailsRepository invoiceDetailsRepository;
 
   public Optional<InvoiceDetails> findInvoiceDetails(Worker worker, YearMonth yearMonth) {
-    log.info("lets get the invoiceDetails");
     var invoiceDetailsList = invoiceDetailsRepository.findInvoiceDetailsByWorker(worker);
     log.info("here is the invoice result: {}", invoiceDetailsList);
     return invoiceDetailsList.stream()
@@ -54,81 +53,97 @@ public class InvoiceService {
     var hasLevelHistory = !workerLevelHistories.isEmpty();
     var referenceDate = now();
     var issueDate = referenceDate.plusDays(3);
-    var ym =
+    var yearMonth =
         isEmpty
             ? YearMonth.from(referenceDate)
             : invoiceForm.yearMonth();
-    var firstCurrentMonthDay = ym.atDay(1);
-    var lastCurrentMonthDay = ym.atEndOfMonth();
+    var firstCurrentMonthDay = yearMonth.atDay(1);
+    var lastCurrentMonthDay = yearMonth.atEndOfMonth();
     var hasUpgradedLevel =
         hasLevelHistory
             && LocalDate.ofInstant(workerLevelHistories.getFirst().entranceInstant(), UTC)
                 .isBefore(lastCurrentMonthDay)
             && LocalDate.ofInstant(workerLevelHistories.getFirst().entranceInstant(), UTC)
                 .isAfter(firstCurrentMonthDay);
+    var bankAccount = bankAccountRepository.findByWorkerCode(worker.code());
     if (hasUpgradedLevel) {
-      var firstDescription = workerLevelHistories.get(1).jobTitle();
-      var secondDescription = workerLevelHistories.getFirst().jobTitle();
+      var firstWorkerLevelHistory = workerLevelHistories.getFirst();
+      var secondWorkerLevelHistory = workerLevelHistories.get(1);
       var firstTotalDaysWorked =
           missionExecutionPercentageSumByWorker(
               worker,
               firstCurrentMonthDay,
-              LocalDate.ofInstant(workerLevelHistories.getFirst().entranceInstant(), UTC));
+              LocalDate.ofInstant(firstWorkerLevelHistory.entranceInstant(), UTC));
       var secondTotalDaysWorked =
           missionExecutionPercentageSumByWorker(
               worker,
-              LocalDate.ofInstant(workerLevelHistories.getFirst().entranceInstant(), UTC),
+              LocalDate.ofInstant(firstWorkerLevelHistory.entranceInstant(), UTC),
               lastCurrentMonthDay);
-      var firstUnitPrice = workerLevelHistories.get(1).compensation();
-      var secondUnitPrice = workerLevelHistories.getFirst().compensation();
-      var firstAmount = firstUnitPrice.multiply(valueOf(firstTotalDaysWorked));
-      var secondAmount = secondUnitPrice.multiply(valueOf(secondTotalDaysWorked));
-      var total = firstAmount.add(secondAmount);
-      var parsedTotal = numberConverter.convertToWords(numberParser.parseToNumber(total));
-      var bankAccount = bankAccountRepository.findByWorkerCode(worker.code());
-
-      return new InvoiceForm(
-          ym,
-          referenceDate,
-          issueDate,
-          firstDescription,
-          firstTotalDaysWorked,
-          firstUnitPrice,
-          firstAmount,
-          true,
-          secondDescription,
-          secondTotalDaysWorked,
-          secondUnitPrice,
-          secondAmount,
-          total,
-          parsedTotal,
-          bankAccount.toString());
+      var firstInvoiceForm = generateInvoiceFormFrom(firstTotalDaysWorked,firstWorkerLevelHistory);
+      var secondInvoiceForm = generateInvoiceFormFrom(secondTotalDaysWorked,secondWorkerLevelHistory);
+      var total = firstInvoiceForm.amount().add(secondInvoiceForm.amount());
+        var parsedTotal = numberConverter.convertToWords(numberParser.parseToNumber(total));
+        return new InvoiceForm(
+                yearMonth,
+                referenceDate,
+                issueDate,
+                firstInvoiceForm.description(),
+                firstInvoiceForm.quantity(),
+                firstInvoiceForm.unitPrice(),
+                firstInvoiceForm.amount(),
+                true,
+                secondInvoiceForm.description(),
+                secondInvoiceForm.quantity(),
+                secondInvoiceForm.unitPrice(),
+                secondInvoiceForm.amount(),
+                total,
+                parsedTotal,
+                bankAccount.toString());
     }
     var totalDaysWorked =
         missionExecutionPercentageSumByWorker(worker, firstCurrentMonthDay, lastCurrentMonthDay);
-    var unitPrice = hasLevelHistory ? workerLevelHistories.getFirst().compensation() : ZERO;
-    var amount = unitPrice.multiply(valueOf(totalDaysWorked));
-    var parsedAmount = numberConverter.convertToWords(numberParser.parseToNumber(amount));
-    var description = hasLevelHistory ? workerLevelHistories.getFirst().jobTitle() : "";
-    var bankAccount = bankAccountRepository.findByWorkerCode(worker.code());
-    log.info("this is your thInvoiceForm: {}", invoiceForm);
+    var tempResult = generateInvoiceFormFrom(totalDaysWorked, workerLevelHistories.getFirst());
+    return new InvoiceForm(
+            yearMonth,
+            referenceDate,
+            issueDate,
+            tempResult.description(),
+            tempResult.quantity(),
+            tempResult.unitPrice(),
+            tempResult.amount(),
+            false,
+            null,
+            null,
+            null,
+            null,
+            tempResult.total(),
+            tempResult.parsedAmount(),
+            bankAccount.toString());
+
+  }
+
+  private InvoiceForm generateInvoiceFormFrom(Double totalDaysWorked, WorkerLevelHistory workerLevelHistory){
+      var unitPrice = workerLevelHistory.compensation();
+      var amount = unitPrice.multiply(valueOf(totalDaysWorked));
+      var parsedAmount = numberConverter.convertToWords(numberParser.parseToNumber(amount));
+      var description = workerLevelHistory.jobTitle();
 
       return new InvoiceForm(
-              ym,
-              referenceDate,
-              issueDate,
+              null,
+              null,
+              null,
               description,
               totalDaysWorked,
               unitPrice,
               amount,
-              false,
+              null,
               null,
               null,
               null,
               null,
               amount,
               parsedAmount,
-              bankAccount.toString());
+              null);
   }
 
   private Double missionExecutionPercentageSumByWorker(

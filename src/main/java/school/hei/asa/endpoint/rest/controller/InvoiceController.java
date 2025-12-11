@@ -1,7 +1,5 @@
 package school.hei.asa.endpoint.rest.controller;
 
-import static java.time.LocalDateTime.now;
-import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
@@ -62,7 +60,8 @@ public class InvoiceController {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var invoice = thInvoiceService.extractInvoice(worker, invoiceForm);
-    var fileName = thInvoiceService.generateInvoiceFileName(invoice.invoiceData().yearMonth(), worker.code());
+    var fileName =
+        thInvoiceService.generateInvoiceFileName(invoice.invoiceData().yearMonth(), worker.code());
 
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     FileSystemResource resource = new FileSystemResource(pdfFile);
@@ -82,7 +81,8 @@ public class InvoiceController {
 
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();
-    var fileName = thInvoiceService.generateInvoiceFileName(invoice.invoiceData().yearMonth(), worker.code());
+    var fileName =
+        thInvoiceService.generateInvoiceFileName(invoice.invoiceData().yearMonth(), worker.code());
     invoiceService.saveInvoice(fileName, invoice.invoiceData(), worker);
     bucketComponent.upload(pdfFile, fileName);
 

@@ -153,7 +153,8 @@
         flatpickr("#ref", {
             dateFormat: "Y-m",
             onChange: function () {
-                loadPreview();
+            var yearMonth = getFormData().yearMonth;
+             window.location.href = `/invoice?yearMonth=${yearMonth}`;
             }
         });
 

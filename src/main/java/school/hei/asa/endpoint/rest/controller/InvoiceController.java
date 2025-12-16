@@ -36,6 +36,7 @@ public class InvoiceController {
   private final InvoiceService invoiceService;
   private final BucketComponent bucketComponent;
   private final ThInvoiceService thInvoiceService;
+  private static final String INVOICES_FOLDER = "invoices/";
 
   @GetMapping("/invoice")
   public String getInvoicePage(
@@ -84,7 +85,7 @@ public class InvoiceController {
     var fileName =
         thInvoiceService.generateInvoiceFileName(invoice.invoiceData().yearMonth(), worker.code());
     invoiceService.saveInvoice(fileName, invoice.invoiceData(), worker);
-    bucketComponent.upload(pdfFile, fileName);
+    bucketComponent.upload(pdfFile, INVOICES_FOLDER + fileName);
 
     return ResponseEntity.ok()
         .header(CONTENT_DISPOSITION, "attachment; filename=" + fileName)

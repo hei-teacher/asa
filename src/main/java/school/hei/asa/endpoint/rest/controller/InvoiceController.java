@@ -48,7 +48,7 @@ public class InvoiceController {
         invoiceForm.yearMonth() != null
             ? YearMonth.parse(invoiceForm.yearMonth(), pattern)
             : YearMonth.now();
-    var invoiceDetails = invoiceService.findInvoiceDetails(worker, yearMonth);
+    var invoiceDetails = invoiceService.findInvoiceReference(worker, yearMonth);
     model.addAttribute("yearMonthReference", invoiceForm.yearMonth());
     model.addAttribute("invoiceDetails", invoiceDetails);
 
@@ -84,7 +84,7 @@ public class InvoiceController {
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();
     var fileName =
         thInvoiceService.generateInvoiceFileName(invoice.invoiceData().yearMonth(), worker.code());
-    invoiceService.saveInvoice(fileName, invoice.invoiceData(), worker);
+    invoiceService.saveInvoice(invoice.invoiceData(), worker);
     bucketComponent.upload(pdfFile, INVOICES_FOLDER + fileName);
 
     return ResponseEntity.ok()

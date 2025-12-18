@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
-import school.hei.asa.model.InvoiceDetails;
+import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
@@ -38,7 +38,7 @@ public class InvoiceService {
   private final CareProductCodeSupplier careProductCodeSupplier;
   private final InvoiceDetailsRepository invoiceDetailsRepository;
 
-  public Optional<InvoiceDetails> findInvoiceDetails(Worker worker, YearMonth yearMonth) {
+  public Optional<InvoiceReference> findInvoiceReference(Worker worker, YearMonth yearMonth) {
     var invoiceDetailsList = invoiceDetailsRepository.findInvoiceDetailsByWorker(worker);
     log.info("here is the invoice result: {}", invoiceDetailsList);
     return invoiceDetailsList.stream()
@@ -163,12 +163,12 @@ public class InvoiceService {
     return mission.isCare(careProductCodeSupplier.get());
   }
 
-  public void saveInvoice(String fileName, ThInvoiceForm invoiceForm, Worker worker) {
+  public void saveInvoice(ThInvoiceForm invoiceForm, Worker worker) {
     var invoiceDetails =
-        new InvoiceDetails(
+        new InvoiceReference(
             randomUUID().toString(),
             YearMonth.parse(invoiceForm.yearMonth(), DateTimeFormatter.ofPattern("yyyy-MM")),
-            fileName,
+            null,
             worker);
     invoiceDetailsRepository.saveInvoiceDetails(invoiceDetails);
   }

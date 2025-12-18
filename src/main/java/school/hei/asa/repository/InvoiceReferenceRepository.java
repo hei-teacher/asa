@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
-import school.hei.asa.model.InvoiceDetails;
+import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.jrepository.JInvoiceDetailsRepository;
 import school.hei.asa.repository.mapper.InvoiceDetailsMapper;
@@ -16,14 +16,14 @@ public class InvoiceDetailsRepository {
   private final JInvoiceDetailsRepository jInvoiceDetailsRepository;
 
   @Transactional
-  public List<InvoiceDetails> findInvoiceDetailsByWorker(Worker worker) {
+  public List<InvoiceReference> findInvoiceDetailsByWorker(Worker worker) {
     return jInvoiceDetailsRepository.findByWorkerCode(worker.code()).stream()
         .map(invoiceDetailsMapper::toDomain)
         .toList();
   }
 
   @Transactional
-  public void saveInvoiceDetails(InvoiceDetails invoiceDetails) {
-    jInvoiceDetailsRepository.save(invoiceDetailsMapper.toEntity(invoiceDetails));
+  public void saveInvoiceDetails(InvoiceReference invoiceReference) {
+    jInvoiceDetailsRepository.save(invoiceDetailsMapper.toEntity(invoiceReference));
   }
 }

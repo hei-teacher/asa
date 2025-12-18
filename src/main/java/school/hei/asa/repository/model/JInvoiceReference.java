@@ -15,14 +15,14 @@ import lombok.Setter;
 @EqualsAndHashCode(of = "id")
 @Getter
 @Setter
-public class JInvoiceDetails {
+public class JInvoiceReference {
   @Id private String id;
 
   @Column(name = "year_month")
   private String yearMonth;
 
-  @Column(name = "invoice_reference")
-  private String reference;
+  @Column(name = "autoincrement", updatable = false, insertable = false)
+  private Integer autoincrement;
 
   @ManyToOne
   @JoinColumn(name = "worker_code")

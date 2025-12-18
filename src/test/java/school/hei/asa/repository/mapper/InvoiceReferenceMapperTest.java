@@ -6,13 +6,13 @@ import static school.hei.asa.repository.model.WorkerType.studentContractor;
 
 import java.time.YearMonth;
 import org.junit.jupiter.api.Test;
-import school.hei.asa.model.InvoiceDetails;
+import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.StudentContractor;
 import school.hei.asa.model.Worker;
-import school.hei.asa.repository.model.JInvoiceDetails;
+import school.hei.asa.repository.model.JInvoiceReference;
 import school.hei.asa.repository.model.JWorker;
 
-public class InvoiceDetailsMapperTest {
+public class InvoiceReferenceMapperTest {
   private final InvoiceDetailsMapper invoiceDetailsMapper =
       new InvoiceDetailsMapper(new WorkerMapper());
 
@@ -20,8 +20,8 @@ public class InvoiceDetailsMapperTest {
   void mapping_to_domain() {
     var jInvoiceDetails = newJInvoiceDetails();
     var expected =
-        new InvoiceDetails(
-            "id", YearMonth.parse("2025-01", ofPattern("yyyy-MM")), "ref", newWorker());
+        new InvoiceReference(
+            "id", YearMonth.parse("2025-01", ofPattern("yyyy-MM")), null, newWorker());
 
     var actual = invoiceDetailsMapper.toDomain(jInvoiceDetails);
 
@@ -31,8 +31,8 @@ public class InvoiceDetailsMapperTest {
   @Test
   void mapping_to_entity() {
     var invoiceDetails =
-        new InvoiceDetails(
-            "id", YearMonth.parse("2025-01", ofPattern("yyyy-MM")), "ref", newWorker());
+        new InvoiceReference(
+            "id", YearMonth.parse("2025-01", ofPattern("yyyy-MM")), null, newWorker());
     var expected = newJInvoiceDetails();
 
     var actual = invoiceDetailsMapper.toEntity(invoiceDetails);
@@ -45,9 +45,8 @@ public class InvoiceDetailsMapperTest {
         "code", "name", "email", "fullname", "address", "city", "NIF", "STAT");
   }
 
-  private JInvoiceDetails newJInvoiceDetails() {
-    var jInvoiceDetails = new JInvoiceDetails();
-    jInvoiceDetails.setReference("ref");
+  private JInvoiceReference newJInvoiceDetails() {
+    var jInvoiceDetails = new JInvoiceReference();
     jInvoiceDetails.setId("id");
     jInvoiceDetails.setWorker(newJWorker());
     jInvoiceDetails.setYearMonth("2025-01");

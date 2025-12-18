@@ -4,28 +4,28 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.hei.asa.model.InvoiceDetails;
-import school.hei.asa.repository.model.JInvoiceDetails;
+import school.hei.asa.model.InvoiceReference;
+import school.hei.asa.repository.model.JInvoiceReference;
 
 @Component
 @AllArgsConstructor
 public class InvoiceDetailsMapper {
   private final WorkerMapper workerMapper;
 
-  public InvoiceDetails toDomain(JInvoiceDetails jInvoiceDetails) {
-    return new InvoiceDetails(
-        jInvoiceDetails.getId(),
-        YearMonth.parse(jInvoiceDetails.getYearMonth(), DateTimeFormatter.ofPattern("yyyy-MM")),
-        jInvoiceDetails.getReference(),
-        workerMapper.toDomain(jInvoiceDetails.getWorker()));
+  public InvoiceReference toDomain(JInvoiceReference jInvoiceReference) {
+    return new InvoiceReference(
+        jInvoiceReference.getId(),
+        YearMonth.parse(jInvoiceReference.getYearMonth(), DateTimeFormatter.ofPattern("yyyy-MM")),
+        jInvoiceReference.getAutoincrement(),
+        workerMapper.toDomain(jInvoiceReference.getWorker()));
   }
 
-  public JInvoiceDetails toEntity(InvoiceDetails invoiceDetails) {
-    var jInvoiceDetails = new JInvoiceDetails();
-    jInvoiceDetails.setId(invoiceDetails.id());
-    jInvoiceDetails.setWorker(workerMapper.toEntity(invoiceDetails.worker()));
-    jInvoiceDetails.setYearMonth(invoiceDetails.yearMonth().toString());
-    jInvoiceDetails.setReference(invoiceDetails.reference());
+  public JInvoiceReference toEntity(InvoiceReference invoiceReference) {
+    var jInvoiceDetails = new JInvoiceReference();
+    jInvoiceDetails.setId(invoiceReference.id());
+    jInvoiceDetails.setWorker(workerMapper.toEntity(invoiceReference.worker()));
+    jInvoiceDetails.setYearMonth(invoiceReference.yearMonth().toString());
+    jInvoiceDetails.setAutoincrement(invoiceReference.autoincrement());
     return jInvoiceDetails;
   }
 }

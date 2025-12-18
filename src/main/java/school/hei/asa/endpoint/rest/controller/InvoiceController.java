@@ -61,14 +61,12 @@ public class InvoiceController {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var invoice = thInvoiceService.extractInvoice(worker, invoiceForm);
-    var fileName =
-        thInvoiceService.generateInvoiceFileName(invoice.invoiceData().yearMonth(), worker.code());
 
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     FileSystemResource resource = new FileSystemResource(pdfFile);
     return ResponseEntity.ok()
         .contentType(APPLICATION_PDF)
-        .header(CONTENT_DISPOSITION, "inline; filename=" + fileName)
+        .header(CONTENT_DISPOSITION, "inline; filename=invoice-preview")
         .body(resource);
   }
 
@@ -82,9 +80,7 @@ public class InvoiceController {
 
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();
-    var fileName =
-        thInvoiceService.generateInvoiceFileName(invoice.invoiceData().yearMonth(), worker.code());
-    invoiceService.saveInvoice(invoice.invoiceData(), worker);
+    var fileName = thInvoiceService.generateInvoiceFileName(invoice.invoiceData(), worker);
     bucketComponent.upload(pdfFile, INVOICES_FOLDER + fileName);
 
     return ResponseEntity.ok()

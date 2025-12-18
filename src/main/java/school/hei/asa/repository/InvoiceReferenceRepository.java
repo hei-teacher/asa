@@ -6,24 +6,24 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.Worker;
-import school.hei.asa.repository.jrepository.JInvoiceDetailsRepository;
+import school.hei.asa.repository.jrepository.JInvoiceReferenceRepository;
 import school.hei.asa.repository.mapper.InvoiceDetailsMapper;
 
 @AllArgsConstructor
 @Repository
-public class InvoiceDetailsRepository {
+public class InvoiceReferenceRepository {
   private final InvoiceDetailsMapper invoiceDetailsMapper;
-  private final JInvoiceDetailsRepository jInvoiceDetailsRepository;
+  private final JInvoiceReferenceRepository jInvoiceReferenceRepository;
 
   @Transactional
   public List<InvoiceReference> findInvoiceDetailsByWorker(Worker worker) {
-    return jInvoiceDetailsRepository.findByWorkerCode(worker.code()).stream()
+    return jInvoiceReferenceRepository.findByWorkerCode(worker.code()).stream()
         .map(invoiceDetailsMapper::toDomain)
         .toList();
   }
 
   @Transactional
   public void saveInvoiceDetails(InvoiceReference invoiceReference) {
-    jInvoiceDetailsRepository.save(invoiceDetailsMapper.toEntity(invoiceReference));
+    jInvoiceReferenceRepository.save(invoiceDetailsMapper.toEntity(invoiceReference));
   }
 }

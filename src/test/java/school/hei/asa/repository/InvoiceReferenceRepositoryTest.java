@@ -13,7 +13,8 @@ import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.PartnerContractor;
 
 public class InvoiceReferenceRepositoryTest extends FacadeIT {
-  @Autowired InvoiceDetailsRepository invoiceDetailsRepository;
+  @Autowired
+  InvoiceReferenceRepository invoiceReferenceRepository;
 
   @Test
   void fetch_all_invoice_details_for_worker() {
@@ -28,7 +29,7 @@ public class InvoiceReferenceRepositoryTest extends FacadeIT {
         new InvoiceReference("id4", YearMonth.parse("2025-04", ofPattern("yyyy-MM")), 4, worker);
     var expected = List.of(invoiceDetails1, invoiceDetails2, invoiceDetails3, invoiceDetails4);
 
-    var actual = invoiceDetailsRepository.findInvoiceDetailsByWorker(worker);
+    var actual = invoiceReferenceRepository.findInvoiceDetailsByWorker(worker);
 
     assertEquals(expected, actual);
   }
@@ -39,9 +40,9 @@ public class InvoiceReferenceRepositoryTest extends FacadeIT {
     var expected =
         new InvoiceReference("id5", YearMonth.parse("2025-05", ofPattern("yyyy-MM")), 5, worker);
 
-    invoiceDetailsRepository.saveInvoiceDetails(expected);
+    invoiceReferenceRepository.saveInvoiceDetails(expected);
 
-    var actual = invoiceDetailsRepository.findInvoiceDetailsByWorker(worker);
+    var actual = invoiceReferenceRepository.findInvoiceDetailsByWorker(worker);
 
     assertTrue(actual.contains(expected));
   }

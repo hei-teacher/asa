@@ -26,7 +26,12 @@ public class ThInvoiceService {
   private final ThInvoiceFormMapper thInvoiceFormMapper;
   private final InvoicePDFGenerator invoicePDFGenerator;
 
-  @SneakyThrows
+    public String generateInvoiceFileName(ThInvoiceForm thInvoiceForm, Worker worker) {
+        var invoiceData = thInvoiceFormMapper.toDomain(thInvoiceForm);
+        return invoiceService.generateInvoiceFileName(invoiceData, worker);
+    }
+
+    @SneakyThrows
   public ThInvoice extractInvoice(Worker worker, ThInvoiceForm invoiceForm) {
     var invoiceData =
         invoiceService.extractInvoiceData(worker, thInvoiceFormMapper.toDomain(invoiceForm));
@@ -45,9 +50,5 @@ public class ThInvoiceService {
 
       return new ThInvoice(base64Image, thInvoiceData);
     }
-  }
-
-  public String generateInvoiceFileName(String yearMonth, String workerCode) {
-    return String.format("FAC-NUMERMG-%s-%s.pdf", workerCode, yearMonth);
   }
 }

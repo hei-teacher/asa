@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import school.hei.asa.repository.model.JInvoiceReference;
 
 @Repository
-public interface JInvoiceDetailsRepository extends JpaRepository<JInvoiceReference, String> {
+public interface JInvoiceReferenceRepository extends JpaRepository<JInvoiceReference, String> {
   @Override
   List<JInvoiceReference> findAll();
 

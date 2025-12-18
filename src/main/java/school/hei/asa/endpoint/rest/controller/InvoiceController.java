@@ -80,6 +80,7 @@ public class InvoiceController {
 
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();
+    thInvoiceService.saveInvoiceReference(invoice.invoiceData(), worker);
     var fileName = thInvoiceService.generateInvoiceFileName(invoice.invoiceData(), worker);
     bucketComponent.upload(pdfFile, INVOICES_FOLDER + fileName);
 

@@ -163,7 +163,7 @@ public class InvoiceService {
     return mission.isCare(careProductCodeSupplier.get());
   }
 
-  private void saveInvoiceReference(InvoiceForm invoiceForm, Worker worker) {
+  public void saveInvoiceReference(InvoiceForm invoiceForm, Worker worker) {
     var invoiceReference =
         new InvoiceReference(
             randomUUID().toString(),
@@ -174,7 +174,6 @@ public class InvoiceService {
   }
 
   public String generateInvoiceFileName(InvoiceForm invoiceForm, Worker worker){
-      saveInvoiceReference(invoiceForm,worker);
       var savedInvoice = invoiceReferenceRepository.findInvoiceDetailsByWorker(worker).stream().sorted(comparing(InvoiceReference::autoincrement,naturalOrder()).reversed()).toList().getFirst();
 
       return String.format("FAC-NUM-2025-%s-%s", worker.code(),savedInvoice.autoincrement());

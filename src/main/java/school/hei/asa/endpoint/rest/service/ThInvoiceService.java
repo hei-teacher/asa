@@ -31,6 +31,11 @@ public class ThInvoiceService {
         return invoiceService.generateInvoiceFileName(invoiceData, worker);
     }
 
+    public void saveInvoiceReference(ThInvoiceForm thInvoiceForm, Worker worker){
+        var invoiceData = thInvoiceFormMapper.toDomain(thInvoiceForm);
+        invoiceService.saveInvoiceReference(invoiceData, worker);
+    }
+
     @SneakyThrows
   public ThInvoice extractInvoice(Worker worker, ThInvoiceForm invoiceForm) {
     var invoiceData =

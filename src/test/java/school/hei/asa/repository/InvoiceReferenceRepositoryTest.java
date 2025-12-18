@@ -40,7 +40,7 @@ public class InvoiceReferenceRepositoryTest extends FacadeIT {
     var expected =
         new InvoiceReference("id5", YearMonth.parse("2025-05", ofPattern("yyyy-MM")), 5, worker);
 
-    invoiceReferenceRepository.saveInvoiceDetails(expected);
+    invoiceReferenceRepository.saveInvoiceReference(expected);
 
     var actual = invoiceReferenceRepository.findInvoiceDetailsByWorker(worker);
 

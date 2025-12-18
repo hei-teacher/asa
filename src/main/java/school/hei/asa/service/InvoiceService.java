@@ -39,10 +39,10 @@ public class InvoiceService {
   private final InvoiceReferenceRepository invoiceReferenceRepository;
 
   public Optional<InvoiceReference> findInvoiceReference(Worker worker, YearMonth yearMonth) {
-    var invoiceDetailsList = invoiceReferenceRepository.findInvoiceDetailsByWorker(worker);
-    log.info("here is the invoice result: {}", invoiceDetailsList);
-    return invoiceDetailsList.stream()
-        .filter(invoiceDetails -> invoiceDetails.yearMonth().equals(yearMonth))
+    var invoiceReferenceList = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker);
+    log.info("here is the invoice result: {}", invoiceReferenceList);
+    return invoiceReferenceList.stream()
+        .filter(invoiceReference -> invoiceReference.yearMonth().equals(yearMonth))
         .findFirst();
   }
 
@@ -170,11 +170,11 @@ public class InvoiceService {
             invoiceForm.yearMonth(),
             null,
             worker);
-    invoiceReferenceRepository.saveInvoiceDetails(invoiceReference);
+    invoiceReferenceRepository.saveInvoiceReference(invoiceReference);
   }
 
-  public String generateInvoiceFileName(InvoiceForm invoiceForm, Worker worker){
-      var savedInvoice = invoiceReferenceRepository.findInvoiceDetailsByWorker(worker).stream().sorted(comparing(InvoiceReference::autoincrement,naturalOrder()).reversed()).toList().getFirst();
+  public String generateInvoiceFileName(Worker worker){
+      var savedInvoice = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker).stream().sorted(comparing(InvoiceReference::autoincrement,naturalOrder()).reversed()).toList().getFirst();
 
       return String.format("FAC-NUM-2025-%s-%s", worker.code(),savedInvoice.autoincrement());
   }

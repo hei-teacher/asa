@@ -16,14 +16,14 @@ public class InvoiceReferenceRepository {
   private final JInvoiceReferenceRepository jInvoiceReferenceRepository;
 
   @Transactional
-  public List<InvoiceReference> findInvoiceDetailsByWorker(Worker worker) {
+  public List<InvoiceReference> findInvoiceReferenceByWorker(Worker worker) {
     return jInvoiceReferenceRepository.findByWorkerCode(worker.code()).stream()
         .map(invoiceDetailsMapper::toDomain)
         .toList();
   }
 
   @Transactional
-  public void saveInvoiceDetails(InvoiceReference invoiceReference) {
+  public void saveInvoiceReference(InvoiceReference invoiceReference) {
     jInvoiceReferenceRepository.save(invoiceDetailsMapper.toEntity(invoiceReference));
   }
 }

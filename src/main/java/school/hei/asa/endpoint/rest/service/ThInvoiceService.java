@@ -26,9 +26,8 @@ public class ThInvoiceService {
   private final ThInvoiceFormMapper thInvoiceFormMapper;
   private final InvoicePDFGenerator invoicePDFGenerator;
 
-    public String generateInvoiceFileName(ThInvoiceForm thInvoiceForm, Worker worker) {
-        var invoiceData = thInvoiceFormMapper.toDomain(thInvoiceForm);
-        return invoiceService.generateInvoiceFileName(invoiceData, worker);
+    public String generateInvoiceFileName(Worker worker) {
+        return invoiceService.generateInvoiceFileName(worker);
     }
 
     public void saveInvoiceReference(ThInvoiceForm thInvoiceForm, Worker worker){

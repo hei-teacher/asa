@@ -43,10 +43,12 @@ public class ThInvoiceFormMapper {
   }
 
   public InvoiceForm toDomain(ThInvoiceForm invoiceForm) {
+      log.info("mapping ThInvoiceForm {}",invoiceForm);
     var yearMonth =
         invoiceForm.yearMonth() != null && !invoiceForm.yearMonth().isBlank()
             ? YearMonth.parse(invoiceForm.yearMonth(), yearMonthFormatter)
             : null;
+    log.info("1");
     var reference =
         invoiceForm.reference() != null && !invoiceForm.reference().isBlank()
             ? LocalDate.parse(invoiceForm.reference(), localDateFormatter)
@@ -61,27 +63,27 @@ public class ThInvoiceFormMapper {
             : null;
     var unitPrice =
         invoiceForm.unitPrice() != null && !invoiceForm.unitPrice().isBlank()
-            ? new BigDecimal(invoiceForm.unitPrice())
+            ? new BigDecimal(invoiceForm.unitPrice().replace(" ", ""))
             : null;
     var amount =
         invoiceForm.amount() != null && !invoiceForm.amount().isBlank()
-            ? new BigDecimal(invoiceForm.amount())
+            ? new BigDecimal(invoiceForm.amount().replace(" ", ""))
             : null;
     var extraQuantity =
-        invoiceForm.extraQuantity() != null && !invoiceForm.extraQuantity().isBlank()
+        invoiceForm.extraQuantity() != null && !invoiceForm.extraQuantity().isBlank() && !invoiceForm.extraQuantity().equals("null")
             ? parseDouble(invoiceForm.extraQuantity())
             : null;
     var extraUnitPrice =
         invoiceForm.extraUnitPrice() != null && !invoiceForm.extraUnitPrice().isBlank()
-            ? new BigDecimal(invoiceForm.extraUnitPrice())
+            ? new BigDecimal(invoiceForm.extraUnitPrice().replace(" ", ""))
             : null;
     var extraAmount =
         invoiceForm.extraAmount() != null && !invoiceForm.extraAmount().isBlank()
-            ? new BigDecimal(invoiceForm.extraAmount())
+            ? new BigDecimal(invoiceForm.extraAmount().replace(" ", ""))
             : null;
     var total =
         invoiceForm.total() != null && !invoiceForm.total().isBlank()
-            ? new BigDecimal(invoiceForm.total())
+            ? new BigDecimal(invoiceForm.total().replace(" ", ""))
             : null;
 
     return new InvoiceForm(

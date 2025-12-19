@@ -178,4 +178,10 @@ public class InvoiceService {
 
       return String.format("FAC-NUM-2025-%s-%s", worker.code(),savedInvoice.autoincrement());
   }
+
+    public String getInvoiceBucketKey(Worker worker, YearMonth yearMonth){
+        var invoiceReference = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker).stream().filter(ref -> ref.yearMonth().equals(yearMonth)).findFirst().get();
+
+        return String.format("FAC-NUM-2025-%s-%s", worker.code(),invoiceReference.autoincrement());
+    }
 }

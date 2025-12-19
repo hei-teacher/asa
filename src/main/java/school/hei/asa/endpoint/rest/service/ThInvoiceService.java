@@ -69,6 +69,7 @@ public class ThInvoiceService {
       ImageIO.write(image, "png", baos);
       String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
 
+        log.info("successfully extracted invoiceData");
       return new ThInvoice(base64Image, thInvoiceData);
     }
   }

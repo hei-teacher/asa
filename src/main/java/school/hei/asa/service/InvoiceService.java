@@ -183,6 +183,7 @@ public class InvoiceService {
     var invoiceReference =
         invoiceReferenceRepository.findInvoiceReferenceByWorker(worker).stream()
             .filter(ref -> ref.yearMonth().equals(yearMonth))
+            .sorted(comparing(InvoiceReference::autoincrement, naturalOrder()).reversed())
             .findFirst()
             .get();
 

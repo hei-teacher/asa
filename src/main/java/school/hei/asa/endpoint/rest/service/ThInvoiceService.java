@@ -3,7 +3,13 @@ package school.hei.asa.endpoint.rest.service;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.time.Month;
+import java.time.YearMonth;
+import java.time.format.TextStyle;
 import java.util.Base64;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Locale;
 import javax.imageio.ImageIO;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -14,9 +20,12 @@ import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.rest.controller.mapper.ThInvoiceFormMapper;
 import school.hei.asa.endpoint.rest.model.th.ThInvoice;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
+import school.hei.asa.endpoint.rest.model.th.ThMonthInvoiceStatus;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.InvoicePDFGenerator;
 import school.hei.asa.service.InvoiceService;
+
+import static java.time.LocalDate.now;
 
 @Slf4j
 @AllArgsConstructor
@@ -35,6 +44,14 @@ public class ThInvoiceService {
         invoiceService.saveInvoiceReference(invoiceData, worker);
     }
 
+    public List<ThMonthInvoiceStatus> getMonthInvoiceStatusForWorker(Worker worker){
+        EnumSet<Month> months = EnumSet.allOf(Month.class);
+        return months.stream().map(month -> {
+            var yearMonth = YearMonth.of(now().getYear(),month.getValue());
+            var invoiceReference = invoiceService.findInvoiceReference(worker, yearMonth);
+            return new ThMonthInvoiceStatus(yearMonth, invoiceReference.isPresent());
+        }).toList();
+    }
     @SneakyThrows
   public ThInvoice extractInvoice(Worker worker, ThInvoiceForm invoiceForm) {
     var invoiceData =

@@ -48,9 +48,12 @@ public class InvoiceController {
         invoiceForm.yearMonth() != null
             ? YearMonth.parse(invoiceForm.yearMonth(), pattern)
             : YearMonth.now();
-    var invoiceDetails = invoiceService.findInvoiceReference(worker, yearMonth);
+    var monthInvoiceStatus = thInvoiceService.getMonthInvoiceStatusForWorker(worker);
+    var invoiceReference = invoiceService.findInvoiceReference(worker, yearMonth);
+
     model.addAttribute("yearMonthReference", invoiceForm.yearMonth());
-    model.addAttribute("invoiceDetails", invoiceDetails);
+    model.addAttribute("invoiceReference", invoiceReference);
+    model.addAttribute("monthInvoiceStatuses", monthInvoiceStatus);
 
     return "invoice-generator";
   }

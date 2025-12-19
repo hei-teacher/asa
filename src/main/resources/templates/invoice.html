@@ -162,6 +162,7 @@
             <td style="width: 43%; vertical-align: top;">
                 <p th:text="'Facture : FAC' + ${invoice.reference}" style="font-family: 'EB Garamond', serif; font-weight: 700;"></p>
                 <p th:text="'Date d\'émission : ' + ${invoice.issueDate}" style="font-family: 'EB Garamond', serif; font-weight: 700;"></p>
+                <p th:text="'Mois facturé : ' + ${yearMonth}" style="font-family: 'EB Garamond', serif; font-weight: 700;"></p>
             </td>
             <td style="width: 57%; vertical-align: top;">
                 <p><strong>NUMER MADAGASCAR (SARLU)</strong></p>
@@ -180,8 +181,8 @@
             <tr>
                 <th class="text-left" style="width: 230px;">Description</th>
                 <th class="text-center">Quantité</th>
-                <th class="text-center">Prix unitaire (Arirary)</th>
-                <th class="text-right">Montant (Arirary)</th>
+                <th class="text-center">Prix unitaire (Ariary)</th>
+                <th class="text-right">Montant (Ariary)</th>
             </tr>
             </thead>
             <tbody>

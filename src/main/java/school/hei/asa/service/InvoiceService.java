@@ -14,8 +14,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.hei.asa.CareProductCodeSupplier;
-import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.InvoiceForm;
+import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.WorkerLevelHistory;
@@ -165,23 +165,27 @@ public class InvoiceService {
 
   public void saveInvoiceReference(InvoiceForm invoiceForm, Worker worker) {
     var invoiceReference =
-        new InvoiceReference(
-            randomUUID().toString(),
-            invoiceForm.yearMonth(),
-            null,
-            worker);
+        new InvoiceReference(randomUUID().toString(), invoiceForm.yearMonth(), null, worker);
     invoiceReferenceRepository.saveInvoiceReference(invoiceReference);
   }
 
-  public String generateInvoiceFileName(Worker worker){
-      var savedInvoice = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker).stream().sorted(comparing(InvoiceReference::autoincrement,naturalOrder()).reversed()).toList().getFirst();
+  public String generateInvoiceFileName(Worker worker) {
+    var savedInvoice =
+        invoiceReferenceRepository.findInvoiceReferenceByWorker(worker).stream()
+            .sorted(comparing(InvoiceReference::autoincrement, naturalOrder()).reversed())
+            .toList()
+            .getFirst();
 
-      return String.format("FAC-NUM-2025-%s-%s", worker.code(),savedInvoice.autoincrement());
+    return String.format("FAC-NUM-2025-%s-%s", worker.code(), savedInvoice.autoincrement());
   }
 
-    public String getInvoiceBucketKey(Worker worker, YearMonth yearMonth){
-        var invoiceReference = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker).stream().filter(ref -> ref.yearMonth().equals(yearMonth)).findFirst().get();
+  public String getInvoiceBucketKey(Worker worker, YearMonth yearMonth) {
+    var invoiceReference =
+        invoiceReferenceRepository.findInvoiceReferenceByWorker(worker).stream()
+            .filter(ref -> ref.yearMonth().equals(yearMonth))
+            .findFirst()
+            .get();
 
-        return String.format("FAC-NUM-2025-%s-%s", worker.code(),invoiceReference.autoincrement());
-    }
+    return String.format("FAC-NUM-2025-%s-%s", worker.code(), invoiceReference.autoincrement());
+  }
 }

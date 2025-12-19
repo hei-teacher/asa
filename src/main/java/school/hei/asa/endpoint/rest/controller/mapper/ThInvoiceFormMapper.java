@@ -43,7 +43,7 @@ public class ThInvoiceFormMapper {
   }
 
   public InvoiceForm toDomain(ThInvoiceForm invoiceForm) {
-      log.info("mapping ThInvoiceForm {}",invoiceForm);
+    log.info("mapping ThInvoiceForm {}", invoiceForm);
     var yearMonth =
         invoiceForm.yearMonth() != null && !invoiceForm.yearMonth().isBlank()
             ? YearMonth.parse(invoiceForm.yearMonth(), yearMonthFormatter)
@@ -70,7 +70,9 @@ public class ThInvoiceFormMapper {
             ? new BigDecimal(invoiceForm.amount().replace(" ", ""))
             : null;
     var extraQuantity =
-        invoiceForm.extraQuantity() != null && !invoiceForm.extraQuantity().isBlank() && !invoiceForm.extraQuantity().equals("null")
+        invoiceForm.extraQuantity() != null
+                && !invoiceForm.extraQuantity().isBlank()
+                && !invoiceForm.extraQuantity().equals("null")
             ? parseDouble(invoiceForm.extraQuantity())
             : null;
     var extraUnitPrice =

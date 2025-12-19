@@ -1,15 +1,15 @@
 package school.hei.asa.endpoint.rest.service;
 
+import static java.time.LocalDate.now;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.time.Month;
 import java.time.YearMonth;
-import java.time.format.TextStyle;
 import java.util.Base64;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Locale;
 import javax.imageio.ImageIO;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -25,8 +25,6 @@ import school.hei.asa.model.Worker;
 import school.hei.asa.service.InvoicePDFGenerator;
 import school.hei.asa.service.InvoiceService;
 
-import static java.time.LocalDate.now;
-
 @Slf4j
 @AllArgsConstructor
 @Service
@@ -35,24 +33,28 @@ public class ThInvoiceService {
   private final ThInvoiceFormMapper thInvoiceFormMapper;
   private final InvoicePDFGenerator invoicePDFGenerator;
 
-    public String generateInvoiceFileName(Worker worker) {
-        return invoiceService.generateInvoiceFileName(worker);
-    }
+  public String generateInvoiceFileName(Worker worker) {
+    return invoiceService.generateInvoiceFileName(worker);
+  }
 
-    public void saveInvoiceReference(ThInvoiceForm thInvoiceForm, Worker worker){
-        var invoiceData = thInvoiceFormMapper.toDomain(thInvoiceForm);
-        invoiceService.saveInvoiceReference(invoiceData, worker);
-    }
+  public void saveInvoiceReference(ThInvoiceForm thInvoiceForm, Worker worker) {
+    var invoiceData = thInvoiceFormMapper.toDomain(thInvoiceForm);
+    invoiceService.saveInvoiceReference(invoiceData, worker);
+  }
 
-    public List<ThMonthInvoiceStatus> getMonthInvoiceStatusForWorker(Worker worker){
-        EnumSet<Month> months = EnumSet.allOf(Month.class);
-        return months.stream().map(month -> {
-            var yearMonth = YearMonth.of(now().getYear(),month.getValue());
-            var invoiceReference = invoiceService.findInvoiceReference(worker, yearMonth);
-            return new ThMonthInvoiceStatus(yearMonth, invoiceReference.isPresent());
-        }).toList();
-    }
-    @SneakyThrows
+  public List<ThMonthInvoiceStatus> getMonthInvoiceStatusForWorker(Worker worker) {
+    EnumSet<Month> months = EnumSet.allOf(Month.class);
+    return months.stream()
+        .map(
+            month -> {
+              var yearMonth = YearMonth.of(now().getYear(), month.getValue());
+              var invoiceReference = invoiceService.findInvoiceReference(worker, yearMonth);
+              return new ThMonthInvoiceStatus(yearMonth, invoiceReference.isPresent());
+            })
+        .toList();
+  }
+
+  @SneakyThrows
   public ThInvoice extractInvoice(Worker worker, ThInvoiceForm invoiceForm) {
     var invoiceData =
         invoiceService.extractInvoiceData(worker, thInvoiceFormMapper.toDomain(invoiceForm));
@@ -69,7 +71,7 @@ public class ThInvoiceService {
       ImageIO.write(image, "png", baos);
       String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
 
-        log.info("successfully extracted invoiceData");
+      log.info("successfully extracted invoiceData");
       return new ThInvoice(base64Image, thInvoiceData);
     }
   }

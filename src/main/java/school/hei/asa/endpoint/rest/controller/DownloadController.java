@@ -3,7 +3,6 @@ package school.hei.asa.endpoint.rest.controller;
 import java.time.Duration;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -19,8 +18,8 @@ import school.hei.asa.service.InvoiceService;
 public class DownloadController {
   private static final String CONTRACTS_FOLDER = "contracts/";
   private static final String INVOICES_FOLDER = "invoices/";
-    private final WorkerFromAuthentication workerFromAuthentication;
-    private final WorkerToModelAdder workerToModelAdder;
+  private final WorkerFromAuthentication workerFromAuthentication;
+  private final WorkerToModelAdder workerToModelAdder;
   private final BucketComponent bucketComponent;
   private final InvoiceService invoiceService;
 
@@ -34,12 +33,13 @@ public class DownloadController {
   }
 
   @GetMapping("/download-invoice")
-  public String redirectToPresignedUrlForInvoiceFile(Model model, Authentication authentication, @RequestParam String yearMonth) {
-      var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
-      var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-      var pattern = DateTimeFormatter.ofPattern("yyyy-MM");
-      var date = YearMonth.parse(yearMonth, pattern);
-      var invoiceBucketKey = invoiceService.getInvoiceBucketKey(worker,date);
+  public String redirectToPresignedUrlForInvoiceFile(
+      Model model, Authentication authentication, @RequestParam String yearMonth) {
+    var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
+    var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
+    var pattern = DateTimeFormatter.ofPattern("yyyy-MM");
+    var date = YearMonth.parse(yearMonth, pattern);
+    var invoiceBucketKey = invoiceService.getInvoiceBucketKey(worker, date);
 
     String presignedUrl =
         bucketComponent

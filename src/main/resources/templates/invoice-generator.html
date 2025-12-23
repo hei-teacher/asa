@@ -164,7 +164,8 @@
       function generateInvoice() {
         const formData = getFormData();
         document.getElementById("gen_ref").value = formData.yearMonth;
-        document.getElementById("invoiceGenerate").submit();
+        document.getElementById("invoiceGenerate").submit().preventDefault();
+        window.location.href = `/invoice`;
       }
 
       function loadPreview() {

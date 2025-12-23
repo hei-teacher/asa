@@ -3,16 +3,19 @@ package school.hei.asa.repository.mapper;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.repository.model.JInvoiceReference;
 
+@Slf4j
 @Component
 @AllArgsConstructor
-public class InvoiceDetailsMapper {
+public class InvoiceReferenceMapper {
   private final WorkerMapper workerMapper;
 
   public InvoiceReference toDomain(JInvoiceReference jInvoiceReference) {
+    log.info("jinvoiceRef = {}", jInvoiceReference);
     return new InvoiceReference(
         jInvoiceReference.getId(),
         YearMonth.parse(jInvoiceReference.getYearMonth(), DateTimeFormatter.ofPattern("yyyy-MM")),

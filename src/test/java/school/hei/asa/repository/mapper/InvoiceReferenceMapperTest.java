@@ -13,8 +13,8 @@ import school.hei.asa.repository.model.JInvoiceReference;
 import school.hei.asa.repository.model.JWorker;
 
 public class InvoiceReferenceMapperTest {
-  private final InvoiceDetailsMapper invoiceDetailsMapper =
-      new InvoiceDetailsMapper(new WorkerMapper());
+  private final InvoiceReferenceMapper invoiceReferenceMapper =
+      new InvoiceReferenceMapper(new WorkerMapper());
 
   @Test
   void mapping_to_domain() {
@@ -23,7 +23,7 @@ public class InvoiceReferenceMapperTest {
         new InvoiceReference(
             "id", YearMonth.parse("2025-01", ofPattern("yyyy-MM")), null, newWorker());
 
-    var actual = invoiceDetailsMapper.toDomain(jInvoiceDetails);
+    var actual = invoiceReferenceMapper.toDomain(jInvoiceDetails);
 
     assertEquals(expected, actual);
   }
@@ -35,7 +35,7 @@ public class InvoiceReferenceMapperTest {
             "id", YearMonth.parse("2025-01", ofPattern("yyyy-MM")), null, newWorker());
     var expected = newJInvoiceDetails();
 
-    var actual = invoiceDetailsMapper.toEntity(invoiceDetails);
+    var actual = invoiceReferenceMapper.toEntity(invoiceDetails);
 
     assertEquals(expected, actual);
   }

@@ -7,23 +7,23 @@ import org.springframework.stereotype.Repository;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.jrepository.JInvoiceReferenceRepository;
-import school.hei.asa.repository.mapper.InvoiceDetailsMapper;
+import school.hei.asa.repository.mapper.InvoiceReferenceMapper;
 
 @AllArgsConstructor
 @Repository
 public class InvoiceReferenceRepository {
-  private final InvoiceDetailsMapper invoiceDetailsMapper;
+  private final InvoiceReferenceMapper invoiceReferenceMapper;
   private final JInvoiceReferenceRepository jInvoiceReferenceRepository;
 
   @Transactional
   public List<InvoiceReference> findInvoiceReferenceByWorker(Worker worker) {
     return jInvoiceReferenceRepository.findByWorkerCode(worker.code()).stream()
-        .map(invoiceDetailsMapper::toDomain)
+        .map(invoiceReferenceMapper::toDomain)
         .toList();
   }
 
   @Transactional
   public void saveInvoiceReference(InvoiceReference invoiceReference) {
-    jInvoiceReferenceRepository.save(invoiceDetailsMapper.toEntity(invoiceReference));
+    jInvoiceReferenceRepository.save(invoiceReferenceMapper.toEntity(invoiceReference));
   }
 }

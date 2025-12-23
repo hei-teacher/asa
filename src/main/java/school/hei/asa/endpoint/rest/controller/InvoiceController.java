@@ -88,6 +88,7 @@ public class InvoiceController {
     log.info("Generating name for bucket key...");
     var fileName = thInvoiceService.generateInvoiceFileName(worker);
     log.info("uploading...");
+    log.info("fileName = {}", fileName);
     bucketComponent.upload(pdfFile, INVOICES_FOLDER + fileName);
 
     return ResponseEntity.ok()

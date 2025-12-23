@@ -1,5 +1,7 @@
 package school.hei.asa.service;
 
+import static java.lang.Double.parseDouble;
+import static java.lang.System.lineSeparator;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 
@@ -7,6 +9,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
@@ -276,7 +279,7 @@ public class MissionService {
           "code,worker,worker level,start date,"
               + "contract duration (in days),"
               + "total days worked,remaining days"
-              + System.lineSeparator());
+              + lineSeparator());
       fileWriter.flush();
       totalWorkDaysPerWorker.forEach(
           (worker, thWorkerLevelHistories) -> {
@@ -303,7 +306,7 @@ public class MissionService {
                                 actualWorkedDays,
                                 remainingDays);
 
-                        fileWriter.write(textToWrite + System.lineSeparator());
+                        fileWriter.write(textToWrite + lineSeparator());
                         fileWriter.flush();
                       } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -319,18 +322,23 @@ public class MissionService {
   private String remainingDaysToString(ThWorkerLevelHistory thWorkerLevelHistory) {
     if (thWorkerLevelHistory.projectedDaysToWork().equals("-")) {
       return "-";
-    } else {
-      var number =
-          (Double.parseDouble(thWorkerLevelHistory.projectedDaysToWork())
-              - Double.parseDouble(thWorkerLevelHistory.actualWorkedDay()));
-      var numberFormat = new DecimalFormat("#.0");
-      return numberFormat.format(number);
     }
+
+    var res =
+        parseDouble(thWorkerLevelHistory.projectedDaysToWork())
+            - parseDouble(thWorkerLevelHistory.actualWorkedDay());
+    return formatDays(res);
   }
 
   private String actualWorkedDaysToString(ThWorkerLevelHistory thWorkerLevelHistory) {
-    return Double.parseDouble(thWorkerLevelHistory.actualWorkedDay()) == 0.0d
-        ? "-"
-        : thWorkerLevelHistory.actualWorkedDay();
+    double res = parseDouble(thWorkerLevelHistory.actualWorkedDay());
+    return res == 0.0d ? "-" : formatDays(res);
+  }
+
+  private String formatDays(double days) {
+    var decimalFormatSymbols = new DecimalFormatSymbols();
+    decimalFormatSymbols.setDecimalSeparator('.');
+    var numberFormat = new DecimalFormat("#.0", decimalFormatSymbols);
+    return numberFormat.format(days);
   }
 }

@@ -27,11 +27,11 @@ import school.hei.asa.model.ContractType;
 import school.hei.asa.model.Invoice;
 import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
+import school.hei.asa.number.NumberConverter;
+import school.hei.asa.number.NumberParser;
 import school.hei.asa.repository.BankAccountRepository;
 import school.hei.asa.repository.MissionExecutionRepository;
 import school.hei.asa.repository.WorkerLevelHistoryRepository;
-import school.hei.asa.service.utils.NumberConverter;
-import school.hei.asa.service.utils.NumberParser;
 
 @AllArgsConstructor
 @Service

@@ -1,4 +1,4 @@
-package school.hei.asa.service.utils;
+package school.hei.asa.number;
 
 import static com.ibm.icu.text.RuleBasedNumberFormat.SPELLOUT;
 import static java.util.Locale.FRENCH;

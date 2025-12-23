@@ -3,7 +3,7 @@ package school.hei.asa.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import school.hei.asa.service.utils.NumberConverter;
+import school.hei.asa.number.NumberConverter;
 
 public class NumberConverterTest {
 

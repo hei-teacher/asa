@@ -1,4 +1,4 @@
-package school.hei.asa.service.utils;
+package school.hei.asa.number;
 
 import static java.lang.Math.round;
 import static java.util.Locale.FRANCE;

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
-import school.hei.asa.service.utils.NumberParser;
+import school.hei.asa.number.NumberParser;
 
 public class NumberParserTest {
 

@@ -9,9 +9,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.time.format.TextStyle.FULL;
 import static java.util.Locale.FRENCH;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
@@ -50,15 +48,15 @@ public class InvoiceService {
   @SneakyThrows
   public Invoice extractInvoice(Worker worker, ThInvoiceForm invoiceForm) {
     var invoiceData = extractInvoiceData(worker, invoiceForm);
-    File data = invoicePDFGenerator.apply(worker, invoiceData, "invoice");
+    var file = invoicePDFGenerator.apply(worker, invoiceData, "invoice");
 
-    try (PDDocument document = PDDocument.load(data)) {
-      PDFRenderer pdfRenderer = new PDFRenderer(document);
-      BufferedImage image = pdfRenderer.renderImageWithDPI(0, 150);
+    try (PDDocument document = PDDocument.load(file)) {
+      var pdfRenderer = new PDFRenderer(document);
+      var image = pdfRenderer.renderImageWithDPI(0, 150);
 
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      var baos = new ByteArrayOutputStream();
       ImageIO.write(image, "png", baos);
-      String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
+      var base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
 
       return new Invoice(base64Image, invoiceData);
     }

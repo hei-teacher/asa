@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -165,7 +165,9 @@
         const formData = getFormData();
         document.getElementById("gen_ref").value = formData.yearMonth;
         document.getElementById("invoiceGenerate").submit().preventDefault();
-        window.location.href = `/invoice`;
+        setTimeout(() => {
+          window.location.href = `/invoice`;
+        }, 5000);
       }
 
       function loadPreview() {
@@ -180,7 +182,6 @@
         viewer.src = url;
       }
 
-      // reload page when selecting a new date
       function getPreviewFor(yearMonth) {
         window.location.href = `/invoice?yearMonth=${yearMonth}`;
       }

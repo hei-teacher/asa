@@ -1,5 +1,6 @@
 package school.hei.asa.endpoint.rest.controller;
 
+import static java.time.LocalDate.now;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.ThInvoiceService;
@@ -40,7 +42,13 @@ public class InvoiceController {
 
   @GetMapping("/invoice")
   public String getInvoicePage(
-      Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
+      Model model,
+      Authentication authentication,
+      @ModelAttribute ThInvoiceForm invoiceForm,
+      @RequestParam(required = false) Integer year) {
+    year = year == null ? now().getYear() : year;
+    model.addAttribute("year", year);
+    model.addAttribute("currentYear", now().getYear());
     var pattern = DateTimeFormatter.ofPattern("yyyy-MM");
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
@@ -48,7 +56,7 @@ public class InvoiceController {
         invoiceForm.yearMonth() != null
             ? YearMonth.parse(invoiceForm.yearMonth(), pattern)
             : YearMonth.now();
-    var monthInvoiceStatus = thInvoiceService.getMonthInvoiceStatusForWorker(worker);
+    var monthInvoiceStatus = thInvoiceService.getMonthInvoiceStatusForWorker(worker, year);
     var invoiceReference = invoiceService.findInvoiceReference(worker, yearMonth);
 
     model.addAttribute("yearMonthReference", invoiceForm.yearMonth());

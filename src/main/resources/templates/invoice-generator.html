@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -25,24 +25,25 @@
     <div class="flex flex-1 overflow-hidden">
       <!-- Left section -->
       <div class="w-1/2 p-5 bg-gray-100 box-border h-full overflow-y-auto">
-        <h1 class="text-4xl font-bold text-[#3F2F6A] mt-4 mb-4">
+        <h1 class="text-4xl px-3 font-bold text-[#3F2F6A] mt-3 mb-4">
           Get your invoice
         </h1>
 
         <div class="flex space-x-6">
           <div
-            class="w-1/2 flex justify-center"
+            class="w-1/2 flex-col gap-4 justify-center"
             th:if="${yearMonthReference == null}"
           >
+            <div class="pt-5 px-3 mb-6">
+              <div
+                th:replace="fragments/selectors/year :: apply(invoice)"
+              ></div>
+            </div>
+
             <div class="flex items-center gap-4 relative w-full">
               <div class="flex-col justify-between w-full">
                 <div
-                  class="text-xl inline-flex w-full gap-x-1.5 bg-gray-100 rounded-md py-2 pl-4 font-bold"
-                >
-                  Select the month of the invoice
-                </div>
-                <div
-                  class="w-full h-3/4 overflow-scroll origin-top-right rounded-md bg-gray-100 transition transition-discrete"
+                  class="w-full h-3/4 origin-top-right rounded-md bg-gray-100 transition transition-discrete"
                 >
                   <div
                     class="py-1"
@@ -56,13 +57,13 @@
                       ></p>
                       <button
                         th:if="${monthInvoiceStatus.hasInvoice()}"
-                        class="rounded bg-[#3f2f6a] px-6 py-2 font-semibold text-white hover:bg-blue-800 cursor-pointer"
+                        class="rounded bg-[#3f2f6a] px-4 py-1.5 font-semibold text-white hover:bg-blue-800 cursor-pointer"
                         th:text="Download"
                         th:attr="onclick=|downloadInvoice('${monthInvoiceStatus.yearMonth().toString()}')|"
                       ></button>
                       <button
                         th:unless="${monthInvoiceStatus.hasInvoice()}"
-                        class="rounded bg-[#3f2f6a] px-6 py-2 font-semibold text-white hover:bg-blue-800 cursor-pointer"
+                        class="rounded bg-[#3f2f6a] px-4 py-1.5 font-semibold text-white hover:bg-blue-800 cursor-pointer"
                         th:text="Generate"
                         th:attr="onclick=|getPreviewFor('${monthInvoiceStatus.yearMonth().toString()}')|"
                       ></button>
@@ -151,6 +152,11 @@
     </div>
 
     <script>
+      function updateFilters() {
+        const year = document.getElementById("year").value;
+        window.location.href = `/invoice?year=${year}`;
+      }
+
       function getFormData() {
         return {
           yearMonth: document.getElementById("ref").value,

@@ -1,7 +1,5 @@
 package school.hei.asa.endpoint.rest.service;
 
-import static java.time.LocalDate.now;
-
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -42,12 +40,12 @@ public class ThInvoiceService {
     invoiceService.saveInvoiceReference(invoiceData, worker);
   }
 
-  public List<ThMonthInvoiceStatus> getMonthInvoiceStatusForWorker(Worker worker) {
+  public List<ThMonthInvoiceStatus> getMonthInvoiceStatusForWorker(Worker worker, int year) {
     EnumSet<Month> months = EnumSet.allOf(Month.class);
     return months.stream()
         .map(
             month -> {
-              var yearMonth = YearMonth.of(now().getYear(), month.getValue());
+              var yearMonth = YearMonth.of(year, month.getValue());
               var invoiceReference = invoiceService.findInvoiceReference(worker, yearMonth);
               return new ThMonthInvoiceStatus(yearMonth, invoiceReference.isPresent());
             })

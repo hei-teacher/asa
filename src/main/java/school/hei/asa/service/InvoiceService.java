@@ -1,124 +1,151 @@
 package school.hei.asa.service;
 
-import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
-import static java.math.RoundingMode.HALF_UP;
 import static java.time.LocalDate.now;
-import static java.time.LocalDate.parse;
-import static java.time.format.DateTimeFormatter.ofPattern;
-import static java.time.format.TextStyle.FULL;
-import static java.util.Locale.FRENCH;
+import static java.time.ZoneOffset.UTC;
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.naturalOrder;
+import static java.util.UUID.randomUUID;
 
-import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
-import javax.imageio.ImageIO;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.PDFRenderer;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.hei.asa.CareProductCodeSupplier;
-import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
-import school.hei.asa.model.ContractType;
-import school.hei.asa.model.Invoice;
+import school.hei.asa.model.InvoiceForm;
+import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
+import school.hei.asa.model.WorkerLevelHistory;
 import school.hei.asa.number.NumberConverter;
 import school.hei.asa.number.NumberParser;
 import school.hei.asa.repository.BankAccountRepository;
+import school.hei.asa.repository.InvoiceReferenceRepository;
 import school.hei.asa.repository.MissionExecutionRepository;
 import school.hei.asa.repository.WorkerLevelHistoryRepository;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 public class InvoiceService {
-  private final InvoicePDFGenerator invoicePDFGenerator;
   private final NumberConverter numberConverter;
   private final NumberParser numberParser;
   private final WorkerLevelHistoryRepository workerLevelHistoryRepository;
   private final MissionExecutionRepository missionExecutionRepository;
   private final BankAccountRepository bankAccountRepository;
   private final CareProductCodeSupplier careProductCodeSupplier;
+  private final InvoiceReferenceRepository invoiceReferenceRepository;
 
-  private static final int DAYS_TO_BE_WORKED_BY_PARTNER = 18;
-  private static final int DAYS_TO_BE_WORKED_BY_STUDENT = 10;
-
-  @SneakyThrows
-  public Invoice extractInvoice(Worker worker, ThInvoiceForm invoiceForm) {
-    var invoiceData = extractInvoiceData(worker, invoiceForm);
-    var file = invoicePDFGenerator.apply(worker, invoiceData, "invoice");
-
-    try (PDDocument document = PDDocument.load(file)) {
-      var pdfRenderer = new PDFRenderer(document);
-      var image = pdfRenderer.renderImageWithDPI(0, 150);
-
-      var baos = new ByteArrayOutputStream();
-      ImageIO.write(image, "png", baos);
-      var base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
-
-      return new Invoice(base64Image, invoiceData);
-    }
+  public Optional<InvoiceReference> findInvoiceReference(Worker worker, YearMonth yearMonth) {
+    var invoiceReferenceList = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker);
+    log.info("here is the invoice result: {}", invoiceReferenceList);
+    return invoiceReferenceList.stream()
+        .filter(invoiceReference -> invoiceReference.yearMonth().equals(yearMonth))
+        .findFirst();
   }
 
-  public String generateInvoiceFileName(String invoiceIssueDate, String workerName) {
-    var invoiceDate = parse(invoiceIssueDate, ofPattern("dd/MM/yyyy", FRENCH));
-    String month = invoiceDate.getMonth().getDisplayName(FULL, FRENCH);
-    String capitalizedMonth = month.substring(0, 1).toUpperCase() + month.substring(1);
-    return workerName + " - " + capitalizedMonth + ".pdf";
-  }
-
-  private ThInvoiceForm extractInvoiceData(Worker worker, ThInvoiceForm invoiceForm) {
-    var formatter = ofPattern("dd/MM/yyyy", FRENCH);
-    var isEmpty = invoiceForm.reference() == null || invoiceForm.reference().isBlank();
-    var today = now();
-    var firstDay = today.withDayOfYear(1);
+  public InvoiceForm extractInvoiceData(Worker worker, InvoiceForm invoiceForm) {
+    var isEmpty = invoiceForm.yearMonth() == null;
     var workerLevelHistories = workerLevelHistoryRepository.findAllByWorker(worker);
     var hasLevelHistory = !workerLevelHistories.isEmpty();
-    var compensation = hasLevelHistory ? workerLevelHistories.getFirst().compensation() : ZERO;
-    var dateReference =
-        LocalDate.parse(isEmpty ? firstDay.format(formatter) : invoiceForm.reference(), formatter);
-    var issueDate = dateReference.plusDays(3).format(formatter);
-    var reference = dateReference.format(formatter);
-    var firstCurrentMonthDay = dateReference.withDayOfMonth(1);
-    var ym = YearMonth.from(dateReference);
-    var lastCurrentMonthDay = ym.atEndOfMonth();
+    var referenceDate = now();
+    var issueDate = referenceDate.plusDays(3);
+    var yearMonth = isEmpty ? YearMonth.from(referenceDate) : invoiceForm.yearMonth();
+    var firstCurrentMonthDay = yearMonth.atDay(1);
+    var lastCurrentMonthDay = yearMonth.atEndOfMonth();
+    var hasUpgradedLevel =
+        hasLevelHistory
+            && LocalDate.ofInstant(workerLevelHistories.getFirst().entranceInstant(), UTC)
+                .isBefore(lastCurrentMonthDay)
+            && LocalDate.ofInstant(workerLevelHistories.getFirst().entranceInstant(), UTC)
+                .isAfter(firstCurrentMonthDay);
+    var bankAccount = bankAccountRepository.findByWorkerCode(worker.code());
+    if (hasUpgradedLevel) {
+      var firstWorkerLevelHistory = workerLevelHistories.getFirst();
+      var secondWorkerLevelHistory = workerLevelHistories.get(1);
+      var firstTotalDaysWorked =
+          missionExecutionPercentageSumByWorker(
+              worker,
+              firstCurrentMonthDay,
+              LocalDate.ofInstant(firstWorkerLevelHistory.entranceInstant(), UTC));
+      var secondTotalDaysWorked =
+          missionExecutionPercentageSumByWorker(
+              worker,
+              LocalDate.ofInstant(firstWorkerLevelHistory.entranceInstant(), UTC),
+              lastCurrentMonthDay);
+      var firstInvoiceForm = generateInvoiceFormFrom(firstTotalDaysWorked, firstWorkerLevelHistory);
+      var secondInvoiceForm =
+          generateInvoiceFormFrom(secondTotalDaysWorked, secondWorkerLevelHistory);
+      var total = firstInvoiceForm.amount().add(secondInvoiceForm.amount());
+      var parsedTotal = numberConverter.convertToWords(numberParser.parseToNumber(total));
+      return new InvoiceForm(
+          yearMonth,
+          referenceDate,
+          issueDate,
+          firstInvoiceForm.description(),
+          firstInvoiceForm.quantity(),
+          firstInvoiceForm.unitPrice(),
+          firstInvoiceForm.amount(),
+          true,
+          secondInvoiceForm.description(),
+          secondInvoiceForm.quantity(),
+          secondInvoiceForm.unitPrice(),
+          secondInvoiceForm.amount(),
+          total,
+          parsedTotal,
+          bankAccount.toString());
+    }
     var totalDaysWorked =
         missionExecutionPercentageSumByWorker(worker, firstCurrentMonthDay, lastCurrentMonthDay);
-    var contractType =
-        hasLevelHistory
-            ? workerLevelHistories.getFirst().contractType()
-            : ContractType.STUDENT_CONTRACTOR.getValue();
-    var isStudentContractor =
-        Objects.equals(contractType, ContractType.STUDENT_CONTRACTOR.getValue());
-    var unitValue =
-        isStudentContractor ? DAYS_TO_BE_WORKED_BY_STUDENT : DAYS_TO_BE_WORKED_BY_PARTNER;
-    var unitPriceValue = compensation.divide(valueOf(unitValue), 2, HALF_UP);
-    var unitPrice = numberParser.parseToNumber(unitPriceValue);
-    var amount =
-        isStudentContractor
-            ? numberParser.parseToNumber(compensation)
-            : numberParser.parseToNumber(unitPriceValue.multiply(valueOf(totalDaysWorked)));
-    var parsedAmount = isEmpty ? "" : numberConverter.convertToWords(amount);
-    var description = hasLevelHistory ? workerLevelHistories.getFirst().jobTitle() : "";
-    var bankAccount = bankAccountRepository.findByWorkerCode(worker.code());
-
-    return new ThInvoiceForm(
-        reference,
+    var workerLevelhistory = hasLevelHistory ? workerLevelHistories.getFirst() : null;
+    var tempResult = generateInvoiceFormFrom(totalDaysWorked, workerLevelhistory);
+    return new InvoiceForm(
+        yearMonth,
+        referenceDate,
         issueDate,
+        tempResult.description(),
+        tempResult.quantity(),
+        tempResult.unitPrice(),
+        tempResult.amount(),
+        false,
+        null,
+        null,
+        null,
+        null,
+        tempResult.total(),
+        tempResult.parsedAmount(),
+        bankAccount.toString());
+  }
+
+  private InvoiceForm generateInvoiceFormFrom(
+      Double totalDaysWorked, WorkerLevelHistory workerLevelHistory) {
+    if (workerLevelHistory == null) {
+      return new InvoiceForm(
+          null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+    }
+    var unitPrice = workerLevelHistory.compensation();
+    var amount = unitPrice.multiply(valueOf(totalDaysWorked));
+    var parsedAmount = numberConverter.convertToWords(numberParser.parseToNumber(amount));
+    var description = workerLevelHistory.jobTitle();
+
+    return new InvoiceForm(
+        null,
+        null,
+        null,
         description,
-        String.valueOf(totalDaysWorked),
+        totalDaysWorked,
         unitPrice,
         amount,
+        null,
+        null,
+        null,
+        null,
+        null,
         amount,
-        false,
-        invoiceForm.bonusDescription(),
-        invoiceForm.bonusQuantity(),
-        invoiceForm.unitPrice(),
-        invoiceForm.bonusAmount(),
         parsedAmount,
-        bankAccount.toString());
+        null);
   }
 
   private Double missionExecutionPercentageSumByWorker(
@@ -134,5 +161,32 @@ public class InvoiceService {
   private boolean isCare(MissionExecution me) {
     var mission = me.mission();
     return mission.isCare(careProductCodeSupplier.get());
+  }
+
+  public void saveInvoiceReference(InvoiceForm invoiceForm, Worker worker) {
+    var invoiceReference =
+        new InvoiceReference(randomUUID().toString(), invoiceForm.yearMonth(), null, worker);
+    invoiceReferenceRepository.saveInvoiceReference(invoiceReference);
+  }
+
+  public String generateInvoiceFileName(Worker worker) {
+    var savedInvoice =
+        invoiceReferenceRepository.findInvoiceReferenceByWorker(worker).stream()
+            .sorted(comparing(InvoiceReference::autoincrement, naturalOrder()).reversed())
+            .toList()
+            .getFirst();
+
+    return String.format("FAC-NUM-2025-%s-%s.pdf", worker.code(), savedInvoice.autoincrement());
+  }
+
+  public String getInvoiceBucketKey(Worker worker, YearMonth yearMonth) {
+    var invoiceReference =
+        invoiceReferenceRepository.findInvoiceReferenceByWorker(worker).stream()
+            .filter(ref -> ref.yearMonth().equals(yearMonth))
+            .sorted(comparing(InvoiceReference::autoincrement, naturalOrder()).reversed())
+            .findFirst()
+            .get();
+
+    return String.format("FAC-NUM-2025-%s-%s.pdf", worker.code(), invoiceReference.autoincrement());
   }
 }

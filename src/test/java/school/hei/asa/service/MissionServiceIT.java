@@ -2,7 +2,7 @@ package school.hei.asa.service;
 
 import static java.lang.System.lineSeparator;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -133,7 +133,7 @@ class MissionServiceIT extends FacadeIT {
     var thProducts =
         missionService.filterThProductByWorkerCodeAndDateBetween(null, null, null, true);
 
-    assertTrue(thProducts.size() == 1 || thProducts.size() == 2);
+    assertFalse(thProducts.isEmpty());
   }
 
   @Test

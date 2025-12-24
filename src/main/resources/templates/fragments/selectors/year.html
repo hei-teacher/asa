@@ -1,0 +1,39 @@
+<form
+  th:fragment="apply(targetEndpoint)"
+  th:action="@{'/' + ${targetEndpoint}}"
+  method="get"
+  class="bg-gray-100 flex flex-row align-center gap-4"
+>
+  <div class="flex flex-col">
+    <label for="worker" class="block text-gray-700 font-medium mb-2 font-semibold"
+      >Select a Year</label
+    >
+    <div class="flex items-center gap-4">
+      <select
+        id="year"
+        name="year"
+        class="w-64 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#9933CC] focus:outline-none"
+        onchange="updateFilters()"
+      >
+        <option
+          th:text="${currentYear -1}"
+          th:value="${currentYear -1}"
+          th:selected="${currentYear - 1 == year}"
+          class="text-gray-500"
+        ></option>
+        <option
+          th:text="${currentYear}"
+          th:value="${currentYear}"
+          th:selected="${currentYear == year}"
+          class="text-gray-500"
+        ></option>
+        <option
+          th:text="${currentYear + 1}"
+          th:value="${currentYear + 1}"
+          th:selected="${currentYear + 1 == year}"
+          class="text-gray-500"
+        ></option>
+      </select>
+    </div>
+  </div>
+</form>

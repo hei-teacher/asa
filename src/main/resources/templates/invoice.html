@@ -135,6 +135,12 @@
     </style>
 </head>
 <body>
+<div style="position:absolute; right:0; width:75px; height:75px;">
+    <img sizes="75px"
+         src="https://static.wixstatic.com/media/c6fa1c_88cd4438b50842cd89c29b47b21fdbcb~mv2.png/v1/fill/w_53,h_53,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/image-fotor-20230713142318.png"
+         alt="Numer"
+         style="object-fit:cover"></img>
+</div>
 <header>
     <table class="table-head">
         <tr>
@@ -156,6 +162,7 @@
             <td style="width: 43%; vertical-align: top;">
                 <p th:text="'Facture : FAC' + ${invoice.reference}" style="font-family: 'EB Garamond', serif; font-weight: 700;"></p>
                 <p th:text="'Date d\'émission : ' + ${invoice.issueDate}" style="font-family: 'EB Garamond', serif; font-weight: 700;"></p>
+                <p th:text="'Mois facturé : ' + ${yearMonth}" style="font-family: 'EB Garamond', serif; font-weight: 700;"></p>
             </td>
             <td style="width: 57%; vertical-align: top;">
                 <p><strong>NUMER MADAGASCAR (SARLU)</strong></p>
@@ -174,8 +181,8 @@
             <tr>
                 <th class="text-left" style="width: 230px;">Description</th>
                 <th class="text-center">Quantité</th>
-                <th class="text-center">Prix unitaire</th>
-                <th class="text-right">Montant</th>
+                <th class="text-center">Prix unitaire (Ariary)</th>
+                <th class="text-right">Montant (Ariary)</th>
             </tr>
             </thead>
             <tbody>
@@ -185,11 +192,11 @@
                 <td class="text-center" th:text="${invoice.unitPrice}"></td>
                 <td class="text-right" th:text="${invoice.amount}"></td>
             </tr>
-            <tr th:if="${invoice.hasBonus}">
-                <td class="text-left" style="width: 230px; word-wrap: break-word;" th:text="${invoice.bonusDescription}"></td>
-                <td class="text-center" th:text="${invoice.bonusQuantity}"></td>
-                <td class="text-center" th:text="${invoice.bonusUnitPrice}"></td>
-                <td class="text-right" th:text="${invoice.bonusAmount}"></td>
+            <tr th:if="${invoice.hasUpgradedLevel}">
+                <td class="text-left" style="width: 230px; word-wrap: break-word;" th:text="${invoice.extraDescription}"></td>
+                <td class="text-center" th:text="${invoice.extraQuantity}"></td>
+                <td class="text-center" th:text="${invoice.extraUnitPrice}"></td>
+                <td class="text-right" th:text="${invoice.extraAmount}"></td>
             </tr>
             <tr>
                 <td colspan="2" style="border-bottom: none;"></td>
@@ -215,8 +222,9 @@
 
         <div style="margin-top: 60px; display: flex; gap: 8px; align-items: center;">
             <span style="font-family: 'EB Garamond', serif; font-size: 14px; font-weight: 400;">
-                Signature
+               Générée par <a href="https://asa.poja.io/">https://asa.poja.io/</a> le
             </span>
+            <span style="font-family: 'EB Garamond', serif; font-size: 15px;" th:text="${creationDate}"></span>
         </div>
     </section>
 </div>

@@ -23,6 +23,7 @@ public class NumberParser {
   }
 
   public String parseToNumber(BigDecimal number) {
+    if (number == null) return "";
     NumberFormat formatter = NumberFormat.getInstance(FRANCE);
     formatter.setMinimumFractionDigits(0);
     String formatted = formatter.format(round(number.doubleValue()));

@@ -134,7 +134,7 @@ public class MissionController {
         "dailyExecutions",
         thDailyExecutions.stream().sorted(comparing(ThDailyExecution::date).reversed()).toList());
     model.addAttribute("careProductCode", careProductCodeSupplier.get());
-    model.addAttribute("month", month.toString());
+    model.addAttribute("yearMonth", month.toString());
     model.addAttribute("workerCode", workerCode);
     workerToModelAdder.apply(workerCode, model);
 

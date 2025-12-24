@@ -1,8 +1,16 @@
 package school.hei.asa.service;
 
+import static java.time.LocalDateTime.now;
+import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Locale.FRENCH;
+
 import com.lowagie.text.DocumentException;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.Locale;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;
@@ -44,9 +52,15 @@ public class InvoicePDFGenerator {
   }
 
   private Context configureContext(Worker worker, ThInvoiceForm thInvoiceForm) {
-    var context = new Context();
+    var pattern = DateTimeFormatter.ofPattern("yyyy-MM");
+    var date = YearMonth.parse(thInvoiceForm.yearMonth(), pattern);
+    var month = date.getMonth().getDisplayName(TextStyle.FULL, Locale.FRANCE).toLowerCase();
+    var year = date.getYear();
+    Context context = new Context();
+    context.setVariable("creationDate", now().format(ofPattern("dd LLLL yyyy à HH:mm:ss", FRENCH)));
     context.setVariable("worker", worker);
     context.setVariable("invoice", thInvoiceForm);
+    context.setVariable("yearMonth", String.format("%s %s", month, year));
 
     return context;
   }

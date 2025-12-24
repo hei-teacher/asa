@@ -1,0 +1,2 @@
+ALTER TABLE invoice
+ALTER COLUMN worker_code SET NOT NULL;

@@ -29,18 +29,8 @@
       </select>
     </div>
   </div>
-  <div class="flex flex-col">
-    <label class="block text-gray-700 font-medium mb-2"
-      >Select Year</label
-    >
-    <input
-      id="year"
-      name="year"
-      type="year"
-      th:value="${year}"
-      class="w-64 p-2 border border-gray-300 rounded-lg"
-    />
-  </div>
+
+  <div th:replace="fragments/selectors/year :: apply(targetEndpoint)"></div>
 
   <button
     class="cursor-pointer bg-[#2D2D5A] hover:bg-[#4D4D7A] self-end text-white py-2 px-4 rounded shadow h-1/2"

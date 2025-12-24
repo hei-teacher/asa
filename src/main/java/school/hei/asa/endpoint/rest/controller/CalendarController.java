@@ -63,6 +63,7 @@ public class CalendarController {
     var lateReportedDaysByMonth = calendarService.lateReportedDaysByMonth(worker, year);
 
     model.addAttribute("workerCode", workerCodeOrAuth);
+    model.addAttribute("currentYear", now().getYear());
     model.addAttribute(
         "thYear",
         new ThYear(

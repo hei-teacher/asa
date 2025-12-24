@@ -157,6 +157,10 @@
         window.location.href = `/invoice?year=${year}`;
       }
 
+      document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("year").addEventListener("change", updateFilters);
+      });
+
       function getFormData() {
         return {
           yearMonth: document.getElementById("ref").value,

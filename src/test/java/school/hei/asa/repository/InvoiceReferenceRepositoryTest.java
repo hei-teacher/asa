@@ -10,14 +10,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.model.InvoiceReference;
-import school.hei.asa.model.PartnerContractor;
+import school.hei.asa.model.Worker;
 
 public class InvoiceReferenceRepositoryTest extends FacadeIT {
   @Autowired InvoiceReferenceRepository invoiceReferenceRepository;
 
   @Test
   void fetch_all_invoice_details_for_worker() {
-    var worker = new PartnerContractor("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
+    var worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
     var invoiceDetails1 =
         new InvoiceReference("id1", YearMonth.parse("2025-01", ofPattern("yyyy-MM")), 1, worker);
     var invoiceDetails2 =
@@ -35,7 +35,7 @@ public class InvoiceReferenceRepositoryTest extends FacadeIT {
 
   @Test
   void save_invoice_details_for_worker() {
-    var worker = new PartnerContractor("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
+    var worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
     var expected =
         new InvoiceReference("id5", YearMonth.parse("2025-05", ofPattern("yyyy-MM")), 5, worker);
 

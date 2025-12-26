@@ -1,12 +1,12 @@
 package school.hei.asa.service;
 
-import static java.math.BigDecimal.valueOf;
 import static java.time.LocalDate.now;
 import static java.time.ZoneOffset.UTC;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.UUID.randomUUID;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
@@ -19,13 +19,13 @@ import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
-import school.hei.asa.model.WorkerLevelHistory;
+import school.hei.asa.model.contract.Contract;
 import school.hei.asa.number.NumberConverter;
 import school.hei.asa.number.NumberParser;
 import school.hei.asa.repository.BankAccountRepository;
+import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.InvoiceReferenceRepository;
 import school.hei.asa.repository.MissionExecutionRepository;
-import school.hei.asa.repository.WorkerLevelHistoryRepository;
 
 @Slf4j
 @AllArgsConstructor
@@ -33,7 +33,7 @@ import school.hei.asa.repository.WorkerLevelHistoryRepository;
 public class InvoiceService {
   private final NumberConverter numberConverter;
   private final NumberParser numberParser;
-  private final WorkerLevelHistoryRepository workerLevelHistoryRepository;
+  private final ContractRepository contractRepository;
   private final MissionExecutionRepository missionExecutionRepository;
   private final BankAccountRepository bankAccountRepository;
   private final CareProductCodeSupplier careProductCodeSupplier;
@@ -50,36 +50,35 @@ public class InvoiceService {
 
   public InvoiceForm extractInvoiceData(Worker worker, InvoiceForm invoiceForm) {
     var isEmpty = invoiceForm.yearMonth() == null;
-    var workerLevelHistories = workerLevelHistoryRepository.findAllByWorker(worker);
-    var hasLevelHistory = !workerLevelHistories.isEmpty();
+    var contracts = contractRepository.findAllByWorker(worker);
+    var hasContract = !contracts.isEmpty();
     var referenceDate = now();
     var issueDate = referenceDate.plusDays(3);
     var yearMonth = isEmpty ? YearMonth.from(referenceDate) : invoiceForm.yearMonth();
     var firstCurrentMonthDay = yearMonth.atDay(1);
     var lastCurrentMonthDay = yearMonth.atEndOfMonth();
     var hasUpgradedLevel =
-        hasLevelHistory
-            && LocalDate.ofInstant(workerLevelHistories.getFirst().entranceInstant(), UTC)
+        hasContract
+            && LocalDate.ofInstant(contracts.getFirst().entranceInstant(), UTC)
                 .isBefore(lastCurrentMonthDay)
-            && LocalDate.ofInstant(workerLevelHistories.getFirst().entranceInstant(), UTC)
+            && LocalDate.ofInstant(contracts.getFirst().entranceInstant(), UTC)
                 .isAfter(firstCurrentMonthDay);
     var bankAccount = bankAccountRepository.findByWorkerCode(worker.code());
     if (hasUpgradedLevel) {
-      var firstWorkerLevelHistory = workerLevelHistories.getFirst();
-      var secondWorkerLevelHistory = workerLevelHistories.get(1);
+      var firstContract = contracts.getFirst();
+      var secondContract = contracts.get(1);
       var firstTotalDaysWorked =
           missionExecutionPercentageSumByWorker(
               worker,
               firstCurrentMonthDay,
-              LocalDate.ofInstant(firstWorkerLevelHistory.entranceInstant(), UTC));
+              LocalDate.ofInstant(firstContract.entranceInstant(), UTC));
       var secondTotalDaysWorked =
           missionExecutionPercentageSumByWorker(
               worker,
-              LocalDate.ofInstant(firstWorkerLevelHistory.entranceInstant(), UTC),
+              LocalDate.ofInstant(firstContract.entranceInstant(), UTC),
               lastCurrentMonthDay);
-      var firstInvoiceForm = generateInvoiceFormFrom(firstTotalDaysWorked, firstWorkerLevelHistory);
-      var secondInvoiceForm =
-          generateInvoiceFormFrom(secondTotalDaysWorked, secondWorkerLevelHistory);
+      var firstInvoiceForm = generateInvoiceFormFrom(firstTotalDaysWorked, firstContract);
+      var secondInvoiceForm = generateInvoiceFormFrom(secondTotalDaysWorked, secondContract);
       var total = firstInvoiceForm.amount().add(secondInvoiceForm.amount());
       var parsedTotal = numberConverter.convertToWords(numberParser.parseToNumber(total));
       return new InvoiceForm(
@@ -101,8 +100,8 @@ public class InvoiceService {
     }
     var totalDaysWorked =
         missionExecutionPercentageSumByWorker(worker, firstCurrentMonthDay, lastCurrentMonthDay);
-    var workerLevelhistory = hasLevelHistory ? workerLevelHistories.getFirst() : null;
-    var tempResult = generateInvoiceFormFrom(totalDaysWorked, workerLevelhistory);
+    var contract = hasContract ? contracts.getFirst() : null;
+    var tempResult = generateInvoiceFormFrom(totalDaysWorked, contract);
     return new InvoiceForm(
         yearMonth,
         referenceDate,
@@ -121,16 +120,20 @@ public class InvoiceService {
         bankAccount.toString());
   }
 
-  private InvoiceForm generateInvoiceFormFrom(
-      Double totalDaysWorked, WorkerLevelHistory workerLevelHistory) {
-    if (workerLevelHistory == null) {
+  private InvoiceForm generateInvoiceFormFrom(Double totalDaysWorked, Contract contract) {
+    if (contract == null) {
       return new InvoiceForm(
           null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
-    var unitPrice = workerLevelHistory.compensation();
-    var amount = unitPrice.multiply(valueOf(totalDaysWorked));
+    var contractLevel = contract.level();
+    Double unitPrice =
+        switch (contractLevel.type()) {
+          case partnerContractor, studentContractor -> contractLevel.dailyPay();
+          case fullTimeEmployee -> null;
+        };
+    var amount = BigDecimal.valueOf(totalDaysWorked * unitPrice);
     var parsedAmount = numberConverter.convertToWords(numberParser.parseToNumber(amount));
-    var description = workerLevelHistory.jobTitle();
+    var description = contract.jobTitle();
 
     return new InvoiceForm(
         null,
@@ -138,7 +141,7 @@ public class InvoiceService {
         null,
         description,
         totalDaysWorked,
-        unitPrice,
+        BigDecimal.valueOf(unitPrice),
         amount,
         null,
         null,

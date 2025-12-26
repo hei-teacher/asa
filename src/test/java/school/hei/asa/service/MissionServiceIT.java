@@ -216,7 +216,7 @@ class MissionServiceIT extends FacadeIT {
 
   @Test
   @SneakyThrows
-  void export_worker_level_history_for_one_worker() {
+  void export_contract_for_one_worker() {
     var actualCSV = missionService.generateCSV("W-P-2024-01");
 
     var actualContent = Files.readString(actualCSV.toPath());

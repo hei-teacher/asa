@@ -17,7 +17,6 @@ import school.hei.asa.endpoint.rest.controller.WorkerController;
 import school.hei.asa.endpoint.rest.controller.WorkerToModelAdder;
 import school.hei.asa.endpoint.rest.model.th.ThWorker;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
-import school.hei.asa.model.PartnerContractor;
 import school.hei.asa.model.Worker;
 
 class WorkerControllerIT extends FacadeIT {
@@ -35,7 +34,7 @@ class WorkerControllerIT extends FacadeIT {
   void setUp() {
     authentication = mock(Authentication.class);
     authenticatedWorker =
-        new PartnerContractor(
+        new Worker(
             "worker-code",
             "Test Worker",
             "worker@example.com",
@@ -78,7 +77,7 @@ class WorkerControllerIT extends FacadeIT {
 
     verify(model).addAttribute(eq("worker"), any(Worker.class));
     verify(model).addAttribute(eq("workerCode"), eq("worker-code"));
-    verify(model).addAttribute(eq("workerLevelHistory"), anyList());
+    verify(model).addAttribute(eq("contracts"), anyList());
     assertEquals("contracts", viewName);
   }
 
@@ -88,7 +87,7 @@ class WorkerControllerIT extends FacadeIT {
 
     verify(model).addAttribute(eq("worker"), any(Worker.class));
     verify(model).addAttribute(eq("workerCode"), eq("worker-code"));
-    verify(model).addAttribute(eq("workerLevelHistory"), anyList());
+    verify(model).addAttribute(eq("contracts"), anyList());
     assertEquals("contracts", viewName);
   }
 }

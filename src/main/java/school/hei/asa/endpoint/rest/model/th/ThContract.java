@@ -9,14 +9,13 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 @Getter
 @AllArgsConstructor
-public class ThWorkerLevelHistory {
+public class ThContract {
   String level;
   Instant entranceInstant;
   String contractType;
-  String projectedDaysToWork;
   String actualWorkedDay;
   BigDecimal compensation;
   String jobTitle;
-  Integer contractDuration;
+  String duration;
   String contractBucketKey;
 }

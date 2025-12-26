@@ -2,17 +2,17 @@ package school.hei.asa.endpoint.rest.controller.mapper;
 
 import static java.time.Instant.now;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.hei.asa.CareProductCodeSupplier;
-import school.hei.asa.endpoint.rest.model.th.ThWorkerLevelHistory;
+import school.hei.asa.endpoint.rest.model.th.ThContract;
 import school.hei.asa.model.Worker;
-import school.hei.asa.model.WorkerLevelHistory;
+import school.hei.asa.model.contract.Contract;
 import school.hei.asa.repository.MissionExecutionRepository;
 import school.hei.asa.repository.model.WorkerDayPercentageSummary;
 
@@ -24,30 +24,36 @@ public class ThWorkerMapper {
   private final MissionExecutionRepository missionExecutionRepository;
   private final CareProductCodeSupplier careProductCodeSupplier;
 
-  public List<ThWorkerLevelHistory> toTh(List<WorkerLevelHistory> histories) {
-    List<ThWorkerLevelHistory> result = new ArrayList<>();
+  public List<ThContract> toTh(List<Contract> contracts) {
+    List<ThContract> result = new ArrayList<>();
 
-    for (int i = 0; i < histories.size(); i++) {
-      var current = histories.get(i);
-      var nextEntrance = (i == 0) ? now() : histories.get(i - 1).entranceInstant();
+    for (int i = 0; i < contracts.size(); i++) {
+      var current = contracts.get(i);
+      var nextEntrance = (i == 0) ? now() : contracts.get(i - 1).entranceInstant();
 
       double totalDaysWorked =
           missionExecutionPercentageSumByWorker(
               current.worker(), current.entranceInstant(), nextEntrance);
 
-      var contractType = toWorkerType(current.contractType());
-      var totalWorkDays = Objects.toString(current.projectedDaysToWork(), "-");
+      var contractLevel = current.level();
+      var contractType = toWorkerType(contractLevel.type().name());
+      var executedDays = current.executions().isEmpty() ? "-" : current.executions().size() + "";
+
+      var compensation =
+          switch (contractLevel.type()) {
+            case partnerContractor, studentContractor -> contractLevel.dailyPay();
+            case fullTimeEmployee -> contractLevel.monthlyPay();
+          };
 
       result.add(
-          new ThWorkerLevelHistory(
-              current.level().getLevel(),
+          new ThContract(
+              contractLevel.code(),
               current.entranceInstant(),
               contractType,
-              totalWorkDays,
-              String.valueOf(totalDaysWorked),
-              current.compensation(),
+              executedDays,
+              BigDecimal.valueOf(compensation),
               current.jobTitle(),
-              current.contractDuration(),
+              current.duration() == null ? "-" : current.duration().toDays() + "",
               current.contractBucketKey()));
     }
 

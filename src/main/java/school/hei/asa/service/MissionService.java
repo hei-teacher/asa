@@ -27,13 +27,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.rest.controller.mapper.ThProductMapper;
 import school.hei.asa.endpoint.rest.controller.mapper.ThWorkerMapper;
+import school.hei.asa.endpoint.rest.model.th.ThContract;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
 import school.hei.asa.endpoint.rest.model.th.ThMissionExecution;
 import school.hei.asa.endpoint.rest.model.th.ThProduct;
-import school.hei.asa.endpoint.rest.model.th.ThWorkerLevelHistory;
 import school.hei.asa.model.Worker;
+import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.ProductRepository;
-import school.hei.asa.repository.WorkerLevelHistoryRepository;
 import school.hei.asa.repository.WorkerRepository;
 
 @Slf4j
@@ -44,7 +44,7 @@ public class MissionService {
   private final ProductRepository productRepository;
   private final ThProductMapper thProductMapper;
   private final WorkerRepository workerRepository;
-  private final WorkerLevelHistoryRepository workerLevelHistoryRepository;
+  private final ContractRepository contractRepository;
   private final ThWorkerMapper thWorkerMapper;
 
   private List<ThProduct> filterThProductsByWorkerCode(
@@ -231,25 +231,23 @@ public class MissionService {
         .toList();
   }
 
-  public Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysForOneWorker(String workerCode) {
-    Map<Worker, List<ThWorkerLevelHistory>> result = new HashMap<>();
+  public Map<Worker, List<ThContract>> totalWorkDaysForOneWorker(String workerCode) {
+    Map<Worker, List<ThContract>> result = new HashMap<>();
     var worker = workerRepository.findByCode(workerCode);
-    var workerLevelHistories =
-        thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
-    result.put(worker, workerLevelHistories);
+    var contracts = thWorkerMapper.toTh(contractRepository.findAllByWorker(worker));
+    result.put(worker, contracts);
     log.info("result be like = {}", result);
     return result;
   }
 
-  public Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysPerWorker() {
-    Map<Worker, List<ThWorkerLevelHistory>> result = new HashMap<>();
+  public Map<Worker, List<ThContract>> totalWorkDaysPerWorker() {
+    Map<Worker, List<ThContract>> result = new HashMap<>();
     var workers = workerRepository.findAll().stream().sorted(comparing(Worker::name)).toList();
     workers.parallelStream()
         .forEach(
             worker -> {
-              var workerLevelHistories =
-                  thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
-              result.put(worker, workerLevelHistories);
+              var contracts = thWorkerMapper.toTh(contractRepository.findAllByWorker(worker));
+              result.put(worker, contracts);
             });
     return result;
   }
@@ -272,25 +270,24 @@ public class MissionService {
   }
 
   @SneakyThrows
-  private void writeToFile(
-      File file, Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysPerWorker) {
+  private void writeToFile(File file, Map<Worker, List<ThContract>> totalWorkDaysPerWorker) {
     try (FileWriter fileWriter = new FileWriter(file)) {
       fileWriter.write(
-          "code,worker,worker level,start date,"
+          "code,worker,contract level,start date,"
               + "contract duration (in days),"
               + "total days worked,remaining days"
               + lineSeparator());
       fileWriter.flush();
       totalWorkDaysPerWorker.forEach(
-          (worker, thWorkerLevelHistories) -> {
-            thWorkerLevelHistories.parallelStream()
+          (worker, thContracts) -> {
+            thContracts.parallelStream()
                 .forEach(
-                    thWorkerLevelHistory -> {
+                    thContract -> {
                       try {
-                        String remainingDays = remainingDaysToString(thWorkerLevelHistory);
-                        String actualWorkedDays = actualWorkedDaysToString(thWorkerLevelHistory);
+                        String remainingDays = remainingDaysToString(thContract);
+                        String actualWorkedDays = actualWorkedDaysToString(thContract);
                         String startDate =
-                            thWorkerLevelHistory
+                            thContract
                                 .entranceInstant()
                                 .atZone(ZoneId.of("UTC"))
                                 .toLocalDate()
@@ -300,9 +297,9 @@ public class MissionService {
                                 "%s,%s,%s,%s,%s,%s,%s",
                                 worker.code(),
                                 worker.name(),
-                                thWorkerLevelHistory.level(),
+                                thContract.level(),
                                 startDate,
-                                thWorkerLevelHistory.projectedDaysToWork(),
+                                thContract.duration(),
                                 actualWorkedDays,
                                 remainingDays);
 
@@ -319,19 +316,17 @@ public class MissionService {
     }
   }
 
-  private String remainingDaysToString(ThWorkerLevelHistory thWorkerLevelHistory) {
-    if (thWorkerLevelHistory.projectedDaysToWork().equals("-")) {
+  private String remainingDaysToString(ThContract thContract) {
+    if (thContract.duration().equals("-")) {
       return "-";
     }
 
-    var res =
-        parseDouble(thWorkerLevelHistory.projectedDaysToWork())
-            - parseDouble(thWorkerLevelHistory.actualWorkedDay());
+    var res = parseDouble(thContract.duration()) - parseDouble(thContract.actualWorkedDay());
     return formatDays(res);
   }
 
-  private String actualWorkedDaysToString(ThWorkerLevelHistory thWorkerLevelHistory) {
-    double res = parseDouble(thWorkerLevelHistory.actualWorkedDay());
+  private String actualWorkedDaysToString(ThContract thContract) {
+    double res = parseDouble(thContract.actualWorkedDay());
     return res == 0.0d ? "-" : formatDays(res);
   }
 

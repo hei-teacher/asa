@@ -11,7 +11,7 @@ import school.hei.asa.endpoint.rest.controller.mapper.ThWorkerMapper;
 import school.hei.asa.endpoint.rest.model.th.ThWorker;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.*;
-import school.hei.asa.repository.WorkerLevelHistoryRepository;
+import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.WorkerRepository;
 
 @Controller
@@ -19,7 +19,7 @@ import school.hei.asa.repository.WorkerRepository;
 public class WorkerController {
 
   private final WorkerRepository workerRepository;
-  private final WorkerLevelHistoryRepository workerLevelHistoryRepository;
+  private final ContractRepository contractRepository;
   private final WorkerFromAuthentication workerFromAuthentication;
   private final WorkerToModelAdder workerToModelAdder;
   private final ThWorkerMapper thWorkerMapper;
@@ -40,14 +40,13 @@ public class WorkerController {
             : workerCode;
 
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-    var workerLevelHistories = workerLevelHistoryRepository.findAllByWorker(worker);
+    var contracts = contractRepository.findAllByWorker(worker);
 
-    var hasLevelHistory = !workerLevelHistories.isEmpty();
-    var entranceInstant = hasLevelHistory ? workerLevelHistories.getLast().entranceInstant() : null;
-    var level = hasLevelHistory ? workerLevelHistories.getFirst().level().getLevel() : null;
-    var levelEntranceInstant =
-        hasLevelHistory ? workerLevelHistories.getFirst().entranceInstant() : null;
-    var contractType = hasLevelHistory ? workerLevelHistories.getFirst().contractType() : null;
+    var hasContract = !contracts.isEmpty();
+    var entranceInstant = hasContract ? contracts.getLast().entranceInstant() : null;
+    var level = hasContract ? contracts.getFirst().level().code() : null;
+    var levelEntranceInstant = hasContract ? contracts.getFirst().entranceInstant() : null;
+    var contractType = hasContract ? contracts.getFirst().level().type().name() : null;
     var workerType = thWorkerMapper.toWorkerType(contractType);
 
     model.addAttribute(
@@ -74,12 +73,11 @@ public class WorkerController {
             : workerCode;
 
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-    var workerLevelHistories =
-        thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
+    var contracts = thWorkerMapper.toTh(contractRepository.findAllByWorker(worker));
 
     model.addAttribute("worker", worker);
     model.addAttribute("workerCode", workerCodeOrAuth);
-    model.addAttribute("workerLevelHistory", workerLevelHistories);
+    model.addAttribute("contracts", contracts);
     return "contracts";
   }
 }

@@ -53,7 +53,7 @@ class CalendarControllerIT extends FacadeIT {
 
   @Test
   void can_get_calendar_without_worker_code() {
-    String viewName = calendarController.getCalendar(model, authentication, null, 2025);
+    String viewName = calendarController.getCalendar(model, authentication, null, now().getYear());
 
     verify(model).addAttribute(eq("year"), eq(now().getYear()));
     verify(model).addAttribute(eq("thYear"), any(ThYear.class));
@@ -62,7 +62,8 @@ class CalendarControllerIT extends FacadeIT {
 
   @Test
   void can_get_calendar_with_worker_code() {
-    String viewName = calendarController.getCalendar(model, authentication, "worker-code", 2025);
+    String viewName =
+        calendarController.getCalendar(model, authentication, "worker-code", now().getYear());
 
     verify(model).addAttribute(eq("year"), eq(now().getYear()));
     verify(model).addAttribute(eq("thYear"), any(ThYear.class));

@@ -23,6 +23,7 @@ import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.endpoint.rest.controller.mapper.ThDailyExecutionMapper;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecution;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
+import school.hei.asa.endpoint.rest.service.ThContractService;
 import school.hei.asa.endpoint.rest.service.ThMissionService;
 import school.hei.asa.endpoint.rest.service.ThProductService;
 import school.hei.asa.model.DailyExecution;
@@ -43,6 +44,7 @@ public class MissionController {
   private final MissionService missionService;
   private final ThMissionService thMissionService;
   private final ThProductService thProductService;
+  private final ThContractService thContractService;
 
   @GetMapping("/missions")
   public String getMissions(
@@ -81,7 +83,8 @@ public class MissionController {
         toListOfMap(thMissionsPerProductsByWorkerCode);
     model.addAttribute("executedDaysByProductMission", executedDaysByProductMission);
 
-    var thMissionsByWorkerCode = thMissionService.getAllMissionsFromProducts(thProductsByWorkerCode);
+    var thMissionsByWorkerCode =
+        thMissionService.getAllMissionsFromProducts(thProductsByWorkerCode);
     List<Map<String, Object>> executedDaysByMission = toListOfMap(thMissionsByWorkerCode);
     model.addAttribute("executedDaysByMission", executedDaysByMission);
 
@@ -110,7 +113,7 @@ public class MissionController {
   @SneakyThrows
   @GetMapping("/missions/export-to-csv")
   public ResponseEntity<ByteArrayResource> exportToCSV(@RequestParam String workerCode) {
-    var file = missionService.generateCSV(workerCode);
+    var file = thContractService.generateCSV(workerCode);
     ByteArrayResource resource =
         new ByteArrayResource(Files.readAllBytes(Path.of(file.getAbsolutePath())));
     HttpHeaders header = new HttpHeaders();

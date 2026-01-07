@@ -1,4 +1,4 @@
-package school.hei.asa.endpoint;
+package school.hei.asa.endpoint.rest.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import school.hei.asa.conf.FacadeIT;
-import school.hei.asa.endpoint.rest.controller.MissionController;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Product;
 import school.hei.asa.repository.MissionRepository;

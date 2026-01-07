@@ -1,4 +1,4 @@
-package school.hei.asa.endpoint;
+package school.hei.asa.endpoint.rest.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -13,8 +13,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import school.hei.asa.conf.FacadeIT;
-import school.hei.asa.endpoint.rest.controller.WorkerController;
-import school.hei.asa.endpoint.rest.controller.WorkerToModelAdder;
 import school.hei.asa.endpoint.rest.model.th.ThWorker;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Worker;

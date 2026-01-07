@@ -1,4 +1,4 @@
-package school.hei.asa.endpoint;
+package school.hei.asa.endpoint.rest.controller;
 
 import static java.time.Month.DECEMBER;
 import static java.util.concurrent.Executors.newFixedThreadPool;
@@ -23,8 +23,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import school.hei.asa.conf.FacadeIT;
-import school.hei.asa.endpoint.rest.controller.CalendarController;
-import school.hei.asa.endpoint.rest.controller.DailyExecutionController;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.SecurityConfig;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;

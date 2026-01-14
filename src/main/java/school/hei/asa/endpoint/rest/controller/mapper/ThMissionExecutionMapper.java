@@ -27,7 +27,7 @@ public class ThMissionExecutionMapper {
         me.dayPercentage(),
         me.comment(),
         isCare,
-       isExecutedByStudent(worker, me));
+        isExecutedByStudent(worker, me));
   }
 
   private boolean isExecutedByStudent(Worker worker, MissionExecution me) {

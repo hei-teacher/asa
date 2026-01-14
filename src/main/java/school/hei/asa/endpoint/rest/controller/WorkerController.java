@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import school.hei.asa.endpoint.rest.controller.mapper.ThContractMapper;
 import school.hei.asa.endpoint.rest.controller.mapper.ThWorkerMapper;
 import school.hei.asa.endpoint.rest.model.th.ThWorker;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
@@ -23,6 +24,7 @@ public class WorkerController {
   private final WorkerFromAuthentication workerFromAuthentication;
   private final WorkerToModelAdder workerToModelAdder;
   private final ThWorkerMapper thWorkerMapper;
+  private final ThContractMapper thContractMapper;
 
   @GetMapping("/workers")
   public List<Worker> getWorkers() {
@@ -73,7 +75,7 @@ public class WorkerController {
             : workerCode;
 
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
-    var contracts = thWorkerMapper.toTh(contractRepository.findAllByWorker(worker));
+    var contracts = thContractMapper.toTh(contractRepository.findAllByWorker(worker));
 
     model.addAttribute("worker", worker);
     model.addAttribute("workerCode", workerCodeOrAuth);

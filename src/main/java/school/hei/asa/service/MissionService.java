@@ -25,6 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.hei.asa.endpoint.rest.controller.mapper.ThContractMapper;
 import school.hei.asa.endpoint.rest.controller.mapper.ThProductMapper;
 import school.hei.asa.endpoint.rest.controller.mapper.ThWorkerMapper;
 import school.hei.asa.endpoint.rest.model.th.ThContract;
@@ -46,6 +47,7 @@ public class MissionService {
   private final WorkerRepository workerRepository;
   private final ContractRepository contractRepository;
   private final ThWorkerMapper thWorkerMapper;
+  private final ThContractMapper thContractMapper;
 
   private List<ThProduct> filterThProductsByWorkerCode(
       String workerCode, boolean noUnpaidCareMissions) {
@@ -234,7 +236,7 @@ public class MissionService {
   public Map<Worker, List<ThContract>> totalWorkDaysForOneWorker(String workerCode) {
     Map<Worker, List<ThContract>> result = new HashMap<>();
     var worker = workerRepository.findByCode(workerCode);
-    var contracts = thWorkerMapper.toTh(contractRepository.findAllByWorker(worker));
+    var contracts = thContractMapper.toTh(contractRepository.findAllByWorker(worker));
     result.put(worker, contracts);
     log.info("result be like = {}", result);
     return result;
@@ -246,7 +248,7 @@ public class MissionService {
     workers.parallelStream()
         .forEach(
             worker -> {
-              var contracts = thWorkerMapper.toTh(contractRepository.findAllByWorker(worker));
+              var contracts = thContractMapper.toTh(contractRepository.findAllByWorker(worker));
               result.put(worker, contracts);
             });
     return result;

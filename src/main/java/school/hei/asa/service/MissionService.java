@@ -319,7 +319,7 @@ public class MissionService {
   }
 
   private String remainingDaysToString(ThContract thContract) {
-    if (thContract.duration().equals("-")) {
+    if (thContract.duration().equals("-") || thContract.actualWorkedDay().equals("-")) {
       return "-";
     }
 
@@ -328,6 +328,9 @@ public class MissionService {
   }
 
   private String actualWorkedDaysToString(ThContract thContract) {
+    if (thContract.actualWorkedDay().equals("-")) {
+      return "-";
+    }
     double res = parseDouble(thContract.actualWorkedDay());
     return res == 0.0d ? "-" : formatDays(res);
   }

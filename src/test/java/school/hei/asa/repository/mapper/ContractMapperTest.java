@@ -94,7 +94,6 @@ public class ContractMapperTest {
   private JContractLevel newJWorkerLevel() {
     JContractLevel jContractLevel = new JContractLevel();
     jContractLevel.setCode("level");
-    jContractLevel.setLevelId("levelId");
 
     return jContractLevel;
   }

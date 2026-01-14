@@ -16,10 +16,8 @@ import school.hei.asa.model.contract.ContractType;
 @Getter
 @Setter
 public class JContractLevel {
-  @Column(name = "level_id", nullable = false)
+  @Column(name = "code", nullable = false)
   @Id
-  private String levelId;
-
   private String code;
 
   @Enumerated(STRING)

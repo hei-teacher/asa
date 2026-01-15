@@ -53,6 +53,7 @@ public class MissionController {
     var thProductsByWorkerCode =
         missionService.filterThProductByWorkerCodeAndDateBetween(
             workerCode, startDate, endDate, true);
+    log.info("thProductsByWorkerCode = {}", thProductsByWorkerCode);
     model.addAttribute("products", thProductsByWorkerCode);
 
     List<Map<String, Object>> executedDaysByProduct = new ArrayList<>();

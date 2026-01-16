@@ -3,23 +3,68 @@ package school.hei.asa.service;
 import static java.lang.System.lineSeparator;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import jakarta.transaction.Transactional;
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.Authentication;
 import school.hei.asa.conf.FacadeIT;
+import school.hei.asa.endpoint.rest.controller.DailyExecutionController;
+import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
 import school.hei.asa.endpoint.rest.model.th.ThMissionExecution;
 import school.hei.asa.endpoint.rest.model.th.ThProduct;
+import school.hei.asa.endpoint.rest.security.SecurityConfig;
+import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
+import school.hei.asa.model.Mission;
+import school.hei.asa.model.Product;
+import school.hei.asa.model.Worker;
+import school.hei.asa.repository.MissionRepository;
+import school.hei.asa.repository.ProductRepository;
+import school.hei.asa.repository.WorkerRepository;
 
+@Transactional
 class MissionServiceIT extends FacadeIT {
 
   @Autowired MissionService missionService;
+  @Autowired ProductRepository productRepository;
+  @Autowired MissionRepository missionRepository;
+  @Autowired DailyExecutionController dailyExecutionController;
+  @Autowired WorkerRepository workerRepository;
+
+  @MockBean SecurityConfig securityConfig;
+  @MockBean WorkerFromAuthentication workerFromAuthentication;
+
+  Authentication authentication;
+  Worker authenticatedWorker;
+
+  @BeforeEach
+  void setUp() {
+    var product = new Product("product-code", "product-name", "product-description");
+    productRepository.save(product);
+    var mission1 = new Mission("code1", "title1", "description1", 10, product);
+    var mission2 = new Mission("code2", "title2", "description2", 2, product);
+    missionRepository.saveAll(List.of(mission1, mission2));
+
+    authentication = mock(Authentication.class);
+    authenticatedWorker =
+        new Worker(
+            "workerCode", "code", "email", "full code", "address", "random city", "nif", "stat");
+    workerRepository.save(authenticatedWorker);
+    when(workerFromAuthentication.apply(authentication))
+        .thenReturn(Optional.of(authenticatedWorker));
+  }
 
   @Test
   void thProductsExecutedDays_count_by_month() {
@@ -177,41 +222,41 @@ class MissionServiceIT extends FacadeIT {
 
   @Test
   void filter_product_by_date_between() {
-    var missionExecution1 =
-        new ThMissionExecution(
-            "mission0-code",
-            "W-P-2024-01",
-            LocalDate.parse("2024-07-01"),
-            0.5,
-            "comment3",
-            false,
-            true);
-    var missionExecution2 =
-        new ThMissionExecution(
-            "mission0-code",
-            "W-P-2024-01",
-            LocalDate.parse("2024-07-01"),
-            0.5,
-            "comment4",
-            false,
-            true);
-    var mission =
-        new ThMission(
-            "mission0-code",
-            "a mission",
-            "a description",
-            List.of(missionExecution1, missionExecution2),
-            false,
-            false);
-    var expected = new ThProduct("pCode0", "pname0", "pDescription0", List.of(mission), false);
+    var dmeForm =
+        new ThDailyExecutionForm(
+            "2024-07-01",
+            "code1",
+            "0.5",
+            "missionComment1",
+            "code1",
+            "0.5",
+            "missionComment2",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
 
-    var actual =
+    dailyExecutionController.createDailyExecution(authentication, dmeForm);
+
+    var savedWorker = workerRepository.findByCode(authenticatedWorker.code());
+    var expected =
+        new ThProduct("product-code", "product-name", "product-description", List.of(), false);
+
+    var thProducts =
         missionService
             .filterThProductByWorkerCodeAndDateBetween(
-                "W-P-2024-01", "2024-06-01", "2024-08-01", true)
-            .getFirst();
+                savedWorker.code(), "2024-06-01", "2025-06-01", true)
+            .stream()
+            .filter(p -> p.code().equals("product-code")) // Filter for your test data
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("Test product not found"));
 
-    assertEquals(expected, actual);
+    assertEquals(expected, thProducts);
   }
 
   @Test

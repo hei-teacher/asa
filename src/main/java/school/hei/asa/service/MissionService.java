@@ -10,10 +10,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -26,15 +24,11 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.rest.controller.mapper.ThContractMapper;
-import school.hei.asa.endpoint.rest.controller.mapper.ThProductMapper;
-import school.hei.asa.endpoint.rest.controller.mapper.ThWorkerMapper;
 import school.hei.asa.endpoint.rest.model.th.ThContract;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
-import school.hei.asa.endpoint.rest.model.th.ThMissionExecution;
 import school.hei.asa.endpoint.rest.model.th.ThProduct;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.ContractRepository;
-import school.hei.asa.repository.ProductRepository;
 import school.hei.asa.repository.WorkerRepository;
 
 @Slf4j
@@ -42,92 +36,9 @@ import school.hei.asa.repository.WorkerRepository;
 @Service
 public class MissionService {
 
-  private final ProductRepository productRepository;
-  private final ThProductMapper thProductMapper;
   private final WorkerRepository workerRepository;
   private final ContractRepository contractRepository;
-  private final ThWorkerMapper thWorkerMapper;
   private final ThContractMapper thContractMapper;
-
-  private List<ThProduct> filterThProductsByWorkerCode(
-      String workerCode, boolean noUnpaidCareMissions) {
-    var thProducts =
-        thProductMapper.toTh(productRepository.findAll()).stream()
-            .map(
-                p ->
-                    new ThProduct(
-                        p.code(),
-                        p.name(),
-                        p.description(),
-                        p.missions().stream()
-                            .filter(m -> !m.isUnpaidCare() || !noUnpaidCareMissions)
-                            .toList(),
-                        p.isCare()))
-            .toList();
-    return workerCode == null || workerCode.isBlank()
-        ? thProducts.stream()
-            .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
-            .toList()
-        : thProducts.stream()
-            .map(p -> p.filterByWorkerCode(workerCode))
-            .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
-            .toList();
-  }
-
-  public List<ThProduct> filterThProductByWorkerCodeAndDateBetween(
-      String workerCode, String startDate, String endDate, boolean noUnpaidCareMissions) {
-    var thProducts = filterThProductsByWorkerCode(workerCode, noUnpaidCareMissions);
-    if (startDate == null || startDate.isBlank() || endDate == null || endDate.isBlank()) {
-      return thProducts;
-    }
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    var startLocalDate = LocalDate.parse(startDate, formatter);
-    var endLocalDate = LocalDate.parse(endDate, formatter);
-    if (endLocalDate.isBefore(startLocalDate)) {
-      return thProducts;
-    }
-    log.info("filtering by date...");
-
-    List<ThProduct> result = new ArrayList<>();
-    thProducts.forEach(
-        p -> {
-          var missions = p.missions();
-          List<ThMission> newMissions = new ArrayList<>();
-          missions.forEach(
-              m -> {
-                List<ThMissionExecution> newMissionExecution =
-                    m.getMissionExecutions().stream()
-                        .filter(
-                            me -> {
-                              var isBetween =
-                                  me.getDate().isAfter(startLocalDate)
-                                      && me.getDate().isBefore(endLocalDate);
-                              return isBetween
-                                  || me.getDate().isEqual(startLocalDate)
-                                  || me.getDate().isEqual(endLocalDate);
-                            })
-                        .toList();
-                newMissions.add(
-                    new ThMission(
-                        m.getCode(),
-                        m.getTitle(),
-                        m.getDescription(),
-                        newMissionExecution,
-                        m.isCare(),
-                        m.isUnpaidCare()));
-              });
-          result.add(new ThProduct(p.code(), p.name(), p.description(), newMissions, p.isCare()));
-        });
-    if (workerCode.isBlank() || workerCode == null) {
-      return result.stream()
-          .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
-          .toList();
-    }
-    return result.stream()
-        .map(p -> p.filterByWorkerCode(workerCode))
-        .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
-        .toList();
-  }
 
   public Map<String, List<ThProduct>> thProductsByMonth(List<ThProduct> thProducts) {
     EnumSet<Month> months = EnumSet.allOf(Month.class);

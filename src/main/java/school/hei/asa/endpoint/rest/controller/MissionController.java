@@ -26,6 +26,7 @@ import school.hei.asa.endpoint.rest.model.th.ThMission;
 import school.hei.asa.model.DailyExecution;
 import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.service.MissionService;
+import school.hei.asa.service.ProductService;
 
 @Slf4j
 @Controller
@@ -33,7 +34,7 @@ import school.hei.asa.service.MissionService;
 public class MissionController {
 
   private final DailyExecutionRepository dailyExecutionRepository;
-
+  private final ProductService productService;
   private final CareProductCodeSupplier careProductCodeSupplier;
   private final ThDailyExecutionMapper thDailyExecutionMapper;
   private final WorkerToModelAdder workerToModelAdder;
@@ -51,7 +52,7 @@ public class MissionController {
 
     var noUnpaidCareMissions = true;
     var thProductsByWorkerCode =
-        missionService.filterThProductByWorkerCodeAndDateBetween(
+        productService.filterThProductByWorkerCodeAndDateBetween(
             workerCode, startDate, endDate, true);
     log.info("thProductsByWorkerCode = {}", thProductsByWorkerCode);
     model.addAttribute("products", thProductsByWorkerCode);

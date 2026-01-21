@@ -3,13 +3,9 @@ package school.hei.asa.repository.mapper;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.hei.asa.model.FullTimeEmployee;
-import school.hei.asa.model.PartnerContractor;
-import school.hei.asa.model.StudentContractor;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.model.JMissionExecution;
 import school.hei.asa.repository.model.JWorker;
-import school.hei.asa.repository.model.WorkerType;
 
 @AllArgsConstructor
 @Component
@@ -26,38 +22,15 @@ public class WorkerMapper {
     }
 
     var worker =
-        switch (jWorker.getWorkerType()) {
-          case partnerContractor ->
-              new PartnerContractor(
-                  code,
-                  jWorker.getName(),
-                  jWorker.getEmail(),
-                  jWorker.getFullname(),
-                  jWorker.getAddress(),
-                  jWorker.getCity(),
-                  jWorker.getNif(),
-                  jWorker.getStat());
-          case studentContractor ->
-              new StudentContractor(
-                  code,
-                  jWorker.getName(),
-                  jWorker.getEmail(),
-                  jWorker.getFullname(),
-                  jWorker.getAddress(),
-                  jWorker.getCity(),
-                  jWorker.getNif(),
-                  jWorker.getStat());
-          case fullTimeEmployee ->
-              new FullTimeEmployee(
-                  code,
-                  jWorker.getName(),
-                  jWorker.getEmail(),
-                  jWorker.getFullname(),
-                  jWorker.getAddress(),
-                  jWorker.getCity(),
-                  jWorker.getNif(),
-                  jWorker.getStat());
-        };
+        new Worker(
+            code,
+            jWorker.getName(),
+            jWorker.getEmail(),
+            jWorker.getFullname(),
+            jWorker.getAddress(),
+            jWorker.getCity(),
+            jWorker.getNif(),
+            jWorker.getStat());
     cache.put(code, worker, Worker.class);
 
     return worker;
@@ -67,7 +40,6 @@ public class WorkerMapper {
     var jWorker = new JWorker();
     jWorker.setCode(worker.code());
     jWorker.setName(worker.name());
-    jWorker.setWorkerType(WorkerType.type(worker));
     jWorker.setMissionExecutions(jmeList);
     return jWorker;
   }

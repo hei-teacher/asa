@@ -2,12 +2,10 @@ package school.hei.asa.repository.mapper;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static school.hei.asa.repository.model.WorkerType.studentContractor;
 
 import java.time.YearMonth;
 import org.junit.jupiter.api.Test;
 import school.hei.asa.model.InvoiceReference;
-import school.hei.asa.model.StudentContractor;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.model.JInvoiceReference;
 import school.hei.asa.repository.model.JWorker;
@@ -41,8 +39,7 @@ public class InvoiceReferenceMapperTest {
   }
 
   private Worker newWorker() {
-    return new StudentContractor(
-        "code", "name", "email", "fullname", "address", "city", "NIF", "STAT");
+    return new Worker("code", "code", "email", "fullname", "address", "city", "NIF", "STAT");
   }
 
   private JInvoiceReference newJInvoiceDetails() {
@@ -56,14 +53,13 @@ public class InvoiceReferenceMapperTest {
   private JWorker newJWorker() {
     JWorker jWorker = new JWorker();
     jWorker.setCode("code");
-    jWorker.setName("name");
+    jWorker.setName("code");
     jWorker.setEmail("email");
     jWorker.setFullname("fullname");
     jWorker.setAddress("address");
     jWorker.setCity("city");
     jWorker.setNif("NIF");
     jWorker.setStat("STAT");
-    jWorker.setWorkerType(studentContractor);
     return jWorker;
   }
 }

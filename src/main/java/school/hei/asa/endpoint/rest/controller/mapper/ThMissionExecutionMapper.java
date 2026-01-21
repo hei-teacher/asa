@@ -1,12 +1,22 @@
 package school.hei.asa.endpoint.rest.controller.mapper;
 
-import org.springframework.stereotype.Controller;
-import school.hei.asa.endpoint.rest.model.th.ThMissionExecution;
-import school.hei.asa.model.MissionExecution;
-import school.hei.asa.model.StudentContractor;
+import static java.time.ZoneOffset.UTC;
 
+import java.util.Comparator;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
+import school.hei.asa.endpoint.rest.model.th.ThContract;
+import school.hei.asa.endpoint.rest.model.th.ThMissionExecution;
+import school.hei.asa.endpoint.rest.service.ThContractService;
+import school.hei.asa.model.MissionExecution;
+import school.hei.asa.model.Worker;
+
+@Slf4j
 @Controller
+@AllArgsConstructor
 public class ThMissionExecutionMapper {
+  private final ThContractService thContractService;
 
   public ThMissionExecution toTh(MissionExecution me, boolean isCare) {
     var worker = me.worker();
@@ -17,6 +27,20 @@ public class ThMissionExecutionMapper {
         me.dayPercentage(),
         me.comment(),
         isCare,
-        worker instanceof StudentContractor);
+        isExecutedByStudent(worker, me));
+  }
+
+  private boolean isExecutedByStudent(Worker worker, MissionExecution me) {
+    var contracts = thContractService.getAllContractsForWorker(worker);
+    return contracts.stream()
+        .filter(
+            contract -> {
+              var entranceDate = contract.entranceInstant().atZone(UTC).toLocalDate();
+              return entranceDate.isBefore(me.date());
+            })
+        .max(Comparator.comparing(ThContract::entranceInstant))
+        .get()
+        .contractType()
+        .equals("Alternant");
   }
 }

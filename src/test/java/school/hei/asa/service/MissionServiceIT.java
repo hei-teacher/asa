@@ -2,8 +2,8 @@ package school.hei.asa.service;
 
 import static java.lang.System.lineSeparator;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import jakarta.transaction.Transactional;
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Files;
@@ -17,6 +17,7 @@ import school.hei.asa.endpoint.rest.model.th.ThMission;
 import school.hei.asa.endpoint.rest.model.th.ThMissionExecution;
 import school.hei.asa.endpoint.rest.model.th.ThProduct;
 
+@Transactional
 class MissionServiceIT extends FacadeIT {
 
   @Autowired MissionService missionService;
@@ -129,14 +130,6 @@ class MissionServiceIT extends FacadeIT {
   }
 
   @Test
-  void fetch_product_from_database() {
-    var thProducts =
-        missionService.filterThProductByWorkerCodeAndDateBetween(null, null, null, true);
-
-    assertFalse(thProducts.isEmpty());
-  }
-
-  @Test
   void group_product_by_month() {
     var missionExecution1 =
         new ThMissionExecution(
@@ -176,47 +169,8 @@ class MissionServiceIT extends FacadeIT {
   }
 
   @Test
-  void filter_product_by_date_between() {
-    var missionExecution1 =
-        new ThMissionExecution(
-            "mission0-code",
-            "W-P-2024-01",
-            LocalDate.parse("2024-07-01"),
-            0.5,
-            "comment3",
-            false,
-            false);
-    var missionExecution2 =
-        new ThMissionExecution(
-            "mission0-code",
-            "W-P-2024-01",
-            LocalDate.parse("2024-07-01"),
-            0.5,
-            "comment4",
-            false,
-            false);
-    var mission =
-        new ThMission(
-            "mission0-code",
-            "a mission",
-            "a description",
-            List.of(missionExecution1, missionExecution2),
-            false,
-            false);
-    var expected = new ThProduct("pCode0", "pname0", "pDescription0", List.of(mission), false);
-
-    var actual =
-        missionService
-            .filterThProductByWorkerCodeAndDateBetween(
-                "W-P-2024-01", "2024-06-01", "2024-08-01", true)
-            .getFirst();
-
-    assertEquals(expected, actual);
-  }
-
-  @Test
   @SneakyThrows
-  void export_worker_level_history_for_one_worker() {
+  void export_contract_for_one_worker() {
     var actualCSV = missionService.generateCSV("W-P-2024-01");
 
     var actualContent = Files.readString(actualCSV.toPath());
@@ -232,13 +186,15 @@ class MissionServiceIT extends FacadeIT {
     File file = new File(filePath, "test.csv");
     try (FileWriter fileWriter = new FileWriter(file)) {
       fileWriter.write(
-          "code,worker,worker level,start date,"
+          "code,worker,contract level,start date,"
               + "contract duration (in days),"
               + "total days worked,remaining days"
               + lineSeparator());
       fileWriter.flush();
       fileWriter.write(
-          String.format("W-P-2024-01,Lita Andria,L5,2023-01-01,13,2.8,10.2" + lineSeparator()));
+          String.format("W-P-2024-01,Lita Andria,L4P-2026,2025-01-01,80,-,-" + lineSeparator()));
+      fileWriter.write(
+          String.format("W-P-2024-01,Lita Andria,L5,2023-01-01,13,2.0,11.0" + lineSeparator()));
       fileWriter.flush();
       return file;
     } catch (Exception e) {

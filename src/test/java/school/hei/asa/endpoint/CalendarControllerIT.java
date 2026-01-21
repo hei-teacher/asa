@@ -17,7 +17,6 @@ import school.hei.asa.endpoint.rest.controller.CalendarController;
 import school.hei.asa.endpoint.rest.controller.WorkerToModelAdder;
 import school.hei.asa.endpoint.rest.model.th.ThYear;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
-import school.hei.asa.model.PartnerContractor;
 import school.hei.asa.model.Worker;
 
 class CalendarControllerIT extends FacadeIT {
@@ -35,7 +34,7 @@ class CalendarControllerIT extends FacadeIT {
   void setUp() {
     authentication = mock(Authentication.class);
     authenticatedWorker =
-        new PartnerContractor(
+        new Worker(
             "worker-code",
             "Test Worker",
             "worker@example.com",

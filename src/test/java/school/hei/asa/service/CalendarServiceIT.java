@@ -23,8 +23,8 @@ import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.SecurityConfig;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Mission;
-import school.hei.asa.model.PartnerContractor;
 import school.hei.asa.model.Product;
+import school.hei.asa.model.Worker;
 import school.hei.asa.repository.MissionRepository;
 import school.hei.asa.repository.ProductRepository;
 import school.hei.asa.repository.WorkerRepository;
@@ -162,11 +162,11 @@ class CalendarServiceIT extends FacadeIT {
   private Authentication authentication() {
     var authentication = mock(Authentication.class);
     var authenticatedWorker =
-        new PartnerContractor(
+        new Worker(
             authenticatedWorkerCode,
-            "name",
+            "code",
             "email",
-            "full name",
+            "full code",
             "address",
             "random city",
             "nif",

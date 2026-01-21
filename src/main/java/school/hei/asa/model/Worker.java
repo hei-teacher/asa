@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode(of = "code")
-public abstract sealed class Worker permits Contractor, FullTimeEmployee {
+public class Worker {
   private final String code;
   private final String name;
   private final String email;

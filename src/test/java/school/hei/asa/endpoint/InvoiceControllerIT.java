@@ -19,7 +19,6 @@ import school.hei.asa.endpoint.rest.controller.WorkerToModelAdder;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.BankAccount;
-import school.hei.asa.model.PartnerContractor;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.BankAccountRepository;
 
@@ -40,7 +39,7 @@ class InvoiceControllerIT extends FacadeIT {
   void setUp() {
     authentication = mock(Authentication.class);
     authenticatedWorker =
-        new PartnerContractor(
+        new Worker(
             "worker-code",
             "Test Worker",
             "worker@example.com",

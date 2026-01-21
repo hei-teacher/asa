@@ -1,0 +1,1 @@
+ALTER TABLE worker_level RENAME TO contract_level;

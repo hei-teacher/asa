@@ -10,10 +10,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -25,15 +23,12 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import school.hei.asa.endpoint.rest.controller.mapper.ThProductMapper;
-import school.hei.asa.endpoint.rest.controller.mapper.ThWorkerMapper;
+import school.hei.asa.endpoint.rest.controller.mapper.ThContractMapper;
+import school.hei.asa.endpoint.rest.model.th.ThContract;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
-import school.hei.asa.endpoint.rest.model.th.ThMissionExecution;
 import school.hei.asa.endpoint.rest.model.th.ThProduct;
-import school.hei.asa.endpoint.rest.model.th.ThWorkerLevelHistory;
 import school.hei.asa.model.Worker;
-import school.hei.asa.repository.ProductRepository;
-import school.hei.asa.repository.WorkerLevelHistoryRepository;
+import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.WorkerRepository;
 
 @Slf4j
@@ -41,91 +36,9 @@ import school.hei.asa.repository.WorkerRepository;
 @Service
 public class MissionService {
 
-  private final ProductRepository productRepository;
-  private final ThProductMapper thProductMapper;
   private final WorkerRepository workerRepository;
-  private final WorkerLevelHistoryRepository workerLevelHistoryRepository;
-  private final ThWorkerMapper thWorkerMapper;
-
-  private List<ThProduct> filterThProductsByWorkerCode(
-      String workerCode, boolean noUnpaidCareMissions) {
-    var thProducts =
-        thProductMapper.toTh(productRepository.findAll()).stream()
-            .map(
-                p ->
-                    new ThProduct(
-                        p.code(),
-                        p.name(),
-                        p.description(),
-                        p.missions().stream()
-                            .filter(m -> !m.isUnpaidCare() || !noUnpaidCareMissions)
-                            .toList(),
-                        p.isCare()))
-            .toList();
-    return workerCode == null || workerCode.isBlank()
-        ? thProducts.stream()
-            .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
-            .toList()
-        : thProducts.stream()
-            .map(p -> p.filterByWorkerCode(workerCode))
-            .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
-            .toList();
-  }
-
-  public List<ThProduct> filterThProductByWorkerCodeAndDateBetween(
-      String workerCode, String startDate, String endDate, boolean noUnpaidCareMissions) {
-    var thProducts = filterThProductsByWorkerCode(workerCode, noUnpaidCareMissions);
-    if (startDate == null || startDate.isBlank() || endDate == null || endDate.isBlank()) {
-      return thProducts;
-    }
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    var startLocalDate = LocalDate.parse(startDate, formatter);
-    var endLocalDate = LocalDate.parse(endDate, formatter);
-    if (endLocalDate.isBefore(startLocalDate)) {
-      return thProducts;
-    }
-    log.info("filtering by date...");
-
-    List<ThProduct> result = new ArrayList<>();
-    thProducts.forEach(
-        p -> {
-          var missions = p.missions();
-          List<ThMission> newMissions = new ArrayList<>();
-          missions.forEach(
-              m -> {
-                List<ThMissionExecution> newMissionExecution =
-                    m.getMissionExecutions().stream()
-                        .filter(
-                            me -> {
-                              var isBetween =
-                                  me.getDate().isAfter(startLocalDate)
-                                      && me.getDate().isBefore(endLocalDate);
-                              return isBetween
-                                  || me.getDate().isEqual(startLocalDate)
-                                  || me.getDate().isEqual(endLocalDate);
-                            })
-                        .toList();
-                newMissions.add(
-                    new ThMission(
-                        m.getCode(),
-                        m.getTitle(),
-                        m.getDescription(),
-                        newMissionExecution,
-                        m.isCare(),
-                        m.isUnpaidCare()));
-              });
-          result.add(new ThProduct(p.code(), p.name(), p.description(), newMissions, p.isCare()));
-        });
-    if (workerCode.isBlank() || workerCode == null) {
-      return result.stream()
-          .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
-          .toList();
-    }
-    return result.stream()
-        .map(p -> p.filterByWorkerCode(workerCode))
-        .sorted(comparing(ThProduct::executedDays, naturalOrder()).reversed())
-        .toList();
-  }
+  private final ContractRepository contractRepository;
+  private final ThContractMapper thContractMapper;
 
   public Map<String, List<ThProduct>> thProductsByMonth(List<ThProduct> thProducts) {
     EnumSet<Month> months = EnumSet.allOf(Month.class);
@@ -231,25 +144,23 @@ public class MissionService {
         .toList();
   }
 
-  public Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysForOneWorker(String workerCode) {
-    Map<Worker, List<ThWorkerLevelHistory>> result = new HashMap<>();
+  public Map<Worker, List<ThContract>> totalWorkDaysForOneWorker(String workerCode) {
+    Map<Worker, List<ThContract>> result = new HashMap<>();
     var worker = workerRepository.findByCode(workerCode);
-    var workerLevelHistories =
-        thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
-    result.put(worker, workerLevelHistories);
+    var contracts = thContractMapper.toTh(contractRepository.findAllByWorker(worker));
+    result.put(worker, contracts);
     log.info("result be like = {}", result);
     return result;
   }
 
-  public Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysPerWorker() {
-    Map<Worker, List<ThWorkerLevelHistory>> result = new HashMap<>();
+  public Map<Worker, List<ThContract>> totalWorkDaysPerWorker() {
+    Map<Worker, List<ThContract>> result = new HashMap<>();
     var workers = workerRepository.findAll().stream().sorted(comparing(Worker::name)).toList();
     workers.parallelStream()
         .forEach(
             worker -> {
-              var workerLevelHistories =
-                  thWorkerMapper.toTh(workerLevelHistoryRepository.findAllByWorker(worker));
-              result.put(worker, workerLevelHistories);
+              var contracts = thContractMapper.toTh(contractRepository.findAllByWorker(worker));
+              result.put(worker, contracts);
             });
     return result;
   }
@@ -272,25 +183,24 @@ public class MissionService {
   }
 
   @SneakyThrows
-  private void writeToFile(
-      File file, Map<Worker, List<ThWorkerLevelHistory>> totalWorkDaysPerWorker) {
+  private void writeToFile(File file, Map<Worker, List<ThContract>> totalWorkDaysPerWorker) {
     try (FileWriter fileWriter = new FileWriter(file)) {
       fileWriter.write(
-          "code,worker,worker level,start date,"
+          "code,worker,contract level,start date,"
               + "contract duration (in days),"
               + "total days worked,remaining days"
               + lineSeparator());
       fileWriter.flush();
       totalWorkDaysPerWorker.forEach(
-          (worker, thWorkerLevelHistories) -> {
-            thWorkerLevelHistories.parallelStream()
+          (worker, thContracts) -> {
+            thContracts.parallelStream()
                 .forEach(
-                    thWorkerLevelHistory -> {
+                    thContract -> {
                       try {
-                        String remainingDays = remainingDaysToString(thWorkerLevelHistory);
-                        String actualWorkedDays = actualWorkedDaysToString(thWorkerLevelHistory);
+                        String remainingDays = remainingDaysToString(thContract);
+                        String actualWorkedDays = actualWorkedDaysToString(thContract);
                         String startDate =
-                            thWorkerLevelHistory
+                            thContract
                                 .entranceInstant()
                                 .atZone(ZoneId.of("UTC"))
                                 .toLocalDate()
@@ -300,9 +210,9 @@ public class MissionService {
                                 "%s,%s,%s,%s,%s,%s,%s",
                                 worker.code(),
                                 worker.name(),
-                                thWorkerLevelHistory.level(),
+                                thContract.level(),
                                 startDate,
-                                thWorkerLevelHistory.projectedDaysToWork(),
+                                thContract.duration(),
                                 actualWorkedDays,
                                 remainingDays);
 
@@ -319,19 +229,20 @@ public class MissionService {
     }
   }
 
-  private String remainingDaysToString(ThWorkerLevelHistory thWorkerLevelHistory) {
-    if (thWorkerLevelHistory.projectedDaysToWork().equals("-")) {
+  private String remainingDaysToString(ThContract thContract) {
+    if (thContract.duration().equals("-") || thContract.actualWorkedDay().equals("-")) {
       return "-";
     }
 
-    var res =
-        parseDouble(thWorkerLevelHistory.projectedDaysToWork())
-            - parseDouble(thWorkerLevelHistory.actualWorkedDay());
+    var res = parseDouble(thContract.duration()) - parseDouble(thContract.actualWorkedDay());
     return formatDays(res);
   }
 
-  private String actualWorkedDaysToString(ThWorkerLevelHistory thWorkerLevelHistory) {
-    double res = parseDouble(thWorkerLevelHistory.actualWorkedDay());
+  private String actualWorkedDaysToString(ThContract thContract) {
+    if (thContract.actualWorkedDay().equals("-")) {
+      return "-";
+    }
+    double res = parseDouble(thContract.actualWorkedDay());
     return res == 0.0d ? "-" : formatDays(res);
   }
 

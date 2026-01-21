@@ -24,27 +24,27 @@
                     <th class="py-3 px-6">Level</th>
                     <th class="py-3 px-6">Entrance date</th>
                     <th class="py-3 px-6">Contract Type</th>
-                    <th class="py-3 px-6">Projected Days To Work</th>
-                    <th class="py-3 px-6">Actual Worked Day</th>
+                    <th class="py-3 px-6">Contract Duration</th>
+                    <th class="py-3 px-6">Worked Days</th>
                     <th class="py-3 px-6">Contract</th>
                 </tr>
                 </thead>
                 <tbody class="text-gray-700 text-sm font-light text-center">
-                <tr th:each="levelHistory : ${workerLevelHistory}"
+                <tr th:each="contract : ${contracts}"
                     class="border-b border-gray-200 hover:bg-gray-50 text-center">
-                    <td class="py-3 px-6 text-center" th:text="${levelHistory.level}"></td>
-                    <td class="py-3 px-6 text-center" th:text="${#dates.format(levelHistory.entranceInstant, 'dd MMM yyyy')}"></td>
-                    <td class="py-3 px-6 text-center" th:text="${levelHistory.contractType}"></td>
-                    <td class="py-3 px-6 text-center" th:text="${levelHistory.projectedDaysToWork}"></td>
-                    <td class="py-3 px-6 text-center" th:text="${levelHistory.actualWorkedDay}"></td>
+                    <td class="py-3 px-6 text-center" th:text="${contract.level}"></td>
+                    <td class="py-3 px-6 text-center" th:text="${#dates.format(contract.entranceInstant, 'dd MMM yyyy')}"></td>
+                    <td class="py-3 px-6 text-center" th:text="${contract.contractType}"></td>
+                    <td class="py-3 px-6 text-center" th:text="${contract.duration}"></td>
+                    <td class="py-3 px-6 text-center" th:text="${contract.actualWorkedDay}"></td>
                     <td class="py-3 px-6 text-center">
-                        <a th:if="${levelHistory.contractBucketKey() != null}"
-                           th:href="@{/download-contract(contractBucketKey=${levelHistory.contractBucketKey()})}"
+                        <a th:if="${contract.contractBucketKey() != null}"
+                           th:href="@{/download-contract(contractBucketKey=${contract.contractBucketKey()})}"
                            target="_blank"
                            class="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-800 text-white font-semibold py-1 px-3 rounded transition">
                             <i class="material-icons">download</i> Download
                         </a>
-                        <strong th:if="${levelHistory.contractBucketKey() == null}" class="">No Contract</strong>
+                        <strong th:if="${contract.contractBucketKey() == null}" class="">No Contract</strong>
                     </td>
                 </tr>
                 </tbody>

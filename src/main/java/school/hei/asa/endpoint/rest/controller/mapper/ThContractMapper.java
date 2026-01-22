@@ -45,7 +45,7 @@ public class ThContractMapper {
     return result;
   }
 
-    public Map<Worker, List<ThContract>> toThContractsByWorker(
+  public Map<Worker, List<ThContract>> toThContractsByWorker(
       Map<Worker, List<Contract>> contractsByWorker) {
     Map<Worker, List<ThContract>> result = new HashMap<>();
     contractsByWorker.forEach(

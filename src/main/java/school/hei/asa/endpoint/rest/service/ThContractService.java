@@ -105,8 +105,8 @@ public class ThContractService {
   }
 
   private String actualWorkedDaysToString(ThContract thContract) {
-    if (thContract.actualWorkedDay().equals("-")){
-        return "-";
+    if (thContract.actualWorkedDay().equals("-")) {
+      return "-";
     }
     double res = parseDouble(thContract.actualWorkedDay());
     return res == 0.0d ? "-" : formatDays(res);
@@ -119,7 +119,7 @@ public class ThContractService {
     return numberFormat.format(days);
   }
 
-    public List<ThContract> getAllContractsForWorker(Worker worker) {
-        return thContractMapper.toTh(contractService.getAllContractsForWorker(worker));
-    }
+  public List<ThContract> getAllContractsForWorker(Worker worker) {
+    return thContractMapper.toTh(contractService.getAllContractsForWorker(worker));
+  }
 }

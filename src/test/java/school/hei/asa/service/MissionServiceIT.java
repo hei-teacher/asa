@@ -6,5 +6,4 @@ import school.hei.asa.conf.FacadeIT;
 class MissionServiceIT extends FacadeIT {
 
   @Autowired MissionService missionService;
-
 }

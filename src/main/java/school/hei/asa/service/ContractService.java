@@ -38,7 +38,7 @@ public class ContractService {
     return result;
   }
 
-    public List<Contract> getAllContractsForWorker(Worker worker) {
-        return contractRepository.findAllByWorker(worker);
-    }
+  public List<Contract> getAllContractsForWorker(Worker worker) {
+    return contractRepository.findAllByWorker(worker);
+  }
 }

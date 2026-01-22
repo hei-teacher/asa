@@ -10,10 +10,9 @@ public class ProductServiceIT extends FacadeIT {
   @Autowired ProductService productService;
 
   @Test
-    void fetch_all_products(){
-      var products = productService.getAllProducts();
+  void fetch_all_products() {
+    var products = productService.getAllProducts();
 
-      assertFalse(products.isEmpty());
+    assertFalse(products.isEmpty());
   }
-
 }

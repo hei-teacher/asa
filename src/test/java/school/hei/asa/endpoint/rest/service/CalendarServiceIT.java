@@ -1,4 +1,4 @@
-package school.hei.asa.service;
+package school.hei.asa.endpoint.rest.service;
 
 import static java.time.Month.DECEMBER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,6 +28,7 @@ import school.hei.asa.model.Worker;
 import school.hei.asa.repository.MissionRepository;
 import school.hei.asa.repository.ProductRepository;
 import school.hei.asa.repository.WorkerRepository;
+import school.hei.asa.service.CalendarService;
 
 class CalendarServiceIT extends FacadeIT {
   @Autowired DailyExecutionController dailyExecutionController;

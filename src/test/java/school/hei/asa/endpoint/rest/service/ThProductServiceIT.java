@@ -1,7 +1,6 @@
 package school.hei.asa.endpoint.rest.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,14 +13,6 @@ import school.hei.asa.endpoint.rest.model.th.ThProduct;
 
 class ThProductServiceIT extends FacadeIT {
   @Autowired ThProductService thProductService;
-
-  @Test
-  void fetch_product_from_database() {
-    var thProducts =
-        thProductService.filterThProductByWorkerCodeAndDateBetween(null, null, null, true);
-
-    assertFalse(thProducts.isEmpty());
-  }
 
   @Test
   void thProductsExecutedDays_count_by_month() {

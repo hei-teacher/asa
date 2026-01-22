@@ -96,7 +96,7 @@ public class ThContractService {
   }
 
   private String remainingDaysToString(ThContract thContract) {
-    if (thContract.duration().equals("-")) {
+    if (thContract.duration().equals("-") || thContract.actualWorkedDay().equals("-")) {
       return "-";
     }
 
@@ -105,6 +105,9 @@ public class ThContractService {
   }
 
   private String actualWorkedDaysToString(ThContract thContract) {
+    if (thContract.actualWorkedDay().equals("-")){
+        return "-";
+    }
     double res = parseDouble(thContract.actualWorkedDay());
     return res == 0.0d ? "-" : formatDays(res);
   }
@@ -115,4 +118,8 @@ public class ThContractService {
     var numberFormat = new DecimalFormat("#.0", decimalFormatSymbols);
     return numberFormat.format(days);
   }
+
+    public List<ThContract> getAllContractsForWorker(Worker worker) {
+        return thContractMapper.toTh(contractService.getAllContractsForWorker(worker));
+    }
 }

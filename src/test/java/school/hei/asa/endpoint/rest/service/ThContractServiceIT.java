@@ -32,13 +32,15 @@ class ThContractServiceIT extends FacadeIT {
     File file = new File(filePath, "test.csv");
     try (FileWriter fileWriter = new FileWriter(file)) {
       fileWriter.write(
-          "code,worker,worker level,start date,"
+          "code,worker,contract level,start date,"
               + "contract duration (in days),"
               + "total days worked,remaining days"
               + lineSeparator());
       fileWriter.flush();
       fileWriter.write(
-          String.format("W-P-2024-01,Lita Andria,L5,2023-01-01,13,2.8,10.2" + lineSeparator()));
+          String.format("W-P-2024-01,Lita Andria,L4P-2026,2025-01-01,80,-,-" + lineSeparator()));
+      fileWriter.write(
+          String.format("W-P-2024-01,Lita Andria,L5,2023-01-01,13,2.0,11.0" + lineSeparator()));
       fileWriter.flush();
       return file;
     } catch (Exception e) {
@@ -46,3 +48,5 @@ class ThContractServiceIT extends FacadeIT {
     }
   }
 }
+
+

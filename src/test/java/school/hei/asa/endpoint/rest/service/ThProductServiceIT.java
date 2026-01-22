@@ -103,7 +103,7 @@ class ThProductServiceIT extends FacadeIT {
             0.5,
             "comment3",
             false,
-            false);
+            true);
     var missionExecution2 =
         new ThMissionExecution(
             "mission0-code",
@@ -112,7 +112,7 @@ class ThProductServiceIT extends FacadeIT {
             0.5,
             "comment4",
             false,
-            false);
+            true);
     var mission =
         new ThMission(
             "mission0-code",

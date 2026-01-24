@@ -23,6 +23,9 @@ import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.endpoint.rest.controller.mapper.ThDailyExecutionMapper;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecution;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
+import school.hei.asa.endpoint.rest.service.ThContractService;
+import school.hei.asa.endpoint.rest.service.ThMissionService;
+import school.hei.asa.endpoint.rest.service.ThProductService;
 import school.hei.asa.model.DailyExecution;
 import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.service.MissionService;
@@ -39,6 +42,9 @@ public class MissionController {
   private final ThDailyExecutionMapper thDailyExecutionMapper;
   private final WorkerToModelAdder workerToModelAdder;
   private final MissionService missionService;
+  private final ThMissionService thMissionService;
+  private final ThProductService thProductService;
+  private final ThContractService thContractService;
 
   @GetMapping("/missions")
   public String getMissions(
@@ -52,7 +58,7 @@ public class MissionController {
 
     var noUnpaidCareMissions = true;
     var thProductsByWorkerCode =
-        productService.filterThProductByWorkerCodeAndDateBetween(
+        thProductService.filterThProductByWorkerCodeAndDateBetween(
             workerCode, startDate, endDate, true);
     log.info("thProductsByWorkerCode = {}", thProductsByWorkerCode);
     model.addAttribute("products", thProductsByWorkerCode);
@@ -68,21 +74,22 @@ public class MissionController {
     }
     model.addAttribute("executedDaysByProduct", executedDaysByProduct);
 
-    var thProductsByMonth = missionService.thProductsByMonth(thProductsByWorkerCode);
+    var thProductsByMonth = thProductService.thProductsByMonth(thProductsByWorkerCode);
     model.addAttribute("months", thProductsByMonth);
 
     var thMissionsPerProductsByWorkerCode =
-        missionService.getUniqueMissionsByTitle(thProductsByWorkerCode);
+        thMissionService.getUniqueMissionsByTitle(thProductsByWorkerCode);
     List<Map<String, Object>> executedDaysByProductMission =
         toListOfMap(thMissionsPerProductsByWorkerCode);
     model.addAttribute("executedDaysByProductMission", executedDaysByProductMission);
 
-    var thMissionsByWorkerCode = missionService.getAllMissionsFromProducts(thProductsByWorkerCode);
+    var thMissionsByWorkerCode =
+        thMissionService.getAllMissionsFromProducts(thProductsByWorkerCode);
     List<Map<String, Object>> executedDaysByMission = toListOfMap(thMissionsByWorkerCode);
     model.addAttribute("executedDaysByMission", executedDaysByMission);
 
     var thProductsExecutedDaysSumByMonth =
-        missionService.thProductsExecutedDaysSumByMonth(
+        thProductService.thProductsExecutedDaysSumByMonth(
             thProductsByWorkerCode, noUnpaidCareMissions);
     model.addAttribute("total", thProductsExecutedDaysSumByMonth);
 
@@ -106,7 +113,7 @@ public class MissionController {
   @SneakyThrows
   @GetMapping("/missions/export-to-csv")
   public ResponseEntity<ByteArrayResource> exportToCSV(@RequestParam String workerCode) {
-    var file = missionService.generateCSV(workerCode);
+    var file = thContractService.generateCSV(workerCode);
     ByteArrayResource resource =
         new ByteArrayResource(Files.readAllBytes(Path.of(file.getAbsolutePath())));
     HttpHeaders header = new HttpHeaders();

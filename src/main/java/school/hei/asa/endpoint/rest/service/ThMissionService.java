@@ -9,14 +9,19 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.hei.asa.endpoint.rest.controller.mapper.ThMissionMapper;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
 import school.hei.asa.endpoint.rest.model.th.ThMissionExecution;
 import school.hei.asa.endpoint.rest.model.th.ThProduct;
+import school.hei.asa.service.MissionService;
 
 @Service
 @Slf4j
 @AllArgsConstructor
 public class ThMissionService {
+  private final MissionService missionService;
+  private final ThMissionMapper thMissionMapper;
+
   public List<ThMission> filterThMissionsByDateBetween(
       List<ThMission> missions, LocalDate startDate, LocalDate endDate) {
     return missions.stream()
@@ -88,6 +93,14 @@ public class ThMissionService {
               var isBetween = me.getDate().isAfter(startDate) && me.getDate().isBefore(endDate);
               return isBetween || me.getDate().isEqual(startDate) || me.getDate().isEqual(endDate);
             })
+        .toList();
+  }
+
+  public List<ThMission> sortedMissionsWithoutMissionExecution() {
+    var missions = missionService.getAllMissions();
+    return missions.stream()
+        .map(thMissionMapper::toThWithoutMissionExecution)
+        .sorted(comparing(ThMission::getCode))
         .toList();
   }
 }

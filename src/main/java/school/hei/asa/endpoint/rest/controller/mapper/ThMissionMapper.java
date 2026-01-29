@@ -3,6 +3,7 @@ package school.hei.asa.endpoint.rest.controller.mapper;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.asa.CareProductCodeSupplier;
@@ -32,5 +33,12 @@ public class ThMissionMapper {
             .toList(),
         isCare,
         isUnpaidCare);
+  }
+
+  public ThMission toThWithoutMissionExecution(Mission mission) {
+    var isCare = mission.isCare(careProductCodeSupplier.get());
+    var isUnpaidCare = isCare && !mission.isPaidCare(paidCareMissionCodesSupplier.get());
+    return new ThMission(
+        mission.code(), mission.title(), mission.description(), List.of(), isCare, isUnpaidCare);
   }
 }

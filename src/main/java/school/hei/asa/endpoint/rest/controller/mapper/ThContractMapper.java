@@ -53,6 +53,7 @@ public class ThContractMapper {
                   : dateFormater.format(current.endInstant().atZone(systemDefault()).toLocalDate());
           result.add(
               new ThContract(
+                  current.worker().code(),
                   contractLevel.code(),
                   entranceDate,
                   endDate,

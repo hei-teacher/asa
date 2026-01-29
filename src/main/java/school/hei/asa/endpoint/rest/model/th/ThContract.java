@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 @Getter
 @AllArgsConstructor
 public class ThContract {
+  String workerCode;
   String level;
   String entranceInstant;
   String endInstant;

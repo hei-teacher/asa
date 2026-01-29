@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.model.InvoiceForm;
-import school.hei.asa.model.PartnerContractor;
+import school.hei.asa.model.Worker;
 
 public class InvoiceServiceIT extends FacadeIT {
   @Autowired InvoiceService invoiceService;
@@ -32,7 +32,7 @@ public class InvoiceServiceIT extends FacadeIT {
             null,
             null,
             null);
-    var worker = new PartnerContractor("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
+    var worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
     invoiceService.saveInvoiceReference(invoiceData, worker);
 
     var expected = invoiceService.generateInvoiceFileName(worker);

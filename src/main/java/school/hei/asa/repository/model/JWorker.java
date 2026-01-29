@@ -1,9 +1,6 @@
 package school.hei.asa.repository.model;
 
-import static jakarta.persistence.EnumType.STRING;
-
 import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
@@ -28,9 +25,6 @@ public class JWorker {
   private String city;
   private String nif;
   private String stat;
-
-  @Enumerated(STRING)
-  private WorkerType workerType;
 
   @OneToMany
   @JoinColumn(name = "worker_code")

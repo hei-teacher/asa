@@ -15,8 +15,8 @@ class DailyExecutionTest {
   void missionPercentagesSum_lt100_isIllegal() {
     var product = new Product("pcode", "pname", "pdescription");
     var worker =
-        new PartnerContractor(
-            "worker-code", "name", "email", "full name", "address", "random city", "nif", "stat");
+        new Worker(
+            "worker-code", "code", "email", "full code", "address", "random city", "nif", "stat");
     var mission = new Mission("mission-code", "title", "description", 10, product);
     assertThrows(
         IllegalArgumentException.class,
@@ -32,8 +32,8 @@ class DailyExecutionTest {
   void missionPercentageSum_float_ok() {
     var product = new Product("pcode", "pname", "pdescription");
     var worker =
-        new PartnerContractor(
-            "worker-code", "name", "email", "full name", "address", "random city", "nif", "stat");
+        new Worker(
+            "worker-code", "code", "email", "full code", "address", "random city", "nif", "stat");
     var mission = new Mission("mission-code", "title", "description", 10, product);
 
     assertDoesNotThrow(
@@ -56,8 +56,8 @@ class DailyExecutionTest {
   void daily_execution_removes_duplicates_and_validates_percentage_sum() {
     var product = new Product("pcode", "pname", "pdescription");
     var worker =
-        new PartnerContractor(
-            "worker-code", "name", "email", "full name", "address", "random city", "nif", "stat");
+        new Worker(
+            "worker-code", "code", "email", "full code", "address", "random city", "nif", "stat");
     var mission = new Mission("mission-code", "title", "description", 10, product);
     var now = Instant.now();
 

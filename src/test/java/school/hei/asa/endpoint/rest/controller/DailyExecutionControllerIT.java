@@ -1,4 +1,4 @@
-package school.hei.asa.endpoint;
+package school.hei.asa.endpoint.rest.controller;
 
 import static java.time.Month.DECEMBER;
 import static java.util.concurrent.Executors.newFixedThreadPool;
@@ -23,13 +23,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import school.hei.asa.conf.FacadeIT;
-import school.hei.asa.endpoint.rest.controller.CalendarController;
-import school.hei.asa.endpoint.rest.controller.DailyExecutionController;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.SecurityConfig;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Mission;
-import school.hei.asa.model.PartnerContractor;
 import school.hei.asa.model.Product;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.DailyExecutionRepository;
@@ -57,8 +54,8 @@ class DailyExecutionControllerIT extends FacadeIT {
   void setUp() {
     authentication = mock(Authentication.class);
     authenticatedWorker =
-        new PartnerContractor(
-            "worker-code", "name", "email", "full name", "address", "random city", "nif", "stat");
+        new Worker(
+            "worker-code", "code", "email", "full code", "address", "random city", "nif", "stat");
     workerRepository.save(authenticatedWorker);
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));

@@ -41,9 +41,11 @@ public class MissionMapper {
                 productMapper.toDomain(jMission.getProduct(), cache)));
     cache.put(missionCode, mission);
 
-    jMission.getMissionExecutions().stream()
-        .map(jme -> missionExecutionMapper.toDomain(jme, cache))
-        .forEach(mission::add);
+    if (jMission.getMissionExecutions() != null) {
+      jMission.getMissionExecutions().stream()
+          .map(jme -> missionExecutionMapper.toDomain(jme, cache))
+          .forEach(mission::add);
+    }
     return mission;
   }
 

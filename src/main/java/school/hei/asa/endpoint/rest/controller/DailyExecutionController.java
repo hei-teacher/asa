@@ -1,6 +1,5 @@
 package school.hei.asa.endpoint.rest.controller;
 
-
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;

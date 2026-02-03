@@ -11,19 +11,19 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.asa.CareProductCodeSupplier;
-import school.hei.asa.PaidCareMissionCodesSupplier;
 import school.hei.asa.endpoint.rest.model.th.ThContract;
 import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
+import school.hei.asa.service.MissionService;
 
 @AllArgsConstructor
 @Component
 public class ThContractMapper {
   private final ThWorkerMapper thWorkerMapper;
   private final CareProductCodeSupplier careProductCodeSupplier;
-  private final PaidCareMissionCodesSupplier paidCareMissionCodesSupplier;
+  private final MissionService missionService;
 
   public List<ThContract> toTh(List<Contract> contracts) {
     List<ThContract> result = new ArrayList<>();
@@ -80,7 +80,7 @@ public class ThContractMapper {
               return dailyExecution.executions().stream()
                   .map(
                       me -> {
-                        return isUnpaidCare(me) ? 0.0d : me.dayPercentage();
+                        return missionService.isUnpaidCare(me) ? 0.0d : me.dayPercentage();
                       })
                   .reduce(Double::sum)
                   .get();
@@ -88,11 +88,5 @@ public class ThContractMapper {
         .reduce(Double::sum)
         .get()
         .toString();
-  }
-
-  private boolean isUnpaidCare(MissionExecution me) {
-    var mission = me.mission();
-    return mission.isCare(careProductCodeSupplier.get())
-        && !mission.isPaidCare(paidCareMissionCodesSupplier.get());
   }
 }

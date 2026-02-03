@@ -22,11 +22,11 @@ public class MissionService {
     return missionRepository.findAll();
   }
 
-  public boolean isUnpaidCare(MissionExecution me){
+  public boolean isUnpaidCare(MissionExecution me) {
     var mission = me.mission();
     log.info("here is the care product : {}", careProductCodeSupplier.get());
     log.info("here are the paid care mission : {}", paidCareMissionCodesSupplier.get());
     return mission.isCare(careProductCodeSupplier.get())
-            && !mission.isPaidCare(paidCareMissionCodesSupplier.get());
+        && !mission.isPaidCare(paidCareMissionCodesSupplier.get());
   }
 }

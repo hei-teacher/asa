@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.endpoint.rest.model.th.ThContract;
 import school.hei.asa.model.DailyExecution;
-import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.service.MissionService;

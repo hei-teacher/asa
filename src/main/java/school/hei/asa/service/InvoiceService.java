@@ -13,8 +13,6 @@ import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import school.hei.asa.CareProductCodeSupplier;
-import school.hei.asa.PaidCareMissionCodesSupplier;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
@@ -36,9 +34,8 @@ public class InvoiceService {
   private final ContractRepository contractRepository;
   private final MissionExecutionRepository missionExecutionRepository;
   private final BankAccountRepository bankAccountRepository;
-  private final CareProductCodeSupplier careProductCodeSupplier;
   private final InvoiceReferenceRepository invoiceReferenceRepository;
-  private final PaidCareMissionCodesSupplier paidCareMissionCodesSupplier;
+  private final MissionService missionService;
 
   public Optional<InvoiceReference> findInvoiceReference(Worker worker, YearMonth yearMonth) {
     var invoiceReferenceList = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker);
@@ -158,16 +155,9 @@ public class InvoiceService {
     return missionExecutionRepository
         .missionExecutionsByDateBetween(worker, startDate, endDate)
         .stream()
-        .filter(me -> !isUnpaidCare(me))
+        .filter(me -> !missionService.isUnpaidCare(me))
         .mapToDouble(MissionExecution::dayPercentage)
         .sum();
-  }
-
-  private boolean isUnpaidCare(MissionExecution me) {
-    var mission = me.mission();
-    return mission.isCare(careProductCodeSupplier.get())
-        // TODO: test following second part of the condition
-        && !mission.isPaidCare(paidCareMissionCodesSupplier.get());
   }
 
   public void saveInvoiceReference(InvoiceForm invoiceForm, Worker worker) {

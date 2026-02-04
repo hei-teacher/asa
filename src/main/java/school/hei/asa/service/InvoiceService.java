@@ -4,7 +4,6 @@ import static java.time.LocalDate.now;
 import static java.time.ZoneOffset.UTC;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
-import static java.util.UUID.randomUUID;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -79,6 +78,7 @@ public class InvoiceService {
       var total = firstInvoiceForm.amount().add(secondInvoiceForm.amount());
       var parsedTotal = numberConverter.convertToWords(numberParser.parseToNumber(total));
       return new InvoiceForm(
+          invoiceForm.id(),
           yearMonth,
           referenceDate,
           issueDate,
@@ -100,6 +100,7 @@ public class InvoiceService {
     var contract = hasContract ? contracts.getFirst() : null;
     var tempResult = generateInvoiceFormFrom(totalDaysWorked, contract);
     return new InvoiceForm(
+        invoiceForm.id(),
         yearMonth,
         referenceDate,
         issueDate,
@@ -120,7 +121,8 @@ public class InvoiceService {
   private InvoiceForm generateInvoiceFormFrom(Double totalDaysWorked, Contract contract) {
     if (contract == null) {
       return new InvoiceForm(
-          null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+          null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+          null);
     }
     var contractLevel = contract.level();
     Double unitPrice =
@@ -133,6 +135,7 @@ public class InvoiceService {
     var description = contract.jobTitle();
 
     return new InvoiceForm(
+        null,
         null,
         null,
         null,
@@ -162,7 +165,7 @@ public class InvoiceService {
 
   public void saveInvoiceReference(InvoiceForm invoiceForm, Worker worker) {
     var invoiceReference =
-        new InvoiceReference(randomUUID().toString(), invoiceForm.yearMonth(), null, worker);
+        new InvoiceReference(invoiceForm.id(), invoiceForm.yearMonth(), null, worker);
     invoiceReferenceRepository.saveInvoiceReference(invoiceReference);
   }
 

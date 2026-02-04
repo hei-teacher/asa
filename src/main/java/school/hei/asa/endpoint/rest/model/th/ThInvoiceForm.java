@@ -1,6 +1,7 @@
 package school.hei.asa.endpoint.rest.model.th;
 
 public record ThInvoiceForm(
+    String id,
     String yearMonth,
     String reference,
     String issueDate,

@@ -162,7 +162,8 @@ implementation 'org.xhtmlrenderer:flying-saucer-pdf:9.1.22'
 implementation 'ognl:ognl:3.2.21'
 implementation 'org.apache.pdfbox:pdfbox:2.0.30'
 implementation 'com.ibm.icu:icu4j:77.1'
-    testImplementation 'com.tngtech.archunit:archunit-junit5:1.4.1'
+implementation 'org.knowm.xchart:xchart:3.8.8'
+
     
 
 }

@@ -4,7 +4,6 @@ import static java.time.LocalDate.now;
 import static java.time.ZoneOffset.UTC;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
-import static java.util.UUID.randomUUID;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,8 +12,6 @@ import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import school.hei.asa.CareProductCodeSupplier;
-import school.hei.asa.PaidCareMissionCodesSupplier;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
@@ -36,9 +33,8 @@ public class InvoiceService {
   private final ContractRepository contractRepository;
   private final MissionExecutionRepository missionExecutionRepository;
   private final BankAccountRepository bankAccountRepository;
-  private final CareProductCodeSupplier careProductCodeSupplier;
   private final InvoiceReferenceRepository invoiceReferenceRepository;
-  private final PaidCareMissionCodesSupplier paidCareMissionCodesSupplier;
+  private final MissionService missionService;
 
   public Optional<InvoiceReference> findInvoiceReference(Worker worker, YearMonth yearMonth) {
     var invoiceReferenceList = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker);
@@ -82,6 +78,7 @@ public class InvoiceService {
       var total = firstInvoiceForm.amount().add(secondInvoiceForm.amount());
       var parsedTotal = numberConverter.convertToWords(numberParser.parseToNumber(total));
       return new InvoiceForm(
+          invoiceForm.id(),
           yearMonth,
           referenceDate,
           issueDate,
@@ -103,6 +100,7 @@ public class InvoiceService {
     var contract = hasContract ? contracts.getFirst() : null;
     var tempResult = generateInvoiceFormFrom(totalDaysWorked, contract);
     return new InvoiceForm(
+        invoiceForm.id(),
         yearMonth,
         referenceDate,
         issueDate,
@@ -123,7 +121,8 @@ public class InvoiceService {
   private InvoiceForm generateInvoiceFormFrom(Double totalDaysWorked, Contract contract) {
     if (contract == null) {
       return new InvoiceForm(
-          null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+          null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+          null);
     }
     var contractLevel = contract.level();
     Double unitPrice =
@@ -136,6 +135,7 @@ public class InvoiceService {
     var description = contract.jobTitle();
 
     return new InvoiceForm(
+        null,
         null,
         null,
         null,
@@ -158,21 +158,14 @@ public class InvoiceService {
     return missionExecutionRepository
         .missionExecutionsByDateBetween(worker, startDate, endDate)
         .stream()
-        .filter(me -> !isUnpaidCare(me))
+        .filter(me -> !missionService.isUnpaidCare(me))
         .mapToDouble(MissionExecution::dayPercentage)
         .sum();
   }
 
-  private boolean isUnpaidCare(MissionExecution me) {
-    var mission = me.mission();
-    return mission.isCare(careProductCodeSupplier.get())
-        // TODO: test following second part of the condition
-        && !mission.isPaidCare(paidCareMissionCodesSupplier.get());
-  }
-
   public void saveInvoiceReference(InvoiceForm invoiceForm, Worker worker) {
     var invoiceReference =
-        new InvoiceReference(randomUUID().toString(), invoiceForm.yearMonth(), null, worker);
+        new InvoiceReference(invoiceForm.id(), invoiceForm.yearMonth(), null, worker);
     invoiceReferenceRepository.saveInvoiceReference(invoiceReference);
   }
 

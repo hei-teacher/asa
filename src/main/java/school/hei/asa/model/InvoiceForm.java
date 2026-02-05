@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 
 public record InvoiceForm(
+    String id,
     YearMonth yearMonth,
     LocalDate referenceDate,
     LocalDate issueDate,

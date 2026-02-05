@@ -3,6 +3,7 @@ package school.hei.asa.endpoint.rest.controller.mapper;
 import static java.lang.Double.parseDouble;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Locale.FRENCH;
+import static java.util.UUID.randomUUID;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ public class ThInvoiceFormMapper {
 
   public ThInvoiceForm toTh(InvoiceForm invoiceForm) {
     return new ThInvoiceForm(
+        randomUUID().toString(),
         invoiceForm.yearMonth().format(yearMonthFormatter),
         invoiceForm.referenceDate().format(localDateFormatter),
         invoiceForm.issueDate().format(localDateFormatter),
@@ -89,6 +91,7 @@ public class ThInvoiceFormMapper {
             : null;
 
     return new InvoiceForm(
+        invoiceForm.id(),
         yearMonth,
         reference,
         issueDate,

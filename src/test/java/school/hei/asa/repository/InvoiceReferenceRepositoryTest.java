@@ -6,18 +6,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.YearMonth;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.Worker;
 
+@Slf4j
 public class InvoiceReferenceRepositoryTest extends FacadeIT {
   @Autowired InvoiceReferenceRepository invoiceReferenceRepository;
 
   @Test
   void fetch_all_invoice_details_for_worker() {
-    var worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
+    var worker = new Worker("W-P-2024-01", "Lita Andria", null, null, null, null, null, null);
     var invoiceDetails1 =
         new InvoiceReference("id1", YearMonth.parse("2025-01", ofPattern("yyyy-MM")), 1, worker);
     var invoiceDetails2 =
@@ -42,6 +44,7 @@ public class InvoiceReferenceRepositoryTest extends FacadeIT {
     invoiceReferenceRepository.saveInvoiceReference(expected);
 
     var actual = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker);
+    log.info("invoiceRef content = {}", actual);
 
     assertTrue(actual.contains(expected));
   }

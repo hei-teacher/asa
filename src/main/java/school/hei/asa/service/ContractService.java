@@ -2,13 +2,18 @@ package school.hei.asa.service;
 
 import static java.util.Comparator.comparing;
 
+import jakarta.transaction.Transactional;
+import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
+import school.hei.asa.model.contract.cas.CasToGraph;
+import school.hei.asa.model.contract.cas.ContractsToCasSet;
 import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.WorkerRepository;
 
@@ -40,5 +45,13 @@ public class ContractService {
 
   public List<Contract> getAllContractsForWorker(Worker worker) {
     return contractRepository.findAllByWorker(worker);
+  }
+
+  @Transactional
+  public File contractsFinancialExecutionAsImage(int year, int month) {
+    var contracts = contractRepository.findAll();
+    var contractsToCasSet = new ContractsToCasSet();
+    contractsToCasSet.apply(new HashSet<>(contracts));
+    return new CasToGraph().apply(contractsToCasSet.getCompanyCas(), year, month);
   }
 }

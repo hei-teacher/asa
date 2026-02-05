@@ -1,16 +1,18 @@
 package school.hei.asa.endpoint.rest.service;
 
 import static java.lang.System.lineSeparator;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import school.hei.asa.conf.FacadeIT;
 
+@Slf4j
 class ThContractServiceIT extends FacadeIT {
   @Autowired ThContractService thContractService;
 
@@ -25,8 +27,10 @@ class ThContractServiceIT extends FacadeIT {
     var expectedCSV2 = expectedFile2();
     var expectedContent1 = Files.readString(expectedCSV1.toPath());
     var expectedContent2 = Files.readString(expectedCSV2.toPath());
+    log.info("here is the content of the file: {}", actualContent);
 
-    assertTrue(actualContent.equals(expectedContent1) || actualContent.equals(expectedContent2));
+    assertEquals(expectedContent1, actualContent);
+    assertEquals(expectedContent2, actualContent);
   }
 
   private File expectedFile1() {

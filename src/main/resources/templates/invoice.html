@@ -221,10 +221,15 @@
         </div>
 
         <div style="margin-top: 60px; display: flex; gap: 8px; align-items: center;">
-            <span style="font-family: 'EB Garamond', serif; font-size: 14px; font-weight: 400;">
+            <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 400;">
                Générée par <a href="https://asa.poja.io/">https://asa.poja.io/</a> le
             </span>
-            <span style="font-family: 'EB Garamond', serif; font-size: 15px;" th:text="${creationDate}"></span>
+            <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 400;" th:text="${creationDate}"></span>
+            <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 400;">(UTC+0)</span>
+        </div>
+        <div style="margin-top: 2px; display: flex; gap: 8px; align-items: center;">
+            <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 400;">id:</span>
+            <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 400;" th:text="${invoiceId}"></span>
         </div>
     </section>
 </div>

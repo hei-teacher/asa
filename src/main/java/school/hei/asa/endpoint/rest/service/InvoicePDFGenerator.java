@@ -60,6 +60,7 @@ public class InvoicePDFGenerator {
     Context context = new Context();
     context.setVariable("creationDate", now().format(ofPattern("dd LLLL yyyy à HH:mm:ss", FRENCH)));
     context.setVariable("worker", worker);
+    context.setVariable("invoiceId", thInvoiceForm.id());
     context.setVariable("invoice", thInvoiceForm);
     context.setVariable("yearMonth", String.format("%s %s", month, year));
 

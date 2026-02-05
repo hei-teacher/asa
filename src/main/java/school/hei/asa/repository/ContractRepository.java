@@ -24,4 +24,8 @@ public class ContractRepository {
         jContractRepository.findAllByWorkerOrderByEntranceInstantDesc(
             workerMapper.toEntity(worker)));
   }
+
+  public List<Contract> findAll() {
+    return contractMapper.toDomain(jContractRepository.findAll());
+  }
 }

@@ -17,6 +17,7 @@ public class InvoiceServiceIT extends FacadeIT {
   void can_generate_invoice_bucketKey() {
     var invoiceData =
         new InvoiceForm(
+            "some id",
             YearMonth.of(2025, Month.JANUARY),
             null,
             null,

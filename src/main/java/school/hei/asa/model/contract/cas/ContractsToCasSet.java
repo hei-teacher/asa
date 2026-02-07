@@ -11,6 +11,8 @@ import gen.patrimoine.modele.Devise;
 import gen.patrimoine.modele.Personne;
 import gen.patrimoine.modele.possession.Compte;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import lombok.Getter;
@@ -29,11 +31,13 @@ public class ContractsToCasSet implements Function<Set<Contract>, CasSet> {
             LocalDate.MIN, LocalDate.MAX, new Personne("Company"), compteCompany, DEVISE);
   }
 
+  @Getter private final Map<Contract, Exception> koContracts = new HashMap<>();
+
   @Override
   public CasSet apply(Set<Contract> contracts) {
     Set<Cas> setOfCas =
         contracts.stream()
-            .map(c -> new ContractToCas(compteCompany, DEVISE).apply(c))
+            .map(c -> new ContractToCas(compteCompany, DEVISE, koContracts).apply(c))
             .collect(toSet());
     setOfCas.add(companyCas);
 

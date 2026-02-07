@@ -12,12 +12,14 @@ import static java.time.Month.MAY;
 import static java.time.Month.NOVEMBER;
 import static java.time.Month.OCTOBER;
 import static java.time.Month.SEPTEMBER;
+import static java.util.stream.Collectors.joining;
 
 import gen.patrimoine.modele.Argent;
 import java.time.Month;
 import java.util.Map;
+import school.hei.asa.model.contract.Contract;
 
-public record FinancialPlan(Map<Month, Argent> cost) {
+public record FinancialPlan(Map<Month, Argent> plannedCost, Map<Contract, Exception> koContracts) {
 
   @Override
   public String toString() {
@@ -36,19 +38,31 @@ public record FinancialPlan(Map<Month, Argent> cost) {
           oct: %s,
           nov: %s,
           dec: %s
-        ]
+        ],
+        koContracts = %s
         """,
-        cost.get(JANUARY).ppMontant(),
-        cost.get(FEBRUARY).ppMontant(),
-        cost.get(MARCH).ppMontant(),
-        cost.get(APRIL).ppMontant(),
-        cost.get(MAY).ppMontant(),
-        cost.get(JUNE).ppMontant(),
-        cost.get(JULY).ppMontant(),
-        cost.get(AUGUST).ppMontant(),
-        cost.get(SEPTEMBER).ppMontant(),
-        cost.get(OCTOBER).ppMontant(),
-        cost.get(NOVEMBER).ppMontant(),
-        cost.get(DECEMBER).ppMontant());
+        plannedCost.get(JANUARY).ppMontant(),
+        plannedCost.get(FEBRUARY).ppMontant(),
+        plannedCost.get(MARCH).ppMontant(),
+        plannedCost.get(APRIL).ppMontant(),
+        plannedCost.get(MAY).ppMontant(),
+        plannedCost.get(JUNE).ppMontant(),
+        plannedCost.get(JULY).ppMontant(),
+        plannedCost.get(AUGUST).ppMontant(),
+        plannedCost.get(SEPTEMBER).ppMontant(),
+        plannedCost.get(OCTOBER).ppMontant(),
+        plannedCost.get(NOVEMBER).ppMontant(),
+        plannedCost.get(DECEMBER).ppMontant(),
+        pp(koContracts));
+  }
+
+  private String pp(Map<Contract, Exception> koContracts) {
+    return koContracts.keySet().stream()
+        .map(
+            c ->
+                String.format(
+                    "[%s,%s] %s",
+                    c.worker().name(), c.entranceInstant(), koContracts.get(c).getMessage()))
+        .collect(joining(", "));
   }
 }

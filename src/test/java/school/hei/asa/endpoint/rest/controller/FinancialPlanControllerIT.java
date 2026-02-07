@@ -39,8 +39,10 @@ class FinancialPlanControllerIT extends FacadeIT {
           oct: 0.0,
           nov: 0.0,
           dec: 0.0
-        ]
-        """,
-        cost);
+        ],
+        koContracts =
+        """
+            .trim(),
+        cost.trim());
   }
 }

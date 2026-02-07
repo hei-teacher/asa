@@ -11,6 +11,7 @@ import gen.patrimoine.modele.possession.Possession;
 import gen.patrimoine.modele.possession.TransfertArgent;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ public class ContractCas extends Cas {
   private final Compte compteCompany;
   private final Function<ContractType, Integer> contractTypeToDaysPerMonth;
   private final Devise devise;
+  private final Map<Contract, Exception> koContracts;
 
   private static final int PAY_DAY = 5;
 
@@ -33,12 +35,14 @@ public class ContractCas extends Cas {
       Contract contract,
       Compte compteCompany,
       Function<ContractType, Integer> contractTypeToDaysPerMonth,
-      Devise devise) {
+      Devise devise,
+      Map<Contract, Exception> koContracts) {
     super(ajd, finSimulation, personne);
     this.contract = contract;
     this.compteCompany = compteCompany;
     this.contractTypeToDaysPerMonth = contractTypeToDaysPerMonth;
     this.devise = devise;
+    this.koContracts = koContracts;
   }
 
   @Override
@@ -61,7 +65,7 @@ public class ContractCas extends Cas {
     try {
       payAllMonths(compteWorker);
     } catch (Exception e) {
-      log.error("Could not payAllMonths for contract {}", contract, e);
+      koContracts.put(contract, e);
     }
 
     return Set.of(compteWorker);

@@ -25,7 +25,8 @@ public class FinancialPlanService {
     var contracts = contractRepository.findAll();
     var contractsToCasSet = new ContractsToCasSet();
     contractsToCasSet.apply(new HashSet<>(contracts));
-    return new FinancialPlan(mapOfCosts(year, contractsToCasSet.getCompanyCas()));
+    return new FinancialPlan(
+        mapOfCosts(year, contractsToCasSet.getCompanyCas()), contractsToCasSet.getKoContracts());
   }
 
   private Map<Month, Argent> mapOfCosts(int year, Cas companyCas) {

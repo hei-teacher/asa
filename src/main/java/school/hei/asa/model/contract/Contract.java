@@ -13,4 +13,8 @@ public record Contract(
     Instant entranceInstant,
     Duration duration,
     List<DailyExecution> executions,
-    String contractBucketKey) {}
+    String contractBucketKey) {
+  public String ppId() {
+    return String.format("%s_%s_%s_%s", worker.code(), worker.name(), level, entranceInstant);
+  }
+}

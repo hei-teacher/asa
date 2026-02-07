@@ -7,6 +7,7 @@ import gen.patrimoine.modele.Devise;
 import gen.patrimoine.modele.Personne;
 import gen.patrimoine.modele.possession.Compte;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import school.hei.asa.model.contract.Contract;
@@ -16,10 +17,15 @@ public class ContractToCas implements Function<Contract, Cas> {
 
   private final Compte compteCompany;
   private final Devise devise;
+  private final Map<Contract, Exception> koContracts;
 
   private static final int DAYS_PER_MONTH_PARTNER = 18;
   private static final int DAYS_PER_MONTH_STUDENT = 11;
   private static final int DAYS_PER_MONTH_FTE = 20;
+
+  public ContractToCas(Compte compteCompany, Devise mga) {
+    this(compteCompany, mga, Map.of());
+  }
 
   @Override
   public Cas apply(Contract contract) {
@@ -37,6 +43,7 @@ public class ContractToCas implements Function<Contract, Cas> {
               case studentContractor -> DAYS_PER_MONTH_STUDENT;
               case fullTimeEmployee -> DAYS_PER_MONTH_FTE;
             },
-        devise);
+        devise,
+        koContracts);
   }
 }

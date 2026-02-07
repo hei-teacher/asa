@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
@@ -34,7 +35,7 @@ public class ContractToCasTest {
     var contract = studentContract(JAN1_2026, 11, 50_000);
 
     var compteCompany = new Compte("Compte-company", JAN1_2026, new Argent(0, MGA));
-    var cas = new ContractToCas(compteCompany, MGA).apply(contract);
+    var cas = new ContractToCas(compteCompany, MGA, Map.of()).apply(contract);
 
     assertEquals(
         new Argent(0, MGA),

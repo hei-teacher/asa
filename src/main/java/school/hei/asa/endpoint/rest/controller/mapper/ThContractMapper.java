@@ -68,25 +68,26 @@ public class ThContractMapper {
     if (executions.isEmpty()) {
       return "-";
     }
-    return executions.stream()
-        .map(
-            dailyExecution -> {
-              var type = dailyExecution.type(careProductCodeSupplier.get());
-              if (type.equals(fullWork)) {
-                return 1.0d;
-              } else if (type.equals(fullCare)) {
-                return 0.0d;
-              }
-              return dailyExecution.executions().stream()
-                  .map(
-                      me -> {
-                        return missionService.isUnpaidCare(me) ? 0.0d : me.dayPercentage();
-                      })
-                  .reduce(Double::sum)
-                  .get();
-            })
-        .reduce(Double::sum)
-        .get()
-        .toString();
+    var result =
+        executions.stream()
+            .map(
+                dailyExecution -> {
+                  var type = dailyExecution.type(careProductCodeSupplier.get());
+                  if (type.equals(fullWork)) {
+                    return 1.0d;
+                  } else if (type.equals(fullCare)) {
+                    return 0.0d;
+                  }
+                  return dailyExecution.executions().stream()
+                      .map(
+                          me -> {
+                            return missionService.isUnpaidCare(me) ? 0.0d : me.dayPercentage();
+                          })
+                      .reduce(Double::sum)
+                      .get();
+                })
+            .reduce(Double::sum)
+            .get();
+    return String.format("%.1f", result);
   }
 }

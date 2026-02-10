@@ -41,6 +41,7 @@ public class ThContractMapper {
               new ThContract(
                   contractLevel.code(),
                   current.entranceInstant(),
+                  current.endInstant(),
                   contractType,
                   executedDays,
                   BigDecimal.valueOf(compensation),

@@ -11,6 +11,7 @@ public record Contract(
     String jobTitle,
     ContractLevel level,
     Instant entranceInstant,
+    Instant endInstant,
     Duration duration,
     List<DailyExecution> executions,
     String contractBucketKey) {}

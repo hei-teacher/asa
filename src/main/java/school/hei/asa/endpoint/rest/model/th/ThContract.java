@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 public class ThContract {
   String level;
   Instant entranceInstant;
+  Instant endInstant;
   String contractType;
   String actualWorkedDay;
   BigDecimal compensation;

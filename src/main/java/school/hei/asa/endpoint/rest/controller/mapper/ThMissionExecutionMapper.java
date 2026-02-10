@@ -1,7 +1,8 @@
 package school.hei.asa.endpoint.rest.controller.mapper;
 
-import static java.time.ZoneOffset.UTC;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +33,11 @@ public class ThMissionExecutionMapper {
 
   private boolean isExecutedByStudent(Worker worker, MissionExecution me) {
     var contracts = thContractService.getAllContractsForWorker(worker);
+    var dateFormater = DateTimeFormatter.ofPattern("dd MMM yyyy");
     return contracts.stream()
         .filter(
             contract -> {
-              var entranceDate = contract.entranceInstant().atZone(UTC).toLocalDate();
+              var entranceDate = LocalDate.parse(contract.entranceInstant(), dateFormater);
               return entranceDate.isBefore(me.date());
             })
         .max(Comparator.comparing(ThContract::entranceInstant))

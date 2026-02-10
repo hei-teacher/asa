@@ -8,7 +8,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -80,8 +79,7 @@ public class ThContractService {
   private String newEntryFrom(ThContract thContract, Worker worker) {
     String remainingDays = remainingDaysToString(thContract);
     String actualWorkedDays = actualWorkedDaysToString(thContract);
-    String startDate =
-        thContract.entranceInstant().atZone(ZoneId.of("UTC")).toLocalDate().toString();
+    String startDate = thContract.entranceInstant();
     String newEntry =
         String.format(
             "%s,%s,%s,%s,%s,%s,%s",

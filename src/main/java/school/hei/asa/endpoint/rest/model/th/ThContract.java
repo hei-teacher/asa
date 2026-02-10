@@ -1,7 +1,6 @@
 package school.hei.asa.endpoint.rest.model.th;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -11,8 +10,8 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 public class ThContract {
   String level;
-  Instant entranceInstant;
-  Instant endInstant;
+  String entranceInstant;
+  String endInstant;
   String contractType;
   String actualWorkedDay;
   BigDecimal compensation;

@@ -1,69 +1,114 @@
-<!DOCTYPE html>
+<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
+  <head>
     <title>Asa - Contracts</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="flex flex-col min-h-screen bg-gray-50" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<div th:replace="fragments/header :: header"></div>
+  </head>
+  <body
+    class="flex flex-col min-h-screen bg-gray-50"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  >
+    <div th:replace="fragments/header :: header"></div>
 
-<main class="flex-grow flex flex-col items-center px-3 mt-16">
-    <div class="w-2/3 space-y-8">
-
+    <main class="flex-grow flex flex-col items-center px-3 mt-16">
+      <div class="w-2/3 space-y-8">
         <div class="flex justify-between items-center">
-            <div th:replace="fragments/selectors/worker :: apply(work-and-care-calendar, Myself)"></div>
+          <div
+            th:replace="fragments/selectors/worker :: apply(work-and-care-calendar, Myself)"
+          ></div>
         </div>
 
-        <h2 class="text-2xl font-semibold text-center text-gray-800" th:text="'Contracts - ' + ${worker.name()}"></h2>
+        <h2
+          class="text-2xl font-semibold text-center text-gray-800"
+          th:text="'Contracts - ' + ${worker.name()}"
+        ></h2>
 
         <div class="overflow-x-auto">
-            <table class="w-full bg-white shadow-md rounded-xl">
-                <thead>
-                <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal text-center">
-                    <th class="py-3 px-6">Level</th>
-                    <th class="py-3 px-6">Entrance date</th>
-                    <th class="py-3 px-6">Contract Type</th>
-                    <th class="py-3 px-6">Contract Duration</th>
-                    <th class="py-3 px-6">Worked Days</th>
-                    <th class="py-3 px-6">Contract</th>
-                </tr>
-                </thead>
-                <tbody class="text-gray-700 text-sm font-light text-center">
-                <tr th:each="contract : ${contracts}"
-                    class="border-b border-gray-200 hover:bg-gray-50 text-center">
-                    <td class="py-3 px-6 text-center" th:text="${contract.level}"></td>
-                    <td class="py-3 px-6 text-center" th:text="${#dates.format(contract.entranceInstant, 'dd MMM yyyy')}"></td>
-                    <td class="py-3 px-6 text-center" th:text="${contract.contractType}"></td>
-                    <td class="py-3 px-6 text-center" th:text="${contract.duration}"></td>
-                    <td class="py-3 px-6 text-center" th:text="${contract.actualWorkedDay}"></td>
-                    <td class="py-3 px-6 text-center">
-                        <a th:if="${contract.contractBucketKey() != null}"
-                           th:href="@{/download-contract(contractBucketKey=${contract.contractBucketKey()})}"
-                           target="_blank"
-                           class="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-800 text-white font-semibold py-1 px-3 rounded transition">
-                            <i class="material-icons">download</i> Download
-                        </a>
-                        <strong th:if="${contract.contractBucketKey() == null}" class="">No Contract</strong>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+          <table class="w-full bg-white shadow-md rounded-xl">
+            <thead>
+              <tr
+                class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal text-center"
+              >
+                <th class="py-3 px-6">Level</th>
+                <th class="py-3 px-6">Entrance date</th>
+                <th th:if="${firstContractEnded}" class="py-3 px-6">
+                  End date
+                </th>
+                <th class="py-3 px-6">Contract Type</th>
+                <th class="py-3 px-6">Contract Duration</th>
+                <th class="py-3 px-6">Worked Days</th>
+                <th class="py-3 px-6">Contract</th>
+              </tr>
+            </thead>
+            <tbody class="text-gray-700 text-sm font-light text-center">
+              <tr
+                th:each="contract : ${contracts}"
+                class="border-b border-gray-200 hover:bg-gray-50 text-center"
+              >
+                <td
+                  class="py-3 px-6 text-center"
+                  th:text="${contract.level}"
+                ></td>
+                <td
+                  class="py-3 px-6 text-center"
+                  th:text="${contract.entranceInstant}"
+                ></td>
+                <td
+                  th:if="${firstContractEnded}"
+                  class="py-3 px-6 text-center"
+                  th:text="${contract.endInstant}"
+                ></td>
+                <td
+                  class="py-3 px-6 text-center"
+                  th:text="${contract.contractType}"
+                ></td>
+                <td
+                  class="py-3 px-6 text-center"
+                  th:text="${contract.duration}"
+                ></td>
+                <td
+                  class="py-3 px-6 text-center"
+                  th:text="${contract.actualWorkedDay}"
+                ></td>
+                <td class="py-3 px-6 text-center">
+                  <a
+                    th:if="${contract.contractBucketKey() != null}"
+                    th:href="@{/download-contract(contractBucketKey=${contract.contractBucketKey()})}"
+                    target="_blank"
+                    class="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-800 text-white font-semibold py-1 px-3 rounded transition"
+                  >
+                    <i class="material-icons">download</i> Download
+                  </a>
+                  <strong
+                    th:if="${contract.contractBucketKey() == null}"
+                    class=""
+                    >No Contract</strong
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-    </div>
-</main>
+      </div>
+    </main>
 
-<script>
-    function updateFilters() {
+    <script>
+      function updateFilters() {
         const workerCode = document.getElementById("worker").value;
         window.location.href = `/contracts?workerCode=${workerCode}`;
-    }
+      }
 
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("worker").addEventListener("change", updateFilters);
-    });
-</script>
+      document.addEventListener("DOMContentLoaded", function () {
+        document
+          .getElementById("worker")
+          .addEventListener("change", updateFilters);
+      });
+    </script>
 
-<div th:replace="fragments/footer :: footer"></div>
-</body>
+    <div th:replace="fragments/footer :: footer"></div>
+  </body>
 </html>

@@ -35,4 +35,9 @@ public class WorkerRepository {
   public Optional<Worker> findByEmail(String email) {
     return jWorkerRepository.findByEmail(email).map(workerMapper::toDomain);
   }
+
+  @Transactional
+  public List<Worker> activeWorkersFromYear(int year) {
+    return jWorkerRepository.findByYear(year).stream().map(workerMapper::toDomain).toList();
+  }
 }

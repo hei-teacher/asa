@@ -20,7 +20,8 @@ public interface JWorkerRepository extends JpaRepository<JWorker, String> {
       """
 SELECT distinct w FROM JWorker w
 JOIN JContract c ON c.worker = w
-WHERE (EXTRACT(YEAR FROM c.endInstant) >= ?1) or (c.endInstant is null) and (EXTRACT(year from c.entranceInstant) < ?1 +1)
+WHERE ((EXTRACT(YEAR FROM c.endInstant) >= ?1) or (c.endInstant is null))
+AND (EXTRACT(year from c.entranceInstant) < ?1 +1)
 """)
   List<JWorker> findByYear(int year);
 }

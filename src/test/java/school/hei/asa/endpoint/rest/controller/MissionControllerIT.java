@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +49,7 @@ public class MissionControllerIT extends FacadeIT {
     verify(model).addAttribute(eq("products"), any(List.class));
     verify(model).addAttribute(eq("total"), any(Map.class));
     verify(model).addAttribute(eq("worker"), eq(null));
-    verify(model).addAttribute(eq("workers"), any(Stream.class));
+    verify(model).addAttribute(eq("workers"), any(List.class));
     verify(model).addAttribute(eq("workerName"), eq("All workers"));
 
     assertEquals("missions", viewName);

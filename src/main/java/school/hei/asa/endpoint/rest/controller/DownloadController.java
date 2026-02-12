@@ -36,9 +36,11 @@ public class DownloadController {
   public String redirectToPresignedUrlForInvoiceFile(
       Model model, Authentication authentication, @RequestParam String yearMonth) {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
-    var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var pattern = DateTimeFormatter.ofPattern("yyyy-MM");
     var date = YearMonth.parse(yearMonth, pattern);
+
+    model.addAttribute("year", date.getYear());
+    var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var invoiceBucketKey = invoiceService.getInvoiceBucketKey(worker, date);
 
     String presignedUrl =

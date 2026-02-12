@@ -16,8 +16,8 @@ public interface JContractRepository extends JpaRepository<JContract, String> {
       """
       SELECT c FROM JContract c
       WHERE ((EXTRACT(YEAR FROM c.endInstant) >= ?1) or (c.endInstant is null))
-      AND (EXTRACT(year from c.entranceInstant) < ?1 +1)
+      AND (EXTRACT(year from c.entranceInstant) < ?2)
       ORDER BY c.entranceInstant DESC
       """)
-  List<JContract> findByYear(int year);
+  List<JContract> findByYearBetween(int startYear, int endYear);
 }

@@ -37,7 +37,9 @@ public class WorkerRepository {
   }
 
   @Transactional
-  public List<Worker> activeWorkersFromYear(int year) {
-    return jWorkerRepository.findByYear(year).stream().map(workerMapper::toDomain).toList();
+  public List<Worker> findByYearBetween(int startYear, int endYear) {
+    return jWorkerRepository.findByYearBetween(startYear, endYear).stream()
+        .map(workerMapper::toDomain)
+        .toList();
   }
 }

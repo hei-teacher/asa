@@ -33,9 +33,9 @@ public class WorkerService {
   }
 
   public List<Worker> getWorkersFrom(Model model) {
-    Integer year = (Integer) model.getAttribute("year");
     var startYear = getYearFrom(model, "startDate");
     var endYear = getYearFrom(model, "endDate");
+    var year = getYearFrom(startYear, endYear, model);
 
     if (year != null) {
       log.info("fetching workers from {}", year);
@@ -55,5 +55,12 @@ public class WorkerService {
     }
     var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     return LocalDate.parse(String.valueOf(date), formatter).getYear();
+  }
+
+  private Integer getYearFrom(Integer startYear, Integer endYear, Model model) {
+    if (startYear != null && startYear.equals(endYear)) {
+      return startYear;
+    }
+    return (Integer) model.getAttribute("year");
   }
 }

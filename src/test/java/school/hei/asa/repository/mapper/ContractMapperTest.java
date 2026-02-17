@@ -76,6 +76,7 @@ public class ContractMapperTest {
         newInstant(),
         null,
         Duration.ofDays(100),
+        null,
         List.of(de),
         "DUMMY_BUCKET");
   }

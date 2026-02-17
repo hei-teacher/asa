@@ -150,6 +150,7 @@ public class ContractToCasTest {
         toInstant(entranceDate),
         null,
         Duration.ofDays(nbDays),
+        "company",
         mock(List.class),
         "contractBucketKey");
   }
@@ -162,6 +163,7 @@ public class ContractToCasTest {
         toInstant(entranceDate),
         null,
         Duration.ofDays(nbDays),
+        "company",
         mock(List.class),
         "contractBucketKey");
   }

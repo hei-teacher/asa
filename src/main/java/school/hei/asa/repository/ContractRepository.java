@@ -28,4 +28,8 @@ public class ContractRepository {
   public List<Contract> findAll() {
     return contractMapper.toDomain(jContractRepository.findAll());
   }
+
+  public List<Contract> findByYearBetween(int startYear, int endYear) {
+    return contractMapper.toDomain(jContractRepository.findByYearBetween(startYear, endYear));
+  }
 }

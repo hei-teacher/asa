@@ -20,7 +20,8 @@ class FinancialPlanControllerIT extends FacadeIT {
 
   @Test
   void oneMonth_complete_studentContract() {
-    when(contractRepository.findAll()).thenReturn(List.of(studentContract(JAN1_2026, 11, 50_000)));
+    when(contractRepository.findByYear(2026))
+        .thenReturn(List.of(studentContract(JAN1_2026, 11, 50_000)));
 
     var cost = subject.financialPlan(2026);
 

@@ -22,7 +22,7 @@ public class FinancialPlanService {
 
   @Transactional
   public FinancialPlan financialPlan(int year) {
-    var contracts = contractRepository.findAll();
+    var contracts = contractRepository.findByYear(year);
     var contractsToCasSet = new ContractsToCasSet();
     contractsToCasSet.apply(new HashSet<>(contracts));
     return new FinancialPlan(

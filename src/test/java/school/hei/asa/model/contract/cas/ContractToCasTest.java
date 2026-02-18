@@ -148,6 +148,7 @@ public class ContractToCasTest {
         "jobTitle",
         new ContractLevel("level", studentContractor, null, (double) dailyPay),
         toInstant(entranceDate),
+        null,
         Duration.ofDays(nbDays),
         mock(List.class),
         "contractBucketKey");
@@ -159,6 +160,7 @@ public class ContractToCasTest {
         "jobTitle",
         new ContractLevel("level", partnerContractor, null, (double) dailyPay),
         toInstant(entranceDate),
+        null,
         Duration.ofDays(nbDays),
         mock(List.class),
         "contractBucketKey");
@@ -170,6 +172,7 @@ public class ContractToCasTest {
         "jobTitle",
         new ContractLevel("level", fullTimeEmployee, (double) monthlyPay, null),
         toInstant(entranceDate),
+        null,
         null,
         mock(List.class),
         "contractBucketKey");

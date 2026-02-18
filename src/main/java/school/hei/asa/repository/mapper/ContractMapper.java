@@ -36,7 +36,7 @@ public class ContractMapper {
         jContract.getJobTitle(),
         contractLevelMapper.toDomain(jContract),
         entranceInstant,
-        null,
+        jContract.getEndInstant(),
         Duration.ofDays(jContract.getDurationInDays()),
         dailyExecutionRepository.findByWorkerCodeAndDateBetween(
             jContract.getWorker().getCode(), startDate, now()),

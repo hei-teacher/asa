@@ -35,4 +35,11 @@ public class WorkerRepository {
   public Optional<Worker> findByEmail(String email) {
     return jWorkerRepository.findByEmail(email).map(workerMapper::toDomain);
   }
+
+  @Transactional
+  public List<Worker> findByYearBetween(int startYear, int endYear) {
+    return jWorkerRepository.findByYearBetween(startYear, endYear).stream()
+        .map(workerMapper::toDomain)
+        .toList();
+  }
 }

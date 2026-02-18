@@ -28,6 +28,9 @@ public class JContract {
   @Column(name = "entrance_instant", nullable = false)
   private Instant entranceInstant;
 
+  @Column(name = "end_instant")
+  private Instant endInstant;
+
   @Column(name = "job_title")
   private String jobTitle;
 

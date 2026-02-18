@@ -4,7 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static school.hei.asa.model.contract.ContractType.studentContractor;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +19,9 @@ import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.model.th.ThWorker;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Worker;
+import school.hei.asa.model.contract.Contract;
+import school.hei.asa.model.contract.ContractLevel;
+import school.hei.asa.repository.ContractRepository;
 
 class WorkerControllerIT extends FacadeIT {
 
@@ -23,6 +29,7 @@ class WorkerControllerIT extends FacadeIT {
 
   @MockBean WorkerFromAuthentication workerFromAuthentication;
   @MockBean WorkerToModelAdder workerToModelAdder;
+  @MockBean ContractRepository contractRepository;
 
   Authentication authentication;
   Worker authenticatedWorker;
@@ -42,10 +49,15 @@ class WorkerControllerIT extends FacadeIT {
             "nif",
             "stat");
     model = mock(Model.class);
+    var level = new ContractLevel("levelCode", studentContractor, null, 55_556d);
+    var mockContract =
+        new Contract(
+            authenticatedWorker, "DevSecOps", level, Instant.now(), null, null, List.of(), null);
 
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
     when(workerToModelAdder.apply(anyString(), any())).thenReturn(authenticatedWorker);
+    when(contractRepository.findAllByWorker(any())).thenReturn(List.of(mockContract));
   }
 
   @Test

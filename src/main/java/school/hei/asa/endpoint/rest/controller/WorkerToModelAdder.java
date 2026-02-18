@@ -1,28 +1,32 @@
 package school.hei.asa.endpoint.rest.controller;
 
-import static java.util.Comparator.comparing;
-
 import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import school.hei.asa.model.Worker;
-import school.hei.asa.repository.WorkerRepository;
+import school.hei.asa.service.WorkerService;
 
+@Slf4j
 @Component
 @AllArgsConstructor
 public class WorkerToModelAdder implements BiFunction<String, Model, Worker> {
 
-  private final WorkerRepository workerRepository;
+  private final WorkerService workerService;
 
   @Override
   public Worker apply(String workerCode, Model model) {
     var worker =
-        workerCode == null || workerCode.isBlank() ? null : workerRepository.findByCode(workerCode);
+        workerCode == null || workerCode.isBlank()
+            ? null
+            : workerService.findWorkerByCode(workerCode);
+    var workers = workerService.getWorkersFrom(model);
+    log.info(
+        "there are {} workers = {}", workers.size(), workers.stream().map(Worker::name).toList());
     model.addAttribute("worker", worker);
     model.addAttribute("workerName", worker == null ? "All workers" : worker.name());
-    model.addAttribute(
-        "workers", workerRepository.findAll().stream().sorted(comparing(Worker::name)));
+    model.addAttribute("workers", workers);
     return worker;
   }
 }

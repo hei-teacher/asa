@@ -76,10 +76,14 @@ public class WorkerController {
 
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var contracts = thContractMapper.toTh(contractRepository.findAllByWorker(worker));
+    var hasMultipleContracts = contracts.size() > 1;
+    var firstContractEnded =
+        hasMultipleContracts || !contracts.getFirst().entranceInstant().equals("-");
 
     model.addAttribute("worker", worker);
     model.addAttribute("workerCode", workerCodeOrAuth);
     model.addAttribute("contracts", contracts);
+    model.addAttribute("firstContractEnded", firstContractEnded);
     return "contracts";
   }
 }

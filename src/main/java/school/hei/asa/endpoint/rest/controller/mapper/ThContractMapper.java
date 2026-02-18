@@ -1,14 +1,17 @@
 package school.hei.asa.endpoint.rest.controller.mapper;
 
+import static java.time.ZoneId.systemDefault;
 import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
 
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.endpoint.rest.model.th.ThContract;
@@ -17,6 +20,7 @@ import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.service.MissionService;
 
+@Slf4j
 @AllArgsConstructor
 @Component
 public class ThContractMapper {
@@ -25,10 +29,12 @@ public class ThContractMapper {
   private final MissionService missionService;
 
   public List<ThContract> toTh(List<Contract> contracts) {
+    log.info("mapping contracts to Th...");
     List<ThContract> result = new ArrayList<>();
 
     contracts.forEach(
         current -> {
+          log.info("mapping {} for {}", current.level().code(), current.worker().name());
           var contractLevel = current.level();
           var contractType = thWorkerMapper.toWorkerType(contractLevel.type().name());
           var executedDays = executedDays(current.executions());
@@ -37,10 +43,19 @@ public class ThContractMapper {
                 case partnerContractor, studentContractor -> contractLevel.dailyPay();
                 case fullTimeEmployee -> contractLevel.monthlyPay();
               };
+          var dateFormater = DateTimeFormatter.ofPattern("dd MMM yyyy");
+          log.info("entrance date = {}", current.entranceInstant());
+          var entranceDate =
+              dateFormater.format(current.entranceInstant().atZone(systemDefault()).toLocalDate());
+          var endDate =
+              current.endInstant() == null
+                  ? "-"
+                  : dateFormater.format(current.endInstant().atZone(systemDefault()).toLocalDate());
           result.add(
               new ThContract(
                   contractLevel.code(),
-                  current.entranceInstant(),
+                  entranceDate,
+                  endDate,
                   contractType,
                   executedDays,
                   BigDecimal.valueOf(compensation),
@@ -48,6 +63,7 @@ public class ThContractMapper {
                   current.duration() == null ? "-" : current.duration().toDays() + "",
                   current.contractBucketKey()));
         });
+    log.info("Successfully mapping contracts to Th !");
 
     return result;
   }
@@ -67,25 +83,26 @@ public class ThContractMapper {
     if (executions.isEmpty()) {
       return "-";
     }
-    return executions.stream()
-        .map(
-            dailyExecution -> {
-              var type = dailyExecution.type(careProductCodeSupplier.get());
-              if (type.equals(fullWork)) {
-                return 1.0d;
-              } else if (type.equals(fullCare)) {
-                return 0.0d;
-              }
-              return dailyExecution.executions().stream()
-                  .map(
-                      me -> {
-                        return missionService.isUnpaidCare(me) ? 0.0d : me.dayPercentage();
-                      })
-                  .reduce(Double::sum)
-                  .get();
-            })
-        .reduce(Double::sum)
-        .get()
-        .toString();
+    var result =
+        executions.stream()
+            .map(
+                dailyExecution -> {
+                  var type = dailyExecution.type(careProductCodeSupplier.get());
+                  if (type.equals(fullWork)) {
+                    return 1.0d;
+                  } else if (type.equals(fullCare)) {
+                    return 0.0d;
+                  }
+                  return dailyExecution.executions().stream()
+                      .map(
+                          me -> {
+                            return missionService.isUnpaidCare(me) ? 0.0d : me.dayPercentage();
+                          })
+                      .reduce(Double::sum)
+                      .get();
+                })
+            .reduce(Double::sum)
+            .get();
+    return String.format("%.1f", result);
   }
 }

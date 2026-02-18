@@ -63,7 +63,12 @@ public class ContractCas extends Cas {
     var compteWorker = new Compte(contract.toString(), entranceDate(), new Argent(0, devise));
 
     try {
-      payAllMonths(compteWorker);
+      var contractType = contract.level().type();
+      switch (contractType) {
+        case partnerContractor, studentContractor -> payContractorAllMonths(compteWorker);
+        case fullTimeEmployee -> payFTEAllMonths(compteWorker);
+        default -> throw new RuntimeException("Unsupported contract type: " + contractType);
+      }
     } catch (Exception e) {
       koContracts.put(contract, e);
     }
@@ -71,42 +76,62 @@ public class ContractCas extends Cas {
     return Set.of(compteWorker);
   }
 
+  private void payFTEAllMonths(Compte compteWorker) {
+    var entranceDate = entranceDate();
+    if (entranceDate.getDayOfMonth() != 1) {
+      log.warn(
+          "Contract does not start at 1st of month."
+              + "No ratio will be paid: assigned cost will be that of a full month."
+              + "Contract={}",
+          contract.ppId());
+    }
+
+    new TransfertArgent(
+        contract.ppId(),
+        compteCompany,
+        compteWorker,
+        LocalDate.of(entranceDate.getYear(), entranceDate.getMonthValue(), 1).plusMonths(1),
+        entranceDate().plusYears(99), // TODO: check end when Contract.endDate is added,
+        PAY_DAY,
+        new Argent(contract.level().monthlyPay(), devise));
+  }
+
   @Override
   protected void suivi() {}
 
-  private void payAllMonths(Compte compteWorker) {
+  private void payContractorAllMonths(Compte compteWorker) {
     // First month, potentially partial
-    var daysToPayMonth1 = daysToPayMonth1();
-    payMonthNth(1, compteWorker, daysToPayMonth1);
+    var daysToPayMonth1 = contractorDaysToPayMonth1();
+    payContractorMonthNth(1, compteWorker, daysToPayMonth1);
 
     // Intermediate months, all full
     var remainingDays = contract.duration().toDays() - daysToPayMonth1;
     var monthNth = 2;
     var daysPerMonth = contractTypeToDaysPerMonth.apply(contract.level().type());
     while (remainingDays > daysPerMonth) {
-      payMonthNth(monthNth, compteWorker, daysPerMonth);
+      payContractorMonthNth(monthNth, compteWorker, daysPerMonth);
       remainingDays -= daysPerMonth;
       monthNth++;
     }
 
     // Last month, potentially partial
-    payMonthNth(monthNth, compteWorker, remainingDays);
+    payContractorMonthNth(monthNth, compteWorker, remainingDays);
   }
 
-  private void payMonthNth(int monthNth, Compte compteWorker, double daysToPay) {
+  private void payContractorMonthNth(int monthNth, Compte compteWorker, double daysToPay) {
     var entranceDate = entranceDate();
     var payDateOfMonth0 =
         LocalDate.of(entranceDate.getYear(), entranceDate.getMonthValue(), PAY_DAY);
 
     new TransfertArgent(
-        String.format("[Mois %s] %s", monthNth, contract),
+        String.format("[Mois %s] %s", monthNth, contract.ppId()),
         compteCompany,
         compteWorker,
-        payDateOfMonth0.plusMonths(monthNth),
+        payDateOfMonth0.plusMonths(monthNth), // TODO: emit warn if > Contract.endDate when added
         new Argent(contract.level().dailyPay() * daysToPay, devise));
   }
 
-  private int daysToPayMonth1() {
+  private int contractorDaysToPayMonth1() {
     var contractLevel = contract.level();
     var daysToWorkPerMonth = contractTypeToDaysPerMonth.apply(contractLevel.type());
 

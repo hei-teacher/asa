@@ -9,6 +9,7 @@ import static java.time.Month.MARCH;
 import static java.time.Month.MAY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static school.hei.asa.model.contract.ContractType.fullTimeEmployee;
 import static school.hei.asa.model.contract.ContractType.partnerContractor;
 import static school.hei.asa.model.contract.ContractType.studentContractor;
 
@@ -49,6 +50,27 @@ public class ContractToCasTest {
 
     assertEquals(
         new Argent(-550_000, MGA), compteCompany.projectionFuture(DEC31_2026).valeurComptable());
+  }
+
+  @Test
+  void oneYear_fteContract() {
+    var contract = fteContract(JAN1_2026, 500_000);
+
+    var compteCompany = new Compte("Compte-company", JAN1_2026, new Argent(0, MGA));
+    var cas = new ContractToCas(compteCompany, MGA, Map.of()).apply(contract);
+
+    assertEquals(
+        new Argent(0, MGA),
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 4)).getValeurComptable());
+    assertEquals(
+        new Argent(500_000, MGA),
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 5)).getValeurComptable());
+    assertEquals(
+        new Argent(5_500_000, MGA),
+        cas.patrimoine().projectionFuture(DEC31_2026).getValeurComptable());
+
+    assertEquals(
+        new Argent(-5_500_000, MGA), compteCompany.projectionFuture(DEC31_2026).valeurComptable());
   }
 
   @Test
@@ -140,6 +162,18 @@ public class ContractToCasTest {
         toInstant(entranceDate),
         null,
         Duration.ofDays(nbDays),
+        mock(List.class),
+        "contractBucketKey");
+  }
+
+  static Contract fteContract(LocalDate entranceDate, int monthlyPay) {
+    return new Contract(
+        mock(Worker.class),
+        "jobTitle",
+        new ContractLevel("level", fullTimeEmployee, (double) monthlyPay, null),
+        toInstant(entranceDate),
+        null,
+        null,
         mock(List.class),
         "contractBucketKey");
   }

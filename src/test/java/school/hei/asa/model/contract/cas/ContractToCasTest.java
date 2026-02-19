@@ -176,6 +176,7 @@ public class ContractToCasTest {
         toInstant(entranceDate),
         null,
         null,
+        "company",
         mock(List.class),
         "contractBucketKey");
   }

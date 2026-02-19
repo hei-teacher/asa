@@ -13,6 +13,7 @@ public record Contract(
     Instant entranceInstant,
     Instant endInstant,
     Duration duration,
+    String company,
     List<DailyExecution> executions,
     String contractBucketKey) {
   public String ppId() {

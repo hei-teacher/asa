@@ -15,6 +15,7 @@ public class ThContract {
   String contractType;
   String actualWorkedDay;
   BigDecimal compensation;
+  String company;
   String jobTitle;
   String duration;
   String contractBucketKey;

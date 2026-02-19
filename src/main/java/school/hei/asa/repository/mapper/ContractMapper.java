@@ -38,6 +38,7 @@ public class ContractMapper {
         entranceInstant,
         jContract.getEndInstant(),
         Duration.ofDays(jContract.getDurationInDays()),
+        jContract.getCompany(),
         dailyExecutionRepository.findByWorkerCodeAndDateBetween(
             jContract.getWorker().getCode(), startDate, now()),
         jContract.getContractBucketKey());

@@ -13,6 +13,7 @@
         id="year"
         name="year"
         class="w-64 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#9933CC] focus:outline-none"
+        onchange="updateFilters()"
       >
         <option
           th:text="${currentYear -1}"

@@ -13,6 +13,7 @@
         id="worker"
         name="workerCode"
         class="w-64 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#9933CC] focus:outline-none"
+        onchange="updateFilters()"
       >
         <option
           th:text="${defaultOption}"
@@ -31,12 +32,4 @@
   </div>
 
   <div th:replace="fragments/selectors/year :: apply(targetEndpoint)"></div>
-
-  <button
-    class="cursor-pointer bg-[#2D2D5A] hover:bg-[#4D4D7A] self-end text-white py-2 px-4 rounded shadow h-1/2"
-    type="button"
-    onclick="updateFilters()"
-  >
-    Update Filters
-  </button>
 </form>

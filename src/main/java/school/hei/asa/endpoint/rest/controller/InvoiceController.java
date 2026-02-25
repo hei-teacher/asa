@@ -95,11 +95,9 @@ public class InvoiceController {
       Authentication authentication,
       @ModelAttribute ThInvoiceForm invoiceForm,
       @Value("${ACCOUNTANTS}") List<String> accountants) {
-
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var invoice = thInvoiceService.extractInvoice(worker, invoiceForm);
-
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();
     log.info("invoice id : {}", invoice.invoiceData().id());
@@ -123,7 +121,6 @@ public class InvoiceController {
                   }
                 })
             .toList();
-
     var email =
         new Email(
             new InternetAddress(emailAddress),
@@ -138,7 +135,6 @@ public class InvoiceController {
             List.of(pdfFile));
     log.info("sending mail copies...");
     mailer.accept(email);
-
     return ResponseEntity.ok()
         .header(CONTENT_DISPOSITION, "attachment; filename=" + fileName)
         .contentType(APPLICATION_PDF)

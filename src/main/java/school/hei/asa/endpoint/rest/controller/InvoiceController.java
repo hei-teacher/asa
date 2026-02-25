@@ -90,7 +90,7 @@ public class InvoiceController {
 
   @SneakyThrows
   @GetMapping("/invoice/generate")
-  public ResponseEntity<byte[]> downloadInvoicePDF(
+  public ResponseEntity<byte[]> generateInvoice(
       Model model,
       Authentication authentication,
       @ModelAttribute ThInvoiceForm invoiceForm,

@@ -111,7 +111,7 @@ public class InvoiceController {
     log.info("fileName = {}", fileName);
     bucketComponent.upload(pdfFile, INVOICES_FOLDER + fileName);
     var emailAddress = accountants.getFirst();
-    accountants.remove(emailAddress);
+    accountants.removeFirst();
     var accountantsEmails =
         accountants.stream()
             .map(
@@ -130,10 +130,8 @@ public class InvoiceController {
             accountantsEmails,
             List.of(),
             String.format(
-                "ASA INVOICE GENERATED - %s - %s"
-                    + worker.name()
-                    + " - "
-                    + invoice.invoiceData().yearMonth()),
+                "ASA INVOICE GENERATED - %s - %s",
+                worker.name(), " - ", invoice.invoiceData().yearMonth()),
             String.format(
                 "Bonjour, \n Voici la facture generé de %s , du mois de %s. \n Cordialement,",
                 worker.name(), invoice.invoiceData().yearMonth()),

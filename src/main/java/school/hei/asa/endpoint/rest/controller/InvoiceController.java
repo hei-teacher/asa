@@ -4,13 +4,17 @@ import static java.time.LocalDate.now;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
 import java.io.File;
 import java.io.FileInputStream;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +29,8 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.InvoicePDFGenerator;
 import school.hei.asa.endpoint.rest.service.ThInvoiceService;
 import school.hei.asa.file.bucket.BucketComponent;
+import school.hei.asa.mail.Email;
+import school.hei.asa.mail.Mailer;
 import school.hei.asa.service.InvoiceService;
 
 @Slf4j
@@ -39,6 +45,7 @@ public class InvoiceController {
   private final BucketComponent bucketComponent;
   private final ThInvoiceService thInvoiceService;
   private static final String INVOICES_FOLDER = "invoices/";
+  private final Mailer mailer;
 
   @GetMapping("/invoice")
   public String getInvoicePage(
@@ -84,7 +91,11 @@ public class InvoiceController {
   @SneakyThrows
   @GetMapping("/invoice/generate")
   public ResponseEntity<byte[]> downloadInvoicePDF(
-      Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
+      Model model,
+      Authentication authentication,
+      @ModelAttribute ThInvoiceForm invoiceForm,
+      @Value("${ACCOUNTANTS}") List<String> accountants) {
+
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var invoice = thInvoiceService.extractInvoice(worker, invoiceForm);
@@ -99,6 +110,29 @@ public class InvoiceController {
     log.info("uploading...");
     log.info("fileName = {}", fileName);
     bucketComponent.upload(pdfFile, INVOICES_FOLDER + fileName);
+    var emailAddress = accountants.getFirst();
+    accountants.remove(emailAddress);
+
+    var email =
+        new Email(
+            new InternetAddress(emailAddress),
+            accountants.stream()
+                .map(
+                    mail -> {
+                      try {
+                        return new InternetAddress(mail);
+                      } catch (AddressException e) {
+                        throw new RuntimeException(e);
+                      }
+                    })
+                .toList(),
+            List.of(),
+            "TEST - SENDING EMAIL WITH POJA ",
+            "Hello world, if you received this means I did great u.u",
+            List.of(pdfFile));
+
+    mailer.accept(email);
+    log.info("sending mail copies...");
 
     return ResponseEntity.ok()
         .header(CONTENT_DISPOSITION, "attachment; filename=" + fileName)

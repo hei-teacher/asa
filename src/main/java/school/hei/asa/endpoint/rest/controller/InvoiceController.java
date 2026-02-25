@@ -112,27 +112,34 @@ public class InvoiceController {
     bucketComponent.upload(pdfFile, INVOICES_FOLDER + fileName);
     var emailAddress = accountants.getFirst();
     accountants.remove(emailAddress);
+    var accountantsEmails =
+        accountants.stream()
+            .map(
+                mail -> {
+                  try {
+                    return new InternetAddress(mail);
+                  } catch (AddressException e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .toList();
 
     var email =
         new Email(
             new InternetAddress(emailAddress),
-            accountants.stream()
-                .map(
-                    mail -> {
-                      try {
-                        return new InternetAddress(mail);
-                      } catch (AddressException e) {
-                        throw new RuntimeException(e);
-                      }
-                    })
-                .toList(),
+            accountantsEmails,
             List.of(),
-            "ASA INVOICE GENERATED - " + worker.name(),
-            "",
+            String.format(
+                "ASA INVOICE GENERATED - %s - %s"
+                    + worker.name()
+                    + " - "
+                    + invoice.invoiceData().yearMonth()),
+            String.format(
+                "Bonjour, \n Voici la facture generé de %s , du mois de %s. \n Cordialement,",
+                worker.name(), invoice.invoiceData().yearMonth()),
             List.of(pdfFile));
-
-    mailer.accept(email);
     log.info("sending mail copies...");
+    mailer.accept(email);
 
     return ResponseEntity.ok()
         .header(CONTENT_DISPOSITION, "attachment; filename=" + fileName)

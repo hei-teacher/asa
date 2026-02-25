@@ -127,7 +127,7 @@ public class InvoiceController {
                     })
                 .toList(),
             List.of(),
-            "TEST - SENDING EMAIL WITH POJA ",
+            "ASA INVOICE GENERATED - " + worker.name(),
             "Hello world, if you received this means I did great u.u",
             List.of(pdfFile));
 

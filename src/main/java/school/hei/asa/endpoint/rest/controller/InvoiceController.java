@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -89,7 +88,7 @@ public class InvoiceController {
       Model model,
       Authentication authentication,
       @ModelAttribute ThInvoiceForm invoiceForm,
-      @Value("${ACCOUNTANTS}") List<String> accountants) {
+      @Value("${ACCOUNTANTS}") String accountants) {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
     var invoice = thInvoiceService.extractInvoice(worker, invoiceForm);

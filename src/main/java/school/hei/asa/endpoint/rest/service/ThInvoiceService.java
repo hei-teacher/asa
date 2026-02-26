@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.time.Month;
 import java.time.YearMonth;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.EnumSet;
 import java.util.List;
@@ -17,12 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
+import school.hei.asa.endpoint.event.EventProducer;
+import school.hei.asa.endpoint.event.model.SendEmailRequested;
 import school.hei.asa.endpoint.rest.controller.mapper.ThInvoiceFormMapper;
 import school.hei.asa.endpoint.rest.model.th.ThInvoice;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.endpoint.rest.model.th.ThMonthInvoiceStatus;
 import school.hei.asa.mail.Email;
-import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.InvoiceService;
 
@@ -33,7 +35,7 @@ public class ThInvoiceService {
   private final InvoiceService invoiceService;
   private final ThInvoiceFormMapper thInvoiceFormMapper;
   private final InvoicePDFGenerator invoicePDFGenerator;
-  private final Mailer mailer;
+  private final EventProducer<SendEmailRequested> eventProducer;
 
   public String generateInvoiceFileName(Worker worker) {
     return invoiceService.generateInvoiceFileName(worker);
@@ -79,11 +81,12 @@ public class ThInvoiceService {
   }
 
   @SneakyThrows
-  public void sendInvoiceCopy(String workerName, List<String> receivers, String month, File file) {
-    var emailAddress = new InternetAddress(receivers.getFirst());
-    receivers.removeFirst();
+  public void sendInvoiceCopy(String workerName, String receivers, String month, File file) {
+    var emails = Arrays.stream(receivers.split(",")).toList();
+    var emailAddress = new InternetAddress(emails.getFirst());
+    emails.removeFirst();
     var accountantsEmails =
-        receivers.stream()
+        emails.stream()
             .map(
                 mail -> {
                   try {
@@ -103,6 +106,7 @@ public class ThInvoiceService {
                 "Bonjour, \n Voici la facture generé de %s , du mois de %s. \n Cordialement,",
                 workerName, month),
             List.of(file));
-    mailer.accept(email);
+    var event = SendEmailRequested.builder().email(email).build();
+    eventProducer.accept(List.of(event));
   }
 }

@@ -4,8 +4,6 @@ import static java.time.LocalDate.now;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
-import jakarta.mail.internet.AddressException;
-import jakarta.mail.internet.InternetAddress;
 import java.io.File;
 import java.io.FileInputStream;
 import java.time.YearMonth;
@@ -29,8 +27,6 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.InvoicePDFGenerator;
 import school.hei.asa.endpoint.rest.service.ThInvoiceService;
 import school.hei.asa.file.bucket.BucketComponent;
-import school.hei.asa.mail.Email;
-import school.hei.asa.mail.Mailer;
 import school.hei.asa.service.InvoiceService;
 
 @Slf4j
@@ -45,7 +41,6 @@ public class InvoiceController {
   private final BucketComponent bucketComponent;
   private final ThInvoiceService thInvoiceService;
   private static final String INVOICES_FOLDER = "invoices/";
-  private final Mailer mailer;
 
   @GetMapping("/invoice")
   public String getInvoicePage(
@@ -108,33 +103,11 @@ public class InvoiceController {
     log.info("uploading...");
     log.info("fileName = {}", fileName);
     bucketComponent.upload(pdfFile, INVOICES_FOLDER + fileName);
-    var emailAddress = accountants.getFirst();
-    accountants.removeFirst();
-    var accountantsEmails =
-        accountants.stream()
-            .map(
-                mail -> {
-                  try {
-                    return new InternetAddress(mail);
-                  } catch (AddressException e) {
-                    throw new RuntimeException(e);
-                  }
-                })
-            .toList();
-    var email =
-        new Email(
-            new InternetAddress(emailAddress),
-            accountantsEmails,
-            List.of(),
-            String.format(
-                "ASA INVOICE GENERATED - %s - %s",
-                worker.name(), " - ", invoice.invoiceData().yearMonth()),
-            String.format(
-                "Bonjour, \n Voici la facture generé de %s , du mois de %s. \n Cordialement,",
-                worker.name(), invoice.invoiceData().yearMonth()),
-            List.of(pdfFile));
+
     log.info("sending mail copies...");
-    mailer.accept(email);
+    thInvoiceService.sendInvoiceCopy(
+        worker.name(), accountants, invoice.invoiceData().yearMonth(), pdfFile);
+
     return ResponseEntity.ok()
         .header(CONTENT_DISPOSITION, "attachment; filename=" + fileName)
         .contentType(APPLICATION_PDF)

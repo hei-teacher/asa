@@ -1,5 +1,7 @@
 package school.hei.asa.endpoint.rest.service;
 
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,6 +21,8 @@ import school.hei.asa.endpoint.rest.controller.mapper.ThInvoiceFormMapper;
 import school.hei.asa.endpoint.rest.model.th.ThInvoice;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.endpoint.rest.model.th.ThMonthInvoiceStatus;
+import school.hei.asa.mail.Email;
+import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.InvoiceService;
 
@@ -29,6 +33,7 @@ public class ThInvoiceService {
   private final InvoiceService invoiceService;
   private final ThInvoiceFormMapper thInvoiceFormMapper;
   private final InvoicePDFGenerator invoicePDFGenerator;
+  private final Mailer mailer;
 
   public String generateInvoiceFileName(Worker worker) {
     return invoiceService.generateInvoiceFileName(worker);
@@ -71,5 +76,33 @@ public class ThInvoiceService {
       log.info("successfully extracted invoiceData");
       return new ThInvoice(base64Image, thInvoiceData);
     }
+  }
+
+  @SneakyThrows
+  public void sendInvoiceCopy(String workerName, List<String> receivers, String month, File file) {
+    var emailAddress = new InternetAddress(receivers.getFirst());
+    receivers.removeFirst();
+    var accountantsEmails =
+        receivers.stream()
+            .map(
+                mail -> {
+                  try {
+                    return new InternetAddress(mail);
+                  } catch (AddressException e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .toList();
+    Email email =
+        new Email(
+            emailAddress,
+            accountantsEmails,
+            List.of(),
+            String.format("ASA INVOICE GENERATED - %s - %s", workerName, month),
+            String.format(
+                "Bonjour, \n Voici la facture generé de %s , du mois de %s. \n Cordialement,",
+                workerName, month),
+            List.of(file));
+    mailer.accept(email);
   }
 }

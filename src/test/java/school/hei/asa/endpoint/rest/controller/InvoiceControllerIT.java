@@ -19,7 +19,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.ui.Model;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
@@ -68,7 +67,6 @@ class InvoiceControllerIT extends FacadeIT {
         .thenReturn(Optional.of(authenticatedWorker));
     when(workerToModelAdder.apply(anyString(), any())).thenReturn(authenticatedWorker);
     when(bankAccountRepository.findByWorkerCode("worker-code")).thenReturn(bankAccount);
-    ReflectionTestUtils.setField(invoiceController, "accountants", "test@test.com");
   }
 
   @Test
@@ -127,8 +125,7 @@ class InvoiceControllerIT extends FacadeIT {
     verify(bucketComponent, times(1)).upload(eq(fakeFile), anyString());
     verify(thInvoiceService, times(1)).saveInvoiceReference(any(), any());
     verify(thInvoiceService, times(1))
-        .sendInvoiceCopy(anyString(), eq("dummy,dummee"), anyString(), eq(fakeFile));
-
+        .sendInvoiceCopy(anyString(), eq("test@test.com"), anyString(), eq(fakeFile));
     fakeFile.deleteOnExit();
   }
 }

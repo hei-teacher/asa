@@ -6,20 +6,32 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.OK;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Optional;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.ui.Model;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
+import school.hei.asa.endpoint.rest.service.InvoicePDFGenerator;
+import school.hei.asa.endpoint.rest.service.ThInvoiceService;
+import school.hei.asa.file.bucket.BucketComponent;
 import school.hei.asa.model.BankAccount;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.BankAccountRepository;
 
+@SpringBootTest(properties = {"ACCOUNTANTS=test@test.com"})
 class InvoiceControllerIT extends FacadeIT {
 
   @Autowired InvoiceController invoiceController;
@@ -27,8 +39,11 @@ class InvoiceControllerIT extends FacadeIT {
   @MockBean WorkerFromAuthentication workerFromAuthentication;
   @MockBean WorkerToModelAdder workerToModelAdder;
   @MockBean BankAccountRepository bankAccountRepository;
-
+  @MockBean BucketComponent bucketComponent;
+  @MockBean InvoicePDFGenerator invoicePDFGenerator;
+  @MockBean ThInvoiceService thInvoiceService;
   Authentication authentication;
+
   Worker authenticatedWorker;
   Model model;
   BankAccount bankAccount;
@@ -53,6 +68,7 @@ class InvoiceControllerIT extends FacadeIT {
         .thenReturn(Optional.of(authenticatedWorker));
     when(workerToModelAdder.apply(anyString(), any())).thenReturn(authenticatedWorker);
     when(bankAccountRepository.findByWorkerCode("worker-code")).thenReturn(bankAccount);
+    ReflectionTestUtils.setField(invoiceController, "accountants", "test@test.com");
   }
 
   @Test
@@ -73,5 +89,48 @@ class InvoiceControllerIT extends FacadeIT {
 
     assertEquals(OK, invoicePreview.getStatusCode());
     assertTrue(invoicePreview.hasBody());
+  }
+
+  @Test
+  void can_send_invoice_when_generated() throws IOException {
+    File fakeFile = File.createTempFile("temp", ".pdf");
+    Files.write(fakeFile.toPath(), new byte[] {1, 2, 3});
+
+    when(invoicePDFGenerator.apply(any(Worker.class), any(), any())).thenReturn(fakeFile);
+
+    var invoiceForm =
+        new ThInvoiceForm(
+            "inv-001", // id
+            "2025-08", // yearMonth
+            "ref-001", // reference
+            "2025-09-03", // issueDate
+            "Invoice for project X", // description
+            "2", // quantity
+            "500", // unitPrice
+            "1000", // amount
+            false, // hasUpgradedLevel
+            "Extra desc", // extraDescription
+            "1", // extraQuantity
+            "200", // extraUnitPrice
+            "200", // extraAmount
+            "1200", // total
+            "1200", // parsedAmount
+            "FR761234567890" // rib
+            );
+
+    var response =
+        invoiceController.generateInvoice(model, authentication, invoiceForm, "dummy,dummee");
+
+    Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+    Assertions.assertEquals(MediaType.APPLICATION_PDF, response.getHeaders().getContentType());
+    Assertions.assertNotNull(response.getBody());
+    Assertions.assertTrue(response.getBody().length > 0);
+
+    verify(bucketComponent, times(1)).upload(eq(fakeFile), anyString());
+    verify(thInvoiceService, times(1)).saveInvoiceReference(any(), any());
+    verify(thInvoiceService, times(1))
+        .sendInvoiceCopy(anyString(), eq("dummy,dummee"), anyString(), eq(fakeFile));
+
+    fakeFile.deleteOnExit();
   }
 }

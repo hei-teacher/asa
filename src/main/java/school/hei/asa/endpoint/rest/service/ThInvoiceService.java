@@ -82,11 +82,12 @@ public class ThInvoiceService {
 
   @SneakyThrows
   public void sendInvoiceCopy(String workerName, String receivers, String month, File file) {
-    var emails = Arrays.stream(receivers.split(",")).toList();
-    var emailAddress = new InternetAddress(emails.getFirst());
-    emails.removeFirst();
+
+      var listEmails = Arrays.stream(receivers.split(",")).toList();
+    var emailAddress = new InternetAddress(listEmails.getFirst());
+    listEmails.removeFirst();
     var accountantsEmails =
-        emails.stream()
+        listEmails.stream()
             .map(
                 mail -> {
                   try {

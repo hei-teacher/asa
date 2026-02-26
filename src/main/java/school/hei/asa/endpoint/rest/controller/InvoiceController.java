@@ -41,7 +41,7 @@ public class InvoiceController {
   private final ThInvoiceService thInvoiceService;
   private static final String INVOICES_FOLDER = "invoices/";
 
-  @Value("${ACCOUNTANTS}")
+  @Value("${ACCOUNTANTS:}")
   String accountants;
 
   @GetMapping("/invoice")

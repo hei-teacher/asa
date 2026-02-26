@@ -67,6 +67,7 @@ class InvoiceControllerIT extends FacadeIT {
         .thenReturn(Optional.of(authenticatedWorker));
     when(workerToModelAdder.apply(anyString(), any())).thenReturn(authenticatedWorker);
     when(bankAccountRepository.findByWorkerCode("worker-code")).thenReturn(bankAccount);
+    when(authentication.getName()).thenReturn("test@test.com");
   }
 
   @Test

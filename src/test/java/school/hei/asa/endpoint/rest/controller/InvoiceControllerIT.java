@@ -100,26 +100,24 @@ class InvoiceControllerIT extends FacadeIT {
 
     var invoiceForm =
         new ThInvoiceForm(
-            "inv-001", // id
-            "2025-08", // yearMonth
-            "ref-001", // reference
-            "2025-09-03", // issueDate
-            "Invoice for project X", // description
-            "2", // quantity
-            "500", // unitPrice
-            "1000", // amount
-            false, // hasUpgradedLevel
-            "Extra desc", // extraDescription
-            "1", // extraQuantity
-            "200", // extraUnitPrice
-            "200", // extraAmount
-            "1200", // total
-            "1200", // parsedAmount
-            "FR761234567890" // rib
-            );
+            "inv-001",
+            "2025-08",
+            "ref-001",
+            "2025-09-03",
+            "Invoice for project X",
+            "2",
+            "500",
+            "1000",
+            false,
+            "Extra desc",
+            "1",
+            "200",
+            "200",
+            "1200",
+            "1200",
+            "FR761234567890");
 
-    var response =
-        invoiceController.generateInvoice(model, authentication, invoiceForm, "dummy,dummee");
+    var response = invoiceController.generateInvoice(model, authentication, invoiceForm);
 
     Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
     Assertions.assertEquals(MediaType.APPLICATION_PDF, response.getHeaders().getContentType());

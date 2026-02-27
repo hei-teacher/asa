@@ -48,7 +48,7 @@ public class InvoiceController {
       InvoiceService invoiceService,
       BucketComponent bucketComponent,
       ThInvoiceService thInvoiceService,
-      @Value("ACCOUNTANTS") String accountants) {
+      @Value("${ACCOUNTANTS}") String accountants) {
     this.workerFromAuthentication = workerFromAuthentication;
     this.workerToModelAdder = workerToModelAdder;
     this.invoicePDFGenerator = invoicePDFGenerator;

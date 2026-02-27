@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,7 @@ import school.hei.asa.service.InvoiceService;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 public class InvoiceController {
 
   private final WorkerFromAuthentication workerFromAuthentication;
@@ -39,24 +41,8 @@ public class InvoiceController {
   private final ThInvoiceService thInvoiceService;
   private static final String INVOICES_FOLDER = "invoices/";
 
+  @Value("${ACCOUNTANTS}")
   private String accountants;
-
-  public InvoiceController(
-      WorkerFromAuthentication workerFromAuthentication,
-      WorkerToModelAdder workerToModelAdder,
-      InvoicePDFGenerator invoicePDFGenerator,
-      InvoiceService invoiceService,
-      BucketComponent bucketComponent,
-      ThInvoiceService thInvoiceService,
-      @Value("${ACCOUNTANTS}") String accountants) {
-    this.workerFromAuthentication = workerFromAuthentication;
-    this.workerToModelAdder = workerToModelAdder;
-    this.invoicePDFGenerator = invoicePDFGenerator;
-    this.invoiceService = invoiceService;
-    this.bucketComponent = bucketComponent;
-    this.thInvoiceService = thInvoiceService;
-    this.accountants = accountants;
-  }
 
   @GetMapping("/invoice")
   public String getInvoicePage(

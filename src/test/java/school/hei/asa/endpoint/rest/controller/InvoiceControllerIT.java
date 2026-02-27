@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import school.hei.asa.conf.FacadeIT;
+import school.hei.asa.endpoint.rest.model.th.ThInvoice;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.InvoicePDFGenerator;
@@ -97,6 +98,16 @@ class InvoiceControllerIT extends FacadeIT {
 
     when(invoicePDFGenerator.apply(any(Worker.class), any(), any())).thenReturn(fakeFile);
 
+    var fakeInvoiceData = mock(ThInvoice.class);
+    when(fakeInvoiceData.invoiceData().id()).thenReturn("inv-001");
+    when(fakeInvoiceData.invoiceData().yearMonth()).thenReturn("2025-08");
+
+    var fakeInvoice = mock(ThInvoice.class);
+    when(fakeInvoice.invoiceData()).thenReturn(fakeInvoiceData.invoiceData());
+
+    when(thInvoiceService.extractInvoice(any(), any())).thenReturn(fakeInvoice);
+    when(thInvoiceService.generateInvoiceFileName(any())).thenReturn("invoice.pdf");
+
     var invoiceForm =
         new ThInvoiceForm(
             "inv-001",
@@ -127,6 +138,5 @@ class InvoiceControllerIT extends FacadeIT {
     verify(thInvoiceService, times(1)).saveInvoiceReference(any(), any());
     verify(thInvoiceService, times(1))
         .sendInvoiceCopy(anyString(), eq("test@test.com"), anyString(), eq(fakeFile));
-    fakeFile.deleteOnExit();
   }
 }

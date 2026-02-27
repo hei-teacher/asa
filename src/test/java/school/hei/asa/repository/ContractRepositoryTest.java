@@ -3,6 +3,7 @@ package school.hei.asa.repository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import school.hei.asa.conf.FacadeIT;
@@ -18,6 +19,14 @@ public class ContractRepositoryTest extends FacadeIT {
     var result = contractRepository.findAllByWorker(worker);
 
     assertEquals(2, result.size());
+  }
+
+  @Test
+  void fetch_by_year_between() {
+    var actual = contractRepository.findByYearBetween(2024, 2026);
+    Assertions.assertEquals(3, actual.size());
+    Assertions.assertTrue(
+        actual.stream().anyMatch(contract -> contract.worker().code().equals("W-P-2024-01")));
   }
 
   private Worker newWorker() {

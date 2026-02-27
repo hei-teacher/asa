@@ -14,25 +14,22 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import school.hei.asa.conf.FacadeIT;
-import school.hei.asa.endpoint.event.model.SendEmailRequested;
 import school.hei.asa.endpoint.rest.model.th.ThInvoice;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.InvoicePDFGenerator;
+import school.hei.asa.endpoint.rest.service.ThInvoiceService;
 import school.hei.asa.file.bucket.BucketComponent;
 import school.hei.asa.model.BankAccount;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.BankAccountRepository;
-import school.hei.asa.service.event.SendEmailRequestedService;
 
-@SpringBootTest(properties = {"ACCOUNTANTS=test@test.com"})
 class InvoiceControllerIT extends FacadeIT {
 
   @Autowired InvoiceController invoiceController;
@@ -41,10 +38,9 @@ class InvoiceControllerIT extends FacadeIT {
   @MockBean WorkerToModelAdder workerToModelAdder;
   @MockBean BankAccountRepository bankAccountRepository;
   @MockBean BucketComponent bucketComponent;
-  @MockBean SendEmailRequestedService sendEmailRequestedService;
+  @MockBean ThInvoiceService thInvoiceService;
   @MockBean InvoicePDFGenerator invoicePDFGenerator;
   Authentication authentication;
-
   Worker authenticatedWorker;
   Model model;
   BankAccount bankAccount;
@@ -69,11 +65,11 @@ class InvoiceControllerIT extends FacadeIT {
         .thenReturn(Optional.of(authenticatedWorker));
     when(workerToModelAdder.apply(anyString(), any())).thenReturn(authenticatedWorker);
     when(bankAccountRepository.findByWorkerCode("worker-code")).thenReturn(bankAccount);
-    when(authentication.getName()).thenReturn("test@test.com");
   }
 
   @Test
   void can_get_invoice() {
+
     var invoiceForm =
         new ThInvoiceForm(null, null, null, "", "", "", "", "", false, "", "", "", "", "", "", "");
     String viewName = invoiceController.getInvoicePage(model, authentication, invoiceForm, 2025);
@@ -82,10 +78,39 @@ class InvoiceControllerIT extends FacadeIT {
   }
 
   @Test
-  void can_preview_invoice() {
+  void can_preview_invoice() throws IOException {
     setUp();
+
+    var placeholderForm =
+        new ThInvoiceForm(
+            "inv-001",
+            "2025-08",
+            "ref-001",
+            "2025-09-03",
+            "Invoice for project X",
+            "2",
+            "500",
+            "1000",
+            false,
+            "Extra desc",
+            "1",
+            "200",
+            "200",
+            "1200",
+            "1200",
+            "FR761234567890");
+
+    var fakeInvoice = new ThInvoice("base64dummy", placeholderForm);
+
+    when(thInvoiceService.extractInvoice(any(Worker.class), any())).thenReturn(fakeInvoice);
+
+    File fakeFile = File.createTempFile("temp", ".pdf");
+    Files.write(fakeFile.toPath(), new byte[] {1, 2, 3}); // contenu dummy
+    when(invoicePDFGenerator.apply(any(Worker.class), any(), any())).thenReturn(fakeFile);
+
     var invoiceForm =
         new ThInvoiceForm(null, null, null, "", "", "", "", "", false, "", "", "", "", "", "", "");
+
     var invoicePreview = invoiceController.previewInvoice(model, authentication, invoiceForm);
 
     assertEquals(OK, invoicePreview.getStatusCode());
@@ -94,17 +119,12 @@ class InvoiceControllerIT extends FacadeIT {
 
   @Test
   void can_send_invoice_when_generated() throws IOException {
+    setUp();
+
     File fakeFile = File.createTempFile("temp", ".pdf");
     Files.write(fakeFile.toPath(), new byte[] {1, 2, 3});
 
     when(invoicePDFGenerator.apply(any(Worker.class), any(), any())).thenReturn(fakeFile);
-
-    var fakeInvoiceData = mock(ThInvoice.class);
-    when(fakeInvoiceData.invoiceData().id()).thenReturn("inv-001");
-    when(fakeInvoiceData.invoiceData().yearMonth()).thenReturn("2025-08");
-
-    var fakeInvoice = mock(ThInvoice.class);
-    when(fakeInvoice.invoiceData()).thenReturn(fakeInvoiceData.invoiceData());
 
     var invoiceForm =
         new ThInvoiceForm(
@@ -125,6 +145,10 @@ class InvoiceControllerIT extends FacadeIT {
             "1200",
             "FR761234567890");
 
+    var fakeInvoice = new ThInvoice("base64dummy", invoiceForm);
+
+    when(thInvoiceService.extractInvoice(any(Worker.class), any())).thenReturn(fakeInvoice);
+
     var response = invoiceController.generateInvoice(model, authentication, invoiceForm);
 
     Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -133,6 +157,7 @@ class InvoiceControllerIT extends FacadeIT {
     Assertions.assertTrue(response.getBody().length > 0);
 
     verify(bucketComponent, times(1)).upload(eq(fakeFile), anyString());
-    verify(sendEmailRequestedService, times(1)).accept(any(SendEmailRequested.class));
+    verify(thInvoiceService, times(1))
+        .sendInvoiceCopy(anyString(), anyString(), anyString(), eq(fakeFile));
   }
 }

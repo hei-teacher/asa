@@ -21,15 +21,16 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import school.hei.asa.conf.FacadeIT;
+import school.hei.asa.endpoint.event.model.SendEmailRequested;
 import school.hei.asa.endpoint.rest.model.th.ThInvoice;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.InvoicePDFGenerator;
-import school.hei.asa.endpoint.rest.service.ThInvoiceService;
 import school.hei.asa.file.bucket.BucketComponent;
 import school.hei.asa.model.BankAccount;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.BankAccountRepository;
+import school.hei.asa.service.event.SendEmailRequestedService;
 
 @SpringBootTest(properties = {"ACCOUNTANTS=test@test.com"})
 class InvoiceControllerIT extends FacadeIT {
@@ -40,8 +41,8 @@ class InvoiceControllerIT extends FacadeIT {
   @MockBean WorkerToModelAdder workerToModelAdder;
   @MockBean BankAccountRepository bankAccountRepository;
   @MockBean BucketComponent bucketComponent;
+  @MockBean SendEmailRequestedService sendEmailRequestedService;
   @MockBean InvoicePDFGenerator invoicePDFGenerator;
-  @MockBean ThInvoiceService thInvoiceService;
   Authentication authentication;
 
   Worker authenticatedWorker;
@@ -105,9 +106,6 @@ class InvoiceControllerIT extends FacadeIT {
     var fakeInvoice = mock(ThInvoice.class);
     when(fakeInvoice.invoiceData()).thenReturn(fakeInvoiceData.invoiceData());
 
-    when(thInvoiceService.extractInvoice(any(), any())).thenReturn(fakeInvoice);
-    when(thInvoiceService.generateInvoiceFileName(any())).thenReturn("invoice.pdf");
-
     var invoiceForm =
         new ThInvoiceForm(
             "inv-001",
@@ -135,8 +133,6 @@ class InvoiceControllerIT extends FacadeIT {
     Assertions.assertTrue(response.getBody().length > 0);
 
     verify(bucketComponent, times(1)).upload(eq(fakeFile), anyString());
-    verify(thInvoiceService, times(1)).saveInvoiceReference(any(), any());
-    verify(thInvoiceService, times(1))
-        .sendInvoiceCopy(anyString(), eq("test@test.com"), anyString(), eq(fakeFile));
+    verify(sendEmailRequestedService, times(1)).accept(any(SendEmailRequested.class));
   }
 }

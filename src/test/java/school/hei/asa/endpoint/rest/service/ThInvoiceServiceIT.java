@@ -14,9 +14,8 @@ import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.endpoint.event.model.SendEmailRequested;
 
 public class ThInvoiceServiceIT extends FacadeIT {
-  @Autowired private ThInvoiceService thInvoiceService;
-
-  @MockBean private EventProducer<SendEmailRequested> eventProducer;
+  @Autowired ThInvoiceService thInvoiceService;
+  @MockBean EventProducer<SendEmailRequested> eventProducer;
 
   @Test
   void send_invoice_copy_ok() throws IOException {

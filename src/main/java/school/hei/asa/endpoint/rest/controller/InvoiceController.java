@@ -8,9 +8,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,6 @@ import school.hei.asa.file.bucket.BucketComponent;
 import school.hei.asa.service.InvoiceService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Controller
 public class InvoiceController {
 
@@ -39,6 +38,25 @@ public class InvoiceController {
   private final BucketComponent bucketComponent;
   private final ThInvoiceService thInvoiceService;
   private static final String INVOICES_FOLDER = "invoices/";
+
+  private String accountants;
+
+  public InvoiceController(
+      WorkerFromAuthentication workerFromAuthentication,
+      WorkerToModelAdder workerToModelAdder,
+      InvoicePDFGenerator invoicePDFGenerator,
+      InvoiceService invoiceService,
+      BucketComponent bucketComponent,
+      ThInvoiceService thInvoiceService,
+      @Value("ACCOUNTANTS") String accountants) {
+    this.workerFromAuthentication = workerFromAuthentication;
+    this.workerToModelAdder = workerToModelAdder;
+    this.invoicePDFGenerator = invoicePDFGenerator;
+    this.invoiceService = invoiceService;
+    this.bucketComponent = bucketComponent;
+    this.thInvoiceService = thInvoiceService;
+    this.accountants = accountants;
+  }
 
   @GetMapping("/invoice")
   public String getInvoicePage(
@@ -101,8 +119,8 @@ public class InvoiceController {
 
     log.info("sending mail copies...");
     thInvoiceService.sendInvoiceCopy(
-        worker.name(), System.getenv("ACCOUNTANTS"), invoice.invoiceData().yearMonth(), pdfFile);
-    log.info(System.getenv("ACCOUNTANTS"));
+        worker.name(), accountants, invoice.invoiceData().yearMonth(), pdfFile);
+    log.info(accountants);
     return ResponseEntity.ok()
         .header(CONTENT_DISPOSITION, "attachment; filename=" + fileName)
         .contentType(APPLICATION_PDF)

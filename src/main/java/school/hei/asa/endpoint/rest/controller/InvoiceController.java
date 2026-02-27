@@ -42,7 +42,7 @@ public class InvoiceController {
   private static final String INVOICES_FOLDER = "invoices/";
 
   @Value("${ACCOUNTANTS}")
-  String accountants;
+  private String accountants;
 
   @GetMapping("/invoice")
   public String getInvoicePage(

@@ -41,6 +41,7 @@
                 <th class="py-3 px-6">Contract Type</th>
                 <th class="py-3 px-6">Contract Duration</th>
                 <th class="py-3 px-6">Worked Days</th>
+                <th class="py-3 px-6">Company</th>
                 <th class="py-3 px-6">Contract</th>
               </tr>
             </thead>
@@ -73,6 +74,10 @@
                 <td
                   class="py-3 px-6 text-center"
                   th:text="${contract.actualWorkedDay}"
+                ></td>
+                <td
+                  class="py-3 px-6 text-center"
+                  th:text="${contract.company}"
                 ></td>
                 <td class="py-3 px-6 text-center">
                   <a

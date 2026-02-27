@@ -59,6 +59,7 @@ public class ThContractMapper {
                   contractType,
                   executedDays,
                   BigDecimal.valueOf(compensation),
+                  current.company(),
                   current.jobTitle(),
                   current.duration() == null ? "-" : current.duration().toDays() + "",
                   current.contractBucketKey()));

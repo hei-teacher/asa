@@ -39,4 +39,7 @@ public class JContract {
 
   @Column(name = "contract_bucket_key")
   private String contractBucketKey;
+
+  @Column(name = "company")
+  private String company;
 }

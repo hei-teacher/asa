@@ -81,7 +81,7 @@ public class ThInvoiceService {
   }
 
   @SneakyThrows
-  public void sendInvoiceCopy(String workerName, String receivers, String month, File file) {
+  public void sendInvoiceCopy(String workerName, String receivers, String month) {
 
     var listEmails = Arrays.stream(receivers.split(",")).toList();
     var ccReceivers = listEmails.stream().skip(1).toList();
@@ -106,7 +106,7 @@ public class ThInvoiceService {
             String.format(
                 "Bonjour, \n Voici la facture generé de %s , du mois de %s. \n Cordialement,",
                 workerName, month),
-            List.of(file));
+            List.of());
     var event = SendEmailRequested.builder().email(email).build();
     eventProducer.accept(List.of(event));
   }

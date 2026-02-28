@@ -27,7 +27,7 @@ public class ThInvoiceServiceIT extends FacadeIT {
     File fakeFile = File.createTempFile("temp", ".pdf");
     Files.write(fakeFile.toPath(), new byte[] {1, 2, 3});
     doNothing().when(eventProducer).accept(List.of(email));
-    thInvoiceService.sendInvoiceCopy(workerName, receiver, month, fakeFile);
+    thInvoiceService.sendInvoiceCopy(workerName, receiver, month);
     verify(eventProducer).accept(anyList());
   }
 }

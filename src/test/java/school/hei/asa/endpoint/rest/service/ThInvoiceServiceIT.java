@@ -22,12 +22,12 @@ public class ThInvoiceServiceIT extends FacadeIT {
     var receiver = "dummy@mail,dummy.chan@mail.com";
     var workerName = "dummy";
     var month = "February";
-
+    byte[] dummyBytes = new byte[1024];
     var email = mock(SendEmailRequested.class);
     File fakeFile = File.createTempFile("temp", ".pdf");
     Files.write(fakeFile.toPath(), new byte[] {1, 2, 3});
     doNothing().when(eventProducer).accept(List.of(email));
-    thInvoiceService.sendInvoiceCopy(workerName, receiver, month, "dummy");
+    thInvoiceService.sendInvoiceCopy(workerName, receiver, month, dummyBytes);
     verify(eventProducer).accept(anyList());
   }
 }

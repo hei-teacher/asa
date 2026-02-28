@@ -77,7 +77,7 @@ public class ThInvoiceService {
   }
 
   @SneakyThrows
-  public void sendInvoiceCopy(String workerName, String receivers, String month, String s3Key) {
+  public void sendInvoiceCopy(String workerName, String receivers, String month, byte[] fileBytes) {
 
     var event =
         SendEmailRequested.builder()
@@ -88,7 +88,9 @@ public class ThInvoiceService {
                 String.format(
                     "Bonjour, \n Voici la facture générée de %s, du mois de %s.",
                     workerName, month))
-            .s3Key(s3Key)
+            .fileBytes(fileBytes)
+            .worker(workerName)
+            .month(month)
             .build();
     eventProducer.accept(List.of(event));
   }

@@ -1,13 +1,10 @@
 package school.hei.asa.endpoint.rest.service;
 
-import jakarta.mail.internet.AddressException;
-import jakarta.mail.internet.InternetAddress;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.time.Month;
 import java.time.YearMonth;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.EnumSet;
 import java.util.List;
@@ -24,7 +21,6 @@ import school.hei.asa.endpoint.rest.controller.mapper.ThInvoiceFormMapper;
 import school.hei.asa.endpoint.rest.model.th.ThInvoice;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.endpoint.rest.model.th.ThMonthInvoiceStatus;
-import school.hei.asa.mail.Email;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.InvoiceService;
 
@@ -81,33 +77,19 @@ public class ThInvoiceService {
   }
 
   @SneakyThrows
-  public void sendInvoiceCopy(String workerName, String receivers, String month) {
+  public void sendInvoiceCopy(String workerName, String receivers, String month, String s3Key) {
 
-    var listEmails = Arrays.stream(receivers.split(",")).toList();
-    var ccReceivers = listEmails.stream().skip(1).toList();
-    var emailAddress = new InternetAddress(listEmails.getFirst());
-    var accountantsEmails =
-        ccReceivers.stream()
-            .map(
-                mail -> {
-                  try {
-                    return new InternetAddress(mail);
-                  } catch (AddressException e) {
-                    throw new RuntimeException(e);
-                  }
-                })
-            .toList();
-    var email =
-        new Email(
-            emailAddress,
-            accountantsEmails,
-            List.of(),
-            String.format("ASA INVOICE GENERATED - %s - %s", workerName, month),
-            String.format(
-                "Bonjour, \n Voici la facture generé de %s , du mois de %s. \n Cordialement,",
-                workerName, month),
-            List.of());
-    var event = SendEmailRequested.builder().email(email).build();
+    var event =
+        SendEmailRequested.builder()
+            .to(receivers.split(",")[0])
+            .cc(receivers)
+            .subject(String.format("ASA INVOICE GENERATED - %s - %s", workerName, month))
+            .body(
+                String.format(
+                    "Bonjour, \n Voici la facture générée de %s, du mois de %s.",
+                    workerName, month))
+            .s3Key(s3Key)
+            .build();
     eventProducer.accept(List.of(event));
   }
 }

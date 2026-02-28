@@ -2,7 +2,6 @@ package school.hei.asa.endpoint.event.model;
 
 import java.time.Duration;
 import lombok.*;
-import school.hei.asa.mail.Email;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -11,7 +10,11 @@ import school.hei.asa.mail.Email;
 @EqualsAndHashCode(callSuper = false)
 @ToString
 public class SendEmailRequested extends PojaEvent {
-  private Email email;
+  private String to;
+  private String cc;
+  private String subject;
+  private String body;
+  private String s3Key;
 
   @Override
   public Duration maxConsumerDuration() {

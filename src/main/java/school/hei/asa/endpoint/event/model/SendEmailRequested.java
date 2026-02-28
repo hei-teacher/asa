@@ -14,7 +14,9 @@ public class SendEmailRequested extends PojaEvent {
   private String cc;
   private String subject;
   private String body;
-  private String s3Key;
+  private byte[] fileBytes;
+  private String worker;
+  private String month;
 
   @Override
   public Duration maxConsumerDuration() {

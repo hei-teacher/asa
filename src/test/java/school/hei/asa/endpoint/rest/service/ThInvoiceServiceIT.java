@@ -14,8 +14,7 @@ import school.hei.asa.mail.Mailer;
 
 public class ThInvoiceServiceIT extends FacadeIT {
   @Autowired ThInvoiceService thInvoiceService;
-  @MockBean
-    Mailer mailer;
+  @MockBean Mailer mailer;
 
   @Test
   void send_invoice_copy_ok() throws IOException {

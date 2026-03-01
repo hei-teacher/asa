@@ -1,5 +1,7 @@
 package school.hei.asa.endpoint.rest.service;
 
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -10,9 +12,6 @@ import java.util.Base64;
 import java.util.EnumSet;
 import java.util.List;
 import javax.imageio.ImageIO;
-
-import jakarta.mail.internet.AddressException;
-import jakarta.mail.internet.InternetAddress;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +34,7 @@ public class ThInvoiceService {
   private final InvoiceService invoiceService;
   private final ThInvoiceFormMapper thInvoiceFormMapper;
   private final InvoicePDFGenerator invoicePDFGenerator;
-private final Mailer  mailer;
+  private final Mailer mailer;
 
   public String generateInvoiceFileName(Worker worker) {
     return invoiceService.generateInvoiceFileName(worker);
@@ -82,29 +81,29 @@ private final Mailer  mailer;
 
   @SneakyThrows
   public void sendInvoiceCopy(String workerName, String receivers, String month, File file) {
-      var accountants = Arrays.stream(receivers.split(",")).toList();
-      var ccReceivers = accountants.stream().skip(1).toList().stream().map(
-              ccReceiver -> {
+    var accountants = Arrays.stream(receivers.split(",")).toList();
+    var ccReceivers =
+        accountants.stream().skip(1).toList().stream()
+            .map(
+                ccReceiver -> {
                   try {
-                      return new InternetAddress(ccReceiver);
+                    return new InternetAddress(ccReceiver);
                   } catch (AddressException e) {
-                      throw new RuntimeException(e);
+                    throw new RuntimeException(e);
                   }
-              }
-      ).toList();
+                })
+            .toList();
 
-      var email =
-              new Email(
-                      new InternetAddress(accountants.getFirst()),
-                      ccReceivers,
-                      List.of(),
-                      String.format("ASA INVOICE GENERATED - %s - %s", workerName, month),
-                      String.format(
-                              "Bonjour, \n Voici la facture générée de %s, du mois de %s.",
-                              workerName, month),
-                      List.of(file)
+    var email =
+        new Email(
+            new InternetAddress(accountants.getFirst()),
+            ccReceivers,
+            List.of(),
+            String.format("ASA INVOICE GENERATED - %s - %s", workerName, month),
+            String.format(
+                "Bonjour, \n Voici la facture générée de %s, du mois de %s.", workerName, month),
+            List.of(file));
 
-              );
-      mailer.accept(email);
+    mailer.accept(email);
   }
 }

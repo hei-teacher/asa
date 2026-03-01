@@ -12,9 +12,6 @@ import java.util.Base64;
 import java.util.EnumSet;
 import java.util.List;
 import javax.imageio.ImageIO;
-
-import jakarta.mail.internet.AddressException;
-import jakarta.mail.internet.InternetAddress;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

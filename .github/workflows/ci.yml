@@ -20,7 +20,13 @@ jobs:
 
     env:
       AWS_REGION: eu-west-3
-      
+      ACCOUNTANTS: ${{
+              (github.event_name == 'pull_request' && github.base_ref == 'prod') && secrets.PROD_ACCOUNTANTS ||
+              (github.event_name == 'pull_request' && github.base_ref == 'preprod') && secrets.PREPROD_ACCOUNTANTS ||
+              (github.ref == 'refs/heads/prod') && secrets.PROD_ACCOUNTANTS ||
+              (github.ref == 'refs/heads/preprod') && secrets.PREPROD_ACCOUNTANTS
+              }}
+
 
     steps:
       - uses: actions/checkout@v4.1.6
@@ -32,7 +38,8 @@ jobs:
       - run: chmod +x gradlew
       - run: chmod +x .shell/publish_gen_to_maven_local.sh
       - run: |
-          ./gradlew test
+          ./gradlew test \
+            -Daccountants="$ACCOUNTANTS"
 
       
 

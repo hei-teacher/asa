@@ -25,4 +25,15 @@ class ThContractServiceIT extends FacadeIT {
     assertTrue(actualContent.contains("W-P-2024-01,Lita Andria,L5,01 Jan 2023,13,2.0,11.0"));
     assertTrue(actualContent.contains("W-P-2024-01,Lita Andria,L4P-2026,01 Jan 2025,80,-,-"));
   }
+
+  @Test
+  @SneakyThrows
+  void export_contract_for_all_workers() {
+    var actualCSV = thContractService.generateCSV(null);
+
+    var actualContent = Files.readString(actualCSV.toPath());
+
+    assertTrue(actualContent.contains("W-P-2024-01,Lita Andria,L5,01 Jan 2023,13,2.0,11.0"));
+    assertTrue(actualContent.contains("W-P-2024-01,Lita Andria,L4P-2026,01 Jan 2025,80,-,-"));
+  }
 }

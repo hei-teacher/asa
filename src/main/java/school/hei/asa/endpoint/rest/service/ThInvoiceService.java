@@ -1,13 +1,10 @@
 package school.hei.asa.endpoint.rest.service;
 
-import jakarta.mail.internet.AddressException;
-import jakarta.mail.internet.InternetAddress;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.time.Month;
 import java.time.YearMonth;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.EnumSet;
 import java.util.List;
@@ -18,12 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
+import school.hei.asa.endpoint.event.EventProducer;
+import school.hei.asa.endpoint.event.model.SendEmailRequested;
 import school.hei.asa.endpoint.rest.controller.mapper.ThInvoiceFormMapper;
 import school.hei.asa.endpoint.rest.model.th.ThInvoice;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.endpoint.rest.model.th.ThMonthInvoiceStatus;
-import school.hei.asa.mail.Email;
-import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.InvoiceService;
 
@@ -33,8 +30,8 @@ import school.hei.asa.service.InvoiceService;
 public class ThInvoiceService {
   private final InvoiceService invoiceService;
   private final ThInvoiceFormMapper thInvoiceFormMapper;
+  private final EventProducer<SendEmailRequested> eventProducer;
   private final InvoicePDFGenerator invoicePDFGenerator;
-  private final Mailer mailer;
 
   public String generateInvoiceFileName(Worker worker) {
     return invoiceService.generateInvoiceFileName(worker);
@@ -80,30 +77,21 @@ public class ThInvoiceService {
   }
 
   @SneakyThrows
-  public void sendInvoiceCopy(String workerName, String receivers, String month, File file) {
-    var accountants = Arrays.stream(receivers.split(",")).toList();
-    var ccReceivers =
-        accountants.stream().skip(1).toList().stream()
-            .map(
-                ccReceiver -> {
-                  try {
-                    return new InternetAddress(ccReceiver);
-                  } catch (AddressException e) {
-                    throw new RuntimeException(e);
-                  }
-                })
-            .toList();
-
-    var email =
-        new Email(
-            new InternetAddress(accountants.getFirst()),
-            ccReceivers,
-            List.of(),
-            String.format("ASA INVOICE GENERATED - %s - %s", workerName, month),
-            String.format(
-                "Bonjour, \n Voici la facture générée de %s, du mois de %s.", workerName, month),
-            List.of(file));
-
-    mailer.accept(email);
-           }
+  public void sendInvoiceCopy(Worker worker, String receivers, ThInvoiceForm invoiceForm) {
+    var event =
+        SendEmailRequested.builder()
+            .to(receivers.split(",")[0])
+            .cc(receivers)
+            .subject(
+                String.format(
+                    "ASA INVOICE GENERATED - %s - %s", worker.name(), invoiceForm.yearMonth()))
+            .body(
+                String.format(
+                    "Bonjour, \n Voici la facture générée de %s, du mois de %s.",
+                    worker.name(), invoiceForm.yearMonth()))
+            .invoiceForm(invoiceForm)
+            .worker(worker)
+            .build();
+    eventProducer.accept(List.of(event));
+  }
 }

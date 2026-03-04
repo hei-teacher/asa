@@ -1,5 +1,6 @@
 package school.hei.asa.endpoint.event.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.Duration;
 import lombok.*;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
@@ -11,6 +12,7 @@ import school.hei.asa.model.Worker;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @ToString
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SendEmailRequested extends PojaEvent {
   private String to;
   private String cc;

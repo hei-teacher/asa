@@ -1,16 +1,18 @@
 package school.hei.asa.model;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.extern.jackson.Jacksonized;
 
 @Accessors(fluent = true)
 @Getter
 @AllArgsConstructor
 @ToString
+@Builder
+@Jacksonized
 @EqualsAndHashCode(of = "code")
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class Worker {
   private final String code;
   private final String name;

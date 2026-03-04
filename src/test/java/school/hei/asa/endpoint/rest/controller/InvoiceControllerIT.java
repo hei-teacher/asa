@@ -60,7 +60,9 @@ class InvoiceControllerIT extends FacadeIT {
             "stat");
     bankAccount = new BankAccount("", "", "", "", "", authenticatedWorker);
     model = mock(Model.class);
-
+    when(thInvoiceService.generateInvoiceFileName(any(Worker.class)))
+        .thenReturn("invoice_2025_08.pdf");
+    doNothing().when(thInvoiceService).saveInvoiceReference(any(), any(Worker.class));
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
     when(workerToModelAdder.apply(anyString(), any())).thenReturn(authenticatedWorker);
@@ -148,7 +150,7 @@ class InvoiceControllerIT extends FacadeIT {
     var fakeInvoice = new ThInvoice("base64dummy", invoiceForm);
 
     when(thInvoiceService.extractInvoice(any(Worker.class), any())).thenReturn(fakeInvoice);
-
+    doNothing().when(bucketComponent).upload(any(File.class), anyString());
     var response = invoiceController.generateInvoice(model, authentication, invoiceForm);
 
     Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());

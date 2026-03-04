@@ -106,7 +106,6 @@ public class InvoiceController {
     log.info("sending mail copies...");
     thInvoiceService.sendInvoiceCopy(
         worker.code(), accountants, fileName, invoice.invoiceData().yearMonth());
-    log.info(accountants);
     return ResponseEntity.ok()
         .header(CONTENT_DISPOSITION, "attachment; filename=" + fileName)
         .contentType(APPLICATION_PDF)

@@ -77,20 +77,15 @@ public class ThInvoiceService {
   }
 
   @SneakyThrows
-  public void sendInvoiceCopy(Worker worker, String receivers, ThInvoiceForm invoiceForm) {
+  public void sendInvoiceCopy(
+      String workerCode, String receivers, String fileName, String yearMonth) {
     var event =
         SendEmailRequested.builder()
             .to(receivers.split(",")[0])
             .cc(receivers)
-            .subject(
-                String.format(
-                    "ASA INVOICE GENERATED - %s - %s", worker.name(), invoiceForm.yearMonth()))
-            .body(
-                String.format(
-                    "Bonjour, \n Voici la facture générée de %s, du mois de %s.",
-                    worker.name(), invoiceForm.yearMonth()))
-            .invoiceForm(invoiceForm)
-            .worker(worker)
+            .workerCode(workerCode)
+            .yearMonth(yearMonth)
+            .fileName(fileName)
             .build();
     eventProducer.accept(List.of(event));
   }

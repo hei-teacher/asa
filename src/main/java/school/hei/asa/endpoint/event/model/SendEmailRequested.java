@@ -3,8 +3,6 @@ package school.hei.asa.endpoint.event.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.Duration;
 import lombok.*;
-import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
-import school.hei.asa.model.Worker;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,12 +14,9 @@ import school.hei.asa.model.Worker;
 public class SendEmailRequested extends PojaEvent {
   private String to;
   private String cc;
-  private String subject;
-  private String body;
-
-  private ThInvoiceForm invoiceForm;
-  private Worker worker;
-  private String month;
+  private String workerCode;
+  private String yearMonth;
+  private String fileName;
 
   @Override
   public Duration maxConsumerDuration() {

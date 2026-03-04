@@ -1,8 +1,8 @@
 package school.hei.asa.service.event;
 
 import jakarta.mail.internet.InternetAddress;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.File;
+import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -10,26 +10,32 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.model.SendEmailRequested;
-import school.hei.asa.endpoint.rest.service.InvoicePDFGenerator;
+import school.hei.asa.file.bucket.BucketComponent;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
+import school.hei.asa.model.InvoiceReference;
+import school.hei.asa.model.Worker;
+import school.hei.asa.service.InvoiceService;
+import school.hei.asa.service.WorkerService;
 
 @Service
 @AllArgsConstructor
 public class SendEmailRequestedService implements Consumer<SendEmailRequested> {
-  Mailer mailer;
-  private final InvoicePDFGenerator invoicePDFGenerator;
+  private static final String INVOICES_FOLDER = "invoices/";
+
+  private Mailer mailer;
+  private BucketComponent bucketComponent;
+  private InvoiceService invoiceService;
+  private WorkerService workerService;
 
   @SneakyThrows
   @Override
   public void accept(SendEmailRequested event) {
-
-    var file = invoicePDFGenerator.apply(event.getWorker(), event.getInvoiceForm(), "invoice");
-    Path path =
-        Paths.get(
-            String.format(
-                "FACTURE_%s_%s.pdf", event.getWorker().name().toUpperCase(), event.getMonth()));
-    var listEmails = Arrays.stream(event.getCc().split(",")).toList();
+    Worker worker = workerService.findWorkerByCode(event.getWorkerCode());
+    InvoiceReference invoiceReference =
+        invoiceService.findInvoiceReference(worker, YearMonth.parse(event.getYearMonth())).get();
+    var listEmailsWithWorkerEmail = String.format("%s,%s", event.getCc(), worker.email());
+    var listEmails = Arrays.stream(listEmailsWithWorkerEmail.split(",")).toList();
     var internetCc =
         listEmails.stream()
             .skip(1)
@@ -43,14 +49,18 @@ public class SendEmailRequestedService implements Consumer<SendEmailRequested> {
                 })
             .toList();
 
+    File pdf = bucketComponent.download(INVOICES_FOLDER + event.getFileName());
     var email =
         new Email(
             new InternetAddress(event.getTo()),
             internetCc,
             List.of(),
-            event.getSubject(),
-            event.getBody(),
-            List.of(file));
+            String.format(
+                "ASA INVOICE GENERATED - %s - %s", worker.name(), invoiceReference.yearMonth()),
+            String.format(
+                "Bonjour, \n Voici la facture de générée de %s  du mois de %s. \n Cordialement,",
+                worker.name(), invoiceReference.yearMonth()),
+            List.of(pdf));
 
     mailer.accept(email);
   }

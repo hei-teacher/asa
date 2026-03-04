@@ -104,7 +104,8 @@ public class InvoiceController {
     bucketComponent.upload(pdfFile, INVOICES_FOLDER + fileName);
 
     log.info("sending mail copies...");
-    thInvoiceService.sendInvoiceCopy(worker, accountants, invoice.invoiceData());
+    thInvoiceService.sendInvoiceCopy(
+        worker.code(), accountants, fileName, invoice.invoiceData().yearMonth());
     log.info(accountants);
     return ResponseEntity.ok()
         .header(CONTENT_DISPOSITION, "attachment; filename=" + fileName)

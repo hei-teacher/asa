@@ -1,4 +1,4 @@
-package school.hei.asa.model;
+package school.hei.asa.endpoint.rest.event;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,6 +9,7 @@ import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import school.hei.asa.endpoint.event.model.SendEmailRequested;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
+import school.hei.asa.model.Worker;
 
 public class EventSerializationTest {
   ObjectMapper om = new ObjectMapper();

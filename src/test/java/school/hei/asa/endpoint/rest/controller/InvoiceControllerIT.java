@@ -26,6 +26,8 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.InvoicePDFGenerator;
 import school.hei.asa.endpoint.rest.service.ThInvoiceService;
 import school.hei.asa.file.bucket.BucketComponent;
+import school.hei.asa.file.hash.FileHash;
+import school.hei.asa.file.hash.FileHashAlgorithm;
 import school.hei.asa.model.BankAccount;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.BankAccountRepository;
@@ -148,9 +150,9 @@ class InvoiceControllerIT extends FacadeIT {
             "FR761234567890");
 
     var fakeInvoice = new ThInvoice("base64dummy", invoiceForm);
-
+    FileHash fileHash = new FileHash(FileHashAlgorithm.NONE, "/invoices");
     when(thInvoiceService.extractInvoice(any(Worker.class), any())).thenReturn(fakeInvoice);
-    doNothing().when(bucketComponent).upload(any(File.class), anyString());
+    when(bucketComponent.upload(any(File.class), anyString())).thenReturn(fileHash);
     var response = invoiceController.generateInvoice(model, authentication, invoiceForm);
 
     Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());

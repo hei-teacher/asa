@@ -1,7 +1,11 @@
 package school.hei.asa.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import lombok.extern.jackson.Jacksonized;
 

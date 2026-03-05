@@ -2,7 +2,12 @@ package school.hei.asa.endpoint.event.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.Duration;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @NoArgsConstructor
 @AllArgsConstructor

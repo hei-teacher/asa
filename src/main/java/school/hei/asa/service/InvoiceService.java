@@ -192,6 +192,7 @@ public class InvoiceService {
 
   public InvoiceReference getInvoiceReference(String invoiceId) {
     var invoiceReference = invoiceReferenceRepository.findInvoiceReferenceByInvoiceId(invoiceId);
-    return invoiceReference.orElse(null);
+    return invoiceReference.orElseThrow(
+        () -> new NoSuchElementException("Invoice reference not found"));
   }
 }

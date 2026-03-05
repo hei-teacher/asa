@@ -8,10 +8,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +29,7 @@ import school.hei.asa.service.InvoiceService;
 
 @Slf4j
 @Controller
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class InvoiceController {
 
   private final WorkerFromAuthentication workerFromAuthentication;
@@ -40,9 +39,6 @@ public class InvoiceController {
   private final BucketComponent bucketComponent;
   private final ThInvoiceService thInvoiceService;
   private static final String INVOICES_FOLDER = "invoices/";
-
-  @Value("${ACCOUNTANTS}")
-  private String accountants;
 
   @GetMapping("/invoice")
   public String getInvoicePage(
@@ -104,8 +100,7 @@ public class InvoiceController {
     bucketComponent.upload(pdfFile, INVOICES_FOLDER + fileName);
 
     log.info("sending mail copies...");
-    thInvoiceService.sendInvoiceCopy(
-        worker.code(), accountants, fileName, invoice.invoiceData().yearMonth());
+    thInvoiceService.sendInvoiceCopy(invoice.invoiceData().id());
     return ResponseEntity.ok()
         .header(CONTENT_DISPOSITION, "attachment; filename=" + fileName)
         .contentType(APPLICATION_PDF)

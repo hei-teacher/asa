@@ -11,12 +11,8 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SendEmailRequested extends PojaEvent {
-  private String to;
-  private String cc;
-  private String workerCode;
-  private String yearMonth;
-  private String fileName;
+public class NewInvoiceGenerated extends PojaEvent {
+  private String invoiceId;
 
   @Override
   public Duration maxConsumerDuration() {

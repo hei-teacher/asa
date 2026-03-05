@@ -16,7 +16,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.EventProducer;
-import school.hei.asa.endpoint.event.model.SendEmailRequested;
+import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
 import school.hei.asa.endpoint.rest.controller.mapper.ThInvoiceFormMapper;
 import school.hei.asa.endpoint.rest.model.th.ThInvoice;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
@@ -30,7 +30,7 @@ import school.hei.asa.service.InvoiceService;
 public class ThInvoiceService {
   private final InvoiceService invoiceService;
   private final ThInvoiceFormMapper thInvoiceFormMapper;
-  private final EventProducer<SendEmailRequested> eventProducer;
+  private final EventProducer<NewInvoiceGenerated> eventProducer;
   private final InvoicePDFGenerator invoicePDFGenerator;
 
   public String generateInvoiceFileName(Worker worker) {
@@ -77,16 +77,8 @@ public class ThInvoiceService {
   }
 
   @SneakyThrows
-  public void sendInvoiceCopy(
-      String workerCode, String receivers, String fileName, String yearMonth) {
-    var event =
-        SendEmailRequested.builder()
-            .to(receivers.split(",")[0])
-            .cc(receivers)
-            .workerCode(workerCode)
-            .yearMonth(yearMonth)
-            .fileName(fileName)
-            .build();
+  public void sendInvoiceCopy(String invoiceId) {
+    var event = NewInvoiceGenerated.builder().invoiceId(invoiceId).build();
     eventProducer.accept(List.of(event));
   }
 }

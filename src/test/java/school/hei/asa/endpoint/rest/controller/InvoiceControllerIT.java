@@ -161,7 +161,6 @@ class InvoiceControllerIT extends FacadeIT {
     Assertions.assertTrue(response.getBody().length > 0);
 
     verify(bucketComponent, times(1)).upload(eq(fakeFile), anyString());
-    verify(thInvoiceService, times(1))
-        .sendInvoiceCopy(anyString(), anyString(), anyString(), anyString());
+    verify(thInvoiceService, times(1)).sendInvoiceCopy(anyString());
   }
 }

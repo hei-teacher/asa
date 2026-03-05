@@ -2,39 +2,40 @@ package school.hei.asa.service.event;
 
 import jakarta.mail.internet.InternetAddress;
 import java.io.File;
-import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import school.hei.asa.endpoint.event.model.SendEmailRequested;
+import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
 import school.hei.asa.file.bucket.BucketComponent;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.InvoiceReference;
-import school.hei.asa.model.Worker;
 import school.hei.asa.service.InvoiceService;
-import school.hei.asa.service.WorkerService;
 
 @Service
-@AllArgsConstructor
-public class SendEmailRequestedService implements Consumer<SendEmailRequested> {
+@RequiredArgsConstructor
+public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated> {
   private static final String INVOICES_FOLDER = "invoices/";
 
-  private Mailer mailer;
-  private BucketComponent bucketComponent;
-  private InvoiceService invoiceService;
-  private WorkerService workerService;
+  @Value("${ACCOUNTANTS}")
+  private String accountants;
+
+  private final Mailer mailer;
+  private final BucketComponent bucketComponent;
+  private final InvoiceService invoiceService;
 
   @SneakyThrows
   @Override
-  public void accept(SendEmailRequested event) {
-    Worker worker = workerService.findWorkerByCode(event.getWorkerCode());
-    InvoiceReference invoiceReference =
-        invoiceService.findInvoiceReference(worker, YearMonth.parse(event.getYearMonth())).get();
-    var listEmailsWithWorkerEmail = String.format("%s,%s", event.getCc(), worker.email());
+  public void accept(NewInvoiceGenerated event) {
+    InvoiceReference invoiceReference = invoiceService.getInvoiceReference(event.getInvoiceId());
+    var fileName =
+        invoiceService.getInvoiceBucketKey(invoiceReference.worker(), invoiceReference.yearMonth());
+    var listEmailsWithWorkerEmail =
+        String.format("%s,%s", accountants, invoiceReference.worker().email());
     var listEmails = Arrays.stream(listEmailsWithWorkerEmail.split(",")).toList();
     var internetCc =
         listEmails.stream()
@@ -49,17 +50,18 @@ public class SendEmailRequestedService implements Consumer<SendEmailRequested> {
                 })
             .toList();
 
-    File pdf = bucketComponent.download(INVOICES_FOLDER + event.getFileName());
+    File pdf = bucketComponent.download(INVOICES_FOLDER + fileName);
     var email =
         new Email(
-            new InternetAddress(event.getTo()),
+            new InternetAddress(listEmails.getFirst()),
             internetCc,
             List.of(),
             String.format(
-                "ASA INVOICE GENERATED - %s - %s", worker.name(), invoiceReference.yearMonth()),
+                "ASA INVOICE GENERATED - %s - %s",
+                invoiceReference.worker().name(), invoiceReference.yearMonth()),
             String.format(
                 "Bonjour, \n Voici la facture de générée de %s  du mois de %s. \n Cordialement,",
-                worker.name(), invoiceReference.yearMonth()),
+                invoiceReference.worker().name(), invoiceReference.yearMonth()),
             List.of(pdf));
 
     mailer.accept(email);

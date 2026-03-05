@@ -189,4 +189,9 @@ public class InvoiceService {
 
     return String.format("FAC-NUM-2025-%s-%s.pdf", worker.code(), invoiceReference.autoincrement());
   }
+
+  public InvoiceReference getInvoiceReference(String invoiceId) {
+    var invoiceReference = invoiceReferenceRepository.findInvoiceReferenceByInvoiceId(invoiceId);
+    return invoiceReference.orElse(null);
+  }
 }

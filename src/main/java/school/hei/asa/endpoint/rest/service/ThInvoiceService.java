@@ -77,7 +77,7 @@ public class ThInvoiceService {
   }
 
   @SneakyThrows
-  public void sendInvoiceCopy(String invoiceId) {
+  public void sendGenerateInvoiceEvent(String invoiceId) {
     var event = NewInvoiceGenerated.builder().invoiceId(invoiceId).build();
     eventProducer.accept(List.of(event));
   }

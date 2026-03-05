@@ -14,12 +14,9 @@ public class EventSerializationTest {
 
   @Test
   void refresh_org_billing_info_requested_serialization() throws JsonProcessingException {
-
     var event = new NewInvoiceGenerated("invoiceId");
-
     var serialized = om.writeValueAsString(event);
     var deserialized = om.readValue(serialized, NewInvoiceGenerated.class);
-
     assertEquals(event, deserialized);
     assertNotNull(event.getInvoiceId());
     assertEquals(Duration.ofSeconds(45), event.maxConsumerDuration());

@@ -100,7 +100,7 @@ public class InvoiceController {
     bucketComponent.upload(pdfFile, INVOICES_FOLDER + fileName);
 
     log.info("sending mail copies...");
-    thInvoiceService.sendInvoiceCopy(invoice.invoiceData().id());
+    thInvoiceService.sendGenerateInvoiceEvent(invoice.invoiceData().id());
     return ResponseEntity.ok()
         .header(CONTENT_DISPOSITION, "attachment; filename=" + fileName)
         .contentType(APPLICATION_PDF)

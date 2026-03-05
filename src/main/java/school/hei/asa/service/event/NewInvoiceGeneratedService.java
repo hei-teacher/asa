@@ -2,11 +2,11 @@ package school.hei.asa.service.event;
 
 import jakarta.mail.internet.InternetAddress;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
@@ -28,7 +28,6 @@ public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated>
   private final BucketComponent bucketComponent;
   private final InvoiceService invoiceService;
 
-  @SneakyThrows
   @Override
   public void accept(NewInvoiceGenerated event) {
     InvoiceReference invoiceReference = invoiceService.getInvoiceReference(event.getInvoiceId());
@@ -36,25 +35,17 @@ public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated>
         invoiceService.getInvoiceBucketKey(invoiceReference.worker(), invoiceReference.yearMonth());
     var listEmailsWithWorkerEmail =
         String.format("%s,%s", accountants, invoiceReference.worker().email());
-    var listEmails = Arrays.stream(listEmailsWithWorkerEmail.split(",")).toList();
-    var internetCc =
-        listEmails.stream()
-            .skip(1)
-            .map(
-                mail -> {
-                  try {
-                    return new InternetAddress(mail);
-                  } catch (Exception e) {
-                    throw new RuntimeException(e);
-                  }
-                })
-            .toList();
+
+    var listEmails = new ArrayList<>(Arrays.stream(listEmailsWithWorkerEmail.split(",")).toList());
+
+    var internetAddressesCc = toInternetAddresses(listEmails);
+    var mainReceiver = internetAddressesCc.removeFirst();
 
     File pdf = bucketComponent.download(INVOICES_FOLDER + fileName);
     var email =
         new Email(
-            new InternetAddress(listEmails.getFirst()),
-            internetCc,
+            mainReceiver,
+            internetAddressesCc,
             List.of(),
             String.format(
                 "ASA INVOICE GENERATED - %s - %s",
@@ -65,5 +56,18 @@ public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated>
             List.of(pdf));
 
     mailer.accept(email);
+  }
+
+  public List<InternetAddress> toInternetAddresses(List<String> emails) {
+    return emails.stream()
+        .map(
+            mail -> {
+              try {
+                return new InternetAddress(mail);
+              } catch (Exception e) {
+                throw new RuntimeException(e);
+              }
+            })
+        .toList();
   }
 }

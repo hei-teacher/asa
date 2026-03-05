@@ -19,7 +19,7 @@ public class ThInvoiceServiceIT extends FacadeIT {
   void send_invoice_copy_ok() throws IOException {
     var event = mock(NewInvoiceGenerated.class);
     doNothing().when(eventProducer).accept(List.of(event));
-    thInvoiceService.sendInvoiceCopy("invoiceId");
+    thInvoiceService.sendGenerateInvoiceEvent("invoiceId");
     verify(eventProducer).accept(anyList());
   }
 }

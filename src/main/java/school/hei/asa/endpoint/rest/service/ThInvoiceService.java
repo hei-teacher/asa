@@ -75,10 +75,4 @@ public class ThInvoiceService {
       return new ThInvoice(base64Image, thInvoiceData);
     }
   }
-
-  @SneakyThrows
-  public void sendGenerateInvoiceEvent(String invoiceId) {
-    var event = NewInvoiceGenerated.builder().invoiceId(invoiceId).build();
-    eventProducer.accept(List.of(event));
-  }
 }

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
@@ -17,12 +16,21 @@ import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.service.InvoiceService;
 
 @Service
-@RequiredArgsConstructor
 public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated> {
   private static final String INVOICES_FOLDER = "invoices/";
 
-  @Value("${ACCOUNTANTS}")
-  private String accountants;
+  public NewInvoiceGeneratedService(
+      @Value("${ACCOUNTANTS}") String accountants,
+      Mailer mailer,
+      BucketComponent bucketComponent,
+      InvoiceService invoiceService) {
+    this.accountants = accountants;
+    this.mailer = mailer;
+    this.bucketComponent = bucketComponent;
+    this.invoiceService = invoiceService;
+  }
+
+  private final String accountants;
 
   private final Mailer mailer;
   private final BucketComponent bucketComponent;

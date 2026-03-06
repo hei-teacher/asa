@@ -22,5 +22,6 @@ public class EnvConf {
         () -> "authorization_code");
     registry.add("casdoor.logout.url", () -> "dummy");
     registry.add("asa.logout.url", () -> "dummy");
+    registry.add("ACCOUNTANTS", () -> "dummy,dummy2");
   }
 }

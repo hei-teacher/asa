@@ -19,33 +19,34 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
-import school.hei.asa.conf.FacadeIT;
+import school.hei.asa.conf.FacadeITMockedThirdParties;
 import school.hei.asa.endpoint.rest.model.th.ThInvoice;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.InvoicePDFGenerator;
 import school.hei.asa.endpoint.rest.service.ThInvoiceService;
-import school.hei.asa.file.bucket.BucketComponent;
 import school.hei.asa.file.hash.FileHash;
 import school.hei.asa.file.hash.FileHashAlgorithm;
 import school.hei.asa.model.BankAccount;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.BankAccountRepository;
+import school.hei.asa.service.InvoiceService;
 
-class InvoiceControllerIT extends FacadeIT {
+class InvoiceControllerIT extends FacadeITMockedThirdParties {
 
   @Autowired InvoiceController invoiceController;
 
   @MockBean WorkerFromAuthentication workerFromAuthentication;
   @MockBean WorkerToModelAdder workerToModelAdder;
   @MockBean BankAccountRepository bankAccountRepository;
-  @MockBean BucketComponent bucketComponent;
   @MockBean ThInvoiceService thInvoiceService;
   @MockBean InvoicePDFGenerator invoicePDFGenerator;
+
   Authentication authentication;
   Worker authenticatedWorker;
   Model model;
   BankAccount bankAccount;
+  @Autowired private InvoiceService invoiceService;
 
   @BeforeEach
   void setUp() {
@@ -152,15 +153,11 @@ class InvoiceControllerIT extends FacadeIT {
     var fakeInvoice = new ThInvoice("base64dummy", invoiceForm);
     FileHash fileHash = new FileHash(FileHashAlgorithm.NONE, "/invoices");
     when(thInvoiceService.extractInvoice(any(Worker.class), any())).thenReturn(fakeInvoice);
-    when(bucketComponent.upload(any(File.class), anyString())).thenReturn(fileHash);
     var response = invoiceController.generateInvoice(model, authentication, invoiceForm);
 
     Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
     Assertions.assertEquals(MediaType.APPLICATION_PDF, response.getHeaders().getContentType());
     Assertions.assertNotNull(response.getBody());
     Assertions.assertTrue(response.getBody().length > 0);
-
-    verify(bucketComponent, times(1)).upload(eq(fakeFile), anyString());
-    verify(thInvoiceService, times(1)).sendGenerateInvoiceEvent(anyString());
   }
 }

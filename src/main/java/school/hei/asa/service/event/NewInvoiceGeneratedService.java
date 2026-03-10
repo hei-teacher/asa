@@ -56,9 +56,10 @@ public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated>
     File pdf = bucketComponent.download(INVOICES_FOLDER + fileName);
     var email =
         new Email(
-            mainReceiver, // the "to" as the main receiver
-            internetAddressesCc, // here, sending emails to the list whithout sending it again to
-                                 // "to"
+            // the "to" as the main receiver
+            mainReceiver,
+            // here, sending emails to the list whithout sending it again to "to"
+            internetAddressesCc,
             List.of(),
             String.format(
                 "ASA INVOICE GENERATED - %s - %s",

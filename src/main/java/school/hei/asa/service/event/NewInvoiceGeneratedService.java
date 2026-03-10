@@ -18,6 +18,10 @@ import school.hei.asa.service.InvoiceService;
 @Service
 public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated> {
   private static final String INVOICES_FOLDER = "invoices/";
+  private final String accountants;
+  private final Mailer mailer;
+  private final BucketComponent bucketComponent;
+  private final InvoiceService invoiceService;
 
   public NewInvoiceGeneratedService(
       @Value("${ACCOUNTANTS}") String accountants,
@@ -30,12 +34,6 @@ public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated>
     this.invoiceService = invoiceService;
   }
 
-  private final String accountants;
-
-  private final Mailer mailer;
-  private final BucketComponent bucketComponent;
-  private final InvoiceService invoiceService;
-
   @Override
   public void accept(NewInvoiceGenerated event) {
     InvoiceReference invoiceReference = invoiceService.getInvoiceReference(event.getInvoiceId());
@@ -44,16 +42,23 @@ public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated>
     var listEmailsWithWorkerEmail =
         String.format("%s,%s", accountants, invoiceReference.worker().email());
 
+    // converting string to a list
     var listEmails = new ArrayList<>(Arrays.stream(listEmailsWithWorkerEmail.split(",")).toList());
 
+    // converting every items in the list to Internet Address
     var internetAddressesCc = toInternetAddresses(listEmails);
+
+    // similar to getFirst for the attribute "to"  in Email,
+    // but using removeFirst so I can get a list without the first item, excluding the "to" receiver
+
     var mainReceiver = internetAddressesCc.removeFirst();
 
     File pdf = bucketComponent.download(INVOICES_FOLDER + fileName);
     var email =
         new Email(
-            mainReceiver,
-            internetAddressesCc,
+            mainReceiver, // the "to" as the main receiver
+            internetAddressesCc, // here, sending emails to the list whithout sending it again to
+                                 // "to"
             List.of(),
             String.format(
                 "ASA INVOICE GENERATED - %s - %s",

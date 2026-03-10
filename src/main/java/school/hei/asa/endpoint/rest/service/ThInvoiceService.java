@@ -15,8 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
-import school.hei.asa.endpoint.event.EventProducer;
-import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
 import school.hei.asa.endpoint.rest.controller.mapper.ThInvoiceFormMapper;
 import school.hei.asa.endpoint.rest.model.th.ThInvoice;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
@@ -30,7 +28,6 @@ import school.hei.asa.service.InvoiceService;
 public class ThInvoiceService {
   private final InvoiceService invoiceService;
   private final ThInvoiceFormMapper thInvoiceFormMapper;
-  private final EventProducer<NewInvoiceGenerated> eventProducer;
   private final InvoicePDFGenerator invoicePDFGenerator;
 
   public String generateInvoiceFileName(Worker worker) {

@@ -13,7 +13,7 @@ public class EventSerializationTest {
   ObjectMapper om = new ObjectMapper();
 
   @Test
-  void refresh_org_billing_info_requested_serialization() throws JsonProcessingException {
+  void can_serialize_event() throws JsonProcessingException {
     var event = new NewInvoiceGenerated("invoiceId");
     var serialized = om.writeValueAsString(event);
     var deserialized = om.readValue(serialized, NewInvoiceGenerated.class);

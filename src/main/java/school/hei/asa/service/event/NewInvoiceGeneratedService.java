@@ -2,7 +2,6 @@ package school.hei.asa.service.event;
 
 import jakarta.mail.internet.InternetAddress;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -37,35 +36,27 @@ public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated>
   @Override
   public void accept(NewInvoiceGenerated event) {
     InvoiceReference invoiceReference = invoiceService.getInvoiceReference(event.getInvoiceId());
-    var fileName =
-        invoiceService.getInvoiceBucketKey(invoiceReference.worker(), invoiceReference.yearMonth());
+
     var listEmailsWithWorkerEmail =
         String.format("%s,%s", accountants, invoiceReference.worker().email());
+    var emailList = Arrays.asList(listEmailsWithWorkerEmail.split(","));
+    var internetAddresses = toInternetAddresses(emailList);
 
-    // converting string to a list
-    var listEmails = new ArrayList<>(Arrays.stream(listEmailsWithWorkerEmail.split(",")).toList());
-
-    // converting every items in the list to Internet Address
-    var internetAddressesCc = toInternetAddresses(listEmails);
-
-    // similar to getFirst for the attribute "to"  in Email,
-    // but using removeFirst so I can get a list without the first item, excluding the "to" receiver
-
-    var mainReceiver = internetAddressesCc.removeFirst();
-
+    var fileName =
+        invoiceService.getInvoiceBucketKey(invoiceReference.worker(), invoiceReference.yearMonth());
     File pdf = bucketComponent.download(INVOICES_FOLDER + fileName);
     var email =
         new Email(
-            // the "to" as the main receiver
-            mainReceiver,
-            // here, sending emails to the list whithout sending it again to "to"
-            internetAddressesCc,
+            internetAddresses.getFirst(),
+            internetAddresses.stream().skip(1).toList(),
             List.of(),
             String.format(
                 "ASA INVOICE GENERATED - %s - %s",
                 invoiceReference.worker().name(), invoiceReference.yearMonth()),
             String.format(
-                "Bonjour, \n Voici la facture de générée de %s  du mois de %s. \n Cordialement,",
+                "Hello,\n"
+                    + " Please find attached the generated invoice for %s for the month of %s.Best"
+                    + " regards,",
                 invoiceReference.worker().name(), invoiceReference.yearMonth()),
             List.of(pdf));
 

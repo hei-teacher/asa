@@ -10,8 +10,11 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.hei.asa.endpoint.event.EventProducer;
+import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
@@ -35,6 +38,7 @@ public class InvoiceService {
   private final BankAccountRepository bankAccountRepository;
   private final InvoiceReferenceRepository invoiceReferenceRepository;
   private final MissionService missionService;
+  private final EventProducer<NewInvoiceGenerated> eventProducer;
 
   public Optional<InvoiceReference> findInvoiceReference(Worker worker, YearMonth yearMonth) {
     var invoiceReferenceList = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker);
@@ -188,5 +192,17 @@ public class InvoiceService {
             .get();
 
     return String.format("FAC-NUM-2025-%s-%s.pdf", worker.code(), invoiceReference.autoincrement());
+  }
+
+  public InvoiceReference getInvoiceReference(String invoiceId) {
+    var invoiceReference = invoiceReferenceRepository.findInvoiceReferenceByInvoiceId(invoiceId);
+    return invoiceReference.orElseThrow(
+        () -> new NoSuchElementException("Invoice reference not found"));
+  }
+
+  @SneakyThrows
+  public void sendGenerateInvoiceEvent(String invoiceId) {
+    var event = NewInvoiceGenerated.builder().invoiceId(invoiceId).build();
+    eventProducer.accept(List.of(event));
   }
 }

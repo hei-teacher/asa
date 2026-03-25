@@ -3,6 +3,9 @@ package school.hei.asa.endpoint.rest.controller.mapper;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -17,6 +20,7 @@ import school.hei.asa.model.Worker;
 @AllArgsConstructor
 public class ThMissionExecutionMapper {
   private final ThContractService thContractService;
+  private final Map<String, List<ThContract>> contractsCache = new ConcurrentHashMap<>();
 
   public ThMissionExecution toTh(MissionExecution me, boolean isCare) {
     var worker = me.worker();
@@ -31,7 +35,9 @@ public class ThMissionExecutionMapper {
   }
 
   private boolean isExecutedByStudent(Worker worker, MissionExecution me) {
-    var contracts = thContractService.getAllContractsForWorker(worker);
+    var contracts =
+        contractsCache.computeIfAbsent(
+            worker.code(), code -> thContractService.getAllContractsForWorker(worker));
     var dateFormater = DateTimeFormatter.ofPattern("dd MMM yyyy");
     return contracts.stream()
         .filter(

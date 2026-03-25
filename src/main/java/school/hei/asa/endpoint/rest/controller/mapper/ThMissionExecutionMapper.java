@@ -40,8 +40,7 @@ public class ThMissionExecutionMapper {
               return entranceDate.isBefore(me.date());
             })
         .max(Comparator.comparing(ThContract::entranceInstant))
-        .get()
-        .contractType()
-        .equals("Alternant");
+        .map(contract -> contract.contractType().equals("Alternant"))
+        .orElse(false);
   }
 }

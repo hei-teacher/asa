@@ -5,8 +5,11 @@ import static java.time.ZoneId.systemDefault;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.model.JContract;
@@ -22,7 +25,29 @@ public class ContractMapper {
   private final DailyExecutionRepository dailyExecutionRepository;
 
   public List<Contract> toDomain(List<JContract> jwlhList) {
-    return jwlhList.stream().map(jContract -> toDomain(jContract, new Cache())).toList();
+
+    var dailyExecutions = dailyExecutionRepository.findAll();
+
+    Map<String, List<DailyExecution>> byWorker =
+        dailyExecutions.stream().collect(Collectors.groupingBy(d -> d.worker().code()));
+
+    return jwlhList.stream()
+        .map(
+            jContract -> {
+              String workerCode = jContract.getWorker().getCode();
+
+              return new Contract(
+                  workerMapper.toDomain(jContract.getWorker()),
+                  jContract.getJobTitle(),
+                  contractLevelMapper.toDomain(jContract),
+                  jContract.getEntranceInstant(),
+                  jContract.getEndInstant(),
+                  Duration.ofDays(jContract.getDurationInDays()),
+                  jContract.getCompany(),
+                  byWorker.getOrDefault(workerCode, List.of()),
+                  jContract.getContractBucketKey());
+            })
+        .toList();
   }
 
   /*package-private*/ Contract toDomain(JContract jContract, Cache cache) {

@@ -8,10 +8,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.WebApplicationContext;
 import school.hei.asa.endpoint.rest.controller.mapper.ThContractMapper;
 import school.hei.asa.endpoint.rest.model.th.ThContract;
 import school.hei.asa.model.Worker;
@@ -19,9 +23,11 @@ import school.hei.asa.service.ContractService;
 
 @AllArgsConstructor
 @Service
+@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class ThContractService {
   private final ContractService contractService;
   private final ThContractMapper thContractMapper;
+  private final Map<String, List<ThContract>> contractsCache = new HashMap<>();
 
   public Map<Worker, List<ThContract>> totalWorkDaysPerWorker() {
     var totalWorkDaysPerWorker = contractService.totalWorkDaysPerWorker();
@@ -118,6 +124,8 @@ public class ThContractService {
   }
 
   public List<ThContract> getAllContractsForWorker(Worker worker) {
-    return thContractMapper.toTh(contractService.getAllContractsForWorker(worker));
+    return contractsCache.computeIfAbsent(
+        worker.code(),
+        code -> thContractMapper.toTh(contractService.getAllContractsForWorker(worker)));
   }
 }

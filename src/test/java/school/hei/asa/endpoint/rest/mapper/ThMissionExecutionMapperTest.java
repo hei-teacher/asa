@@ -4,8 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.controller.mapper.ThMissionExecutionMapper;
 import school.hei.asa.endpoint.rest.model.th.ThMissionExecution;
@@ -16,6 +21,17 @@ import school.hei.asa.model.Worker;
 
 class ThMissionExecutionMapperTest extends FacadeIT {
   @Autowired ThMissionExecutionMapper thMissionExecutionMapper;
+
+  @BeforeEach
+  void setupRequestContext() {
+    RequestContextHolder.setRequestAttributes(
+        new ServletRequestAttributes(new MockHttpServletRequest()));
+  }
+
+  @AfterEach
+  void resetRequestContext() {
+    RequestContextHolder.resetRequestAttributes();
+  }
 
   @Test
   void can_map_mission_execution_by_partners() {

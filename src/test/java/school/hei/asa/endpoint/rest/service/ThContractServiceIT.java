@@ -5,13 +5,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.nio.file.Files;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import school.hei.asa.conf.FacadeIT;
 
 @Slf4j
 class ThContractServiceIT extends FacadeIT {
   @Autowired ThContractService thContractService;
+
+  @BeforeEach
+  void setupRequestContext() {
+    RequestContextHolder.setRequestAttributes(
+        new ServletRequestAttributes(new MockHttpServletRequest()));
+  }
+
+  @AfterEach
+  void resetRequestContext() {
+    RequestContextHolder.resetRequestAttributes();
+  }
 
   @Test
   @SneakyThrows

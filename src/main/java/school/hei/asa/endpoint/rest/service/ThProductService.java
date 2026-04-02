@@ -29,7 +29,8 @@ public class ThProductService {
       String workerCode, String startDate, String endDate, boolean noUnpaidCareMissions) {
     var thProducts = filterThProductsByWorkerCode(workerCode, noUnpaidCareMissions);
     if (startDate == null || startDate.isBlank() || endDate == null || endDate.isBlank()) {
-      return thProducts;
+      startDate = LocalDate.of(LocalDate.now().getYear(), 1, 1).toString();
+      endDate = LocalDate.of(LocalDate.now().getYear(), 12, 31).toString();
     }
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     var startLocalDate = LocalDate.parse(startDate, formatter);

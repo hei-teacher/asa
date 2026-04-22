@@ -22,7 +22,7 @@ public class ProductRepository {
 
   @Transactional
   public List<Product> findAll() {
-    return jProductRepository.findAll().stream().map(productMapper::toDomain).toList();
+    return productMapper.toDomain(jProductRepository.findAll());
   }
 
   @Transactional

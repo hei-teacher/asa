@@ -27,29 +27,14 @@ public class ThProductService {
 
   public List<ThProduct> filterThProductByWorkerCodeAndDateBetween(
       String workerCode, String startDate, String endDate, boolean noUnpaidCareMissions) {
-
+    var thProducts = filterThProductsByWorkerCode(workerCode, noUnpaidCareMissions);
     if (startDate == null || startDate.isBlank() || endDate == null || endDate.isBlank()) {
-      startDate =
-          LocalDate.of(
-                  LocalDate.now().getYear() - 1,
-                  LocalDate.now().getMonth(),
-                  LocalDate.now().getDayOfMonth())
-              .toString();
-      endDate =
-          LocalDate.of(
-                  LocalDate.now().getYear() - 1,
-                  LocalDate.now().getMonth(),
-                  LocalDate.now().getDayOfMonth())
-              .toString();
+      startDate = LocalDate.of(LocalDate.now().getYear(), 1, 1).toString();
+      endDate = LocalDate.of(LocalDate.now().getYear(), 12, 31).toString();
     }
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     var startLocalDate = LocalDate.parse(startDate, formatter);
     var endLocalDate = LocalDate.parse(endDate, formatter);
-
-    var thProducts = getAllThProducts(noUnpaidCareMissions);
-    if (workerCode != null) {
-      thProducts = filterThProductsByWorkerCode(workerCode, noUnpaidCareMissions);
-    }
     if (endLocalDate.isBefore(startLocalDate)) {
       return thProducts;
     }
@@ -67,7 +52,9 @@ public class ThProductService {
   public List<ThProduct> filterThProductsByWorkerCode(
       String workerCode, boolean noUnpaidCareMissions) {
     var thProduct = getAllThProducts(noUnpaidCareMissions);
-
+    if (workerCode == null || workerCode.isBlank()) {
+      return thProduct;
+    }
     return thProduct.stream().map(p -> p.filterByWorkerCode(workerCode)).toList();
   }
 

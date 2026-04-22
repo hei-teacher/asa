@@ -1,10 +1,9 @@
 package school.hei.asa.service;
 
-import static java.util.Comparator.comparing;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.asa.model.Worker;
@@ -19,15 +18,8 @@ public class ContractService {
   private final ContractRepository contractRepository;
 
   public Map<Worker, List<Contract>> totalWorkDaysPerWorker() {
-    Map<Worker, List<Contract>> result = new HashMap<>();
-    var workers = workerRepository.findAll().stream().sorted(comparing(Worker::name)).toList();
-    workers.parallelStream()
-        .forEach(
-            worker -> {
-              var contracts = contractRepository.findAllByWorker(worker);
-              result.put(worker, contracts);
-            });
-    return result;
+    return contractRepository.findAll().stream() // 1 seule requête avec JOIN FETCH worker
+        .collect(Collectors.groupingBy(Contract::worker));
   }
 
   public Map<Worker, List<Contract>> totalWorkDaysForOneWorker(String workerCode) {
@@ -38,7 +30,7 @@ public class ContractService {
     return result;
   }
 
-  public List<Contract> getAllContractsForWorker(Worker worker) {
-    return contractRepository.findAllByWorker(worker);
+  public List<Contract> getAllContractsForWorkerWithoutExecutions(Worker worker) {
+    return contractRepository.findAllByWorkerWithoutExecutions(worker);
   }
 }

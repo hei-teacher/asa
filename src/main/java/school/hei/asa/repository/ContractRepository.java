@@ -41,7 +41,6 @@ public class ContractRepository {
     return findByYearBetween(year, year + 1);
   }
 
-  // ContractRepository : ajoute
   public List<Contract> findAllByWorkerWithoutExecutions(Worker worker) {
     return jContractRepository
         .findAllByWorkerOrderByEntranceInstantDesc(workerMapper.toEntity(worker))
@@ -56,7 +55,7 @@ public class ContractRepository {
                     jc.getEndInstant(),
                     Duration.ofDays(jc.getDurationInDays()),
                     jc.getCompany(),
-                    List.of(), // ← pas de dailyExecutions
+                    List.of(),
                     jc.getContractBucketKey()))
         .toList();
   }

@@ -144,8 +144,4 @@ public class ThProductService {
             .toList(),
         product.isCare());
   }
-
-  public List<ThProduct> filterThProductByDate(LocalDate startDate, LocalDate endDate) {
-    return thProductMapper.toTh(productService.getProductsByDate(startDate, endDate));
-  }
 }

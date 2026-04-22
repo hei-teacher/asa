@@ -1,7 +1,6 @@
 package school.hei.asa.endpoint.rest.controller.mapper;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -9,18 +8,18 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import school.hei.asa.endpoint.rest.model.th.ThContract;
 import school.hei.asa.endpoint.rest.model.th.ThMissionExecution;
-import school.hei.asa.endpoint.rest.service.ThContractService;
 import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
+import school.hei.asa.model.contract.Contract;
+import school.hei.asa.service.ContractService;
 
 @Slf4j
 @Controller
 @AllArgsConstructor
 public class ThMissionExecutionMapper {
-  private final ThContractService thContractService;
-  private final Map<String, List<ThContract>> contractsCache = new ConcurrentHashMap<>();
+  private final ContractService contractService;
+  private final Map<String, List<Contract>> rawContractsCache = new ConcurrentHashMap<>();
 
   public ThMissionExecution toTh(MissionExecution me, boolean isCare) {
     var worker = me.worker();
@@ -36,17 +35,18 @@ public class ThMissionExecutionMapper {
 
   private boolean isExecutedByStudent(Worker worker, MissionExecution me) {
     var contracts =
-        contractsCache.computeIfAbsent(
-            worker.code(), code -> thContractService.getAllContractsForWorker(worker));
-    var dateFormater = DateTimeFormatter.ofPattern("dd MMM yyyy");
+        rawContractsCache.computeIfAbsent(
+            worker.code(),
+            code -> contractService.getAllContractsForWorkerWithoutExecutions(worker));
     return contracts.stream()
         .filter(
-            contract -> {
-              var entranceDate = LocalDate.parse(contract.entranceInstant(), dateFormater);
-              return entranceDate.isBefore(me.date());
-            })
-        .max(Comparator.comparing(ThContract::entranceInstant))
-        .map(contract -> contract.contractType().equals("Alternant"))
+            c ->
+                c.entranceInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+                    .isBefore(me.date()))
+        .max(Comparator.comparing(Contract::entranceInstant))
+        .map(c -> c.level().type().name().equals("studentContractor"))
         .orElse(false);
   }
 }

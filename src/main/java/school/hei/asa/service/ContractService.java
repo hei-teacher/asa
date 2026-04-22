@@ -34,7 +34,6 @@ public class ContractService {
     return contractRepository.findAllByWorker(worker);
   }
 
-  // ContractService : ajoute une méthode légère sans executions
   public List<Contract> getAllContractsForWorkerWithoutExecutions(Worker worker) {
     return contractRepository.findAllByWorkerWithoutExecutions(worker);
   }

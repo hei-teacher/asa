@@ -55,7 +55,6 @@ public class ContractRepository {
                     jc.getEndInstant(),
                     Duration.ofDays(jc.getDurationInDays()),
                     jc.getCompany(),
-                    List.of(),
                     jc.getContractBucketKey()))
         .toList();
   }

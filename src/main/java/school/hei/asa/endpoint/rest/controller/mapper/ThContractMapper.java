@@ -3,6 +3,7 @@ package school.hei.asa.endpoint.rest.controller.mapper;
 import static java.time.ZoneId.systemDefault;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,6 +46,9 @@ public class ThContractMapper {
               current.endInstant() == null
                   ? "-"
                   : dateFormater.format(current.endInstant().atZone(systemDefault()).toLocalDate());
+          var startDate = LocalDate.parse(entranceDate, dateFormater);
+          var localEndDate =
+              !endDate.equals("-") ? LocalDate.parse(endDate, dateFormater) : LocalDate.now();
           result.add(
               new ThContract(
                   contractLevel.code(),
@@ -57,7 +61,7 @@ public class ThContractMapper {
                   current.duration() == null ? "-" : current.duration().toDays() + "",
                   current.contractBucketKey(),
                   contractService.getActualWorkedDaysByDateByWorker(
-                      entranceDate, current.worker().code(), endDate)));
+                      startDate, current.worker().code(), localEndDate)));
         });
     log.info("Successfully mapping contracts to Th !");
 

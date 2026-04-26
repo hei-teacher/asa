@@ -3,28 +3,32 @@ package school.hei.asa.endpoint.rest.service;
 import static java.lang.Double.parseDouble;
 import static java.lang.System.lineSeparator;
 import static java.time.LocalDate.now;
+import static java.time.format.DateTimeFormatter.ofPattern;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.time.Instant;
-import java.time.ZoneId;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.rest.controller.mapper.ThContractMapper;
 import school.hei.asa.endpoint.rest.model.th.ThContract;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.ContractService;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 public class ThContractService {
   private final ContractService contractService;
   private final ThContractMapper thContractMapper;
+  private final DateTimeFormatter localDateFormatter = ofPattern("dd MMM yyyy");
 
   public Map<Worker, List<ThContract>> totalWorkDaysPerWorker() {
     var totalWorkDaysPerWorker = contractService.totalWorkDaysPerWorker();
@@ -80,18 +84,23 @@ public class ThContractService {
   }
 
   private String newEntryFrom(ThContract thContract, Worker worker) {
-    String remainingDays = remainingDaysToString(thContract, worker.code());
-    String actualWorkedDays =
-        actualWorkedDaysToString(
-            thContract.entranceInstant(), thContract.endInstant(), worker.code());
-    String startDate = thContract.entranceInstant();
+    String remainingDays =
+        remainingDaysToString(thContract, worker.code()).equals("0")
+            ? "-"
+            : remainingDaysToString(thContract, worker.code());
+    var startDate = LocalDate.parse(thContract.entranceInstant(), localDateFormatter);
+    var endDate =
+        !thContract.endInstant().equals("-")
+            ? LocalDate.parse(thContract.endInstant(), localDateFormatter)
+            : now();
+    String actualWorkedDays = actualWorkedDaysToString(startDate, endDate, worker.code());
     String newEntry =
         String.format(
             "%s,%s,%s,%s,%s,%s,%s",
             worker.code(),
             worker.name(),
             thContract.level(),
-            startDate,
+            thContract.entranceInstant(),
             thContract.duration(),
             actualWorkedDays,
             remainingDays);
@@ -99,29 +108,30 @@ public class ThContractService {
   }
 
   private String remainingDaysToString(ThContract thContract, String workerCode) {
-    if (thContract.duration().equals("-")) {
+    if (thContract.duration().equals("-") || thContract.actualWorkedDays().equals("-")) {
       return "-";
     }
-    var startDate =
-        Instant.parse(thContract.entranceInstant())
-            .atZone(ZoneId.systemDefault())
-            .toLocalDate()
-            .toString();
+    var startDate = LocalDate.parse(thContract.entranceInstant(), localDateFormatter);
     var endDate =
-        thContract.endInstant() != null && !thContract.endInstant().equals("-")
-            ? Instant.parse(thContract.endInstant())
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate()
-                .toString()
-            : now().toString();
+        !thContract.endInstant().equals("-")
+            ? LocalDate.parse(thContract.endInstant(), localDateFormatter)
+            : now();
 
-    var res =
-        parseDouble(thContract.duration())
-            - parseDouble(actualWorkedDaysToString(endDate, thContract.endInstant(), startDate));
+    log.info("END DATE : {}", endDate);
+    log.info("START DATE : {}", startDate);
+
+    var actualWorkedDays =
+        actualWorkedDaysToString(startDate, endDate, workerCode).equals("-")
+            ? "0"
+            : actualWorkedDaysToString(startDate, endDate, workerCode);
+    log.info("PARSE DOUBLE : {}", parseDouble(actualWorkedDays));
+
+    var res = parseDouble(thContract.duration()) - parseDouble(actualWorkedDays);
     return formatDays(res);
   }
 
-  public String actualWorkedDaysToString(String startDate, String endDate, String workerCode) {
+  public String actualWorkedDaysToString(
+      LocalDate startDate, LocalDate endDate, String workerCode) {
     return contractService.getActualWorkedDaysByDateByWorker(startDate, workerCode, endDate);
   }
 

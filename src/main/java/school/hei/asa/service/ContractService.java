@@ -1,6 +1,5 @@
 package school.hei.asa.service;
 
-import static java.time.LocalDate.now;
 import static java.util.Locale.FRENCH;
 import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
@@ -51,14 +50,9 @@ public class ContractService {
   }
 
   public String getActualWorkedDaysByDateByWorker(
-      String startDate, String workerCode, String endDate) {
-    log.info("START DATE : {}", startDate);
-    log.info("END daTE : {}", endDate);
-    var localStartDate = LocalDate.parse(startDate, localDateFormatter);
-    var localEndDate = !endDate.equals("-") ? LocalDate.parse(endDate, localDateFormatter) : now();
+      LocalDate startDate, String workerCode, LocalDate endDate) {
     var dailyExecutions =
-        dailyExecutionRepository.findByWorkerCodeAndDateBetween(
-            workerCode, localStartDate, localEndDate);
+        dailyExecutionRepository.findByWorkerCodeAndDateBetween(workerCode, startDate, endDate);
     return executedDays(dailyExecutions);
   }
 

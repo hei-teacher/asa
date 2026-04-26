@@ -48,6 +48,7 @@ class ThContractServiceIT extends FacadeIT {
     var actualCSV = thContractService.generateCSV(null);
 
     var actualContent = Files.readString(actualCSV.toPath());
+    log.info("here is the content of the file: {}", actualContent);
 
     assertTrue(actualContent.contains("W-P-2024-01,Lita Andria,L5,01 Jan 2023,13,2.0,11.0"));
     assertTrue(actualContent.contains("W-P-2024-01,Lita Andria,L4P-2026,01 Jan 2025,80,-,-"));

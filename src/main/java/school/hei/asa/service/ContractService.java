@@ -45,8 +45,8 @@ public class ContractService {
     return result;
   }
 
-  public List<Contract> getAllContractsForWorkerWithoutExecutions(Worker worker) {
-    return contractRepository.findAllByWorkerWithoutExecutions(worker);
+  public List<Contract> getAllContractsByWorker(Worker worker) {
+    return contractRepository.findAllByWorker(worker);
   }
 
   public String getActualWorkedDaysByDateByWorker(

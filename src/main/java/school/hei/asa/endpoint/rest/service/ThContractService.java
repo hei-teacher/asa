@@ -85,15 +85,8 @@ public class ThContractService {
 
   private String newEntryFrom(ThContract thContract, Worker worker) {
     String remainingDays =
-        remainingDaysToString(thContract, worker.code()).equals("0")
-            ? "-"
-            : remainingDaysToString(thContract, worker.code());
-    var startDate = LocalDate.parse(thContract.entranceInstant(), localDateFormatter);
-    var endDate =
-        !thContract.endInstant().equals("-")
-            ? LocalDate.parse(thContract.endInstant(), localDateFormatter)
-            : now();
-    String actualWorkedDays = actualWorkedDaysToString(startDate, endDate, worker.code());
+        remainingDaysToString(thContract).equals("0") ? "-" : remainingDaysToString(thContract);
+    String actualWorkedDays = actualWorkedDaysToString(thContract);
     String newEntry =
         String.format(
             "%s,%s,%s,%s,%s,%s,%s",
@@ -107,7 +100,7 @@ public class ThContractService {
     return newEntry + lineSeparator();
   }
 
-  private String remainingDaysToString(ThContract thContract, String workerCode) {
+  private String remainingDaysToString(ThContract thContract) {
     if (thContract.duration().equals("-") || thContract.actualWorkedDays().equals("-")) {
       return "-";
     }
@@ -117,22 +110,17 @@ public class ThContractService {
             ? LocalDate.parse(thContract.endInstant(), localDateFormatter)
             : now();
 
-    log.info("END DATE : {}", endDate);
-    log.info("START DATE : {}", startDate);
-
-    var actualWorkedDays =
-        actualWorkedDaysToString(startDate, endDate, workerCode).equals("-")
-            ? "0"
-            : actualWorkedDaysToString(startDate, endDate, workerCode);
-    log.info("PARSE DOUBLE : {}", parseDouble(actualWorkedDays));
-
-    var res = parseDouble(thContract.duration()) - parseDouble(actualWorkedDays);
+    var res =
+        parseDouble(thContract.duration()) - parseDouble(actualWorkedDaysToString(thContract));
     return formatDays(res);
   }
 
-  public String actualWorkedDaysToString(
-      LocalDate startDate, LocalDate endDate, String workerCode) {
-    return contractService.getActualWorkedDaysByDateByWorker(startDate, workerCode, endDate);
+  private String actualWorkedDaysToString(ThContract thContract) {
+    if (thContract.actualWorkedDays().equals("-")) {
+      return "-";
+    }
+    double res = parseDouble(thContract.actualWorkedDays());
+    return res == 0.0d ? "-" : formatDays(res);
   }
 
   private String formatDays(double days) {

@@ -22,7 +22,6 @@ import school.hei.asa.repository.DummyUuidRepository;
 import school.hei.asa.repository.model.DummyUuid;
 
 @PojaGenerated
-@SuppressWarnings("all")
 @RestController
 @AllArgsConstructor
 public class HealthEventController {

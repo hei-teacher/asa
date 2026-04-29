@@ -44,7 +44,6 @@ public class InvoiceServiceIT extends FacadeIT {
             null,
             Duration.ofDays(100),
             "company",
-            List.of(),
             "");
     when(contractRepository.findAllByWorker(any())).thenReturn(List.of(contract));
     when(bankAccountRepository.findByWorkerCode(anyString()))

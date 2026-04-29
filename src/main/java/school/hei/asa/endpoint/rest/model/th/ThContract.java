@@ -13,10 +13,10 @@ public class ThContract {
   String entranceInstant;
   String endInstant;
   String contractType;
-  String actualWorkedDay;
   BigDecimal compensation;
   String company;
   String jobTitle;
   String duration;
   String contractBucketKey;
+  String actualWorkedDays;
 }

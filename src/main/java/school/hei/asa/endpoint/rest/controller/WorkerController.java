@@ -11,6 +11,7 @@ import school.hei.asa.endpoint.rest.controller.mapper.ThContractMapper;
 import school.hei.asa.endpoint.rest.controller.mapper.ThWorkerMapper;
 import school.hei.asa.endpoint.rest.model.th.ThWorker;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
+import school.hei.asa.endpoint.rest.service.ThContractService;
 import school.hei.asa.model.*;
 import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.WorkerRepository;
@@ -25,6 +26,7 @@ public class WorkerController {
   private final WorkerToModelAdder workerToModelAdder;
   private final ThWorkerMapper thWorkerMapper;
   private final ThContractMapper thContractMapper;
+  private final ThContractService thContractService;
 
   @GetMapping("/workers")
   public List<Worker> getWorkers() {

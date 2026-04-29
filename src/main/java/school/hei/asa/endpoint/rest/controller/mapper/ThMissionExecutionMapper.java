@@ -36,8 +36,7 @@ public class ThMissionExecutionMapper {
   private boolean isExecutedByStudent(Worker worker, MissionExecution me) {
     var contracts =
         rawContractsCache.computeIfAbsent(
-            worker.code(),
-            code -> contractService.getAllContractsForWorkerWithoutExecutions(worker));
+            worker.code(), code -> contractService.getAllContractsByWorker(worker));
     return contracts.stream()
         .filter(
             c ->

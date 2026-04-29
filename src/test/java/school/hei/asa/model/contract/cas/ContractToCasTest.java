@@ -19,7 +19,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import school.hei.asa.model.Worker;
@@ -151,7 +150,6 @@ public class ContractToCasTest {
         null,
         Duration.ofDays(nbDays),
         "company",
-        mock(List.class),
         "contractBucketKey");
   }
 
@@ -164,7 +162,6 @@ public class ContractToCasTest {
         null,
         Duration.ofDays(nbDays),
         "company",
-        mock(List.class),
         "contractBucketKey");
   }
 
@@ -177,7 +174,6 @@ public class ContractToCasTest {
         null,
         null,
         "company",
-        mock(List.class),
         "contractBucketKey");
   }
 

@@ -52,15 +52,7 @@ class WorkerControllerIT extends FacadeIT {
     var level = new ContractLevel("levelCode", studentContractor, null, 55_556d);
     var mockContract =
         new Contract(
-            authenticatedWorker,
-            "DevSecOps",
-            level,
-            Instant.now(),
-            null,
-            null,
-            null,
-            List.of(),
-            null);
+            authenticatedWorker, "DevSecOps", level, Instant.now(), null, null, null, null);
 
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));

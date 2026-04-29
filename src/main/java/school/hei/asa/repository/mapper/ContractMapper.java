@@ -1,6 +1,5 @@
 package school.hei.asa.repository.mapper;
 
-import static java.time.LocalDate.now;
 import static java.time.ZoneId.systemDefault;
 
 import java.time.Duration;
@@ -39,8 +38,6 @@ public class ContractMapper {
         jContract.getEndInstant(),
         Duration.ofDays(jContract.getDurationInDays()),
         jContract.getCompany(),
-        dailyExecutionRepository.findByWorkerCodeAndDateBetween(
-            jContract.getWorker().getCode(), startDate, now()),
         jContract.getContractBucketKey());
   }
 }

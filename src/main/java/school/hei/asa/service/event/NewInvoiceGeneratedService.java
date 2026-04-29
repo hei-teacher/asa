@@ -1,6 +1,5 @@
 package school.hei.asa.service.event;
 
-import jakarta.mail.internet.InternetAddress;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +12,7 @@ import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.service.InvoiceService;
+import school.hei.asa.service.mapper.InternetAddressMapper;
 
 @Service
 public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated> {
@@ -21,16 +21,19 @@ public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated>
   private final Mailer mailer;
   private final BucketComponent bucketComponent;
   private final InvoiceService invoiceService;
+  private final InternetAddressMapper emailService;
 
   public NewInvoiceGeneratedService(
       @Value("${ACCOUNTANTS}") String accountants,
       Mailer mailer,
       BucketComponent bucketComponent,
-      InvoiceService invoiceService) {
+      InvoiceService invoiceService,
+      InternetAddressMapper emailService) {
     this.accountants = accountants;
     this.mailer = mailer;
     this.bucketComponent = bucketComponent;
     this.invoiceService = invoiceService;
+    this.emailService = emailService;
   }
 
   @Override
@@ -40,7 +43,7 @@ public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated>
     var listEmailsWithWorkerEmail =
         String.format("%s,%s", accountants, invoiceReference.worker().email());
     var emailList = Arrays.asList(listEmailsWithWorkerEmail.split(","));
-    var internetAddresses = toInternetAddresses(emailList);
+    var internetAddresses = emailService.toInternetAddresses(emailList);
 
     var fileName =
         invoiceService.getInvoiceBucketKey(invoiceReference.worker(), invoiceReference.yearMonth());
@@ -61,18 +64,5 @@ public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated>
             List.of(pdf));
 
     mailer.accept(email);
-  }
-
-  public List<InternetAddress> toInternetAddresses(List<String> emails) {
-    return emails.stream()
-        .map(
-            mail -> {
-              try {
-                return new InternetAddress(mail);
-              } catch (Exception e) {
-                throw new RuntimeException(e);
-              }
-            })
-        .toList();
   }
 }

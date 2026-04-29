@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.PaidCareMissionCodesSupplier;
+import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Worker;
@@ -25,6 +26,7 @@ public class CalendarService {
   private final DailyExecutionRepository dailyExecutionRepository;
   private final CareProductCodeSupplier careProductCodeSupplier;
   private final PaidCareMissionCodesSupplier paidCareMissionCodesSupplier;
+  private final Mailer mailer;
 
   @Transactional
   public Map<DailyExecution.Type, List<LocalDate>> datesByDailyExecutionType(

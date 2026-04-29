@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import school.hei.asa.repository.model.JMissionExecution;
-import school.hei.asa.repository.model.JWorker;
 import school.hei.asa.repository.model.WorkerDayPercentageSummary;
 
 @Repository
@@ -16,7 +15,8 @@ public interface JMissionExecutionRepository extends JpaRepository<JMissionExecu
   @Override
   List<JMissionExecution> findAll();
 
-  List<JMissionExecution> findAllByWorker(JWorker jWorker);
+  @Query("SELECT m.worker_code FROM JMissionExecution m WHERE m.date = :date")
+  List<String> findAllWorkerCodeByDate( LocalDate date);
 
   List<JMissionExecution> findByDateBetween(LocalDate startDate, LocalDate endDate);
 

@@ -40,4 +40,9 @@ public class MissionExecutionRepository {
     return jMissionExecutionRepository.findWorkerDayPercentageSummary(
         worker.code(), startDate, endDate);
   }
+
+  @Transactional
+  public List<String> findWorkerCodeByDate(LocalDate localDate) {
+    return jMissionExecutionRepository.findAllWorkerCodeByDate(localDate);
+  }
 }

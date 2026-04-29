@@ -82,4 +82,8 @@ public class ContractService {
             .get();
     return String.format("%.1f", result);
   }
+
+  public List<Contract> findActiveContract() {
+    return contractRepository.findAllActiveContract();
+  }
 }

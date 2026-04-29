@@ -27,6 +27,7 @@ import school.hei.asa.repository.WorkerRepository;
 public class ContractService {
   private final WorkerRepository workerRepository;
   private final ContractRepository contractRepository;
+
   private final DailyExecutionRepository dailyExecutionRepository;
   private final MissionService missionService;
   private CareProductCodeSupplier careProductCodeSupplier;

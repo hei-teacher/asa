@@ -38,7 +38,6 @@ public class ContractRepository {
     return findByYearBetween(year, year + 1);
   }
 
-
   public List<Contract> findAllActiveContract() {
     return contractMapper.toDomain(jContractRepository.findActiveContracts());
   }

@@ -41,16 +41,8 @@ public class LateReportedDayServiceTest extends FacadeIT {
     var contractList =
         List.of(
             new Contract(
-                worker1,
-                "",
-                null,
-                Instant.now(),
-                Instant.now(),
-                Duration.ofDays(2),
-                "",
-                List.of(),
-                ""),
-            new Contract(worker2, "", null, null, null, null, "", List.of(), ""));
+                worker1, "", null, Instant.now(), Instant.now(), Duration.ofDays(2), "", ""),
+            new Contract(worker2, "", null, null, null, null, "", ""));
     when(contractService.findActiveContract()).thenReturn(contractList);
 
     var subject =
@@ -82,16 +74,8 @@ public class LateReportedDayServiceTest extends FacadeIT {
         .thenReturn(
             List.of(
                 new Contract(
-                    worker1,
-                    "",
-                    null,
-                    Instant.now(),
-                    Instant.now(),
-                    Duration.ofDays(2),
-                    "",
-                    List.of(),
-                    ""),
-                new Contract(worker2, "", null, null, null, null, "", List.of(), "")));
+                    worker1, "", null, Instant.now(), Instant.now(), Duration.ofDays(2), "", ""),
+                new Contract(worker2, "", null, null, null, null, "", "")));
     when(missionExecutionRepository.findWorkerCodeByDate(any())).thenReturn(List.of("code1"));
 
     lateReportedDaysVerificationService.accept(new LateReportedDaysVerificationRequested());

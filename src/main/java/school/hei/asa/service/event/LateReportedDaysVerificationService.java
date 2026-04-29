@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.model.LateReportedDaysVerificationRequested;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
+import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.repository.MissionExecutionRepository;
 import school.hei.asa.service.ContractService;
@@ -18,6 +19,7 @@ import school.hei.asa.service.mapper.InternetAddressMapper;
 
 @Service
 public class LateReportedDaysVerificationService implements Consumer<LateReportedDaysVerificationRequested> {
+
   private final ContractService contractService;
   private final MissionExecutionRepository missionExecutionRepository;
   private final Mailer mailer;
@@ -43,14 +45,14 @@ public class LateReportedDaysVerificationService implements Consumer<LateReporte
     var dayToReport = now().minusDays(lateReport);
     var workerWhoReported = missionExecutionRepository.findWorkerCodeByDate(dayToReport);
     var unReportedWorker = extractWorkersWhoDidNotReport(workerWhoReported);
-    sendEmailToUnReportedWorkers(
-        unReportedWorker.stream().map(contract -> contract.worker().code()).toList(), dayToReport);
+    sendEmailToUnReportedWorkers(unReportedWorker.stream().map(Worker::code).toList(), dayToReport);
   }
 
-  public List<Contract> extractWorkersWhoDidNotReport(List<String> workerCodes) {
+  public List<Worker> extractWorkersWhoDidNotReport(List<String> workerCodes) {
     var contracts = contractService.findActiveContract();
     return contracts.stream()
         .filter(contract -> !workerCodes.contains(contract.worker().code()))
+        .map(Contract::worker)
         .toList();
   }
 

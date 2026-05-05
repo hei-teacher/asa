@@ -15,6 +15,8 @@ public interface JMissionExecutionRepository extends JpaRepository<JMissionExecu
   @Override
   List<JMissionExecution> findAll();
 
+  List<JMissionExecution> findBydate(LocalDate date);
+
   @Query("SELECT m.worker_code FROM JMissionExecution m WHERE m.date = :date")
   List<String> findAllWorkerCodeByDate( LocalDate date);
 

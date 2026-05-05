@@ -1,8 +1,12 @@
 package school.hei.asa.service.event;
 
-import static java.time.LocalDate.now;
+import static java.time.DayOfWeek.SATURDAY;
+import static java.time.DayOfWeek.SUNDAY;
+import static org.reflections.Reflections.log;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -11,6 +15,7 @@ import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.model.LateReportedDaysVerificationRequested;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
+import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.repository.MissionExecutionRepository;
@@ -42,10 +47,17 @@ public class LateReportedDaysVerificationService implements Consumer<LateReporte
   @Override
   public void accept(LateReportedDaysVerificationRequested lateReportedDaysVerification) {
     int lateReport = 4;
-    var dayToReport = now().minusDays(lateReport);
-    var workerWhoReported = missionExecutionRepository.findWorkerCodeByDate(dayToReport);
-    var unReportedWorker = extractWorkersWhoDidNotReport(workerWhoReported);
-    sendEmailToUnReportedWorkers(unReportedWorker.stream().map(Worker::code).toList(), dayToReport);
+    var dayToReport = lateReportedDaysVerification.getVerificationDate().minusDays(lateReport);
+
+    if (dayToReport.getDayOfWeek() == SATURDAY || dayToReport.getDayOfWeek() == SUNDAY) {
+      sendEmailToUnReportedWorkers(
+          getWorkersWhoReportedLate(dayToReport).stream().map(Worker::email).toList(), dayToReport);
+    } else {
+      var workerWhoReported = missionExecutionRepository.findWorkerCodeByDate(dayToReport);
+      var unReportedWorker =
+          extractWorkersWhoDidNotReport(workerWhoReported).stream().map(Worker::email).toList();
+      sendEmailToUnReportedWorkers(unReportedWorker, dayToReport);
+    }
   }
 
   public List<Worker> extractWorkersWhoDidNotReport(List<String> workerCodes) {
@@ -57,26 +69,46 @@ public class LateReportedDaysVerificationService implements Consumer<LateReporte
   }
 
   public void sendEmailToUnReportedWorkers(List<String> receivers, LocalDate date) {
-    var accountants =
-        emailService.toInternetAddresses(Arrays.stream(this.accountants.split(",")).toList());
-    var receiverAddresses = emailService.toInternetAddresses(receivers);
-    var text =
-        String.format(
-            "Hello, \n"
-                + " This is a reminder that you didn't report your work at the date %s on time. \n"
-                + " Best Regards,",
-            date);
 
-    receiverAddresses.forEach(
-        receiver -> {
-          mailer.accept(
-              new Email(
-                  receiver,
-                  accountants,
-                  List.of(),
-                  String.format("ASA - LATE REPORTED WORK ON %s", date),
-                  text,
-                  List.of()));
-        });
+    if (!receivers.isEmpty()) {
+      var accountants =
+          emailService.toInternetAddresses(Arrays.stream(this.accountants.split(",")).toList());
+      var receiverAddresses = emailService.toInternetAddresses(receivers);
+      var text =
+          String.format(
+              "Hello, \n"
+                  + " This is a reminder that you didn't report your work at the date %s on time."
+                  + " \n"
+                  + " Best Regards,",
+              date);
+
+      log.info("Sending emails to workers...");
+      receiverAddresses.forEach(
+          receiver -> {
+            mailer.accept(
+                new Email(
+                    receiver,
+                    accountants,
+                    List.of(),
+                    String.format("ASA - LATE REPORTED WORK ON %s", date),
+                    text,
+                    List.of()));
+          });
+    } else {
+      log.info("No receivers found");
+    }
+  }
+
+  public List<Worker> getWorkersWhoReportedLate(LocalDate date) {
+    var missionExecutions = missionExecutionRepository.findByDate(date);
+
+    return missionExecutions.stream()
+        .filter(
+            me ->
+                ChronoUnit.DAYS.between(
+                        date, me.reportedAt().atZone(ZoneId.systemDefault()).toLocalDate())
+                    > 3)
+        .map(MissionExecution::worker)
+        .toList();
   }
 }

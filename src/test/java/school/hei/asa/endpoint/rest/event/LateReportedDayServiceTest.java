@@ -37,7 +37,7 @@ public class LateReportedDayServiceTest extends FacadeIT {
   public void extract_not_reporting_worker_ok() {
     var worker1 = new Worker("W-37", "name", "email", "fullNAme", "address", "city", "nif", "stat");
     var worker2 = new Worker("W-36", "name", "email", "fullNAme", "address", "city", "nif", "stat");
-    var workerWhoReported = List.of("W-036"); // those who didn't
+    var workerWhoReported = List.of("W-036");
     var contractList =
         List.of(
             new Contract(

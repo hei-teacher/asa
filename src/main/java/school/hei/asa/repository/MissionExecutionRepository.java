@@ -45,4 +45,9 @@ public class MissionExecutionRepository {
   public List<String> findWorkerCodeByDate(LocalDate localDate) {
     return jMissionExecutionRepository.findAllWorkerCodeByDate(localDate);
   }
+
+  @Transactional
+  public List<MissionExecution> findByDate(LocalDate date) {
+    return missionExecutionMapper.toDomain(jMissionExecutionRepository.findBydate(date));
+  }
 }

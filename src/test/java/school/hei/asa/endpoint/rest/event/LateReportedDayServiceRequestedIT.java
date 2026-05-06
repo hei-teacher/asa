@@ -43,7 +43,7 @@ public class LateReportedDayServiceRequestedIT extends FacadeIT {
             new Contract(
                 worker1, "", null, Instant.now(), Instant.now(), Duration.ofDays(2), "", ""),
             new Contract(worker2, "", null, null, null, null, "", ""));
-    when(contractService.findActiveContract()).thenReturn(contractList);
+    when(contractService.findActiveContracts()).thenReturn(contractList);
 
     var subject =
         lateReportedDaysVerificationService.extractWorkersWhoDidNotReport(workerWhoReported);
@@ -70,7 +70,7 @@ public class LateReportedDayServiceRequestedIT extends FacadeIT {
     var worker1 = new Worker("W-36", "name", "email", "fullNAme", "address", "city", "nif", "stat");
     var worker2 = new Worker("W-37", "name", "email", "fullNAme", "address", "city", "nif", "stat");
     var date = LocalDate.of(2026, 4, 18);
-    when(contractService.findActiveContract())
+    when(contractService.findActiveContracts())
         .thenReturn(
             List.of(
                 new Contract(

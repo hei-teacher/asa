@@ -85,6 +85,6 @@ public class ContractService {
   }
 
   public List<Contract> findActiveContract() {
-    return contractRepository.findAllActiveContract();
+    return contractRepository.findAllActiveContracts();
   }
 }

@@ -23,5 +23,6 @@ public class EnvConf {
     registry.add("casdoor.logout.url", () -> "dummy");
     registry.add("asa.logout.url", () -> "dummy");
     registry.add("ACCOUNTANTS", () -> "dummy,dummy2");
+    registry.add("MAX_LATENESS_REPORT", () -> 4);
   }
 }

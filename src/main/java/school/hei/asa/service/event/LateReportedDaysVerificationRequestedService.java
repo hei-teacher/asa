@@ -6,6 +6,7 @@ import static java.time.DayOfWeek.SUNDAY;
 import static org.reflections.Reflections.log;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -24,7 +25,7 @@ import school.hei.asa.service.ContractService;
 import school.hei.asa.service.mapper.InternetAddressMapper;
 
 @Service
-public class LateReportedDaysVerificationService
+public class LateReportedDaysVerificationRequestedService
     implements Consumer<LateReportedDaysVerificationRequested> {
 
   private final ContractService contractService;
@@ -32,35 +33,35 @@ public class LateReportedDaysVerificationService
   private final Mailer mailer;
   private final String accountants;
   private final InternetAddressMapper emailService;
+  private final int maxLatenessForReport;
 
-  public LateReportedDaysVerificationService(
+  public LateReportedDaysVerificationRequestedService(
       ContractService contractService,
       MissionExecutionRepository missionExecutionRepository,
       Mailer mailer,
       @Value("${ACCOUNTANTS}") String accountants,
+      @Value("${MAX_LATENESS_REPORT}") int maxLatenessForReport,
       InternetAddressMapper emailService) {
     this.contractService = contractService;
     this.missionExecutionRepository = missionExecutionRepository;
     this.mailer = mailer;
     this.accountants = accountants;
     this.emailService = emailService;
+    this.maxLatenessForReport = maxLatenessForReport;
   }
 
   @Override
   public void accept(LateReportedDaysVerificationRequested lateReportedDaysVerification) {
-    int lateReport = 4;
-    var dayToReport = lateReportedDaysVerification.getVerificationDate().minusDays(lateReport);
+    var maxLatenessReport = Period.ofDays(maxLatenessForReport);
+    var dateToVerify = lateReportedDaysVerification.getVerificationDate().minus(maxLatenessReport);
 
-    if (dayToReport.getDayOfWeek() == SATURDAY
-        || dayToReport.getDayOfWeek() == SUNDAY
-        || dayToReport.getDayOfWeek() == MONDAY) {
-      sendEmailToUnReportedWorkers(
-          getWorkersWhoReportedLate(dayToReport).stream().map(Worker::email).toList(), dayToReport);
-    } else {
-      var workerWhoReported = missionExecutionRepository.findWorkerCodeByDate(dayToReport);
+    if (dateToVerify.getDayOfWeek() != SATURDAY
+        && dateToVerify.getDayOfWeek() != SUNDAY
+        && dateToVerify.getDayOfWeek() != MONDAY) {
+      var workerWhoReported = missionExecutionRepository.findWorkerCodeByDate(dateToVerify);
       var unReportedWorker =
           extractWorkersWhoDidNotReport(workerWhoReported).stream().map(Worker::email).toList();
-      sendEmailToUnReportedWorkers(unReportedWorker, dayToReport);
+      sendEmailToUnReportedWorkers(unReportedWorker, dateToVerify);
     }
   }
 

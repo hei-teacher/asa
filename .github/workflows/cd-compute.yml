@@ -34,6 +34,12 @@ jobs:
               (github.ref == 'refs/heads/prod') && secrets.PROD_ACCOUNTANTS ||
               (github.ref == 'refs/heads/preprod') && secrets.PREPROD_ACCOUNTANTS
               }}
+      MAX_LATENESS_REPORT: ${{
+              (github.event_name == 'pull_request' && github.base_ref == 'prod') && secrets.PROD_MAX_LATENESS_REPORT ||
+              (github.event_name == 'pull_request' && github.base_ref == 'preprod') && secrets.PREPROD_MAX_LATENESS_REPORT ||
+              (github.ref == 'refs/heads/prod') && secrets.PROD_MAX_LATENESS_REPORT ||
+              (github.ref == 'refs/heads/preprod') && secrets.PREPROD_MAX_LATENESS_REPORT
+              }}
 
     steps:
       - uses: actions/checkout@v4.1.6

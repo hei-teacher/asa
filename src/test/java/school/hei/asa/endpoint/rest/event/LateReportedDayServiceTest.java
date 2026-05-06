@@ -3,6 +3,7 @@ package school.hei.asa.endpoint.rest.event;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,6 +20,8 @@ import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.event.model.LateReportedDaysVerificationRequested;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
+import school.hei.asa.model.Mission;
+import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.repository.MissionExecutionRepository;
@@ -66,10 +69,10 @@ public class LateReportedDayServiceTest extends FacadeIT {
   }
 
   @Test
-  public void late_reported_days_check_ok() {
+  public void late_reported_days_check_on_normal_dayok() {
     var worker1 = new Worker("W-36", "name", "email", "fullNAme", "address", "city", "nif", "stat");
     var worker2 = new Worker("W-37", "name", "email", "fullNAme", "address", "city", "nif", "stat");
-
+    var date = LocalDate.of(2026, 4, 18);
     when(contractService.findActiveContract())
         .thenReturn(
             List.of(
@@ -77,10 +80,25 @@ public class LateReportedDayServiceTest extends FacadeIT {
                     worker1, "", null, Instant.now(), Instant.now(), Duration.ofDays(2), "", ""),
                 new Contract(worker2, "", null, null, null, null, "", "")));
     when(missionExecutionRepository.findWorkerCodeByDate(any(LocalDate.class)))
-        .thenReturn(List.of("code1"));
+        .thenReturn(List.of("W-36"));
 
-    lateReportedDaysVerificationService.accept(new LateReportedDaysVerificationRequested());
+    lateReportedDaysVerificationService.accept(new LateReportedDaysVerificationRequested(date));
+    verify(mailer, times(1)).accept(any(Email.class));
+  }
 
-    verify(mailer, times(2)).accept(any(Email.class));
+  @Test
+  public void late_reported_days_check_on_week_end_ok() {
+    var worker1 = new Worker("W-36", "name", "email", "fullNAme", "address", "city", "nif", "stat");
+    var reportedAt = Instant.parse("2026-05-06T10:00:00Z");
+    var missionDate = LocalDate.of(2026, 5, 2);
+
+    var missionExecution =
+        new MissionExecution(mock(Mission.class), worker1, missionDate, 0.1, "", reportedAt);
+    when(missionExecutionRepository.findByDate(any(LocalDate.class)))
+        .thenReturn(List.of(missionExecution));
+    lateReportedDaysVerificationService.accept(
+        new LateReportedDaysVerificationRequested(LocalDate.of(2026, 5, 6)));
+
+    verify(mailer, times(1)).accept(any(Email.class));
   }
 }

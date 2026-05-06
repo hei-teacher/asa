@@ -24,7 +24,8 @@ import school.hei.asa.service.ContractService;
 import school.hei.asa.service.mapper.InternetAddressMapper;
 
 @Service
-public class LateReportedDaysVerificationService implements Consumer<LateReportedDaysVerificationRequested> {
+public class LateReportedDaysVerificationService
+    implements Consumer<LateReportedDaysVerificationRequested> {
 
   private final ContractService contractService;
   private final MissionExecutionRepository missionExecutionRepository;

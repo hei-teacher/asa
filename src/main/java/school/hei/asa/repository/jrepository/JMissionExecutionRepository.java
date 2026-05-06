@@ -18,8 +18,7 @@ public interface JMissionExecutionRepository extends JpaRepository<JMissionExecu
   List<JMissionExecution> findBydate(LocalDate date);
 
   @Query("SELECT m.worker_code FROM JMissionExecution m WHERE m.date = :date")
-  List<String> findAllWorkerCodeByDate( LocalDate date);
-
+  List<String> findAllWorkerCodeByDate(LocalDate date);
 
   List<JMissionExecution> findByDateBetween(LocalDate startDate, LocalDate endDate);
 

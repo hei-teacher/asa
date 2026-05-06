@@ -82,7 +82,7 @@ public class LateReportedDaysVerificationRequestedService
       var text =
           String.format(
               "Hello, \n"
-                  + " This is a reminder that you didn't report your work at the date %s on time."
+                  + " This is a reminder that you didn't report your work at the date %s yet. Mind doing it ?"
                   + " \n"
                   + " Best Regards,",
               date);
@@ -95,25 +95,12 @@ public class LateReportedDaysVerificationRequestedService
                     receiver,
                     accountants,
                     List.of(),
-                    String.format("ASA - LATE REPORTED WORK ON %s", date),
+                    String.format("ASA - REMINDER TO REPORT THE DATE %s", date),
                     text,
                     List.of()));
           });
     } else {
       log.info("No receivers found");
     }
-  }
-
-  public List<Worker> getWorkersWhoReportedLate(LocalDate date) {
-    var missionExecutions = missionExecutionRepository.findByDate(date);
-
-    return missionExecutions.stream()
-        .filter(
-            me ->
-                ChronoUnit.DAYS.between(
-                        date, me.reportedAt().atZone(ZoneId.systemDefault()).toLocalDate())
-                    > 3)
-        .map(MissionExecution::worker)
-        .toList();
   }
 }

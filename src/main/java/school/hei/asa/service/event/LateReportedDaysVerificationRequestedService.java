@@ -29,7 +29,7 @@ public class LateReportedDaysVerificationRequestedService
   private final MissionExecutionRepository missionExecutionRepository;
   private final Mailer mailer;
   private final String accountants;
-  private final InternetAddressMapper emailService;
+  private final InternetAddressMapper internetAddressMapper;
   private final int maxLatenessForReport;
 
   public LateReportedDaysVerificationRequestedService(
@@ -38,12 +38,12 @@ public class LateReportedDaysVerificationRequestedService
       Mailer mailer,
       @Value("${ACCOUNTANTS}") String accountants,
       @Value("${MAX_LATENESS_REPORT}") int maxLatenessForReport,
-      InternetAddressMapper emailService) {
+      InternetAddressMapper internetAddressMapper) {
     this.contractService = contractService;
     this.missionExecutionRepository = missionExecutionRepository;
     this.mailer = mailer;
     this.accountants = accountants;
-    this.emailService = emailService;
+    this.internetAddressMapper = internetAddressMapper;
     this.maxLatenessForReport = maxLatenessForReport;
   }
 
@@ -55,7 +55,7 @@ public class LateReportedDaysVerificationRequestedService
     if (dateToVerify.getDayOfWeek() != SATURDAY
         && dateToVerify.getDayOfWeek() != SUNDAY
         && dateToVerify.getDayOfWeek() != MONDAY) {
-      var workersWhoReported = missionExecutionRepository.findWorkersCodeByDate(dateToVerify);
+      var workersWhoReported = missionExecutionRepository.findWorkerCodesByDate(dateToVerify);
       var workersWhoReportedInLate =
           extractWorkersWhoDidNotReport(workersWhoReported).stream().map(Worker::email).toList();
       sendEmailToWorkersWhoDidNotReportYet(workersWhoReportedInLate, dateToVerify);
@@ -74,8 +74,9 @@ public class LateReportedDaysVerificationRequestedService
 
     if (!receivers.isEmpty()) {
       var accountants =
-          emailService.toInternetAddresses(Arrays.stream(this.accountants.split(",")).toList());
-      var receiverAddresses = emailService.toInternetAddresses(receivers);
+          internetAddressMapper.toInternetAddresses(
+              Arrays.stream(this.accountants.split(",")).toList());
+      var receiverAddresses = internetAddressMapper.toInternetAddresses(receivers);
       var text =
           String.format(
               "Hello, \n"

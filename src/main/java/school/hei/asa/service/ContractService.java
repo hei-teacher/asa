@@ -84,7 +84,7 @@ public class ContractService {
     return String.format("%.1f", result);
   }
 
-  public List<Contract> findActiveContract() {
+  public List<Contract> findActiveContracts() {
     return contractRepository.findAllActiveContracts();
   }
 }

@@ -55,22 +55,22 @@ public class LateReportedDaysVerificationRequestedService
     if (dateToVerify.getDayOfWeek() != SATURDAY
         && dateToVerify.getDayOfWeek() != SUNDAY
         && dateToVerify.getDayOfWeek() != MONDAY) {
-      var workerWhoReported = missionExecutionRepository.findWorkerCodeByDate(dateToVerify);
-      var unReportedWorker =
-          extractWorkersWhoDidNotReport(workerWhoReported).stream().map(Worker::email).toList();
-      sendEmailToUnReportedWorkers(unReportedWorker, dateToVerify);
+      var workersWhoReported = missionExecutionRepository.findWorkersCodeByDate(dateToVerify);
+      var workersWhoReportedInLate =
+          extractWorkersWhoDidNotReport(workersWhoReported).stream().map(Worker::email).toList();
+      sendEmailToWorkersWhoDidNotReportYet(workersWhoReportedInLate, dateToVerify);
     }
   }
 
   public List<Worker> extractWorkersWhoDidNotReport(List<String> workerCodes) {
-    var contracts = contractService.findActiveContract();
+    var contracts = contractService.findActiveContracts();
     return contracts.stream()
         .filter(contract -> !workerCodes.contains(contract.worker().code()))
         .map(Contract::worker)
         .toList();
   }
 
-  public void sendEmailToUnReportedWorkers(List<String> receivers, LocalDate date) {
+  public void sendEmailToWorkersWhoDidNotReportYet(List<String> receivers, LocalDate date) {
 
     if (!receivers.isEmpty()) {
       var accountants =

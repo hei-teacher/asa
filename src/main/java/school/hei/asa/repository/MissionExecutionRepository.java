@@ -42,7 +42,7 @@ public class MissionExecutionRepository {
   }
 
   @Transactional
-  public List<String> findWorkerCodeByDate(LocalDate localDate) {
+  public List<String> findWorkersCodeByDate(LocalDate localDate) {
     return jMissionExecutionRepository.findAllWorkerCodeByDate(localDate);
   }
 

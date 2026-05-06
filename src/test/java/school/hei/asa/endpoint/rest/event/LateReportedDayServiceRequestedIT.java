@@ -55,7 +55,7 @@ public class LateReportedDayServiceRequestedIT extends FacadeIT {
     LocalDate date = LocalDate.of(2024, 6, 15);
     List<String> receivers = List.of("worker1@test.com");
 
-    lateReportedDaysVerificationService.sendEmailToUnReportedWorkers(receivers, date);
+    lateReportedDaysVerificationService.sendEmailToWorkersWhoDidNotReportYet(receivers, date);
 
     ArgumentCaptor<Email> emailCaptor = ArgumentCaptor.forClass(Email.class);
     verify(mailer, times(1)).accept(emailCaptor.capture());
@@ -76,7 +76,7 @@ public class LateReportedDayServiceRequestedIT extends FacadeIT {
                 new Contract(
                     worker1, "", null, Instant.now(), Instant.now(), Duration.ofDays(2), "", ""),
                 new Contract(worker2, "", null, null, null, null, "", "")));
-    when(missionExecutionRepository.findWorkerCodeByDate(any(LocalDate.class)))
+    when(missionExecutionRepository.findWorkersCodeByDate(any(LocalDate.class)))
         .thenReturn(List.of("W-36"));
 
     lateReportedDaysVerificationService.accept(new LateReportedDaysVerificationRequested(date));

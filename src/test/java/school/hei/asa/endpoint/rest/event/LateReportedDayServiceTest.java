@@ -76,7 +76,8 @@ public class LateReportedDayServiceTest extends FacadeIT {
                 new Contract(
                     worker1, "", null, Instant.now(), Instant.now(), Duration.ofDays(2), "", ""),
                 new Contract(worker2, "", null, null, null, null, "", "")));
-    when(missionExecutionRepository.findWorkerCodeByDate(any())).thenReturn(List.of("code1"));
+    when(missionExecutionRepository.findWorkerCodeByDate(any(LocalDate.class)))
+        .thenReturn(List.of("code1"));
 
     lateReportedDaysVerificationService.accept(new LateReportedDaysVerificationRequested());
 

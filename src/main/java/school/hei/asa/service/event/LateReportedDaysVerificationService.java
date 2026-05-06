@@ -1,5 +1,6 @@
 package school.hei.asa.service.event;
 
+import static java.time.DayOfWeek.MONDAY;
 import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
 import static org.reflections.Reflections.log;
@@ -49,7 +50,9 @@ public class LateReportedDaysVerificationService implements Consumer<LateReporte
     int lateReport = 4;
     var dayToReport = lateReportedDaysVerification.getVerificationDate().minusDays(lateReport);
 
-    if (dayToReport.getDayOfWeek() == SATURDAY || dayToReport.getDayOfWeek() == SUNDAY) {
+    if (dayToReport.getDayOfWeek() == SATURDAY
+        || dayToReport.getDayOfWeek() == SUNDAY
+        || dayToReport.getDayOfWeek() == MONDAY) {
       sendEmailToUnReportedWorkers(
           getWorkersWhoReportedLate(dayToReport).stream().map(Worker::email).toList(), dayToReport);
     } else {

@@ -25,7 +25,7 @@ import school.hei.asa.repository.MissionExecutionRepository;
 import school.hei.asa.service.ContractService;
 import school.hei.asa.service.event.LateReportedDaysVerificationRequestedService;
 
-public class LateReportedDayServiceIT extends FacadeIT {
+public class LateReportedDayServiceRequestedIT extends FacadeIT {
 
   @Autowired LateReportedDaysVerificationRequestedService lateReportedDaysVerificationService;
   @MockBean ContractService contractService;

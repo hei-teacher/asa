@@ -7,8 +7,6 @@ import static org.reflections.Reflections.log;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.model.LateReportedDaysVerificationRequested;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
-import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.repository.MissionExecutionRepository;
@@ -82,8 +79,8 @@ public class LateReportedDaysVerificationRequestedService
       var text =
           String.format(
               "Hello, \n"
-                  + " This is a reminder that you didn't report your work at the date %s yet. Mind doing it ?"
-                  + " \n"
+                  + " This is a reminder that you didn't report your work at the date %s yet. Mind"
+                  + " doing it ? \n"
                   + " Best Regards,",
               date);
 

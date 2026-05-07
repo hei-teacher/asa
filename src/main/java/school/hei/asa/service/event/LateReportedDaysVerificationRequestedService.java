@@ -56,49 +56,47 @@ public class LateReportedDaysVerificationRequestedService
         && dateToVerify.getDayOfWeek() != SUNDAY
         && dateToVerify.getDayOfWeek() != MONDAY) {
       var workersWhoReported = missionExecutionRepository.findWorkerCodesByDate(dateToVerify);
+      var contracts = contractService.findActiveContracts();
       var workersWhoReportedInLate =
-          extractWorkersWhoDidNotReport(workersWhoReported).stream().map(Worker::email).toList();
+          contracts.stream()
+              .map(Contract::worker)
+              .filter(worker -> !workersWhoReported.contains(worker.code()))
+              .toList();
+
       sendEmailToWorkersWhoDidNotReportYet(workersWhoReportedInLate, dateToVerify);
     }
   }
 
-  public List<Worker> extractWorkersWhoDidNotReport(List<String> workerCodes) {
-    var contracts = contractService.findActiveContracts();
-    return contracts.stream()
-        .filter(contract -> !workerCodes.contains(contract.worker().code()))
-        .map(Contract::worker)
-        .toList();
-  }
-
-  public void sendEmailToWorkersWhoDidNotReportYet(List<String> receivers, LocalDate date) {
-
-    if (!receivers.isEmpty()) {
-      var accountants =
-          internetAddressMapper.toInternetAddresses(
-              Arrays.stream(this.accountants.split(",")).toList());
-      var receiverAddresses = internetAddressMapper.toInternetAddresses(receivers);
-      var text =
-          String.format(
-              "Hello, \n"
-                  + " This is a reminder that you didn't report your work at the date %s yet. Mind"
-                  + " doing it ? \n"
-                  + " Best Regards,",
-              date);
-
-      log.info("Sending emails to workers...");
-      receiverAddresses.forEach(
-          receiver -> {
-            mailer.accept(
-                new Email(
-                    receiver,
-                    accountants,
-                    List.of(),
-                    String.format("ASA - REMINDER TO REPORT THE DATE %s", date),
-                    text,
-                    List.of()));
-          });
-    } else {
-      log.info("No receivers found");
+  public void sendEmailToWorkersWhoDidNotReportYet(List<Worker> receivers, LocalDate date) {
+    if (receivers.isEmpty()) {
+      log.info("No receiver Found.");
+      return;
     }
+
+    var accountants =
+        internetAddressMapper.toInternetAddresses(
+            Arrays.stream(this.accountants.split(",")).toList());
+    var receiverAddresses =
+        internetAddressMapper.toInternetAddresses(receivers.stream().map(Worker::email).toList());
+    var text =
+        String.format(
+            "Hello, \n"
+                + " This is a reminder that you didn't report your work at the date %s yet. Mind"
+                + " doing it ? \n"
+                + " Best Regards,",
+            date);
+
+    log.info("Sending emails to workers...");
+    receiverAddresses.forEach(
+        receiver -> {
+          mailer.accept(
+              new Email(
+                  receiver,
+                  accountants,
+                  List.of(),
+                  String.format("ASA - REMINDER TO REPORT THE DATE %s", date),
+                  text,
+                  List.of()));
+        });
   }
 }

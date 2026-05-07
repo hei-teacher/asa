@@ -34,28 +34,12 @@ public class LateReportedDayServiceRequestedIT extends FacadeIT {
   @MockBean MissionExecutionRepository missionExecutionRepository;
 
   @Test
-  public void extract_not_reporting_worker_ok() {
-    var worker1 = new Worker("W-37", "name", "email", "fullNAme", "address", "city", "nif", "stat");
-    var worker2 = new Worker("W-36", "name", "email", "fullNAme", "address", "city", "nif", "stat");
-    var workerWhoReported = List.of("W-036");
-    var contractList =
-        List.of(
-            new Contract(
-                worker1, "", null, Instant.now(), Instant.now(), Duration.ofDays(2), "", ""),
-            new Contract(worker2, "", null, null, null, null, "", ""));
-    when(contractService.findActiveContracts()).thenReturn(contractList);
-
-    var subject =
-        lateReportedDaysVerificationService.extractWorkersWhoDidNotReport(workerWhoReported);
-    assertTrue(subject.contains(worker1));
-  }
-
-  @Test
   public void send_email_to_unreported_worker_ok() {
     LocalDate date = LocalDate.of(2024, 6, 15);
-    List<String> receivers = List.of("worker1@test.com");
+    var worker1 = new Worker("W-36", "name", "email", "fullNAme", "address", "city", "nif", "stat");
 
-    lateReportedDaysVerificationService.sendEmailToWorkersWhoDidNotReportYet(receivers, date);
+    lateReportedDaysVerificationService.sendEmailToWorkersWhoDidNotReportYet(
+        List.of(worker1), date);
 
     ArgumentCaptor<Email> emailCaptor = ArgumentCaptor.forClass(Email.class);
     verify(mailer, times(1)).accept(emailCaptor.capture());

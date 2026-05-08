@@ -20,4 +20,7 @@ public interface JContractRepository extends JpaRepository<JContract, String> {
       ORDER BY c.entranceInstant DESC
       """)
   List<JContract> findByYearBetween(int startYear, int endYear);
+
+  @Query("SELECT c FROM JContract c WHERE c.endInstant IS NULL AND c.durationInDays != 0")
+  List<JContract> findActiveContracts();
 }

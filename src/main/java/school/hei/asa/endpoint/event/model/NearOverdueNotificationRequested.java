@@ -17,7 +17,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class NearOverdueNotifierRequested extends PojaEvent {
+public class NearOverdueNotificationRequested extends PojaEvent {
   private LocalDate verificationDate = now();
 
   @Override

@@ -16,18 +16,18 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import school.hei.asa.conf.FacadeIT;
-import school.hei.asa.endpoint.event.model.NearOverdueNotifierRequested;
+import school.hei.asa.endpoint.event.model.NearOverdueNotificationRequested;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.repository.MissionExecutionRepository;
 import school.hei.asa.service.ContractService;
-import school.hei.asa.service.event.NearOverdueNotifierRequestedService;
+import school.hei.asa.service.event.NearOverdueNotificationRequestedService;
 
-public class NearOverdueNotifierRequestedServiceIT extends FacadeIT {
+public class NearOverdueNotificationRequestedServiceIT extends FacadeIT {
 
-  @Autowired NearOverdueNotifierRequestedService nearOverdueNotifierRequestedService;
+  @Autowired NearOverdueNotificationRequestedService nearOverdueNotificationRequestedService;
   @MockBean ContractService contractService;
   @MockBean Mailer mailer;
 
@@ -38,7 +38,7 @@ public class NearOverdueNotifierRequestedServiceIT extends FacadeIT {
     LocalDate date = LocalDate.of(2024, 6, 15);
     var worker1 = new Worker("W-36", "name", "email", "fullNAme", "address", "city", "nif", "stat");
 
-    nearOverdueNotifierRequestedService.sendEmailToWorkersWhoDidNotReportYet(
+    nearOverdueNotificationRequestedService.sendEmailToWorkersWhoDidNotReportYet(
         List.of(worker1), date);
 
     ArgumentCaptor<Email> emailCaptor = ArgumentCaptor.forClass(Email.class);
@@ -63,7 +63,7 @@ public class NearOverdueNotifierRequestedServiceIT extends FacadeIT {
     when(missionExecutionRepository.findWorkerCodesByDate(any(LocalDate.class)))
         .thenReturn(List.of("W-36"));
 
-    nearOverdueNotifierRequestedService.accept(new NearOverdueNotifierRequested(date));
+    nearOverdueNotificationRequestedService.accept(new NearOverdueNotificationRequested(date));
     verify(mailer, times(1)).accept(any(Email.class));
   }
 }

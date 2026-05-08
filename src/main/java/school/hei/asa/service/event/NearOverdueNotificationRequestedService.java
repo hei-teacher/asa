@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import school.hei.asa.endpoint.event.model.NearOverdueNotifierRequested;
+import school.hei.asa.endpoint.event.model.NearOverdueNotificationRequested;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.Worker;
@@ -22,7 +22,8 @@ import school.hei.asa.service.ContractService;
 import school.hei.asa.service.mapper.InternetAddressMapper;
 
 @Service
-public class NearOverdueNotifierRequestedService implements Consumer<NearOverdueNotifierRequested> {
+public class NearOverdueNotificationRequestedService
+    implements Consumer<NearOverdueNotificationRequested> {
 
   private final ContractService contractService;
   private final MissionExecutionRepository missionExecutionRepository;
@@ -31,7 +32,7 @@ public class NearOverdueNotifierRequestedService implements Consumer<NearOverdue
   private final InternetAddressMapper internetAddressMapper;
   private final int maxLatenessForReport;
 
-  public NearOverdueNotifierRequestedService(
+  public NearOverdueNotificationRequestedService(
       ContractService contractService,
       MissionExecutionRepository missionExecutionRepository,
       Mailer mailer,
@@ -47,9 +48,10 @@ public class NearOverdueNotifierRequestedService implements Consumer<NearOverdue
   }
 
   @Override
-  public void accept(NearOverdueNotifierRequested nearOverdueNotifierRequested) {
+  public void accept(NearOverdueNotificationRequested nearOverdueNotificationRequested) {
     var maxLatenessReport = Period.ofDays(maxLatenessForReport);
-    var dateToVerify = nearOverdueNotifierRequested.getVerificationDate().minus(maxLatenessReport);
+    var dateToVerify =
+        nearOverdueNotificationRequested.getVerificationDate().minus(maxLatenessReport);
 
     if (dateToVerify.getDayOfWeek() != SATURDAY
         && dateToVerify.getDayOfWeek() != SUNDAY

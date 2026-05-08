@@ -16,18 +16,18 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import school.hei.asa.conf.FacadeIT;
-import school.hei.asa.endpoint.event.model.NearOverdueNotificationRequested;
+import school.hei.asa.endpoint.event.model.NearOverdueReportNotificationRequested;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.repository.MissionExecutionRepository;
 import school.hei.asa.service.ContractService;
-import school.hei.asa.service.event.NearOverdueNotificationRequestedService;
+import school.hei.asa.service.event.NearOverdueReportNotificationRequestedService;
 
 public class NearOverdueNotificationRequestedServiceIT extends FacadeIT {
 
-  @Autowired NearOverdueNotificationRequestedService nearOverdueNotificationRequestedService;
+  @Autowired NearOverdueReportNotificationRequestedService nearOverdueNotificationRequestedService;
   @MockBean ContractService contractService;
   @MockBean Mailer mailer;
 
@@ -63,7 +63,8 @@ public class NearOverdueNotificationRequestedServiceIT extends FacadeIT {
     when(missionExecutionRepository.findWorkerCodesByDate(any(LocalDate.class)))
         .thenReturn(List.of("W-36"));
 
-    nearOverdueNotificationRequestedService.accept(new NearOverdueNotificationRequested(date));
+    nearOverdueNotificationRequestedService.accept(
+        new NearOverdueReportNotificationRequested(date));
     verify(mailer, times(1)).accept(any(Email.class));
   }
 }

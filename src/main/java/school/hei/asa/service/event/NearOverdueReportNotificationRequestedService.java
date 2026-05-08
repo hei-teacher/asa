@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import school.hei.asa.endpoint.event.model.NearOverdueNotificationRequested;
+import school.hei.asa.endpoint.event.model.NearOverdueReportNotificationRequested;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.Worker;
@@ -22,8 +22,8 @@ import school.hei.asa.service.ContractService;
 import school.hei.asa.service.mapper.InternetAddressMapper;
 
 @Service
-public class NearOverdueNotificationRequestedService
-    implements Consumer<NearOverdueNotificationRequested> {
+public class NearOverdueReportNotificationRequestedService
+    implements Consumer<NearOverdueReportNotificationRequested> {
 
   private final ContractService contractService;
   private final MissionExecutionRepository missionExecutionRepository;
@@ -32,7 +32,7 @@ public class NearOverdueNotificationRequestedService
   private final InternetAddressMapper internetAddressMapper;
   private final int maxLatenessForReport;
 
-  public NearOverdueNotificationRequestedService(
+  public NearOverdueReportNotificationRequestedService(
       ContractService contractService,
       MissionExecutionRepository missionExecutionRepository,
       Mailer mailer,
@@ -48,7 +48,7 @@ public class NearOverdueNotificationRequestedService
   }
 
   @Override
-  public void accept(NearOverdueNotificationRequested nearOverdueNotificationRequested) {
+  public void accept(NearOverdueReportNotificationRequested nearOverdueNotificationRequested) {
     var maxLatenessReport = Period.ofDays(maxLatenessForReport);
     var dateToVerify =
         nearOverdueNotificationRequested.getVerificationDate().minus(maxLatenessReport);

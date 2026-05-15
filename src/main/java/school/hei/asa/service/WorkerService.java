@@ -4,9 +4,10 @@ import static java.util.Comparator.comparing;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import school.hei.asa.model.Worker;
@@ -14,9 +15,16 @@ import school.hei.asa.repository.WorkerRepository;
 
 @Slf4j
 @Service
-@AllArgsConstructor
 public class WorkerService {
   private final WorkerRepository workerRepository;
+  private final String sensitiveWokerCodes;
+
+  public WorkerService(
+      WorkerRepository workerRepository,
+      @Value("${SENSITIVE_WORKERS_CODES}") String sensitiveWokerCodes) {
+    this.workerRepository = workerRepository;
+    this.sensitiveWokerCodes = sensitiveWokerCodes;
+  }
 
   public Worker findWorkerByCode(String workerCode) {
     return workerRepository.findByCode(workerCode);
@@ -32,7 +40,7 @@ public class WorkerService {
         .toList();
   }
 
-  public List<Worker> getWorkersFrom(Model model) {
+  public List<Worker> getWorkersFrom(Model model, String authenticatedSensitiveWorkerCode) {
     var startYear = getYearFrom(model, "startDate");
     var endYear = getYearFrom(model, "endDate");
     var year = getYearFrom(startYear, endYear, model);
@@ -45,7 +53,8 @@ public class WorkerService {
       return getAllWorkersFromYearBetween(startYear, endYear);
     }
     log.info("fetching all workers...");
-    return getAllWorkers();
+    return getWorkersWithoutSensitiveWorkers(
+        Arrays.stream(sensitiveWokerCodes.split(",")).toList(), authenticatedSensitiveWorkerCode);
   }
 
   private Integer getYearFrom(Model model, String attributeName) {
@@ -62,5 +71,22 @@ public class WorkerService {
       return startYear;
     }
     return (Integer) model.getAttribute("year");
+  }
+
+  public List<Worker> getWorkersWithoutSensitiveWorkers(
+      List<String> sensitiveWorkerCodes, String authenticatedSensitiveWorkerCode) {
+    var workers = getAllWorkers();
+
+    log.info("sensitiveWorkerCodes: {}", sensitiveWorkerCodes);
+    if (sensitiveWorkerCodes.contains(authenticatedSensitiveWorkerCode)) {
+      var toExculde =
+          sensitiveWorkerCodes.stream()
+              .filter(workerCode -> !workerCode.equals(authenticatedSensitiveWorkerCode))
+              .toList();
+      return workers.stream().filter(worker -> !toExculde.contains(worker.code())).toList();
+    }
+    return workers.stream()
+        .filter(worker -> !sensitiveWorkerCodes.contains(worker.code()))
+        .toList();
   }
 }

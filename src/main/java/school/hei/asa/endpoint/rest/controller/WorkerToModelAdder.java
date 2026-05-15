@@ -8,11 +8,10 @@ import org.springframework.ui.Model;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.WorkerService;
 
+@AllArgsConstructor
 @Slf4j
 @Component
-@AllArgsConstructor
 public class WorkerToModelAdder implements BiFunction<String, Model, Worker> {
-
   private final WorkerService workerService;
 
   @Override
@@ -21,7 +20,7 @@ public class WorkerToModelAdder implements BiFunction<String, Model, Worker> {
         workerCode == null || workerCode.isBlank()
             ? null
             : workerService.findWorkerByCode(workerCode);
-    var workers = workerService.getWorkersFrom(model);
+    var workers = workerService.getWorkersFrom(model, workerCode);
     log.info(
         "there are {} workers = {}", workers.size(), workers.stream().map(Worker::name).toList());
     model.addAttribute("worker", worker);

@@ -8,13 +8,14 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
-import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.endpoint.rest.controller.mapper.ThDailyExecutionMapper;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecution;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
+import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.ThContractService;
 import school.hei.asa.endpoint.rest.service.ThMissionService;
 import school.hei.asa.endpoint.rest.service.ThProductService;
@@ -33,7 +35,6 @@ import school.hei.asa.service.ProductService;
 
 @Slf4j
 @Controller
-@AllArgsConstructor
 public class MissionController {
 
   private final DailyExecutionRepository dailyExecutionRepository;
@@ -45,6 +46,33 @@ public class MissionController {
   private final ThMissionService thMissionService;
   private final ThProductService thProductService;
   private final ThContractService thContractService;
+  private final String sensitiveWorkerCodes;
+  private final WorkerFromAuthentication workerFromAuthentication;
+
+  public MissionController(
+      DailyExecutionRepository dailyExecutionRepository,
+      ProductService productService,
+      CareProductCodeSupplier careProductCodeSupplier,
+      ThDailyExecutionMapper thDailyExecutionMapper,
+      WorkerToModelAdder workerToModelAdder,
+      MissionService missionService,
+      ThMissionService thMissionService,
+      ThProductService thProductService,
+      ThContractService thContractService,
+      @Value("${SENSITIVE_WORKERS_CODES}") String sensitiveWorkerCodes,
+      WorkerFromAuthentication workerFromAuthentication) {
+    this.dailyExecutionRepository = dailyExecutionRepository;
+    this.productService = productService;
+    this.careProductCodeSupplier = careProductCodeSupplier;
+    this.thDailyExecutionMapper = thDailyExecutionMapper;
+    this.workerToModelAdder = workerToModelAdder;
+    this.missionService = missionService;
+    this.thMissionService = thMissionService;
+    this.thProductService = thProductService;
+    this.thContractService = thContractService;
+    this.sensitiveWorkerCodes = sensitiveWorkerCodes;
+    this.workerFromAuthentication = workerFromAuthentication;
+  }
 
   @GetMapping("/missions")
   public String getMissions(
@@ -128,11 +156,17 @@ public class MissionController {
 
   @GetMapping("/mission-executions")
   public String getMissionExecutions(
+      Authentication authentication,
       Model model,
       @RequestParam(required = false) String workerCode,
       @RequestParam(required = false) String yearMonth) {
     YearMonth month =
         (yearMonth == null || yearMonth.isBlank()) ? YearMonth.now() : YearMonth.parse(yearMonth);
+
+    workerCode =
+        workerCode == null
+            ? workerFromAuthentication.apply(authentication).get().code()
+            : workerCode;
 
     var dailyExecutionsByYearMonth = dailyExecutionsByDate(workerCode, month);
     var thDailyExecutions = new ArrayList<ThDailyExecution>();
@@ -155,15 +189,31 @@ public class MissionController {
       String workerCode, YearMonth month) {
     LocalDate startDate = month.atDay(1);
     LocalDate endDate = month.atEndOfMonth();
+    var toExclude = Arrays.stream(sensitiveWorkerCodes.split(",")).toList();
+    return filterMissionExecutionsWithoutSensitiveWorkers(
+            dailyExecutionRepository.findByWorkerCodeAndDateBetween(workerCode, startDate, endDate),
+            toExclude,
+            workerCode)
+        .stream()
+        .collect(groupingBy(DailyExecution::date));
+  }
 
-    if (workerCode == null || workerCode.isBlank()) {
-      return dailyExecutionRepository.findByDateBetween(startDate, endDate).stream()
-          .collect(groupingBy(DailyExecution::date));
-    } else {
-      return dailyExecutionRepository
-          .findByWorkerCodeAndDateBetween(workerCode, startDate, endDate)
-          .stream()
-          .collect(groupingBy(DailyExecution::date));
+  public List<DailyExecution> filterMissionExecutionsWithoutSensitiveWorkers(
+      List<DailyExecution> dailyExecutions,
+      List<String> sensitiveWorkerCodes,
+      String authenticatedSensitiveWorkerCode) {
+
+    if (sensitiveWorkerCodes.contains(authenticatedSensitiveWorkerCode)) {
+      var toExclude =
+          sensitiveWorkerCodes.stream()
+              .filter(workerCode -> !workerCode.equals(authenticatedSensitiveWorkerCode))
+              .toList();
+      return dailyExecutions.stream()
+          .filter(dailyExecution -> !toExclude.contains(dailyExecution.worker().code()))
+          .toList();
     }
+    return dailyExecutions.stream()
+        .filter(dailyExecution -> !sensitiveWorkerCodes.contains(dailyExecution.worker().code()))
+        .toList();
   }
 }

@@ -7,7 +7,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import school.hei.asa.model.DailyExecution;
@@ -18,7 +19,7 @@ import school.hei.asa.repository.jrepository.JWorkerRepository;
 import school.hei.asa.repository.mapper.MissionExecutionMapper;
 import school.hei.asa.repository.model.JMissionExecution;
 
-@AllArgsConstructor
+@Slf4j
 @Repository
 public class DailyExecutionRepository {
 
@@ -27,8 +28,25 @@ public class DailyExecutionRepository {
   private final JWorkerRepository jWorkerRepository;
   private final JMissionRepository jMissionRepository;
   private final PsMissionExecutionRepository psMissionExecutionRepository;
-
+  private final String sensitiveWorkerCodes;
   private final MissionExecutionMapper missionExecutionMapper;
+
+  public DailyExecutionRepository(
+      MissionExecutionRepository missionExecutionRepository,
+      JMissionExecutionRepository jMissionExecutionRepository,
+      JWorkerRepository jWorkerRepository,
+      JMissionRepository jMissionRepository,
+      PsMissionExecutionRepository psMissionExecutionRepository,
+      @Value("${SENSITIVE_WORKERS_CODES}") String sensitiveWorkerCodes,
+      MissionExecutionMapper missionExecutionMapper) {
+    this.missionExecutionRepository = missionExecutionRepository;
+    this.jMissionExecutionRepository = jMissionExecutionRepository;
+    this.jWorkerRepository = jWorkerRepository;
+    this.jMissionRepository = jMissionRepository;
+    this.psMissionExecutionRepository = psMissionExecutionRepository;
+    this.sensitiveWorkerCodes = sensitiveWorkerCodes;
+    this.missionExecutionMapper = missionExecutionMapper;
+  }
 
   @Transactional(isolation = SERIALIZABLE)
   public void save(DailyExecution dailyExecution) {

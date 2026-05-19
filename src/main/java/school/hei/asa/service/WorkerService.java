@@ -44,17 +44,24 @@ public class WorkerService {
     var startYear = getYearFrom(model, "startDate");
     var endYear = getYearFrom(model, "endDate");
     var year = getYearFrom(startYear, endYear, model);
+    var toBeExcluded = Arrays.stream(sensitiveWokerCodes.split(",")).toList();
 
     if (year != null) {
       log.info("fetching workers from {}", year);
-      return getAllWorkersFromYearBetween(year, year + 1);
+      return getWorkersWithoutSensitiveWorkers(
+          getAllWorkersFromYearBetween(year, year + 1),
+          toBeExcluded,
+          authenticatedSensitiveWorkerCode);
     } else if (startYear != null && endYear != null && startYear < endYear) {
       log.info("fetching workers between {} and {}", startYear, endYear);
-      return getAllWorkersFromYearBetween(startYear, endYear);
+      return getWorkersWithoutSensitiveWorkers(
+          getAllWorkersFromYearBetween(startYear, endYear),
+          toBeExcluded,
+          authenticatedSensitiveWorkerCode);
     }
     log.info("fetching all workers...");
     return getWorkersWithoutSensitiveWorkers(
-        Arrays.stream(sensitiveWokerCodes.split(",")).toList(), authenticatedSensitiveWorkerCode);
+        getAllWorkers(), toBeExcluded, authenticatedSensitiveWorkerCode);
   }
 
   private Integer getYearFrom(Model model, String attributeName) {
@@ -74,8 +81,9 @@ public class WorkerService {
   }
 
   public List<Worker> getWorkersWithoutSensitiveWorkers(
-      List<String> sensitiveWorkerCodes, String authenticatedSensitiveWorkerCode) {
-    var workers = getAllWorkers();
+      List<Worker> workers,
+      List<String> sensitiveWorkerCodes,
+      String authenticatedSensitiveWorkerCode) {
 
     log.info("sensitiveWorkerCodes: {}", sensitiveWorkerCodes);
     if (sensitiveWorkerCodes.contains(authenticatedSensitiveWorkerCode)) {

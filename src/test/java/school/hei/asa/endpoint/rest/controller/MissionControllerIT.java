@@ -35,7 +35,6 @@ public class MissionControllerIT extends FacadeIT {
   @Autowired ProductRepository productRepository;
   @Autowired MissionRepository missionRepository;
   @MockBean WorkerFromAuthentication workerFromAuthentication;
-
   Model model;
   Authentication authentication;
   Worker authenticatedWorker;

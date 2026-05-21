@@ -84,7 +84,6 @@ class SensitiveWorkerFilterTest extends FacadeIT {
 
   @Test
   void normal_worker_can_not_select_sensitives_workers() {
-
     var worker1 = new Worker("W-059", null, null, null, null, null, null, null);
     var worker2 = new Worker("W-038", null, null, null, null, null, null, null);
     var worker3 = new Worker("W-037", null, null, null, null, null, null, null);
@@ -100,7 +99,6 @@ class SensitiveWorkerFilterTest extends FacadeIT {
 
   @Test
   void sensitive_worker_can_self_select() {
-
     var worker1 = new Worker("W-059", null, null, null, null, null, null, null);
     var worker2 = new Worker("W-038", null, null, null, null, null, null, null);
     var worker3 = new Worker("W-037", null, null, null, null, null, null, null);

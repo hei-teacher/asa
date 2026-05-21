@@ -19,7 +19,6 @@ public class SensitiveWorkerFilter {
 
   public List<Worker> filterSensitiveWorkers(
       List<Worker> workers, String authenticatedSensitiveWorkerCode) {
-
     log.info("sensitiveWorkerCodes: {}", sensitiveWorkerCodes);
     if (sensitiveWorkerCodes.contains(authenticatedSensitiveWorkerCode)) {
       var toExculde =
@@ -35,7 +34,6 @@ public class SensitiveWorkerFilter {
 
   public List<DailyExecution> filterMissionExecutionsWithoutSensitiveWorkers(
       List<DailyExecution> dailyExecutions, String authenticatedSensitiveWorkerCode) {
-
     if (sensitiveWorkerCodes.contains(authenticatedSensitiveWorkerCode)) {
       var toExclude =
           sensitiveWorkerCodes.stream()

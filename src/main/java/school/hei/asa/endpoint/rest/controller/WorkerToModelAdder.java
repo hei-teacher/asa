@@ -13,7 +13,6 @@ import school.hei.asa.service.WorkerService;
 @Component
 @AllArgsConstructor
 public class WorkerToModelAdder implements BiFunction<String, Model, Worker> {
-
   private final WorkerService workerService;
   private final SensitiveWorkerFilter sensitiveWorkerFilter;
 

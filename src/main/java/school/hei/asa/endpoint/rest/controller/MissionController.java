@@ -140,7 +140,6 @@ public class MissionController {
     var authenticatedWorker = workerFromAuthentication.apply(authentication).get().code();
     YearMonth month =
         (yearMonth == null || yearMonth.isBlank()) ? YearMonth.now() : YearMonth.parse(yearMonth);
-
     var dailyExecutionsByYearMonth = dailyExecutionsByDate(workerCode, month, authenticatedWorker);
     var thDailyExecutions = new ArrayList<ThDailyExecution>();
     dailyExecutionsByYearMonth.forEach(

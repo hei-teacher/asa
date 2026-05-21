@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+import school.hei.asa.endpoint.rest.service.SensitiveWorkerFilter;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.WorkerRepository;
 
@@ -17,6 +18,7 @@ import school.hei.asa.repository.WorkerRepository;
 @AllArgsConstructor
 public class WorkerService {
   private final WorkerRepository workerRepository;
+  private final SensitiveWorkerFilter sensitiveWorkerFilter;
 
   public Worker findWorkerByCode(String workerCode) {
     return workerRepository.findByCode(workerCode);

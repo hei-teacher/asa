@@ -15,6 +15,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,8 @@ import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.endpoint.rest.controller.mapper.ThDailyExecutionMapper;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecution;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
+import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
+import school.hei.asa.endpoint.rest.service.SensitiveWorkerFilter;
 import school.hei.asa.endpoint.rest.service.ThContractService;
 import school.hei.asa.endpoint.rest.service.ThMissionService;
 import school.hei.asa.endpoint.rest.service.ThProductService;
@@ -45,6 +48,8 @@ public class MissionController {
   private final ThMissionService thMissionService;
   private final ThProductService thProductService;
   private final ThContractService thContractService;
+  private final SensitiveWorkerFilter sensitiveWorkerFilter;
+  private final WorkerFromAuthentication workerFromAuthentication;
 
   @GetMapping("/missions")
   public String getMissions(
@@ -130,11 +135,13 @@ public class MissionController {
   public String getMissionExecutions(
       Model model,
       @RequestParam(required = false) String workerCode,
-      @RequestParam(required = false) String yearMonth) {
+      @RequestParam(required = false) String yearMonth,
+      Authentication authentication) {
+    var authenticatedWorker = workerFromAuthentication.apply(authentication).get().code();
     YearMonth month =
         (yearMonth == null || yearMonth.isBlank()) ? YearMonth.now() : YearMonth.parse(yearMonth);
 
-    var dailyExecutionsByYearMonth = dailyExecutionsByDate(workerCode, month);
+    var dailyExecutionsByYearMonth = dailyExecutionsByDate(workerCode, month, authenticatedWorker);
     var thDailyExecutions = new ArrayList<ThDailyExecution>();
     dailyExecutionsByYearMonth.forEach(
         (date, deList) -> thDailyExecutions.add(thDailyExecutionMapper.toTh(date, deList)));
@@ -152,18 +159,23 @@ public class MissionController {
   }
 
   private Map<LocalDate, List<DailyExecution>> dailyExecutionsByDate(
-      String workerCode, YearMonth month) {
+      String workerCode, YearMonth month, String authenticatedWorkerCode) {
     LocalDate startDate = month.atDay(1);
     LocalDate endDate = month.atEndOfMonth();
 
     if (workerCode == null || workerCode.isBlank()) {
-      return dailyExecutionRepository.findByDateBetween(startDate, endDate).stream()
-          .collect(groupingBy(DailyExecution::date));
-    } else {
-      return dailyExecutionRepository
-          .findByWorkerCodeAndDateBetween(workerCode, startDate, endDate)
+      return sensitiveWorkerFilter
+          .filterMissionExecutionsWithoutSensitiveWorkers(
+              dailyExecutionRepository.findByDateBetween(startDate, endDate),
+              authenticatedWorkerCode)
           .stream()
           .collect(groupingBy(DailyExecution::date));
     }
+    return sensitiveWorkerFilter
+        .filterMissionExecutionsWithoutSensitiveWorkers(
+            dailyExecutionRepository.findByWorkerCodeAndDateBetween(workerCode, startDate, endDate),
+            authenticatedWorkerCode)
+        .stream()
+        .collect(groupingBy(DailyExecution::date));
   }
 }

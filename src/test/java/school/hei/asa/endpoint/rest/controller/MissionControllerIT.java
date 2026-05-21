@@ -68,7 +68,7 @@ public class MissionControllerIT extends FacadeIT {
 
   @Test
   void can_get_all_mission_executions_for_specific_yearMonth() {
-    var viewName = missionController.getMissionExecutions(model, null, "2024-07");
+    var viewName = missionController.getMissionExecutions(model, null, "2024-07", null);
 
     verify(model).addAttribute(eq("dailyExecutions"), any(List.class));
     verify(model).addAttribute(eq("careProductCode"), any(String.class));

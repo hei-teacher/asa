@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-import school.hei.asa.endpoint.rest.service.SensitiveWorkerFilter;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.WorkerRepository;
 

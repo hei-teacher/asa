@@ -1,4 +1,4 @@
-package school.hei.asa.endpoint.rest.service;
+package school.hei.asa.service;
 
 import java.util.Arrays;
 import java.util.List;

@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -140,7 +141,14 @@ public class MissionController {
     var authenticatedWorker = workerFromAuthentication.apply(authentication).get().code();
     YearMonth month =
         (yearMonth == null || yearMonth.isBlank()) ? YearMonth.now() : YearMonth.parse(yearMonth);
-    var dailyExecutionsByYearMonth = dailyExecutionsByDate(workerCode, month, authenticatedWorker);
+    var dailyExecutionsByYearMonth =
+        dailyExecutionsByDate(workerCode, month).entrySet().stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    entry ->
+                        sensitiveWorkerFilter.filterMissionExecutionsWithoutSensitiveWorkers(
+                            entry.getValue(), authenticatedWorker)));
     var thDailyExecutions = new ArrayList<ThDailyExecution>();
     dailyExecutionsByYearMonth.forEach(
         (date, deList) -> thDailyExecutions.add(thDailyExecutionMapper.toTh(date, deList)));
@@ -158,22 +166,16 @@ public class MissionController {
   }
 
   private Map<LocalDate, List<DailyExecution>> dailyExecutionsByDate(
-      String workerCode, YearMonth month, String authenticatedWorkerCode) {
+      String workerCode, YearMonth month) {
     LocalDate startDate = month.atDay(1);
     LocalDate endDate = month.atEndOfMonth();
 
     if (workerCode == null || workerCode.isBlank()) {
-      return sensitiveWorkerFilter
-          .filterMissionExecutionsWithoutSensitiveWorkers(
-              dailyExecutionRepository.findByDateBetween(startDate, endDate),
-              authenticatedWorkerCode)
-          .stream()
+      return dailyExecutionRepository.findByDateBetween(startDate, endDate).stream()
           .collect(groupingBy(DailyExecution::date));
     }
-    return sensitiveWorkerFilter
-        .filterMissionExecutionsWithoutSensitiveWorkers(
-            dailyExecutionRepository.findByWorkerCodeAndDateBetween(workerCode, startDate, endDate),
-            authenticatedWorkerCode)
+    return dailyExecutionRepository
+        .findByWorkerCodeAndDateBetween(workerCode, startDate, endDate)
         .stream()
         .collect(groupingBy(DailyExecution::date));
   }

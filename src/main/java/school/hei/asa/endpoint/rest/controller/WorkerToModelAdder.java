@@ -22,14 +22,16 @@ public class WorkerToModelAdder implements BiFunction<String, Model, Worker> {
         workerCode == null || workerCode.isBlank()
             ? null
             : workerService.findWorkerByCode(workerCode);
-    var workers =
+    var workersSensitiveWorkerFiltered =
         sensitiveWorkerFilter.filterSensitiveWorkers(
             workerService.getWorkersFrom(model), workerCode);
     log.info(
-        "there are {} workers = {}", workers.size(), workers.stream().map(Worker::name).toList());
+        "there are {} workers = {}",
+        workersSensitiveWorkerFiltered.size(),
+        workersSensitiveWorkerFiltered.stream().map(Worker::name).toList());
     model.addAttribute("worker", worker);
     model.addAttribute("workerName", worker == null ? "All workers" : worker.name());
-    model.addAttribute("workers", workers);
+    model.addAttribute("workers", workersSensitiveWorkerFiltered);
     return worker;
   }
 }

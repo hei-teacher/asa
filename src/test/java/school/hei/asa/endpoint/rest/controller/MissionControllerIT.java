@@ -58,7 +58,20 @@ public class MissionControllerIT extends FacadeIT {
 
   @Test
   void can_get_all_missions() {
-    var viewName = missionController.getMissions(model, null, null, null);
+    authenticatedWorker =
+        new Worker(
+            "W-101",
+            "Test Worker",
+            "worker@example.com",
+            "Full Worker Name",
+            "address",
+            "random city",
+            "nif",
+            "stat");
+    authentication = mock(Authentication.class);
+    when(workerFromAuthentication.apply(authentication))
+        .thenReturn(Optional.of(authenticatedWorker));
+    var viewName = missionController.getMissions(model, null, null, null, authentication);
 
     log.info("viewName = {}", viewName);
 
@@ -68,10 +81,9 @@ public class MissionControllerIT extends FacadeIT {
     verify(model).addAttribute(eq("months"), any(Map.class));
     verify(model).addAttribute(eq("products"), any(List.class));
     verify(model).addAttribute(eq("total"), any(Map.class));
-    verify(model).addAttribute(eq("worker"), eq(null));
+    verify(model).addAttribute(eq("worker"), eq(authenticatedWorker)); // actual worker
     verify(model).addAttribute(eq("workers"), any(List.class));
-    verify(model).addAttribute(eq("workerName"), eq("All workers"));
-
+    verify(model).addAttribute(eq("workerName"), eq("John"));
     assertEquals("missions", viewName);
   }
 

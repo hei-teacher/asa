@@ -57,11 +57,12 @@ public class MissionController {
       Model model,
       @RequestParam(required = false) String workerCode,
       @RequestParam(required = false) String startDate,
-      @RequestParam(required = false) String endDate) {
+      @RequestParam(required = false) String endDate,
+      Authentication authentication) {
     model.addAttribute("workerCode", workerCode);
     model.addAttribute("startDate", startDate);
     model.addAttribute("endDate", endDate);
-
+    var authenticateWorkerCode = workerFromAuthentication.apply(authentication).get().code();
     var noUnpaidCareMissions = true;
     var thProductsByWorkerCode =
         thProductService.filterThProductByWorkerCodeAndDateBetween(
@@ -99,7 +100,7 @@ public class MissionController {
             thProductsByWorkerCode, noUnpaidCareMissions);
     model.addAttribute("total", thProductsExecutedDaysSumByMonth);
 
-    workerToModelAdder.apply(workerCode, model);
+    workerToModelAdder.apply(authenticateWorkerCode, model);
     return "missions";
   }
 
@@ -141,7 +142,7 @@ public class MissionController {
     var authenticatedWorker = workerFromAuthentication.apply(authentication).get().code();
     YearMonth month =
         (yearMonth == null || yearMonth.isBlank()) ? YearMonth.now() : YearMonth.parse(yearMonth);
-    var dailyExecutionsByYearMonth =
+    var dailyExecutionsByYearMonthSensitiveWorkerFiltered =
         dailyExecutionsByDate(workerCode, month).entrySet().stream()
             .collect(
                 Collectors.toMap(
@@ -150,7 +151,7 @@ public class MissionController {
                         sensitiveWorkerFilter.filterMissionExecutionsWithoutSensitiveWorkers(
                             entry.getValue(), authenticatedWorker)));
     var thDailyExecutions = new ArrayList<ThDailyExecution>();
-    dailyExecutionsByYearMonth.forEach(
+    dailyExecutionsByYearMonthSensitiveWorkerFiltered.forEach(
         (date, deList) -> thDailyExecutions.add(thDailyExecutionMapper.toTh(date, deList)));
 
     model.addAttribute(
@@ -160,7 +161,7 @@ public class MissionController {
     model.addAttribute("yearMonth", month.toString());
     model.addAttribute("year", month.getYear());
     model.addAttribute("workerCode", workerCode);
-    workerToModelAdder.apply(workerCode, model);
+    workerToModelAdder.apply(authenticatedWorker, model);
 
     return "mission-executions";
   }

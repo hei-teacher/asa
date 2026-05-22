@@ -17,6 +17,7 @@ import school.hei.asa.repository.WorkerRepository;
 @AllArgsConstructor
 public class WorkerService {
   private final WorkerRepository workerRepository;
+  private final SensitiveWorkerFilter sensitiveWorkerFilter;
 
   public Worker findWorkerByCode(String workerCode) {
     return workerRepository.findByCode(workerCode);

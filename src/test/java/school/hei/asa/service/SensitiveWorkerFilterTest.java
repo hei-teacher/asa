@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.MissionExecution;
@@ -14,7 +13,7 @@ import school.hei.asa.model.Worker;
 
 @Slf4j
 class SensitiveWorkerFilterTest extends FacadeIT {
-  @Autowired SensitiveWorkerFilter sensitiveWorkerFilter;
+  SensitiveWorkerFilter sensitiveWorkerFilter = new SensitiveWorkerFilter("W-059,W-015");
 
   @Test
   void sensitive_worker_sees_own_executions_but_not_other_sensitive_workers() {

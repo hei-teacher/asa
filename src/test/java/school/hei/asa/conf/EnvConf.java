@@ -24,5 +24,6 @@ public class EnvConf {
     registry.add("asa.logout.url", () -> "dummy");
     registry.add("ACCOUNTANTS", () -> "dummy,dummy2");
     registry.add("MAX_LATENESS_REPORT", () -> 4);
+    registry.add("SENSITIVE_WORKERS_CODES", () -> "W-059,W-00");
   }
 }

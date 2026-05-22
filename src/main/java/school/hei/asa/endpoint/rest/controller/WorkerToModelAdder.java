@@ -6,14 +6,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import school.hei.asa.model.Worker;
+import school.hei.asa.service.SensitiveWorkerFilter;
 import school.hei.asa.service.WorkerService;
 
 @Slf4j
 @Component
 @AllArgsConstructor
 public class WorkerToModelAdder implements BiFunction<String, Model, Worker> {
-
   private final WorkerService workerService;
+  private final SensitiveWorkerFilter sensitiveWorkerFilter;
 
   @Override
   public Worker apply(String workerCode, Model model) {
@@ -21,12 +22,16 @@ public class WorkerToModelAdder implements BiFunction<String, Model, Worker> {
         workerCode == null || workerCode.isBlank()
             ? null
             : workerService.findWorkerByCode(workerCode);
-    var workers = workerService.getWorkersFrom(model);
+    var workersSensitiveWorkerFiltered =
+        sensitiveWorkerFilter.filterSensitiveWorkers(
+            workerService.getWorkersFrom(model), workerCode);
     log.info(
-        "there are {} workers = {}", workers.size(), workers.stream().map(Worker::name).toList());
+        "there are {} workers = {}",
+        workersSensitiveWorkerFiltered.size(),
+        workersSensitiveWorkerFiltered.stream().map(Worker::name).toList());
     model.addAttribute("worker", worker);
     model.addAttribute("workerName", worker == null ? "All workers" : worker.name());
-    model.addAttribute("workers", workers);
+    model.addAttribute("workers", workersSensitiveWorkerFiltered);
     return worker;
   }
 }

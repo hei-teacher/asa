@@ -40,6 +40,12 @@ jobs:
               (github.ref == 'refs/heads/prod') && secrets.PROD_MAX_LATENESS_REPORT ||
               (github.ref == 'refs/heads/preprod') && secrets.PREPROD_MAX_LATENESS_REPORT
               }}
+      SENSITIVE_WORKERS_CODES: ${{
+              (github.event_name == 'pull_request' && github.base_ref == 'prod') && secrets.PROD_SENSITIVE_WORKERS_CODES ||
+              (github.event_name == 'pull_request' && github.base_ref == 'preprod') && secrets.PREPROD_SENSITIVE_WORKERS_CODES ||
+              (github.ref == 'refs/heads/prod') && secrets.PROD_SENSITIVE_WORKERS_CODES ||
+              (github.ref == 'refs/heads/preprod') && secrets.PREPROD_SENSITIVE_WORKERS_CODES
+              }}
 
     steps:
       - uses: actions/checkout@v4.1.6

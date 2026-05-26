@@ -45,7 +45,7 @@ public class NearOverdueNotificationRequestedServiceIT extends FacadeIT {
     verify(mailer, times(1)).accept(emailCaptor.capture());
 
     Email sentEmail = emailCaptor.getValue();
-    assertEquals("ASA - REMINDER TO REPORT THE DATE 2024-06-15", sentEmail.subject());
+    assertEquals("ASA - REMINDER TO REPORT THE DATE - 2024-06-15 - name", sentEmail.subject());
     assertTrue(sentEmail.htmlBody().contains("2024-06-15"));
   }
 

@@ -5,6 +5,8 @@ import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
 import static org.reflections.Reflections.log;
 
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Arrays;
@@ -77,8 +79,6 @@ public class NearOverdueReportNotificationRequestedService
     var accountants =
         internetAddressMapper.toInternetAddresses(
             Arrays.stream(this.accountants.split(",")).toList());
-    var receiverAddresses =
-        internetAddressMapper.toInternetAddresses(receivers.stream().map(Worker::email).toList());
     var text =
         String.format(
             "Hello, \n"
@@ -88,16 +88,22 @@ public class NearOverdueReportNotificationRequestedService
             date);
 
     log.info("Sending emails to workers...");
-    receiverAddresses.forEach(
-        receiver -> {
-          mailer.accept(
-              new Email(
-                  receiver,
-                  accountants,
-                  List.of(),
-                  String.format("ASA - REMINDER TO REPORT THE DATE %s", date),
-                  text,
-                  List.of()));
+
+    receivers.forEach(
+        worker -> {
+          try {
+            mailer.accept(
+                new Email(
+                    new InternetAddress(worker.address()),
+                    accountants,
+                    List.of(),
+                    String.format(
+                        "ASA - REMINDER TO REPORT THE DATE - %s - %s", date, worker.name()),
+                    text,
+                    List.of()));
+          } catch (AddressException e) {
+            throw new RuntimeException(e);
+          }
         });
   }
 }

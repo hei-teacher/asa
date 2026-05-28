@@ -19,13 +19,16 @@ import java.time.Month;
 import java.util.Map;
 import school.hei.asa.model.contract.Contract;
 
-public record FinancialPlan(Map<Month, Argent> plannedCost, Map<Contract, Exception> koContracts) {
+public record FinancialPlan(
+    Map<Month, Argent> plannedCost,
+    Map<Month, Argent> executedCost,
+    Map<Contract, Exception> koContracts) {
 
   @Override
   public String toString() {
     return String.format(
         """
-        cost = [
+        plannedCost = [
           jan: %s,
           feb: %s,
           mar: %s,
@@ -39,6 +42,20 @@ public record FinancialPlan(Map<Month, Argent> plannedCost, Map<Contract, Except
           nov: %s,
           dec: %s
         ],
+        executedCost = [
+        jan: %s,
+          feb: %s,
+          mar: %s,
+          apr: %s,
+          may: %s,
+          jun: %s,
+          jul: %s,
+          aug: %s,
+          sep: %s,
+          oct: %s,
+          nov: %s,
+          dec: %s
+        ]
         koContracts = %s
         """,
         plannedCost.get(JANUARY).ppMontant(),
@@ -53,6 +70,18 @@ public record FinancialPlan(Map<Month, Argent> plannedCost, Map<Contract, Except
         plannedCost.get(OCTOBER).ppMontant(),
         plannedCost.get(NOVEMBER).ppMontant(),
         plannedCost.get(DECEMBER).ppMontant(),
+        executedCost.get(JANUARY).ppMontant(),
+        executedCost.get(FEBRUARY).ppMontant(),
+        executedCost.get(MARCH).ppMontant(),
+        executedCost.get(APRIL).ppMontant(),
+        executedCost.get(MAY).ppMontant(),
+        executedCost.get(JUNE).ppMontant(),
+        executedCost.get(JULY).ppMontant(),
+        executedCost.get(AUGUST).ppMontant(),
+        executedCost.get(SEPTEMBER).ppMontant(),
+        executedCost.get(OCTOBER).ppMontant(),
+        executedCost.get(NOVEMBER).ppMontant(),
+        executedCost.get(DECEMBER).ppMontant(),
         pp(koContracts));
   }
 

@@ -5,16 +5,20 @@ import static java.time.ZoneOffset.UTC;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
+import school.hei.asa.file.bucket.BucketComponent;
+import school.hei.asa.file.bucket.BucketConf;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
@@ -26,6 +30,7 @@ import school.hei.asa.repository.BankAccountRepository;
 import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.InvoiceReferenceRepository;
 import school.hei.asa.repository.MissionExecutionRepository;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 
 @Slf4j
 @AllArgsConstructor
@@ -39,6 +44,10 @@ public class InvoiceService {
   private final InvoiceReferenceRepository invoiceReferenceRepository;
   private final MissionService missionService;
   private final EventProducer<NewInvoiceGenerated> eventProducer;
+  private final BucketComponent bucketComponent;
+  private static final String INVOICES_FOLDER = "invoices/";
+  private final BucketConf bucketConf;
+  private final PDFScrapper pdfScrapper;
 
   public Optional<InvoiceReference> findInvoiceReference(Worker worker, YearMonth yearMonth) {
     var invoiceReferenceList = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker);
@@ -204,5 +213,23 @@ public class InvoiceService {
   public void sendGenerateInvoiceEvent(String invoiceId) {
     var event = NewInvoiceGenerated.builder().invoiceId(invoiceId).build();
     eventProducer.accept(List.of(event));
+  }
+
+  public long getInvoiceTotalAmountByMonth(YearMonth yearMonth) {
+    var invoices = downloadInvoiceByYearMonth(yearMonth);
+    return invoices.stream().map(pdfScrapper::extractTotalAmount).reduce(0L, Long::sum);
+  }
+
+  public List<File> downloadInvoiceByYearMonth(YearMonth yearMonth) {
+    ListObjectsV2Request request =
+        ListObjectsV2Request.builder()
+            .bucket(bucketComponent.getBucketName())
+            .prefix(INVOICES_FOLDER)
+            .build();
+
+    return bucketConf.getS3Client().listObjectsV2Paginator(request).contents().stream()
+        .filter(invoice -> YearMonth.from(invoice.lastModified()).equals(yearMonth))
+        .map(item -> bucketComponent.download(item.key()))
+        .collect(Collectors.toList());
   }
 }

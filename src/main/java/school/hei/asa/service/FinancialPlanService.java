@@ -1,10 +1,13 @@
 package school.hei.asa.service;
 
+import static gen.patrimoine.modele.Devise.MGA;
+
 import gen.patrimoine.cas.Cas;
 import gen.patrimoine.modele.Argent;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,6 +22,7 @@ import school.hei.asa.repository.ContractRepository;
 public class FinancialPlanService {
 
   private final ContractRepository contractRepository;
+  private final InvoiceService invoiceService;
 
   @Transactional
   public FinancialPlan financialPlan(int year) {
@@ -26,7 +30,9 @@ public class FinancialPlanService {
     var contractsToCasSet = new ContractsToCasSet();
     contractsToCasSet.apply(new HashSet<>(contracts));
     return new FinancialPlan(
-        mapOfCosts(year, contractsToCasSet.getCompanyCas()), contractsToCasSet.getKoContracts());
+        mapOfCosts(year, contractsToCasSet.getCompanyCas()),
+        mapOfExecuted(year),
+        contractsToCasSet.getKoContracts());
   }
 
   private Map<Month, Argent> mapOfCosts(int year, Cas companyCas) {
@@ -43,6 +49,16 @@ public class FinancialPlanService {
           patrimoineAtEnd
               .getValeurComptable()
               .minus(patrimoineAtStart.getValeurComptable(), endDate));
+    }
+
+    return map;
+  }
+
+  private Map<Month, Argent> mapOfExecuted(int year) {
+    var map = new HashMap<Month, Argent>();
+    for (Month m : Month.values()) {
+      map.put(
+          m, new Argent(invoiceService.getInvoiceTotalAmountByMonth(YearMonth.of(year, m)), MGA));
     }
 
     return map;

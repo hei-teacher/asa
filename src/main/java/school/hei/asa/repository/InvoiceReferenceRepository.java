@@ -1,6 +1,7 @@
 package school.hei.asa.repository;
 
 import jakarta.transaction.Transactional;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -32,5 +33,12 @@ public class InvoiceReferenceRepository {
   public Optional<InvoiceReference> findInvoiceReferenceByInvoiceId(String invoiceId) {
     var jInvoiceRef = jInvoiceReferenceRepository.findById(invoiceId);
     return jInvoiceRef.map(invoiceReferenceMapper::toDomain);
+  }
+
+  @Transactional
+  public List<InvoiceReference> findByYearMonth(YearMonth yearMonth) {
+    return jInvoiceReferenceRepository.findByYearMonth(yearMonth).stream()
+        .map(invoiceReferenceMapper::toDomain)
+        .toList();
   }
 }

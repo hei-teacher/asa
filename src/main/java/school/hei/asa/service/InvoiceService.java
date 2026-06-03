@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,6 @@ import school.hei.asa.repository.BankAccountRepository;
 import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.InvoiceReferenceRepository;
 import school.hei.asa.repository.MissionExecutionRepository;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 
 @Slf4j
 @AllArgsConstructor
@@ -221,15 +219,21 @@ public class InvoiceService {
   }
 
   public List<File> downloadInvoiceByYearMonth(YearMonth yearMonth) {
-    ListObjectsV2Request request =
-        ListObjectsV2Request.builder()
-            .bucket(bucketComponent.getBucketName())
-            .prefix(INVOICES_FOLDER)
-            .build();
+    var invoices = invoiceReferenceRepository.findByYearMonth(yearMonth);
+    var invoiceKeys =
+        invoices.stream()
+            .map(
+                invoiceReference ->
+                    String.format(
+                        "FAC-NUM-2025-%s-%s.pdf",
+                        invoiceReference.worker().code(), invoiceReference.autoincrement()))
+            .toList();
 
-    return bucketConf.getS3Client().listObjectsV2Paginator(request).contents().stream()
-        .filter(invoice -> YearMonth.from(invoice.lastModified()).equals(yearMonth))
-        .map(item -> bucketComponent.download(item.key()))
-        .collect(Collectors.toList());
+    return invoiceKeys.stream()
+        .map(
+            key -> {
+              return bucketComponent.download(INVOICES_FOLDER + key);
+            })
+        .toList();
   }
 }

@@ -11,19 +11,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class PDFScrapper {
   public long extractTotalAmount(File file) {
-    try (PDDocument fis = PDDocument.load(file)) {
+    try (PDDocument doc = PDDocument.load(file)) {
       PDFTextStripper stripper = new PDFTextStripper();
-      String text = stripper.getText(fis);
-      Pattern pattern = Pattern.compile("Total\\s+([\\d\\s]+)");
+      String text = stripper.getText(doc);
+
+      Pattern pattern = Pattern.compile("Total[^\\d]*(\\d[\\d\\s]*)");
       Matcher matcher = pattern.matcher(text);
 
       if (matcher.find()) {
-        String totalAmount = matcher.group(1).replaceAll("\\s", "").trim();
-        return Long.parseLong(totalAmount);
+        String raw = matcher.group(1).replaceAll("[\\s\\u00A0]", "").trim();
+        try {
+          return Long.parseLong(raw);
+        } catch (NumberFormatException e) {
+          throw new RuntimeException("Invalid amount extracted : " + raw, e);
+        }
       }
+
+      throw new RuntimeException("");
+
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("An Error occured while reading the PDF", e);
     }
-    return 0;
   }
 }

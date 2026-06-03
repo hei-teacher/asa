@@ -28,35 +28,35 @@ public record FinancialPlan(
   public String toString() {
     return String.format(
         """
-        plannedCost = [
-          jan: %s,
-          feb: %s,
-          mar: %s,
-          apr: %s,
-          may: %s,
-          jun: %s,
-          jul: %s,
-          aug: %s,
-          sep: %s,
-          oct: %s,
-          nov: %s,
-          dec: %s
-        ],
-        executedCost = [
-        jan: %s,
-          feb: %s,
-          mar: %s,
-          apr: %s,
-          may: %s,
-          jun: %s,
-          jul: %s,
-          aug: %s,
-          sep: %s,
-          oct: %s,
-          nov: %s,
-          dec: %s
-        ]
-        koContracts = %s
+                plannedCost = [
+                        jan: %s,
+                        feb: %s,
+                        mar: %s,
+                        apr: %s,
+                        may: %s,
+                        jun: %s,
+                        jul: %s,
+                        aug: %s,
+                        sep: %s,
+                        oct: %s,
+                        nov: %s,
+                        dec: %s
+                      ],
+                      executedCost = [
+                      jan: %s,
+                        feb: %s,
+                        mar: %s,
+                        apr: %s,
+                        may: %s,
+                        jun: %s,
+                        jul: %s,
+                        aug: %s,
+                        sep: %s,
+                        oct: %s,
+                        nov: %s,
+                        dec: %s
+                      ]
+                      koContracts = %s
         """,
         plannedCost.get(JANUARY).ppMontant(),
         plannedCost.get(FEBRUARY).ppMontant(),

@@ -23,14 +23,14 @@ public class PDFScrapper {
         try {
           return Long.parseLong(raw);
         } catch (NumberFormatException e) {
-          throw new RuntimeException("Invalid amount extracted : " + raw, e);
+          throw new RuntimeException("Invalid amount extracted: " + raw, e);
         }
       }
 
-      throw new RuntimeException("");
+      throw new RuntimeException("No total amount found in PDF");
 
     } catch (IOException e) {
-      throw new RuntimeException("An Error occured while reading the PDF", e);
+      throw new RuntimeException("Error reading PDF", e);
     }
   }
 }

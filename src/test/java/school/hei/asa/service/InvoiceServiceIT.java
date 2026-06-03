@@ -3,6 +3,9 @@ package school.hei.asa.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static school.hei.asa.model.contract.ContractType.studentContractor;
 
@@ -15,6 +18,7 @@ import java.time.YearMonth;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import school.hei.asa.conf.FacadeIT;
@@ -32,6 +36,8 @@ public class InvoiceServiceIT extends FacadeIT {
   @MockBean ContractRepository contractRepository;
 
   @MockBean BankAccountRepository bankAccountRepository;
+
+  private static final String INVOICES_FOLDER = "invoices/";
 
   @BeforeEach
   void setUp() {
@@ -125,5 +131,14 @@ public class InvoiceServiceIT extends FacadeIT {
 
   private Worker newWorker() {
     return new Worker("w-code", "name", "email", "fullname", "address", "city", "nif", "stat");
+  }
+
+  @Test
+  void can_download_yearmonth_invoices() {
+    InvoiceService spyService = Mockito.spy(invoiceService);
+
+    doReturn(List.of()).when(spyService).downloadInvoiceByYearMonth(YearMonth.of(2026, 6));
+    spyService.downloadInvoiceByYearMonth(YearMonth.of(2026, 6));
+    verify(spyService, times(1)).downloadInvoiceByYearMonth(YearMonth.of(2026, 6));
   }
 }

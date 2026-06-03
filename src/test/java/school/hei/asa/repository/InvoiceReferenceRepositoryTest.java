@@ -48,4 +48,15 @@ public class InvoiceReferenceRepositoryTest extends FacadeIT {
 
     assertTrue(actual.contains(expected));
   }
+
+  @Test
+  void can_get_invoices_by_yearmonth() {
+    var authenticatedWorker = new Worker("W-101", "John", null, null, null, null, null, null);
+    var subject = invoiceReferenceRepository.findByYearMonth(YearMonth.of(2026, 6));
+    var expected =
+        new InvoiceReference("INV-2026-001", YearMonth.of(2026, 6), 5, authenticatedWorker);
+    log.info("invoiceRef content = {}", expected);
+    log.info("invoiceRef subject = {}", subject);
+    assertTrue(subject.contains(expected));
+  }
 }

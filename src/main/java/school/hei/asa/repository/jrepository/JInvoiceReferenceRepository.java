@@ -1,6 +1,5 @@
 package school.hei.asa.repository.jrepository;
 
-import java.time.YearMonth;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -13,5 +12,5 @@ public interface JInvoiceReferenceRepository extends JpaRepository<JInvoiceRefer
 
   List<JInvoiceReference> findByWorkerCode(String workerCode);
 
-  List<JInvoiceReference> findByYearMonth(YearMonth yearMonth);
+  List<JInvoiceReference> findByYearMonth(String yearMonth);
 }

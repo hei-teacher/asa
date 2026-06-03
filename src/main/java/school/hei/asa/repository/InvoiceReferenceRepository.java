@@ -37,7 +37,7 @@ public class InvoiceReferenceRepository {
 
   @Transactional
   public List<InvoiceReference> findByYearMonth(YearMonth yearMonth) {
-    return jInvoiceReferenceRepository.findByYearMonth(yearMonth).stream()
+    return jInvoiceReferenceRepository.findByYearMonth(yearMonth.toString()).stream()
         .map(invoiceReferenceMapper::toDomain)
         .toList();
   }

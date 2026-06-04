@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static school.hei.asa.model.contract.ContractType.studentContractor;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
@@ -29,6 +30,7 @@ import school.hei.asa.model.contract.Contract;
 import school.hei.asa.model.contract.ContractLevel;
 import school.hei.asa.repository.BankAccountRepository;
 import school.hei.asa.repository.ContractRepository;
+import school.hei.asa.repository.InvoiceReferenceRepository;
 
 public class InvoiceServiceIT extends FacadeIT {
   @Autowired InvoiceService invoiceService;
@@ -36,6 +38,9 @@ public class InvoiceServiceIT extends FacadeIT {
   @MockBean ContractRepository contractRepository;
 
   @MockBean BankAccountRepository bankAccountRepository;
+  @MockBean PDFScrapper pdfScrapper;
+
+  @MockBean InvoiceReferenceRepository invoiceReferenceRepository;
 
   private static final String INVOICES_FOLDER = "invoices/";
 
@@ -140,5 +145,26 @@ public class InvoiceServiceIT extends FacadeIT {
     doReturn(List.of()).when(spyService).downloadInvoiceByYearMonth(YearMonth.of(2026, 6));
     spyService.downloadInvoiceByYearMonth(YearMonth.of(2026, 6));
     verify(spyService, times(1)).downloadInvoiceByYearMonth(YearMonth.of(2026, 6));
+  }
+
+  @Test
+  void can_get_invoice_total_amount_by_month() {
+    InvoiceService spyService = Mockito.spy(invoiceService);
+
+    var yearMonth = YearMonth.of(2026, 6);
+    var mockFile1 = new File("FAC-NUM-2025-W001-1.pdf");
+    var mockFile2 = new File("FAC-NUM-2025-W002-2.pdf");
+    var mockFiles = List.of(mockFile1, mockFile2);
+
+    doReturn(mockFiles).when(spyService).downloadInvoiceByYearMonth(yearMonth);
+    when(pdfScrapper.extractTotalAmount(mockFile1)).thenReturn(55_000L);
+    when(pdfScrapper.extractTotalAmount(mockFile2)).thenReturn(45_000L);
+
+    var actual = spyService.getInvoiceTotalAmountByMonth(yearMonth);
+
+    assertEquals(100_000L, actual);
+    verify(spyService, times(1)).downloadInvoiceByYearMonth(yearMonth);
+    verify(pdfScrapper, times(1)).extractTotalAmount(mockFile1);
+    verify(pdfScrapper, times(1)).extractTotalAmount(mockFile2);
   }
 }

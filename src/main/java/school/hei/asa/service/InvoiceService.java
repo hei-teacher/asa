@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
 import school.hei.asa.file.bucket.BucketComponent;
-import school.hei.asa.file.bucket.BucketConf;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
@@ -44,7 +43,6 @@ public class InvoiceService {
   private final EventProducer<NewInvoiceGenerated> eventProducer;
   private final BucketComponent bucketComponent;
   private static final String INVOICES_FOLDER = "invoices/";
-  private final BucketConf bucketConf;
   private final PDFScrapper pdfScrapper;
 
   public Optional<InvoiceReference> findInvoiceReference(Worker worker, YearMonth yearMonth) {

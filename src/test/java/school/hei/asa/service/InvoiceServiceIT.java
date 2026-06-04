@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.model.BankAccount;
 import school.hei.asa.model.InvoiceForm;
@@ -30,7 +32,6 @@ import school.hei.asa.model.contract.Contract;
 import school.hei.asa.model.contract.ContractLevel;
 import school.hei.asa.repository.BankAccountRepository;
 import school.hei.asa.repository.ContractRepository;
-import school.hei.asa.repository.InvoiceReferenceRepository;
 
 public class InvoiceServiceIT extends FacadeIT {
   @Autowired InvoiceService invoiceService;
@@ -38,9 +39,6 @@ public class InvoiceServiceIT extends FacadeIT {
   @MockBean ContractRepository contractRepository;
 
   @MockBean BankAccountRepository bankAccountRepository;
-  @MockBean PDFScrapper pdfScrapper;
-
-  @MockBean InvoiceReferenceRepository invoiceReferenceRepository;
 
   private static final String INVOICES_FOLDER = "invoices/";
 
@@ -152,19 +150,23 @@ public class InvoiceServiceIT extends FacadeIT {
     InvoiceService spyService = Mockito.spy(invoiceService);
 
     var yearMonth = YearMonth.of(2026, 6);
-    var mockFile1 = new File("FAC-NUM-2025-W001-1.pdf");
-    var mockFile2 = new File("FAC-NUM-2025-W002-2.pdf");
+    var mockFile1 = mock(File.class);
+    var mockFile2 = mock(File.class);
     var mockFiles = List.of(mockFile1, mockFile2);
 
+    // Mock pdfScrapper localement via ReflectionTestUtils
+    PDFScrapper mockPdfScrapper = mock(PDFScrapper.class);
+    ReflectionTestUtils.setField(spyService, "pdfScrapper", mockPdfScrapper);
+
     doReturn(mockFiles).when(spyService).downloadInvoiceByYearMonth(yearMonth);
-    when(pdfScrapper.extractTotalAmount(mockFile1)).thenReturn(55_000L);
-    when(pdfScrapper.extractTotalAmount(mockFile2)).thenReturn(45_000L);
+    when(mockPdfScrapper.extractTotalAmount(mockFile1)).thenReturn(55_000L);
+    when(mockPdfScrapper.extractTotalAmount(mockFile2)).thenReturn(45_000L);
 
     var actual = spyService.getInvoiceTotalAmountByMonth(yearMonth);
 
     assertEquals(100_000L, actual);
     verify(spyService, times(1)).downloadInvoiceByYearMonth(yearMonth);
-    verify(pdfScrapper, times(1)).extractTotalAmount(mockFile1);
-    verify(pdfScrapper, times(1)).extractTotalAmount(mockFile2);
+    verify(mockPdfScrapper, times(1)).extractTotalAmount(mockFile1);
+    verify(mockPdfScrapper, times(1)).extractTotalAmount(mockFile2);
   }
 }

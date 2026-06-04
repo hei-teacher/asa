@@ -147,14 +147,13 @@ public class InvoiceServiceIT extends FacadeIT {
 
   @Test
   void can_get_invoice_total_amount_by_month() {
-    InvoiceService spyService = Mockito.spy(invoiceService);
+    var spyService = Mockito.spy(invoiceService);
 
     var yearMonth = YearMonth.of(2026, 6);
     var mockFile1 = mock(File.class);
     var mockFile2 = mock(File.class);
     var mockFiles = List.of(mockFile1, mockFile2);
 
-    // Mock pdfScrapper localement via ReflectionTestUtils
     PDFScrapper mockPdfScrapper = mock(PDFScrapper.class);
     ReflectionTestUtils.setField(spyService, "pdfScrapper", mockPdfScrapper);
 

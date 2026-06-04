@@ -2,24 +2,23 @@ package school.hei.asa.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class PDFScrapper {
   public long extractTotalAmount(File file) {
-    try (PDDocument doc = PDDocument.load(file)) {
-      PDFTextStripper stripper = new PDFTextStripper();
-      String text = stripper.getText(doc);
+    try (var doc = PDDocument.load(file)) {
+      var stripper = new PDFTextStripper();
+      var text = stripper.getText(doc);
 
-      Pattern pattern = Pattern.compile("Total[^\\d]*(\\d[\\d\\s]*)");
-      Matcher matcher = pattern.matcher(text);
+      var pattern = Pattern.compile("Total[^\\d]*(\\d[\\d\\s]*)");
+      var matcher = pattern.matcher(text);
 
       if (matcher.find()) {
-        String raw = matcher.group(1).replaceAll("[\\s\\u00A0]", "").trim();
+        var raw = matcher.group(1).replaceAll("[\\s\\u00A0]", "").trim();
         try {
           return Long.parseLong(raw);
         } catch (NumberFormatException e) {

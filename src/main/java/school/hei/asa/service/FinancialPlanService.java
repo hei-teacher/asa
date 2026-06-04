@@ -31,7 +31,7 @@ public class FinancialPlanService {
     contractsToCasSet.apply(new HashSet<>(contracts));
     return new FinancialPlan(
         mapOfCosts(year, contractsToCasSet.getCompanyCas()),
-        mapOfExecuted(year, contractsToCasSet.getCompanyCas()),
+        mapOfExecuted(year),
         contractsToCasSet.getKoContracts());
   }
 
@@ -54,8 +54,9 @@ public class FinancialPlanService {
     return map;
   }
 
-  private Map<Month, Argent> mapOfExecuted(int year, Cas companyCas) {
+  private Map<Month, Argent> mapOfExecuted(int year) {
     var map = new HashMap<Month, Argent>();
+
     for (Month m : Month.values()) {
       long amount = invoiceService.getInvoiceTotalAmountByMonth(YearMonth.of(year, m));
       map.put(m, amount == 0 ? new Argent(0, MGA) : new Argent(amount, MGA).mult(-1));

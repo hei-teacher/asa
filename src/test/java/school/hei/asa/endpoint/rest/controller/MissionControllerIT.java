@@ -91,7 +91,7 @@ public class MissionControllerIT extends FacadeIT {
   void can_get_all_mission_executions_for_specific_yearMonth() {
     authenticatedWorker =
         new Worker(
-            "worker-code",
+            "W-101",
             "Test Worker",
             "worker@example.com",
             "Full Worker Name",

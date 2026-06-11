@@ -15,6 +15,9 @@ public class BankAccountRepository {
 
   @Transactional
   public BankAccount findByWorkerCode(String workerCode) {
-    return bankAccountMapper.toDomain(jBankAccountRepository.findByWorkerCode(workerCode));
+    return jBankAccountRepository
+        .findByWorkerCode(workerCode)
+        .map(bankAccountMapper::toDomain)
+        .orElse(null);
   }
 }

@@ -63,7 +63,10 @@ public class InvoiceService {
                 .isBefore(lastCurrentMonthDay)
             && LocalDate.ofInstant(contracts.getFirst().entranceInstant(), UTC)
                 .isAfter(firstCurrentMonthDay);
-    var bankAccount = bankAccountRepository.findByWorkerCode(worker.code());
+    var bankAccount =
+        bankAccountRepository.findByWorkerCode(worker.code()) != null
+            ? bankAccountRepository.findByWorkerCode(worker.code()).toString()
+            : "";
     if (hasUpgradedLevel) {
       var firstContract = contracts.getFirst();
       var secondContract = contracts.get(1);
@@ -97,7 +100,7 @@ public class InvoiceService {
           secondInvoiceForm.amount(),
           total,
           parsedTotal,
-          bankAccount.toString());
+          bankAccount);
     }
     var totalDaysWorked =
         missionExecutionPercentageSumByWorker(worker, firstCurrentMonthDay, lastCurrentMonthDay);
@@ -119,7 +122,7 @@ public class InvoiceService {
         null,
         tempResult.total(),
         tempResult.parsedAmount(),
-        bankAccount.toString());
+        bankAccount);
   }
 
   private InvoiceForm generateInvoiceFormFrom(Double totalDaysWorked, Contract contract) {

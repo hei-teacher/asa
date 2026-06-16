@@ -11,7 +11,7 @@
 
 ### On cloud, using Poja
 
-Asa is runs on [Poja](https://docs.poja.io/docs). It's the best way we know to host Spring Boot applications.
+Asa runs on [Poja](https://docs.poja.io/docs). It's the best way we know to host Spring Boot applications.
 Within a few clicks, you have your Spring Boot running with a publicly accessible URL, and with your CI/CD pipelines automatically configured on Github.
 ### Locally
 

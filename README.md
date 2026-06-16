@@ -11,9 +11,8 @@
 
 ### On cloud, using Poja
 
-Asa runs on Poja—the simplest and fastest way to deploy your code without infrastructure configuration or cold starts.
-Just code, push, and get your Spring Boot application running with a public URL and automated GitHub CI/CD pipelines.
-
+Asa is runs on [Poja](https://docs.poja.io/docs). It's the best way we know to host Spring Boot applications.
+Within a few clicks, you have your Spring Boot running with a publicly accessible URL, and with your CI/CD pipelines automatically configured on Github.
 ### Locally
 
 First, set all following environment variables:

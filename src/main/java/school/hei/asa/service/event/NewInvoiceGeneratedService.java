@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
 import school.hei.asa.file.bucket.BucketComponent;
+import school.hei.asa.file.bucket.BucketPort;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.InvoiceReference;
@@ -19,14 +20,14 @@ public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated>
   private static final String INVOICES_FOLDER = "invoices/";
   private final String accountants;
   private final Mailer mailer;
-  private final BucketComponent bucketComponent;
+  private final BucketPort bucketComponent;
   private final InvoiceService invoiceService;
   private final InternetAddressMapper emailService;
 
   public NewInvoiceGeneratedService(
       @Value("${ACCOUNTANTS}") String accountants,
       Mailer mailer,
-      BucketComponent bucketComponent,
+      BucketPort bucketComponent,
       InvoiceService invoiceService,
       InternetAddressMapper emailService) {
     this.accountants = accountants;

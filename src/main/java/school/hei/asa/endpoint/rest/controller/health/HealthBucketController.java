@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.hei.asa.PojaGenerated;
 import school.hei.asa.file.bucket.BucketComponent;
+import school.hei.asa.file.bucket.BucketPort;
 import school.hei.asa.file.hash.FileHash;
 
 @PojaGenerated
@@ -25,7 +26,7 @@ import school.hei.asa.file.hash.FileHash;
 @AllArgsConstructor
 public class HealthBucketController {
 
-  BucketComponent bucketComponent;
+  BucketPort bucketComponent;
 
   private static final String HEALTH_KEY = "health/";
 

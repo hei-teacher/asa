@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import school.hei.asa.PojaGenerated;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -12,6 +13,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 
 @PojaGenerated
+@Profile("prod")
 @Configuration
 public class BucketConf {
 
@@ -22,13 +24,14 @@ public class BucketConf {
 
   @SneakyThrows
   public BucketConf(
-      @Value("eu-west-3") String regionString, @Value("${aws.s3.bucket}") String bucketName) {
+          @Value("${aws.region}") String regionString,
+          @Value("${aws.s3.bucket}") String bucketName) {
     this.bucketName = bucketName;
     var region = Region.of(regionString);
     this.s3TransferManager =
-        S3TransferManager.builder()
-            .s3Client(S3AsyncClient.crtBuilder().region(region).build())
-            .build();
+            S3TransferManager.builder()
+                    .s3Client(S3AsyncClient.crtBuilder().region(region).build())
+                    .build();
     this.s3Presigner = S3Presigner.builder().region(region).build();
     this.s3Client = S3Client.builder().region(region).build();
   }

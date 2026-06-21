@@ -1,2 +1,2 @@
-insert into worker (code, name, worker_type)
-values ('W-P-2024-01', 'Lita Andria', 'studentContractor');
+insert into worker (code, name, email, fullname, address, city, nif, stat)
+values ('W-P-2024-01', 'Lita Andria', 'lita@example.com', 'Lita Andria', 'Antananarivo', 'Antananarivo', '000000000', 'ACTIVE');

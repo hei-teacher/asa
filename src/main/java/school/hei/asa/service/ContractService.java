@@ -1,6 +1,8 @@
 package school.hei.asa.service;
 
+import static java.time.ZoneId.systemDefault;
 import static java.util.Locale.FRENCH;
+import static java.util.Locale.US;
 import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
 
@@ -56,6 +58,33 @@ public class ContractService {
     return executedDays(dailyExecutions);
   }
 
+  public double getRemainingDaysByWorker(Worker worker) {
+    var contracts = contractRepository.findAllByWorker(worker);
+    if (contracts.isEmpty()) {
+      return Double.MAX_VALUE;
+    }
+
+    // On cherche le contrat actif : endInstant == null avec une durée définie.
+    // findAllByWorker retourne les contrats triés par entranceInstant DESC,
+    // donc getFirst() renvoie le plus récent, pas forcément le contrat encore actif.
+    var activeContractOpt =
+        contracts.stream()
+            .filter(c -> c.endInstant() == null && c.duration() != null)
+            .findFirst();
+
+    if (activeContractOpt.isEmpty()) {
+      // Pas de contrat actif à durée définie → pas de restriction
+      return Double.MAX_VALUE;
+    }
+
+    var contract = activeContractOpt.get();
+    var startDate = contract.entranceInstant().atZone(systemDefault()).toLocalDate();
+    var endDate = LocalDate.now();
+    var actualWorkedDays = getActualWorkedDaysByDateByWorker(startDate, worker.code(), endDate);
+    var workedDays = actualWorkedDays.equals("-") ? 0d : Double.parseDouble(actualWorkedDays);
+    return contract.duration().toDays() - workedDays;
+  }
+
   private String executedDays(List<DailyExecution> executions) {
     if (executions.isEmpty()) {
       return "-";
@@ -80,7 +109,7 @@ public class ContractService {
                 })
             .reduce(Double::sum)
             .get();
-    return String.format("%.1f", result);
+    return String.format(US, "%.1f", result);
   }
 
   public List<Contract> findActiveContracts() {

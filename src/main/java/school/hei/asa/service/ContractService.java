@@ -60,29 +60,65 @@ public class ContractService {
 
   public double getRemainingDaysByWorker(Worker worker) {
     var contracts = contractRepository.findAllByWorker(worker);
+
+    System.out.println(
+        "\n================================================================================\n"
+            + "                              WORKER CONTRACT INFO\n"
+            + "================================================================================\n"
+            + "Worker: [code=" + worker.code() + ", name=" + worker.name() + ", email="
+            + worker.email() + "]\n"
+            + "Contracts found: " + contracts.size());
+    for (var c : contracts) {
+      System.out.println(
+          "  - Contract: [jobTitle=" + c.jobTitle() + ", level=" + c.level() + ", company="
+              + c.company() + ", entrance=" + c.entranceInstant() + ", end=" + c.endInstant()
+              + ", duration=" + (c.duration() == null ? "null" : c.duration().toDays() + " days")
+              + "]");
+    }
+
     if (contracts.isEmpty()) {
+      System.out.println(
+          "Result: no contract for worker → remainingDays = MAX_VALUE (no restriction)\n"
+              + "================================================================================");
       return Double.MAX_VALUE;
     }
 
-    // On cherche le contrat actif : endInstant == null avec une durée définie.
+    // On prend le contrat le plus récent ayant une durée définie.
     // findAllByWorker retourne les contrats triés par entranceInstant DESC,
-    // donc getFirst() renvoie le plus récent, pas forcément le contrat encore actif.
+    // donc le premier avec une durée est le contrat pertinent, qu'il ait
+    // une date de fin ou non.
     var activeContractOpt =
-        contracts.stream()
-            .filter(c -> c.endInstant() == null && c.duration() != null)
-            .findFirst();
+        contracts.stream().filter(c -> c.duration() != null).findFirst();
 
     if (activeContractOpt.isEmpty()) {
-      // Pas de contrat actif à durée définie → pas de restriction
+      System.out.println(
+          "Result: no contract with a defined duration → "
+              + "remainingDays = MAX_VALUE (no restriction)\n"
+              + "================================================================================");
       return Double.MAX_VALUE;
     }
 
     var contract = activeContractOpt.get();
     var startDate = contract.entranceInstant().atZone(systemDefault()).toLocalDate();
-    var endDate = LocalDate.now();
+    var endDate =
+        contract.endInstant() == null
+            ? LocalDate.now()
+            : contract.endInstant().atZone(systemDefault()).toLocalDate();
     var actualWorkedDays = getActualWorkedDaysByDateByWorker(startDate, worker.code(), endDate);
     var workedDays = actualWorkedDays.equals("-") ? 0d : Double.parseDouble(actualWorkedDays);
-    return contract.duration().toDays() - workedDays;
+    var remainingDays = contract.duration().toDays() - workedDays;
+
+    System.out.println(
+        "Active Contract: [jobTitle=" + contract.jobTitle() + ", level=" + contract.level()
+            + ", company=" + contract.company() + "]\n"
+            + "Entrance Date: " + startDate + "\n"
+            + "End Date (for worked days): " + endDate + "\n"
+            + "Total Contract Duration: " + contract.duration().toDays() + " days\n"
+            + "Actual Worked Days: " + workedDays + " days\n"
+            + "Remaining Days: " + remainingDays + " days\n"
+            + "================================================================================");
+
+    return remainingDays;
   }
 
   private String executedDays(List<DailyExecution> executions) {

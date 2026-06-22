@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+<div th:fragment="toast">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script th:inline="javascript" th:if="${toastMessage}">
+        const toastType = /*[[${toastType}]]*/ "success";
+        const toastMessage = /*[[${toastMessage}]]*/ "";
+        const toastBackground = toastType === "error"
+            ? "#dc2626"
+            : toastType === "warning"
+                ? "#eab308"
+                : "#16a34a";
+
+        Toastify({
+            text: toastMessage,
+            duration: 5000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            stopOnFocus: true,
+            style: {
+                background: toastBackground
+            }
+        }).showToast();
+    </script>
+</div>
+</body>
+</html>

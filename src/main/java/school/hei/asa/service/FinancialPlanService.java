@@ -127,12 +127,11 @@ public class FinancialPlanService {
                   })
               .map(InvoiceForm::amount)
               .map(a -> a == null ? BigDecimal.ZERO : a)
-              .reduce(BigDecimal::add)
-              .get();
+              .reduce(BigDecimal.ZERO, BigDecimal::add);
 
       map.put(
           m,
-          amount.equals(BigDecimal.ZERO)
+          amount.compareTo(BigDecimal.ZERO) == 0
               ? new Argent(0, MGA)
               : new Argent(amount.doubleValue(), MGA).mult(-1));
     }

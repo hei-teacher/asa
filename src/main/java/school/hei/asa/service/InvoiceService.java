@@ -152,7 +152,7 @@ public class InvoiceService {
     eventProducer.accept(List.of(event));
   }
 
-  InvoiceForm extractInvoiceData(
+  public InvoiceForm extractInvoiceData(
       InvoiceForm invoiceForm,
       List<Contract> workerContracts,
       List<MissionExecution> workerMissionExecutions,

@@ -122,7 +122,7 @@ public class FinancialPlanService {
                     var workerMissionExecutions =
                         missionExecutionsByWorker.getOrDefault(worker, List.of());
                     var bankAccount = bankAccountByWorkerCode.get(worker);
-                    return invoiceService.extractInvoiceDataBatched(
+                    return invoiceService.extractInvoiceData(
                         invoiceForm, workerContracts, workerMissionExecutions, bankAccount);
                   })
               .map(InvoiceForm::amount)

@@ -34,7 +34,8 @@ public class WorkerServiceIT extends FacadeIT {
     var actual = workerService.getWorkersFrom(modelWithYearAttribute);
 
     assertEquals(expected, actual);
-  }stat
+  }
+
   @Test
   void can_get_worker_from_date_range() {
     var expected = workersFromDateRange();

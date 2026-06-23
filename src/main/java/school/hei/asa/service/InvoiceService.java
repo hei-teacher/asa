@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
+import school.hei.asa.model.BankAccount;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
@@ -50,7 +51,7 @@ public class InvoiceService {
 
   public InvoiceForm extractInvoiceData(Worker worker, InvoiceForm invoiceForm) {
     var isEmpty = invoiceForm.yearMonth() == null;
-    var contracts = contractRepository.findAllByWorker(worker);
+    var contracts = contractRepository.findAllByWorker(worker); // 1
     var hasContract = !contracts.isEmpty();
     var referenceDate = now();
     var issueDate = referenceDate.plusDays(3);
@@ -135,7 +136,7 @@ public class InvoiceService {
     Double unitPrice =
         switch (contractLevel.type()) {
           case partnerContractor, studentContractor -> contractLevel.dailyPay();
-          case fullTimeEmployee -> null;
+          case fullTimeEmployee -> 0.0;
         };
     var amount = BigDecimal.valueOf(totalDaysWorked * unitPrice);
     var parsedAmount = numberConverter.convertToWords(numberParser.parseToNumber(amount));
@@ -162,7 +163,7 @@ public class InvoiceService {
 
   private Double missionExecutionPercentageSumByWorker(
       Worker worker, LocalDate startDate, LocalDate endDate) {
-    return missionExecutionRepository
+    return missionExecutionRepository // (2)
         .missionExecutionsByDateBetween(worker, startDate, endDate)
         .stream()
         .filter(me -> !missionService.isUnpaidCare(me))
@@ -207,5 +208,98 @@ public class InvoiceService {
   public void sendGenerateInvoiceEvent(String invoiceId) {
     var event = NewInvoiceGenerated.builder().invoiceId(invoiceId).build();
     eventProducer.accept(List.of(event));
+  }
+
+  public InvoiceForm extractInvoiceDataBatched(
+      InvoiceForm invoiceForm,
+      List<Contract> workerContracts,
+      List<MissionExecution> workerMissionExecutions,
+      BankAccount bankAccountForWorker) {
+
+    var isEmpty = invoiceForm.yearMonth() == null;
+    var hasContract = !workerContracts.isEmpty();
+    var referenceDate = now();
+    var issueDate = referenceDate.plusDays(3);
+    var yearMonth = isEmpty ? YearMonth.from(referenceDate) : invoiceForm.yearMonth();
+    var firstCurrentMonthDay = yearMonth.atDay(1);
+    var lastCurrentMonthDay = yearMonth.atEndOfMonth();
+    var hasUpgradedLevel =
+        hasContract
+            && LocalDate.ofInstant(workerContracts.getFirst().entranceInstant(), UTC)
+                .isBefore(lastCurrentMonthDay)
+            && LocalDate.ofInstant(workerContracts.getFirst().entranceInstant(), UTC)
+                .isAfter(firstCurrentMonthDay);
+    var bankAccount = bankAccountForWorker != null ? bankAccountForWorker.toString() : "";
+
+    if (hasUpgradedLevel) {
+      var firstContract = workerContracts.getFirst();
+      var secondContract = workerContracts.get(1);
+      var firstTotalDaysWorked =
+          sumDayPercentage(
+              workerMissionExecutions,
+              firstCurrentMonthDay,
+              LocalDate.ofInstant(firstContract.entranceInstant(), UTC));
+      var secondTotalDaysWorked =
+          sumDayPercentage(
+              workerMissionExecutions,
+              LocalDate.ofInstant(firstContract.entranceInstant(), UTC),
+              lastCurrentMonthDay);
+      var firstInvoiceForm = generateInvoiceFormFrom(firstTotalDaysWorked, firstContract);
+      var secondInvoiceForm = generateInvoiceFormFrom(secondTotalDaysWorked, secondContract);
+      var firstAmount =
+          firstInvoiceForm.amount() != null ? firstInvoiceForm.amount() : BigDecimal.ZERO;
+      var secondAmount =
+          secondInvoiceForm.amount() != null ? secondInvoiceForm.amount() : BigDecimal.ZERO;
+      var total = firstAmount.add(secondAmount);
+      var parsedTotal = numberConverter.convertToWords(numberParser.parseToNumber(total));
+      return new InvoiceForm(
+          invoiceForm.id(),
+          yearMonth,
+          referenceDate,
+          issueDate,
+          firstInvoiceForm.description(),
+          firstInvoiceForm.quantity(),
+          firstInvoiceForm.unitPrice(),
+          firstInvoiceForm.amount(),
+          true,
+          secondInvoiceForm.description(),
+          secondInvoiceForm.quantity(),
+          secondInvoiceForm.unitPrice(),
+          secondInvoiceForm.amount(),
+          total,
+          parsedTotal,
+          bankAccount);
+    }
+
+    var totalDaysWorked =
+        sumDayPercentage(workerMissionExecutions, firstCurrentMonthDay, lastCurrentMonthDay);
+    var contract = hasContract ? workerContracts.getFirst() : null;
+    var tempResult = generateInvoiceFormFrom(totalDaysWorked, contract);
+    return new InvoiceForm(
+        invoiceForm.id(),
+        yearMonth,
+        referenceDate,
+        issueDate,
+        tempResult.description(),
+        tempResult.quantity(),
+        tempResult.unitPrice(),
+        tempResult.amount(),
+        false,
+        null,
+        null,
+        null,
+        null,
+        tempResult.total(),
+        tempResult.parsedAmount(),
+        bankAccount);
+  }
+
+  private Double sumDayPercentage(
+      List<MissionExecution> missionExecutions, LocalDate startDate, LocalDate endDate) {
+    return missionExecutions.stream()
+        .filter(me -> !me.date().isBefore(startDate) && !me.date().isAfter(endDate))
+        .filter(me -> !missionService.isUnpaidCare(me))
+        .mapToDouble(MissionExecution::dayPercentage)
+        .sum();
   }
 }

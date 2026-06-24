@@ -105,7 +105,7 @@ public class InvoiceService {
 
   private Double missionExecutionPercentageSumByWorker(
       Worker worker, LocalDate startDate, LocalDate endDate) {
-    return missionExecutionRepository // (2)
+    return missionExecutionRepository
         .missionExecutionsByDateBetween(worker, startDate, endDate)
         .stream()
         .filter(me -> !missionService.isUnpaidCare(me))

@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.model.th.ThWorker;
+import school.hei.asa.endpoint.rest.model.th.WorkerModelAdderParam;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
@@ -56,7 +57,8 @@ class WorkerControllerIT extends FacadeIT {
 
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
-    when(workerToModelAdder.apply(anyString(), any())).thenReturn(authenticatedWorker);
+    when(workerToModelAdder.apply(any(WorkerModelAdderParam.class), any()))
+        .thenReturn(authenticatedWorker);
     when(contractRepository.findAllByWorker(any())).thenReturn(List.of(mockContract));
   }
 

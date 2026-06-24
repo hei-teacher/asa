@@ -1,6 +1,8 @@
 package school.hei.asa.service;
 
+import static java.time.ZoneId.systemDefault;
 import static java.util.Locale.FRENCH;
+import static java.util.Locale.US;
 import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
 
@@ -56,6 +58,69 @@ public class ContractService {
     return executedDays(dailyExecutions);
   }
 
+  public double getRemainingDaysByWorker(Worker worker) {
+    var contracts = contractRepository.findAllByWorker(worker);
+
+    System.out.println(
+        "\n================================================================================\n"
+            + "                              WORKER CONTRACT INFO\n"
+            + "================================================================================\n"
+            + "Worker: [code=" + worker.code() + ", name=" + worker.name() + ", email="
+            + worker.email() + "]\n"
+            + "Contracts found: " + contracts.size());
+    for (var c : contracts) {
+      System.out.println(
+          "  - Contract: [jobTitle=" + c.jobTitle() + ", level=" + c.level() + ", company="
+              + c.company() + ", entrance=" + c.entranceInstant() + ", end=" + c.endInstant()
+              + ", duration=" + (c.duration() == null ? "null" : c.duration().toDays() + " days")
+              + "]");
+    }
+
+    if (contracts.isEmpty()) {
+      System.out.println(
+          "Result: no contract for worker → remainingDays = MAX_VALUE (no restriction)\n"
+              + "================================================================================");
+      return Double.MAX_VALUE;
+    }
+
+    // On prend le contrat le plus récent ayant une durée définie.
+    // findAllByWorker retourne les contrats triés par entranceInstant DESC,
+    // donc le premier avec une durée est le contrat pertinent, qu'il ait
+    // une date de fin ou non.
+    var activeContractOpt =
+        contracts.stream().filter(c -> c.duration() != null).findFirst();
+
+    if (activeContractOpt.isEmpty()) {
+      System.out.println(
+          "Result: no contract with a defined duration → "
+              + "remainingDays = MAX_VALUE (no restriction)\n"
+              + "================================================================================");
+      return Double.MAX_VALUE;
+    }
+
+    var contract = activeContractOpt.get();
+    var startDate = contract.entranceInstant().atZone(systemDefault()).toLocalDate();
+    var endDate =
+        contract.endInstant() == null
+            ? LocalDate.now()
+            : contract.endInstant().atZone(systemDefault()).toLocalDate();
+    var actualWorkedDays = getActualWorkedDaysByDateByWorker(startDate, worker.code(), endDate);
+    var workedDays = actualWorkedDays.equals("-") ? 0d : Double.parseDouble(actualWorkedDays);
+    var remainingDays = contract.duration().toDays() - workedDays;
+
+    System.out.println(
+        "Active Contract: [jobTitle=" + contract.jobTitle() + ", level=" + contract.level()
+            + ", company=" + contract.company() + "]\n"
+            + "Entrance Date: " + startDate + "\n"
+            + "End Date (for worked days): " + endDate + "\n"
+            + "Total Contract Duration: " + contract.duration().toDays() + " days\n"
+            + "Actual Worked Days: " + workedDays + " days\n"
+            + "Remaining Days: " + remainingDays + " days\n"
+            + "================================================================================");
+
+    return remainingDays;
+  }
+
   private String executedDays(List<DailyExecution> executions) {
     if (executions.isEmpty()) {
       return "-";
@@ -80,7 +145,7 @@ public class ContractService {
                 })
             .reduce(Double::sum)
             .get();
-    return String.format("%.1f", result);
+    return String.format(US, "%.1f", result);
   }
 
   public List<Contract> findActiveContracts() {

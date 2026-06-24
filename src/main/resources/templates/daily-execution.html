@@ -114,7 +114,8 @@
         flatpickr("#date", {
             minDate: `${currentYear-1}-01-01`,
             maxDate: `${currentYear+1}-12-31`,
-            dateFormat: "Y-m-d"
+            dateFormat: "Y-m-d",
+            defaultDate: "today"
         });
         createInputs(5);
     });

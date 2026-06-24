@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import school.hei.asa.endpoint.rest.model.th.WorkerModelAdderParam;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.file.bucket.BucketComponent;
 import school.hei.asa.service.InvoiceService;
@@ -40,7 +41,9 @@ public class DownloadController {
     var date = YearMonth.parse(yearMonth, pattern);
 
     model.addAttribute("year", date.getYear());
-    var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
+    var worker =
+        workerToModelAdder.apply(
+            new WorkerModelAdderParam(workerCodeOrAuth, workerCodeOrAuth), model);
     var invoiceBucketKey = invoiceService.getInvoiceBucketKey(worker, date);
 
     String presignedUrl =

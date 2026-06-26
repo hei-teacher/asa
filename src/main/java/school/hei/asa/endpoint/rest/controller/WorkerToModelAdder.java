@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
+import school.hei.asa.endpoint.rest.model.th.WorkerModelAdderParam;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.SensitiveWorkerFilter;
 import school.hei.asa.service.WorkerService;
@@ -12,19 +13,19 @@ import school.hei.asa.service.WorkerService;
 @Slf4j
 @Component
 @AllArgsConstructor
-public class WorkerToModelAdder implements BiFunction<String, Model, Worker> {
+public class WorkerToModelAdder implements BiFunction<WorkerModelAdderParam, Model, Worker> {
   private final WorkerService workerService;
   private final SensitiveWorkerFilter sensitiveWorkerFilter;
 
   @Override
-  public Worker apply(String workerCode, Model model) {
+  public Worker apply(WorkerModelAdderParam workerModelAdderParam, Model model) {
     var worker =
-        workerCode == null || workerCode.isBlank()
-            ? null
-            : workerService.findWorkerByCode(workerCode);
+        workerModelAdderParam.workerCode() == null
+            ? workerService.findWorkerByCode(workerModelAdderParam.authenticatedWorkerCode())
+            : workerService.findWorkerByCode(workerModelAdderParam.workerCode());
     var workersSensitiveWorkerFiltered =
         sensitiveWorkerFilter.filterSensitiveWorkers(
-            workerService.getWorkersFrom(model), workerCode);
+            workerService.getWorkersFrom(model), workerModelAdderParam.authenticatedWorkerCode());
     log.info(
         "there are {} workers = {}",
         workersSensitiveWorkerFiltered.size(),

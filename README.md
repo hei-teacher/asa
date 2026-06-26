@@ -9,11 +9,10 @@
 
 ## Running
 
-### On cloud, using JCloudify
+### On cloud, using Poja
 
-Asa is hosted on [JCloudify](https://www.jcloudify.com). It's the best way we know to host Spring Boot applications.
+Asa runs on [Poja](https://docs.poja.io/docs). It's the best way we know to host Spring Boot applications.
 Within a few clicks, you have your Spring Boot running with a publicly accessible URL, and with your CI/CD pipelines automatically configured on Github.
-
 ### Locally
 
 First, set all following environment variables:
@@ -36,6 +35,8 @@ SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_CASDOOR_SCOPE_1_=
 SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_CASDOOR_SCOPE_2_=
 ASA_CARE_PRODUCT_CODE=
 ASA_PAID_CARE_MISSION_CODES=
+SENSITIVE_WORKERS_CODES=
+MAX_LATENESS_REPORT=
 ```
 
 Then, run Spring Boot as usual,

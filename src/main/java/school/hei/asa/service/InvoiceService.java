@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
+import school.hei.asa.model.BankAccount;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
@@ -48,81 +49,23 @@ public class InvoiceService {
         .findFirst();
   }
 
-  public InvoiceForm extractInvoiceData(Worker worker, InvoiceForm invoiceForm) {
-    var isEmpty = invoiceForm.yearMonth() == null;
+  public InvoiceForm extractInvoiceForm(Worker worker, InvoiceForm invoiceForm) {
     var contracts = contractRepository.findAllByWorker(worker);
-    var hasContract = !contracts.isEmpty();
-    var referenceDate = now();
-    var issueDate = referenceDate.plusDays(3);
-    var yearMonth = isEmpty ? YearMonth.from(referenceDate) : invoiceForm.yearMonth();
+    var workerContracts =
+        contracts.stream()
+            .sorted(comparing(Contract::entranceInstant, Comparator.reverseOrder()))
+            .toList();
+    var bankAccount = bankAccountRepository.findByWorkerCode(worker.code());
+
+    var yearMonth =
+        invoiceForm.yearMonth() == null ? YearMonth.from(now()) : invoiceForm.yearMonth();
     var firstCurrentMonthDay = yearMonth.atDay(1);
     var lastCurrentMonthDay = yearMonth.atEndOfMonth();
-    var hasUpgradedLevel =
-        hasContract
-            && LocalDate.ofInstant(contracts.getFirst().entranceInstant(), UTC)
-                .isBefore(lastCurrentMonthDay)
-            && LocalDate.ofInstant(contracts.getFirst().entranceInstant(), UTC)
-                .isAfter(firstCurrentMonthDay);
-    var bankAccount =
-        bankAccountRepository.findByWorkerCode(worker.code()) != null
-            ? bankAccountRepository.findByWorkerCode(worker.code()).toString()
-            : "";
-    if (hasUpgradedLevel) {
-      var firstContract = contracts.getFirst();
-      var secondContract = contracts.get(1);
-      var firstTotalDaysWorked =
-          missionExecutionPercentageSumByWorker(
-              worker,
-              firstCurrentMonthDay,
-              LocalDate.ofInstant(firstContract.entranceInstant(), UTC));
-      var secondTotalDaysWorked =
-          missionExecutionPercentageSumByWorker(
-              worker,
-              LocalDate.ofInstant(firstContract.entranceInstant(), UTC),
-              lastCurrentMonthDay);
-      var firstInvoiceForm = generateInvoiceFormFrom(firstTotalDaysWorked, firstContract);
-      var secondInvoiceForm = generateInvoiceFormFrom(secondTotalDaysWorked, secondContract);
-      var total = firstInvoiceForm.amount().add(secondInvoiceForm.amount());
-      var parsedTotal = numberConverter.convertToWords(numberParser.parseToNumber(total));
-      return new InvoiceForm(
-          invoiceForm.id(),
-          yearMonth,
-          referenceDate,
-          issueDate,
-          firstInvoiceForm.description(),
-          firstInvoiceForm.quantity(),
-          firstInvoiceForm.unitPrice(),
-          firstInvoiceForm.amount(),
-          true,
-          secondInvoiceForm.description(),
-          secondInvoiceForm.quantity(),
-          secondInvoiceForm.unitPrice(),
-          secondInvoiceForm.amount(),
-          total,
-          parsedTotal,
-          bankAccount);
-    }
-    var totalDaysWorked =
-        missionExecutionPercentageSumByWorker(worker, firstCurrentMonthDay, lastCurrentMonthDay);
-    var contract = hasContract ? contracts.getFirst() : null;
-    var tempResult = generateInvoiceFormFrom(totalDaysWorked, contract);
-    return new InvoiceForm(
-        invoiceForm.id(),
-        yearMonth,
-        referenceDate,
-        issueDate,
-        tempResult.description(),
-        tempResult.quantity(),
-        tempResult.unitPrice(),
-        tempResult.amount(),
-        false,
-        null,
-        null,
-        null,
-        null,
-        tempResult.total(),
-        tempResult.parsedAmount(),
-        bankAccount);
+    var workerMissionExecutions =
+        missionExecutionRepository.missionExecutionsByDateBetween(
+            worker, firstCurrentMonthDay, lastCurrentMonthDay);
+
+    return extractInvoiceData(invoiceForm, workerContracts, workerMissionExecutions, bankAccount);
   }
 
   private InvoiceForm generateInvoiceFormFrom(Double totalDaysWorked, Contract contract) {
@@ -135,7 +78,7 @@ public class InvoiceService {
     Double unitPrice =
         switch (contractLevel.type()) {
           case partnerContractor, studentContractor -> contractLevel.dailyPay();
-          case fullTimeEmployee -> null;
+          case fullTimeEmployee -> 0.0;
         };
     var amount = BigDecimal.valueOf(totalDaysWorked * unitPrice);
     var parsedAmount = numberConverter.convertToWords(numberParser.parseToNumber(amount));
@@ -207,5 +150,98 @@ public class InvoiceService {
   public void sendGenerateInvoiceEvent(String invoiceId) {
     var event = NewInvoiceGenerated.builder().invoiceId(invoiceId).build();
     eventProducer.accept(List.of(event));
+  }
+
+  public InvoiceForm extractInvoiceData(
+      InvoiceForm invoiceForm,
+      List<Contract> workerContracts,
+      List<MissionExecution> workerMissionExecutions,
+      BankAccount bankAccountForWorker) {
+
+    var isEmpty = invoiceForm.yearMonth() == null;
+    var hasContract = !workerContracts.isEmpty();
+    var referenceDate = now();
+    var issueDate = referenceDate.plusDays(3);
+    var yearMonth = isEmpty ? YearMonth.from(referenceDate) : invoiceForm.yearMonth();
+    var firstCurrentMonthDay = yearMonth.atDay(1);
+    var lastCurrentMonthDay = yearMonth.atEndOfMonth();
+    var hasUpgradedLevel =
+        hasContract
+            && LocalDate.ofInstant(workerContracts.getFirst().entranceInstant(), UTC)
+                .isBefore(lastCurrentMonthDay)
+            && LocalDate.ofInstant(workerContracts.getFirst().entranceInstant(), UTC)
+                .isAfter(firstCurrentMonthDay);
+    var bankAccount = bankAccountForWorker != null ? bankAccountForWorker.toString() : "";
+
+    if (hasUpgradedLevel) {
+      var firstContract = workerContracts.getFirst();
+      var secondContract = workerContracts.get(1);
+      var firstTotalDaysWorked =
+          sumDayPercentage(
+              workerMissionExecutions,
+              firstCurrentMonthDay,
+              LocalDate.ofInstant(firstContract.entranceInstant(), UTC));
+      var secondTotalDaysWorked =
+          sumDayPercentage(
+              workerMissionExecutions,
+              LocalDate.ofInstant(firstContract.entranceInstant(), UTC),
+              lastCurrentMonthDay);
+      var firstInvoiceForm = generateInvoiceFormFrom(firstTotalDaysWorked, firstContract);
+      var secondInvoiceForm = generateInvoiceFormFrom(secondTotalDaysWorked, secondContract);
+      var firstAmount =
+          firstInvoiceForm.amount() != null ? firstInvoiceForm.amount() : BigDecimal.ZERO;
+      var secondAmount =
+          secondInvoiceForm.amount() != null ? secondInvoiceForm.amount() : BigDecimal.ZERO;
+      var total = firstAmount.add(secondAmount);
+      var parsedTotal = numberConverter.convertToWords(numberParser.parseToNumber(total));
+      return new InvoiceForm(
+          invoiceForm.id(),
+          yearMonth,
+          referenceDate,
+          issueDate,
+          firstInvoiceForm.description(),
+          firstInvoiceForm.quantity(),
+          firstInvoiceForm.unitPrice(),
+          firstInvoiceForm.amount(),
+          true,
+          secondInvoiceForm.description(),
+          secondInvoiceForm.quantity(),
+          secondInvoiceForm.unitPrice(),
+          secondInvoiceForm.amount(),
+          total,
+          parsedTotal,
+          bankAccount);
+    }
+
+    var totalDaysWorked =
+        sumDayPercentage(workerMissionExecutions, firstCurrentMonthDay, lastCurrentMonthDay);
+    var contract = hasContract ? workerContracts.getFirst() : null;
+    var tempResult = generateInvoiceFormFrom(totalDaysWorked, contract);
+    return new InvoiceForm(
+        invoiceForm.id(),
+        yearMonth,
+        referenceDate,
+        issueDate,
+        tempResult.description(),
+        tempResult.quantity(),
+        tempResult.unitPrice(),
+        tempResult.amount(),
+        false,
+        null,
+        null,
+        null,
+        null,
+        tempResult.total(),
+        tempResult.parsedAmount(),
+        bankAccount);
+  }
+
+  private Double sumDayPercentage(
+      List<MissionExecution> missionExecutions, LocalDate startDate, LocalDate endDate) {
+    return missionExecutions.stream()
+        .filter(me -> !me.date().isBefore(startDate) && !me.date().isAfter(endDate))
+        .filter(me -> !missionService.isUnpaidCare(me))
+        .mapToDouble(MissionExecution::dayPercentage)
+        .sum();
   }
 }

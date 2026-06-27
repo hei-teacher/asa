@@ -26,6 +26,8 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.CalendarService;
+import school.hei.asa.service.ContractService;
+import school.hei.asa.service.AppSettingsService;
 
 @AllArgsConstructor
 @Controller
@@ -34,6 +36,8 @@ public class CalendarController {
   private final CalendarService calendarService;
   private final WorkerFromAuthentication workerFromAuthentication;
   private final WorkerToModelAdder workerToModelAdder;
+  private final ContractService contractService;
+  private final AppSettingsService appSettingsService;
 
   @GetMapping("/work-and-care-calendar")
   public String getCalendar(
@@ -61,6 +65,13 @@ public class CalendarController {
           missionCounts.put(month, typeCounts);
         });
     var lateReportedDaysByMonth = calendarService.lateReportedDaysByMonth(worker, year);
+
+    double remainingDays = contractService.getRemainingDaysByWorker(worker);
+    int threshold = appSettingsService.getLowContractDaysThreshold();
+    boolean showWarning = remainingDays < threshold;
+
+    model.addAttribute("remainingDays", remainingDays);
+    model.addAttribute("showWarning", showWarning);
 
     model.addAttribute("workerCode", workerCodeOrAuth);
     model.addAttribute("currentYear", now().getYear());

@@ -24,14 +24,13 @@ public class BucketConf {
 
   @SneakyThrows
   public BucketConf(
-          @Value("${aws.region}") String regionString,
-          @Value("${aws.s3.bucket}") String bucketName) {
+      @Value("${aws.region}") String regionString, @Value("${aws.s3.bucket}") String bucketName) {
     this.bucketName = bucketName;
     var region = Region.of(regionString);
     this.s3TransferManager =
-            S3TransferManager.builder()
-                    .s3Client(S3AsyncClient.crtBuilder().region(region).build())
-                    .build();
+        S3TransferManager.builder()
+            .s3Client(S3AsyncClient.crtBuilder().region(region).build())
+            .build();
     this.s3Presigner = S3Presigner.builder().region(region).build();
     this.s3Client = S3Client.builder().region(region).build();
   }

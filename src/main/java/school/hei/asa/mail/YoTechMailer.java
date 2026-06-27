@@ -66,12 +66,15 @@ public class YoTechMailer implements Consumer<Email> {
     props.put("mail.smtp.host", smtpHost);
     props.put("mail.smtp.port", smtpPort);
 
-    Session session = Session.getInstance(props, new Authenticator() {
-      @Override
-      protected PasswordAuthentication getPasswordAuthentication() {
-        return new PasswordAuthentication(smtpUsername, smtpPassword);
-      }
-    });
+    Session session =
+        Session.getInstance(
+            props,
+            new Authenticator() {
+              @Override
+              protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(smtpUsername, smtpPassword);
+              }
+            });
 
     MimeMessage mimeMessage = toMimeMessage(session, email);
     mimeMessage.setContent(toMimeMultipart(email));

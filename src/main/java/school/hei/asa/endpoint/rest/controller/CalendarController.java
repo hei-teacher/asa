@@ -25,9 +25,9 @@ import school.hei.asa.endpoint.rest.model.th.ThYear;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Worker;
+import school.hei.asa.service.AppSettingsService;
 import school.hei.asa.service.CalendarService;
 import school.hei.asa.service.ContractService;
-import school.hei.asa.service.AppSettingsService;
 
 @AllArgsConstructor
 @Controller

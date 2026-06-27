@@ -25,13 +25,15 @@ public class DownloadController {
   @GetMapping("/download-contract")
   public String redirectToPresignedUrlForContractFile(@RequestParam String contractBucketKey) {
     String presignedUrl =
-            bucketPort.presign(CONTRACTS_FOLDER + contractBucketKey, java.time.Duration.ofMinutes(5)).toString();
+        bucketPort
+            .presign(CONTRACTS_FOLDER + contractBucketKey, java.time.Duration.ofMinutes(5))
+            .toString();
     return "redirect:" + presignedUrl;
   }
 
   @GetMapping("/download-invoice")
   public String redirectToPresignedUrlForInvoiceFile(
-          Model model, Authentication authentication, @RequestParam String yearMonth) {
+      Model model, Authentication authentication, @RequestParam String yearMonth) {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var pattern = DateTimeFormatter.ofPattern("yyyy-MM");
     var date = YearMonth.parse(yearMonth, pattern);
@@ -41,7 +43,9 @@ public class DownloadController {
     var invoiceBucketKey = invoiceService.getInvoiceBucketKey(worker, date);
 
     String presignedUrl =
-            bucketPort.presign(INVOICES_FOLDER + invoiceBucketKey, java.time.Duration.ofMinutes(5)).toString();
+        bucketPort
+            .presign(INVOICES_FOLDER + invoiceBucketKey, java.time.Duration.ofMinutes(5))
+            .toString();
     return "redirect:" + presignedUrl;
   }
 }

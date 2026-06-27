@@ -65,14 +65,29 @@ public class ContractService {
         "\n================================================================================\n"
             + "                              WORKER CONTRACT INFO\n"
             + "================================================================================\n"
-            + "Worker: [code=" + worker.code() + ", name=" + worker.name() + ", email="
-            + worker.email() + "]\n"
-            + "Contracts found: " + contracts.size());
+            + "Worker: [code="
+            + worker.code()
+            + ", name="
+            + worker.name()
+            + ", email="
+            + worker.email()
+            + "]\n"
+            + "Contracts found: "
+            + contracts.size());
     for (var c : contracts) {
       System.out.println(
-          "  - Contract: [jobTitle=" + c.jobTitle() + ", level=" + c.level() + ", company="
-              + c.company() + ", entrance=" + c.entranceInstant() + ", end=" + c.endInstant()
-              + ", duration=" + (c.duration() == null ? "null" : c.duration().toDays() + " days")
+          "  - Contract: [jobTitle="
+              + c.jobTitle()
+              + ", level="
+              + c.level()
+              + ", company="
+              + c.company()
+              + ", entrance="
+              + c.entranceInstant()
+              + ", end="
+              + c.endInstant()
+              + ", duration="
+              + (c.duration() == null ? "null" : c.duration().toDays() + " days")
               + "]");
     }
 
@@ -87,8 +102,7 @@ public class ContractService {
     // findAllByWorker retourne les contrats triés par entranceInstant DESC,
     // donc le premier avec une durée est le contrat pertinent, qu'il ait
     // une date de fin ou non.
-    var activeContractOpt =
-        contracts.stream().filter(c -> c.duration() != null).findFirst();
+    var activeContractOpt = contracts.stream().filter(c -> c.duration() != null).findFirst();
 
     if (activeContractOpt.isEmpty()) {
       System.out.println(
@@ -109,13 +123,28 @@ public class ContractService {
     var remainingDays = contract.duration().toDays() - workedDays;
 
     System.out.println(
-        "Active Contract: [jobTitle=" + contract.jobTitle() + ", level=" + contract.level()
-            + ", company=" + contract.company() + "]\n"
-            + "Entrance Date: " + startDate + "\n"
-            + "End Date (for worked days): " + endDate + "\n"
-            + "Total Contract Duration: " + contract.duration().toDays() + " days\n"
-            + "Actual Worked Days: " + workedDays + " days\n"
-            + "Remaining Days: " + remainingDays + " days\n"
+        "Active Contract: [jobTitle="
+            + contract.jobTitle()
+            + ", level="
+            + contract.level()
+            + ", company="
+            + contract.company()
+            + "]\n"
+            + "Entrance Date: "
+            + startDate
+            + "\n"
+            + "End Date (for worked days): "
+            + endDate
+            + "\n"
+            + "Total Contract Duration: "
+            + contract.duration().toDays()
+            + " days\n"
+            + "Actual Worked Days: "
+            + workedDays
+            + " days\n"
+            + "Remaining Days: "
+            + remainingDays
+            + " days\n"
             + "================================================================================");
 
     return remainingDays;

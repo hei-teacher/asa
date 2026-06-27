@@ -27,8 +27,7 @@ public class SettingsController {
       @RequestParam int lowContractDaysThreshold, RedirectAttributes redirectAttributes) {
     if (lowContractDaysThreshold < 0) {
       redirectAttributes.addFlashAttribute("toastType", "error");
-      redirectAttributes.addFlashAttribute(
-          "toastMessage", "Le seuil doit etre un nombre positif.");
+      redirectAttributes.addFlashAttribute("toastMessage", "Le seuil doit etre un nombre positif.");
       return "redirect:/settings";
     }
     appSettingsService.updateLowContractDaysThreshold(lowContractDaysThreshold);

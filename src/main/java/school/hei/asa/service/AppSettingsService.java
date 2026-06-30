@@ -2,8 +2,6 @@ package school.hei.asa.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.hei.asa.model.AppSettings;
-import school.hei.asa.repository.AppSettingsRepository;
 
 @Service
 @AllArgsConstructor

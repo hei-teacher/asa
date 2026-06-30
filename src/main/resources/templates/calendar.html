@@ -12,12 +12,30 @@
 <div th:replace="fragments/header :: header"></div>
 <div th:replace="fragments/toast :: toast"></div>
 
+<div th:if="${showWarning}" 
+     th:class="'text-center py-2 font-bold text-lg shadow-md w-full ' + 
+               (${remainingDays <= 2} ? 'bg-red-600 text-white animate-pulse' : 
+               (${remainingDays <= 3} ? 'bg-orange-500 text-white' : 
+               (${remainingDays <= 5} ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white')))">
+    Attention : Il ne vous reste plus que <span th:text="${#numbers.formatDecimal(remainingDays, 0, 0)}"></span> jours sur votre contrat !
+</div>
+
 <div class="flex justify-between gap-6 py-6 bg-gray-50">
     <!-- Left section: Main title and Worker Selector -->
     <div class="px-6">
-        <h1 th:text="${thYear.year()} + ' - ' + ${thYear.title()}"
-            class="text-2xl font-semibold">
-        </h1>
+        <div class="flex items-center gap-4">
+            <h1 th:text="${thYear.year()} + ' - ' + ${thYear.title()}"
+                class="text-2xl font-semibold">
+            </h1>
+            <div th:if="${remainingDays != null and remainingDays < 100000}" class="relative group flex items-center">
+                <span class="text-white font-bold text-2xl px-4 py-1.5 bg-[#16163F] rounded-full shadow-sm cursor-pointer"
+                      th:text="'J-' + ${#numbers.formatDecimal(remainingDays, 0, 0)}">
+                </span>
+                <div th:if="${showWarning}" class="absolute top-full left-0 mt-2 w-64 p-2 text-sm bg-gray-700 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
+                    Attention : Il ne vous reste plus que <span th:text="${#numbers.formatDecimal(remainingDays, 0, 0)}"></span> jours sur votre contrat !
+                </div>
+            </div>
+        </div>
         <div class="pt-5">
             <div th:replace="fragments/selectors/workerAndYear :: apply(work-and-care-calendar, Myself)"></div>
         </div>

@@ -6,6 +6,13 @@ import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+package school.hei.asa.endpoint.rest.controller;
+import java.time.Duration;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,13 +46,11 @@ public class DownloadController {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var pattern = DateTimeFormatter.ofPattern("yyyy-MM");
     var date = YearMonth.parse(yearMonth, pattern);
-
     model.addAttribute("year", date.getYear());
     var worker =
         workerToModelAdder.apply(
             new WorkerModelAdderParam(workerCodeOrAuth, workerCodeOrAuth), model);
     var invoiceBucketKey = invoiceService.getInvoiceBucketKey(worker, date);
-
     String presignedUrl =
         bucketComponent
             .presign(INVOICES_FOLDER + invoiceBucketKey, Duration.ofMinutes(5))

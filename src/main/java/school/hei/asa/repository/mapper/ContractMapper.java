@@ -36,7 +36,9 @@ public class ContractMapper {
         contractLevelMapper.toDomain(jContract),
         entranceInstant,
         jContract.getEndInstant(),
-        jContract.getDurationInDays() == null ? null : Duration.ofDays(jContract.getDurationInDays()),
+        jContract.getDurationInDays() == null
+            ? null
+            : Duration.ofDays(jContract.getDurationInDays()),
         jContract.getCompany(),
         jContract.getContractBucketKey());
   }

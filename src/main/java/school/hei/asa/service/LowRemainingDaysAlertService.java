@@ -14,8 +14,8 @@ import school.hei.asa.model.contract.Contract;
 import school.hei.asa.service.mapper.InternetAddressMapper;
 
 /**
- * Service responsable d'envoyer une alerte aux ACCOUNTANTS quand un worker a moins de
- * {@code asa.low.remaining.days.threshold} jours restants sur son contrat courant.
+ * Service responsable d'envoyer une alerte aux ACCOUNTANTS quand un worker a moins de {@code
+ * asa.low.remaining.days.threshold} jours restants sur son contrat courant.
  */
 @Slf4j
 @Service
@@ -62,7 +62,8 @@ public class LowRemainingDaysAlertService {
     }
   }
 
-  private void sendAlertToAccountants(Worker worker, Contract contract, long remainingDays, int threshold) {
+  private void sendAlertToAccountants(
+      Worker worker, Contract contract, long remainingDays, int threshold) {
     var accountantAddresses =
         internetAddressMapper.toInternetAddresses(
             Arrays.stream(this.accountants.split(",")).map(String::trim).toList());
@@ -72,8 +73,9 @@ public class LowRemainingDaysAlertService {
             "ASA - ALERTE : %s a seulement %d jour(s) restant(s) sur son contrat",
             worker.name(), remainingDays);
 
-    var dateFormatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
-        .withZone(java.time.ZoneId.of("UTC"));
+    var dateFormatter =
+        java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+            .withZone(java.time.ZoneId.of("UTC"));
     var formattedEntranceDate = dateFormatter.format(contract.entranceInstant());
 
     var htmlBody =
@@ -99,7 +101,9 @@ public class LowRemainingDaysAlertService {
             threshold);
 
     try {
-      var to = new InternetAddress(worker.email() != null ? worker.email() : accountantAddresses.get(0).getAddress());
+      var to =
+          new InternetAddress(
+              worker.email() != null ? worker.email() : accountantAddresses.get(0).getAddress());
       mailer.accept(new Email(to, accountantAddresses, List.of(), subject, htmlBody, List.of()));
       log.info("Alert email sent to accountants for worker '{}'", worker.code());
     } catch (AddressException e) {

@@ -81,10 +81,10 @@ public class NearOverdueReportNotificationRequestedService
             Arrays.stream(this.accountants.split(",")).toList());
     var text =
         String.format(
-            "Hello, \n"
-                + " This is a reminder that you didn't report your work at the date %s yet. Mind"
-                + " doing it ? \n"
-                + " Best Regards,",
+                "Hello, \n"
+                        + " This is a reminder that you didn't report your work at the date %s yet. Mind"
+                        + " doing it ? \n"
+                        + " Best Regards,",
             date);
 
     log.info("Sending emails to workers...");
@@ -94,7 +94,7 @@ public class NearOverdueReportNotificationRequestedService
           try {
             mailer.accept(
                 new Email(
-                    new InternetAddress(worker.address()),
+                    new InternetAddress(worker.email()),
                     accountants,
                     List.of(),
                     String.format(

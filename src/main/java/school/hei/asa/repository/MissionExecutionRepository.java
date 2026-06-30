@@ -50,4 +50,10 @@ public class MissionExecutionRepository {
   public List<MissionExecution> findByDate(LocalDate date) {
     return missionExecutionMapper.toDomain(jMissionExecutionRepository.findBydate(date));
   }
+
+  @Transactional
+  public long countDistinctWorkDates(String workerCode, LocalDate startDate, LocalDate endDate) {
+    return jMissionExecutionRepository.countDistinctDatesByWorkerAndDateBetween(
+        workerCode, startDate, endDate);
+  }
 }

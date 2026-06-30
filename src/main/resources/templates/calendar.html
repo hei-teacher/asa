@@ -11,6 +11,13 @@
 <body>
 <div th:replace="fragments/header :: header"></div>
 
+<div th:if="${contractAlert}" class="mx-6 mt-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded shadow-md" role="alert">
+    <div class="flex items-center gap-2">
+        <i class="material-icons text-yellow-600">warning</i>
+        <p class="font-medium" th:text="${contractAlert}"></p>
+    </div>
+</div>
+
 <div class="flex justify-between gap-6 py-6 bg-gray-50">
     <!-- Left section: Main title and Worker Selector -->
     <div class="px-6">

@@ -1,5 +1,6 @@
 package school.hei.asa.service;
 
+import static java.time.ZoneId.systemDefault;
 import static java.util.Locale.FRENCH;
 import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
@@ -19,6 +20,7 @@ import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.DailyExecutionRepository;
+import school.hei.asa.repository.MissionExecutionRepository;
 import school.hei.asa.repository.WorkerRepository;
 
 @Slf4j
@@ -28,6 +30,7 @@ public class ContractService {
   private final WorkerRepository workerRepository;
   private final ContractRepository contractRepository;
   private final DailyExecutionRepository dailyExecutionRepository;
+  private final MissionExecutionRepository missionExecutionRepository;
   private final MissionService missionService;
   private CareProductCodeSupplier careProductCodeSupplier;
   private final DateTimeFormatter localDateFormatter =
@@ -85,5 +88,52 @@ public class ContractService {
 
   public List<Contract> findActiveContracts() {
     return contractRepository.findAllActiveContracts();
+  }
+
+  public boolean hasRemainingDays(Worker worker) {
+    var contracts = contractRepository.findAllByWorker(worker);
+    var activeContract = contracts.stream()
+        .filter(c -> c.endInstant() == null)
+        .findFirst()
+        .orElse(null);
+
+    if (activeContract == null) {
+      return false;
+    }
+
+    var durationDays = (int) activeContract.duration().toDays();
+    if (durationDays <= 0) {
+      return true;
+    }
+
+    var usedDays = usedDays(worker, activeContract);
+
+    return usedDays < durationDays;
+  }
+
+  public long remainingDays(Worker worker) {
+    var contracts = contractRepository.findAllByWorker(worker);
+    var activeContract = contracts.stream()
+        .filter(c -> c.endInstant() == null)
+        .findFirst()
+        .orElse(null);
+
+    if (activeContract == null) {
+      return -1;
+    }
+
+    var durationDays = activeContract.duration().toDays();
+    if (durationDays <= 0) {
+      return Long.MAX_VALUE;
+    }
+
+    var usedDays = usedDays(worker, activeContract);
+    return durationDays - usedDays;
+  }
+
+  private long usedDays(Worker worker, Contract activeContract) {
+    var startDate = activeContract.entranceInstant().atZone(systemDefault()).toLocalDate();
+    var now = LocalDate.now();
+    return missionExecutionRepository.countDistinctWorkDates(worker.code(), startDate, now);
   }
 }

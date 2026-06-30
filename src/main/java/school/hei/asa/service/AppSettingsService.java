@@ -1,33 +1,19 @@
 package school.hei.asa.service;
 
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import school.hei.asa.model.AppSettings;
-import school.hei.asa.repository.AppSettingsRepository;
 
 @Service
-@AllArgsConstructor
 public class AppSettingsService {
 
-  private static final String DEFAULT_ID = "DEFAULT";
-  private static final int DEFAULT_LOW_CONTRACT_DAYS_THRESHOLD = 10;
+    private final int lowContractDaysThreshold;
 
-  private final AppSettingsRepository appSettingsRepository;
+    public AppSettingsService(
+            @Value("${asa.low.contract.days.threshold:10}") int lowContractDaysThreshold) {
+        this.lowContractDaysThreshold = lowContractDaysThreshold;
+    }
 
-  public AppSettings getSettings() {
-    return appSettingsRepository
-        .findById(DEFAULT_ID)
-        .orElseGet(
-            () ->
-                appSettingsRepository.save(
-                    new AppSettings(DEFAULT_ID, DEFAULT_LOW_CONTRACT_DAYS_THRESHOLD)));
-  }
-
-  public int getLowContractDaysThreshold() {
-    return getSettings().lowContractDaysThreshold();
-  }
-
-  public AppSettings updateLowContractDaysThreshold(int lowContractDaysThreshold) {
-    return appSettingsRepository.save(new AppSettings(DEFAULT_ID, lowContractDaysThreshold));
-  }
+    public int getLowContractDaysThreshold() {
+        return lowContractDaysThreshold;
+    }
 }

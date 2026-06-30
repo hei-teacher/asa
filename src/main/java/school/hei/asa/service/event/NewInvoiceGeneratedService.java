@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
-import school.hei.asa.file.bucket.BucketComponent;
 import school.hei.asa.file.bucket.BucketPort;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;

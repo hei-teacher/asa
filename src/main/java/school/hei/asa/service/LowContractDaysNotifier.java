@@ -43,7 +43,10 @@ public class LowContractDaysNotifier {
                 + "Seuil d'alerte configure : %d jour(s).%n%n"
                 + "Merci de prendre les dispositions necessaires.%n%n"
                 + "Cordialement,%nASA",
-            worker.name(), worker.code(), remainingDays, threshold);
+            worker.name(),
+            worker.code(),
+            remainingDays,
+            threshold);
 
     var email =
         new Email(
@@ -56,7 +59,8 @@ public class LowContractDaysNotifier {
 
     mailer.accept(email);
     log.info(
-        "Low contract days alert sent to ACCOUNTANTS for worker {} (remainingDays={}, threshold={})",
+        "Low contract days alert sent to ACCOUNTANTS for worker {} (remainingDays={},"
+            + " threshold={})",
         worker.code(),
         remainingDays,
         threshold);

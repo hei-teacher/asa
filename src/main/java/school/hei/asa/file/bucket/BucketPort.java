@@ -6,11 +6,11 @@ import java.time.Duration;
 import school.hei.asa.file.hash.FileHash;
 
 public interface BucketPort {
-    FileHash upload(File file, String bucketKey);
+  FileHash upload(File file, String bucketKey);
 
-    File download(String bucketKey);
+  File download(String bucketKey);
 
-    URL presign(String bucketKey, Duration expiration);
+  URL presign(String bucketKey, Duration expiration);
 
-    String getBucketName();
+  String getBucketName();
 }

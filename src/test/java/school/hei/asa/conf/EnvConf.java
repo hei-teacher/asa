@@ -26,5 +26,13 @@ public class EnvConf {
     registry.add("MAX_LATENESS_REPORT", () -> 4);
     registry.add("SENSITIVE_WORKERS_CODES", () -> "W-059,W-00");
     registry.add("asa.low.contract.days.threshold", () -> 10);
+    registry.add("aws.region", () -> "eu-west-3");
+    registry.add("aws.s3.bucket", () -> "dummy-bucket");
+    registry.add("aws.eventBridge.bus", () -> "dummy-bus");
+    registry.add("SMTP_HOST", () -> "dummy");
+    registry.add("SMTP_PORT", () -> "587");
+    registry.add("SMTP_USERNAME", () -> "dummy");
+    registry.add("SMTP_PASSWORD", () -> "dummy");
+    registry.add("SMTP_FROM", () -> "dummy@dummy.com");
   }
 }

@@ -18,37 +18,37 @@ import school.hei.asa.service.InvoiceService;
 @AllArgsConstructor
 public class DownloadController {
 
-    private static final String CONTRACTS_FOLDER = "contracts/";
-    private static final String INVOICES_FOLDER = "invoices/";
-    private final WorkerFromAuthentication workerFromAuthentication;
-    private final WorkerToModelAdder workerToModelAdder;
-    private final BucketComponent bucketComponent;
-    private final InvoiceService invoiceService;
+  private static final String CONTRACTS_FOLDER = "contracts/";
+  private static final String INVOICES_FOLDER = "invoices/";
+  private final WorkerFromAuthentication workerFromAuthentication;
+  private final WorkerToModelAdder workerToModelAdder;
+  private final BucketComponent bucketComponent;
+  private final InvoiceService invoiceService;
 
-    @GetMapping("/download-contract")
-    public String redirectToPresignedUrlForContractFile(@RequestParam String contractBucketKey) {
-        String presignedUrl =
-                bucketComponent
-                        .presign(CONTRACTS_FOLDER + contractBucketKey, Duration.ofMinutes(5))
-                        .toString();
-        return "redirect:" + presignedUrl;
-    }
+  @GetMapping("/download-contract")
+  public String redirectToPresignedUrlForContractFile(@RequestParam String contractBucketKey) {
+    String presignedUrl =
+        bucketComponent
+            .presign(CONTRACTS_FOLDER + contractBucketKey, Duration.ofMinutes(5))
+            .toString();
+    return "redirect:" + presignedUrl;
+  }
 
-    @GetMapping("/download-invoice")
-    public String redirectToPresignedUrlForInvoiceFile(
-            Model model, Authentication authentication, @RequestParam String yearMonth) {
-        var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
-        var pattern = DateTimeFormatter.ofPattern("yyyy-MM");
-        var date = YearMonth.parse(yearMonth, pattern);
-        model.addAttribute("year", date.getYear());
-        var worker =
-                workerToModelAdder.apply(
-                        new WorkerModelAdderParam(workerCodeOrAuth, workerCodeOrAuth), model);
-        var invoiceBucketKey = invoiceService.getInvoiceBucketKey(worker, date);
-        String presignedUrl =
-                bucketComponent
-                        .presign(INVOICES_FOLDER + invoiceBucketKey, Duration.ofMinutes(5))
-                        .toString();
-        return "redirect:" + presignedUrl;
-    }
+  @GetMapping("/download-invoice")
+  public String redirectToPresignedUrlForInvoiceFile(
+      Model model, Authentication authentication, @RequestParam String yearMonth) {
+    var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
+    var pattern = DateTimeFormatter.ofPattern("yyyy-MM");
+    var date = YearMonth.parse(yearMonth, pattern);
+    model.addAttribute("year", date.getYear());
+    var worker =
+        workerToModelAdder.apply(
+            new WorkerModelAdderParam(workerCodeOrAuth, workerCodeOrAuth), model);
+    var invoiceBucketKey = invoiceService.getInvoiceBucketKey(worker, date);
+    String presignedUrl =
+        bucketComponent
+            .presign(INVOICES_FOLDER + invoiceBucketKey, Duration.ofMinutes(5))
+            .toString();
+    return "redirect:" + presignedUrl;
+  }
 }

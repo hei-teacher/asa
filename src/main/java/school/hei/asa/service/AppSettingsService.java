@@ -6,14 +6,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppSettingsService {
 
-    private final int lowContractDaysThreshold;
+  private final int lowContractDaysThreshold;
 
-    public AppSettingsService(
-            @Value("${asa.low.contract.days.threshold:10}") int lowContractDaysThreshold) {
-        this.lowContractDaysThreshold = lowContractDaysThreshold;
-    }
+  public AppSettingsService(
+      @Value("${asa.low.contract.days.threshold:10}") int lowContractDaysThreshold) {
+    this.lowContractDaysThreshold = lowContractDaysThreshold;
+  }
 
-    public int getLowContractDaysThreshold() {
-        return lowContractDaysThreshold;
-    }
+  public int getLowContractDaysThreshold() {
+    return lowContractDaysThreshold;
+  }
 }

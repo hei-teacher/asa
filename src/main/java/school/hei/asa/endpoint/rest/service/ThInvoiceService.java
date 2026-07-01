@@ -54,7 +54,7 @@ public class ThInvoiceService {
   @SneakyThrows
   public ThInvoice extractInvoice(Worker worker, ThInvoiceForm invoiceForm) {
     var invoiceData =
-        invoiceService.extractInvoiceData(worker, thInvoiceFormMapper.toDomain(invoiceForm));
+        invoiceService.extractInvoiceForm(worker, thInvoiceFormMapper.toDomain(invoiceForm));
     log.info("mapping invoice to th ...");
     var thInvoiceData = thInvoiceFormMapper.toTh(invoiceData);
     log.info("successfully mapped to th");

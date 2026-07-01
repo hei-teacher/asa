@@ -15,6 +15,8 @@ public interface JContractRepository extends JpaRepository<JContract, String> {
   @Query(
       """
       SELECT c FROM JContract c
+      JOIN FETCH c.worker
+      JOIN FETCH c.level
       WHERE ((EXTRACT(YEAR FROM c.endInstant) >= ?1) or (c.endInstant is null))
       AND (EXTRACT(year from c.entranceInstant) < ?2)
       ORDER BY c.entranceInstant DESC

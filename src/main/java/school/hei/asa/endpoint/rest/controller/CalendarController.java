@@ -22,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import school.hei.asa.endpoint.rest.model.th.ThYear;
+import school.hei.asa.endpoint.rest.model.th.WorkerModelAdderParam;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Worker;
@@ -53,7 +54,11 @@ public class CalendarController {
             ? workerFromAuthentication.apply(authentication).get().code()
             : workerCode;
 
-    var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
+    var worker =
+        workerToModelAdder.apply(
+            new WorkerModelAdderParam(
+                workerCode, workerFromAuthentication.apply(authentication).get().code()),
+            model);
 
     var missionTypeByMonth =
         calendarService.missionExecutionPercentageSumByMissionType(worker, year);

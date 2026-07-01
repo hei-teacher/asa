@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
+import school.hei.asa.endpoint.rest.model.th.WorkerModelAdderParam;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.InvoicePDFGenerator;
 import school.hei.asa.endpoint.rest.service.ThInvoiceService;
@@ -50,8 +51,9 @@ public class InvoiceController {
     model.addAttribute("year", year);
     model.addAttribute("currentYear", now().getYear());
     var pattern = DateTimeFormatter.ofPattern("yyyy-MM");
-    var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
-    var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
+    var authenticatedWorkerCode = workerFromAuthentication.apply(authentication).get().code();
+    var worker =
+        workerToModelAdder.apply(new WorkerModelAdderParam(null, authenticatedWorkerCode), model);
     var yearMonth =
         invoiceForm.yearMonth() != null
             ? YearMonth.parse(invoiceForm.yearMonth(), pattern)
@@ -70,7 +72,7 @@ public class InvoiceController {
   public ResponseEntity<Resource> previewInvoice(
       Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
-    var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
+    var worker = workerToModelAdder.apply(new WorkerModelAdderParam(null, workerCodeOrAuth), model);
     var invoice = thInvoiceService.extractInvoice(worker, invoiceForm);
 
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
@@ -86,7 +88,7 @@ public class InvoiceController {
   public ResponseEntity<byte[]> generateInvoice(
       Model model, Authentication authentication, @ModelAttribute ThInvoiceForm invoiceForm) {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
-    var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
+    var worker = workerToModelAdder.apply(new WorkerModelAdderParam(null, workerCodeOrAuth), model);
     var invoice = thInvoiceService.extractInvoice(worker, invoiceForm);
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();

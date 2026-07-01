@@ -62,7 +62,8 @@ public class MissionExecutionMapper {
   }
 
   public List<MissionExecution> toDomain(List<JMissionExecution> jmeList) {
-    return jmeList.stream().map(jme -> toDomain(jme, new Cache())).toList();
+    var cache = new Cache();
+    return jmeList.stream().map(jme -> toDomain(jme, cache)).toList();
   }
 
   /*package-private*/ List<MissionExecution> toDomain(

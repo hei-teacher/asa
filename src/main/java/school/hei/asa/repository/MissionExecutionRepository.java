@@ -50,4 +50,11 @@ public class MissionExecutionRepository {
   public List<MissionExecution> findByDate(LocalDate date) {
     return missionExecutionMapper.toDomain(jMissionExecutionRepository.findBydate(date));
   }
+
+  @Transactional
+  public List<MissionExecution> missionExecutionsByDateBetweenAllWorkers(
+      LocalDate startDate, LocalDate endDate) {
+    return missionExecutionMapper.toDomain(
+        jMissionExecutionRepository.findByDateBetween(startDate, endDate));
+  }
 }

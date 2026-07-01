@@ -25,6 +25,7 @@ import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.endpoint.rest.controller.mapper.ThDailyExecutionMapper;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecution;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
+import school.hei.asa.endpoint.rest.model.th.WorkerModelAdderParam;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.ThContractService;
 import school.hei.asa.endpoint.rest.service.ThMissionService;
@@ -100,7 +101,7 @@ public class MissionController {
             thProductsByWorkerCode, noUnpaidCareMissions);
     model.addAttribute("total", thProductsExecutedDaysSumByMonth);
 
-    workerToModelAdder.apply(authenticateWorkerCode, model);
+    workerToModelAdder.apply(new WorkerModelAdderParam(workerCode, authenticateWorkerCode), model);
     return "missions";
   }
 
@@ -161,7 +162,7 @@ public class MissionController {
     model.addAttribute("yearMonth", month.toString());
     model.addAttribute("year", month.getYear());
     model.addAttribute("workerCode", workerCode);
-    workerToModelAdder.apply(authenticatedWorker, model);
+    workerToModelAdder.apply(new WorkerModelAdderParam(workerCode, authenticatedWorker), model);
 
     return "mission-executions";
   }

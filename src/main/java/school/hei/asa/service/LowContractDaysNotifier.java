@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.hei.asa.mail.Email;
-import school.hei.asa.mail.YoTechMailer;
+import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.mapper.InternetAddressMapper;
 
@@ -16,12 +16,12 @@ import school.hei.asa.service.mapper.InternetAddressMapper;
 public class LowContractDaysNotifier {
 
   private final String accountants;
-  private final YoTechMailer mailer;
+  private final Mailer mailer;
   private final InternetAddressMapper internetAddressMapper;
 
   public LowContractDaysNotifier(
       @Value("${ACCOUNTANTS}") String accountants,
-      YoTechMailer mailer,
+      Mailer mailer,
       InternetAddressMapper internetAddressMapper) {
     this.accountants = accountants;
     this.mailer = mailer;

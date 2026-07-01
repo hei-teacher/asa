@@ -61,7 +61,7 @@ public class ContractService {
   public double getRemainingDaysByWorker(Worker worker) {
     var contracts = contractRepository.findAllByWorker(worker);
 
-    System.out.println(
+    log.debug(
         "\n================================================================================\n"
             + "                              WORKER CONTRACT INFO\n"
             + "================================================================================\n"
@@ -75,7 +75,7 @@ public class ContractService {
             + "Contracts found: "
             + contracts.size());
     for (var c : contracts) {
-      System.out.println(
+      log.debug(
           "  - Contract: [jobTitle="
               + c.jobTitle()
               + ", level="
@@ -92,7 +92,7 @@ public class ContractService {
     }
 
     if (contracts.isEmpty()) {
-      System.out.println(
+      log.debug(
           "Result: no contract for worker → remainingDays = MAX_VALUE (no restriction)\n"
               + "================================================================================");
       return Double.MAX_VALUE;
@@ -105,7 +105,7 @@ public class ContractService {
     var activeContractOpt = contracts.stream().filter(c -> c.duration() != null).findFirst();
 
     if (activeContractOpt.isEmpty()) {
-      System.out.println(
+      log.debug(
           "Result: no contract with a defined duration → "
               + "remainingDays = MAX_VALUE (no restriction)\n"
               + "================================================================================");
@@ -122,7 +122,7 @@ public class ContractService {
     var workedDays = actualWorkedDays.equals("-") ? 0d : Double.parseDouble(actualWorkedDays);
     var remainingDays = contract.duration().toDays() - workedDays;
 
-    System.out.println(
+    log.debug(
         "Active Contract: [jobTitle="
             + contract.jobTitle()
             + ", level="

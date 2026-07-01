@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.model.NearOverdueReportNotificationRequested;
 import school.hei.asa.mail.Email;
-import school.hei.asa.mail.YoTechMailer;
+import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.repository.MissionExecutionRepository;
@@ -29,7 +29,7 @@ public class NearOverdueReportNotificationRequestedService
 
   private final ContractService contractService;
   private final MissionExecutionRepository missionExecutionRepository;
-  private final YoTechMailer mailer;
+  private final Mailer mailer;
   private final String accountants;
   private final InternetAddressMapper internetAddressMapper;
   private final int maxLatenessForReport;
@@ -37,7 +37,7 @@ public class NearOverdueReportNotificationRequestedService
   public NearOverdueReportNotificationRequestedService(
       ContractService contractService,
       MissionExecutionRepository missionExecutionRepository,
-      YoTechMailer mailer,
+      Mailer mailer,
       @Value("${ACCOUNTANTS}") String accountants,
       @Value("${MAX_LATENESS_REPORT}") int maxLatenessForReport,
       InternetAddressMapper internetAddressMapper) {

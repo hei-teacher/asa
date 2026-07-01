@@ -2,16 +2,12 @@ package school.hei.asa.endpoint.rest.service;
 
 import static java.lang.Double.parseDouble;
 import static java.lang.System.lineSeparator;
-import static java.time.LocalDate.now;
-import static java.time.format.DateTimeFormatter.ofPattern;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -28,7 +24,6 @@ import school.hei.asa.service.ContractService;
 public class ThContractService {
   private final ContractService contractService;
   private final ThContractMapper thContractMapper;
-  private final DateTimeFormatter localDateFormatter = ofPattern("dd MMM yyyy");
 
   public Map<Worker, List<ThContract>> totalWorkDaysPerWorker() {
     var totalWorkDaysPerWorker = contractService.totalWorkDaysPerWorker();
@@ -104,11 +99,6 @@ public class ThContractService {
     if (thContract.duration().equals("-") || thContract.actualWorkedDays().equals("-")) {
       return "-";
     }
-    var startDate = LocalDate.parse(thContract.entranceInstant(), localDateFormatter);
-    var endDate =
-        !thContract.endInstant().equals("-")
-            ? LocalDate.parse(thContract.endInstant(), localDateFormatter)
-            : now();
 
     var res =
         parseDouble(thContract.duration()) - parseDouble(actualWorkedDaysToString(thContract));

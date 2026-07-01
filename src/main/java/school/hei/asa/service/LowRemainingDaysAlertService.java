@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.hei.asa.mail.Email;
-import school.hei.asa.mail.YoTechMailer;
+import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.service.mapper.InternetAddressMapper;
@@ -21,24 +21,24 @@ import school.hei.asa.service.mapper.InternetAddressMapper;
 @Service
 public class LowRemainingDaysAlertService {
 
-  private final YoTechMailer mailer;
+  private final Mailer mailer;
   private final String accountants;
   private final InternetAddressMapper internetAddressMapper;
-  private final AppSettingsService appSettingsService;
+  private final int lowRemainingDaysThreshold;
 
   public LowRemainingDaysAlertService(
-      YoTechMailer mailer,
+      Mailer mailer,
       @Value("${ACCOUNTANTS}") String accountants,
-      AppSettingsService appSettingsService,
+      @Value("${asa.low.contract.days.threshold:10}") int lowRemainingDaysThreshold,
       InternetAddressMapper internetAddressMapper) {
     this.mailer = mailer;
     this.accountants = accountants;
-    this.appSettingsService = appSettingsService;
+    this.lowRemainingDaysThreshold = lowRemainingDaysThreshold;
     this.internetAddressMapper = internetAddressMapper;
   }
 
   public int getLowRemainingDaysThreshold() {
-    return appSettingsService.getLowContractDaysThreshold();
+    return lowRemainingDaysThreshold;
   }
 
   /**

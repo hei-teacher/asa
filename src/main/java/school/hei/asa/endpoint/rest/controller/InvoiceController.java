@@ -25,7 +25,7 @@ import school.hei.asa.endpoint.rest.model.th.WorkerModelAdderParam;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.InvoicePDFGenerator;
 import school.hei.asa.endpoint.rest.service.ThInvoiceService;
-import school.hei.asa.file.bucket.BucketPort;
+import school.hei.asa.file.bucket.BucketComponent;
 import school.hei.asa.service.InvoiceService;
 
 @Slf4j
@@ -37,7 +37,7 @@ public class InvoiceController {
   private final WorkerToModelAdder workerToModelAdder;
   private final InvoicePDFGenerator invoicePDFGenerator;
   private final InvoiceService invoiceService;
-  private final BucketPort bucketComponent;
+  private final BucketComponent bucketComponent;
   private final ThInvoiceService thInvoiceService;
   private static final String INVOICES_FOLDER = "invoices/";
 

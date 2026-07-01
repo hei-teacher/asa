@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,11 +26,9 @@ import school.hei.asa.endpoint.rest.model.th.WorkerModelAdderParam;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Worker;
-import school.hei.asa.service.AppSettingsService;
 import school.hei.asa.service.CalendarService;
 import school.hei.asa.service.ContractService;
 
-@AllArgsConstructor
 @Controller
 public class CalendarController {
 
@@ -38,7 +36,20 @@ public class CalendarController {
   private final WorkerFromAuthentication workerFromAuthentication;
   private final WorkerToModelAdder workerToModelAdder;
   private final ContractService contractService;
-  private final AppSettingsService appSettingsService;
+  private final int lowRemainingDaysThreshold;
+
+  public CalendarController(
+      CalendarService calendarService,
+      WorkerFromAuthentication workerFromAuthentication,
+      WorkerToModelAdder workerToModelAdder,
+      ContractService contractService,
+      @Value("${asa.low.contract.days.threshold:10}") int lowRemainingDaysThreshold) {
+    this.calendarService = calendarService;
+    this.workerFromAuthentication = workerFromAuthentication;
+    this.workerToModelAdder = workerToModelAdder;
+    this.contractService = contractService;
+    this.lowRemainingDaysThreshold = lowRemainingDaysThreshold;
+  }
 
   @GetMapping("/work-and-care-calendar")
   public String getCalendar(
@@ -72,7 +83,7 @@ public class CalendarController {
     var lateReportedDaysByMonth = calendarService.lateReportedDaysByMonth(worker, year);
 
     double remainingDays = contractService.getRemainingDaysByWorker(worker);
-    int threshold = appSettingsService.getLowContractDaysThreshold();
+    int threshold = lowRemainingDaysThreshold;
     boolean showWarning = remainingDays < threshold;
 
     model.addAttribute("remainingDays", remainingDays);

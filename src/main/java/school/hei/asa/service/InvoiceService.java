@@ -4,6 +4,8 @@ import static java.time.LocalDate.now;
 import static java.time.ZoneOffset.UTC;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
+import static school.hei.asa.number.NullToBigDecimalHanlder.toBigDecimalOrZero;
+import static school.hei.asa.number.NullToBigDecimalHanlder.toDoubleOrZero;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -71,16 +73,30 @@ public class InvoiceService {
   private InvoiceForm generateInvoiceFormFrom(Double totalDaysWorked, Contract contract) {
     if (contract == null) {
       return new InvoiceForm(
-          null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          toBigDecimalOrZero(null),
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
           null);
     }
     var contractLevel = contract.level();
     Double unitPrice =
         switch (contractLevel.type()) {
           case partnerContractor, studentContractor -> contractLevel.dailyPay();
-          case fullTimeEmployee -> 0.0;
+          case fullTimeEmployee -> null;
         };
-    var amount = BigDecimal.valueOf(totalDaysWorked * unitPrice);
+    var amount = toBigDecimalOrZero(totalDaysWorked * toDoubleOrZero(unitPrice));
     var parsedAmount = numberConverter.convertToWords(numberParser.parseToNumber(amount));
     var description = contract.jobTitle();
 
@@ -91,7 +107,7 @@ public class InvoiceService {
         null,
         description,
         totalDaysWorked,
-        BigDecimal.valueOf(unitPrice),
+        toBigDecimalOrZero(unitPrice),
         amount,
         null,
         null,

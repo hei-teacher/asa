@@ -33,7 +33,7 @@ public class ContractService {
   private final MissionService missionService;
   private CareProductCodeSupplier careProductCodeSupplier;
   private final DateTimeFormatter localDateFormatter =
-      DateTimeFormatter.ofPattern("dd MMM yyyy", FRENCH);
+          DateTimeFormatter.ofPattern("dd MMM yyyy", FRENCH);
 
   public Map<Worker, List<Contract>> totalWorkDaysPerWorker() {
     return contractRepository.findAll().stream().collect(Collectors.groupingBy(Contract::worker));
@@ -52,9 +52,9 @@ public class ContractService {
   }
 
   public String getActualWorkedDaysByDateByWorker(
-      LocalDate startDate, String workerCode, LocalDate endDate) {
+          LocalDate startDate, String workerCode, LocalDate endDate) {
     var dailyExecutions =
-        dailyExecutionRepository.findByWorkerCodeAndDateBetween(workerCode, startDate, endDate);
+            dailyExecutionRepository.findByWorkerCodeAndDateBetween(workerCode, startDate, endDate);
     return executedDays(dailyExecutions);
   }
 
@@ -62,39 +62,39 @@ public class ContractService {
     var contracts = contractRepository.findAllByWorker(worker);
 
     log.debug(
-        "\n================================================================================\n"
-            + "                              WORKER CONTRACT INFO\n"
-            + "================================================================================\n"
-            + "Worker: [code="
-            + worker.code()
-            + ", name="
-            + worker.name()
-            + ", email="
-            + worker.email()
-            + "]\n"
-            + "Contracts found: "
-            + contracts.size());
+            "\n================================================================================\n"
+                    + "                              WORKER CONTRACT INFO\n"
+                    + "================================================================================\n"
+                    + "Worker: [code="
+                    + worker.code()
+                    + ", name="
+                    + worker.name()
+                    + ", email="
+                    + worker.email()
+                    + "]\n"
+                    + "Contracts found: "
+                    + contracts.size());
     for (var c : contracts) {
       log.debug(
-          "  - Contract: [jobTitle="
-              + c.jobTitle()
-              + ", level="
-              + c.level()
-              + ", company="
-              + c.company()
-              + ", entrance="
-              + c.entranceInstant()
-              + ", end="
-              + c.endInstant()
-              + ", duration="
-              + (c.duration() == null ? "null" : c.duration().toDays() + " days")
-              + "]");
+              "  - Contract: [jobTitle="
+                      + c.jobTitle()
+                      + ", level="
+                      + c.level()
+                      + ", company="
+                      + c.company()
+                      + ", entrance="
+                      + c.entranceInstant()
+                      + ", end="
+                      + c.endInstant()
+                      + ", duration="
+                      + (c.duration() == null ? "null" : c.duration().toDays() + " days")
+                      + "]");
     }
 
     if (contracts.isEmpty()) {
       log.debug(
-          "Result: no contract for worker → remainingDays = MAX_VALUE (no restriction)\n"
-              + "================================================================================");
+              "Result: no contract for worker → remainingDays = MAX_VALUE (no restriction)\n"
+                      + "================================================================================");
       return Double.MAX_VALUE;
     }
 
@@ -105,47 +105,18 @@ public class ContractService {
     var activeContractOpt = contracts.stream().filter(c -> c.duration() != null).findFirst();
 
     if (activeContractOpt.isEmpty()) {
-      log.debug(
-          "Result: no contract with a defined duration → "
-              + "remainingDays = MAX_VALUE (no restriction)\n"
-              + "================================================================================");
       return Double.MAX_VALUE;
     }
 
     var contract = activeContractOpt.get();
     var startDate = contract.entranceInstant().atZone(systemDefault()).toLocalDate();
     var endDate =
-        contract.endInstant() == null
-            ? LocalDate.now()
-            : contract.endInstant().atZone(systemDefault()).toLocalDate();
+            contract.endInstant() == null
+                    ? LocalDate.now()
+                    : contract.endInstant().atZone(systemDefault()).toLocalDate();
     var actualWorkedDays = getActualWorkedDaysByDateByWorker(startDate, worker.code(), endDate);
     var workedDays = actualWorkedDays.equals("-") ? 0d : Double.parseDouble(actualWorkedDays);
     var remainingDays = contract.duration().toDays() - workedDays;
-
-    log.debug(
-        "Active Contract: [jobTitle="
-            + contract.jobTitle()
-            + ", level="
-            + contract.level()
-            + ", company="
-            + contract.company()
-            + "]\n"
-            + "Entrance Date: "
-            + startDate
-            + "\n"
-            + "End Date (for worked days): "
-            + endDate
-            + "\n"
-            + "Total Contract Duration: "
-            + contract.duration().toDays()
-            + " days\n"
-            + "Actual Worked Days: "
-            + workedDays
-            + " days\n"
-            + "Remaining Days: "
-            + remainingDays
-            + " days\n"
-            + "================================================================================");
 
     return remainingDays;
   }
@@ -155,25 +126,25 @@ public class ContractService {
       return "-";
     }
     var result =
-        executions.stream()
-            .map(
-                dailyExecution -> {
-                  var type = dailyExecution.type(careProductCodeSupplier.get());
-                  if (type.equals(fullWork)) {
-                    return 1.0d;
-                  } else if (type.equals(fullCare)) {
-                    return 0.0d;
-                  }
-                  return dailyExecution.executions().stream()
-                      .map(
-                          me -> {
-                            return missionService.isUnpaidCare(me) ? 0.0d : me.dayPercentage();
-                          })
-                      .reduce(Double::sum)
-                      .get();
-                })
-            .reduce(Double::sum)
-            .get();
+            executions.stream()
+                    .map(
+                            dailyExecution -> {
+                              var type = dailyExecution.type(careProductCodeSupplier.get());
+                              if (type.equals(fullWork)) {
+                                return 1.0d;
+                              } else if (type.equals(fullCare)) {
+                                return 0.0d;
+                              }
+                              return dailyExecution.executions().stream()
+                                      .map(
+                                              me -> {
+                                                return missionService.isUnpaidCare(me) ? 0.0d : me.dayPercentage();
+                                              })
+                                      .reduce(Double::sum)
+                                      .get();
+                            })
+                    .reduce(Double::sum)
+                    .get();
     return String.format(US, "%.1f", result);
   }
 

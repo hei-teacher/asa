@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import school.hei.asa.endpoint.rest.controller.mapper.ThDailyExecutionFormMapper;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
@@ -34,22 +35,21 @@ public class DailyExecutionController {
 
   public String createDailyExecution(Authentication authentication, ThDailyExecutionForm dmeForm) {
     return createDailyExecution(
-        authentication,
-        dmeForm,
-        new org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap());
+            authentication,
+            dmeForm,
+            new RedirectAttributesModelMap());
   }
 
   @PostMapping("/daily-execution")
   public String createDailyExecution(
-      Authentication authentication,
-      ThDailyExecutionForm dmeForm,
-      RedirectAttributes redirectAttributes) {
+          Authentication authentication,
+          ThDailyExecutionForm dmeForm,
+          RedirectAttributes redirectAttributes) {
     var worker = workerFromAuthentication.apply(authentication).get();
     var remainingDays = contractService.getRemainingDaysByWorker(worker);
     if (remainingDays <= 0) {
       throw new IllegalStateException(
-          "Vous n'avez plus de jours disponibles sur votre contrat. Veuillez contacter votre"
-              + " administrateur.");
+              "You have no more days available under your contract. Please contact your administrator.");
     }
 
     var dailyExecution = thDailyExecutionFormMapper.toDomain(dmeForm, worker);
@@ -60,14 +60,14 @@ public class DailyExecutionController {
     var activeContractOpt = contracts.stream().filter(c -> c.duration() != null).findFirst();
 
     if (activeContractOpt.isPresent()
-        && remainingDaysAfter < lowRemainingDaysAlertService.getLowRemainingDaysThreshold()) {
+            && remainingDaysAfter < lowRemainingDaysAlertService.getLowRemainingDaysThreshold()) {
       lowRemainingDaysAlertService.checkAndAlert(
-          worker, activeContractOpt.get(), (long) remainingDaysAfter);
+              worker, activeContractOpt.get(), (long) remainingDaysAfter);
       redirectAttributes.addFlashAttribute(
-          "toastMessage",
-          "Attention : Il vous reste "
-              + (long) remainingDaysAfter
-              + " jour(s) sur votre contrat !");
+              "toastMessage",
+              "Please note : You have "
+                      + (long) remainingDaysAfter
+                      + " day(s) left on your contract !");
       redirectAttributes.addFlashAttribute("toastType", "warning");
     }
 

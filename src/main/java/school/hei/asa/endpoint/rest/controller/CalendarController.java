@@ -39,11 +39,11 @@ public class CalendarController {
   private final int lowRemainingDaysThreshold;
 
   public CalendarController(
-      CalendarService calendarService,
-      WorkerFromAuthentication workerFromAuthentication,
-      WorkerToModelAdder workerToModelAdder,
-      ContractService contractService,
-      @Value("${asa.low.contract.days.threshold:10}") int lowRemainingDaysThreshold) {
+          CalendarService calendarService,
+          WorkerFromAuthentication workerFromAuthentication,
+          WorkerToModelAdder workerToModelAdder,
+          ContractService contractService,
+          @Value("${asa.low.contract.days.threshold}") int lowRemainingDaysThreshold) {
     this.calendarService = calendarService;
     this.workerFromAuthentication = workerFromAuthentication;
     this.workerToModelAdder = workerToModelAdder;
@@ -53,33 +53,33 @@ public class CalendarController {
 
   @GetMapping("/work-and-care-calendar")
   public String getCalendar(
-      Model model,
-      Authentication authentication,
-      @RequestParam(required = false) String workerCode,
-      @RequestParam(required = false) Integer year) {
+          Model model,
+          Authentication authentication,
+          @RequestParam(required = false) String workerCode,
+          @RequestParam(required = false) Integer year) {
     year = year == null ? now().getYear() : year;
     model.addAttribute("year", year);
 
     var workerCodeOrAuth =
-        workerCode == null || workerCode.isBlank()
-            ? workerFromAuthentication.apply(authentication).get().code()
-            : workerCode;
+            workerCode == null || workerCode.isBlank()
+                    ? workerFromAuthentication.apply(authentication).get().code()
+                    : workerCode;
 
     var worker =
-        workerToModelAdder.apply(
-            new WorkerModelAdderParam(
-                workerCode, workerFromAuthentication.apply(authentication).get().code()),
-            model);
+            workerToModelAdder.apply(
+                    new WorkerModelAdderParam(
+                            workerCode, workerFromAuthentication.apply(authentication).get().code()),
+                    model);
 
     var missionTypeByMonth =
-        calendarService.missionExecutionPercentageSumByMissionType(worker, year);
+            calendarService.missionExecutionPercentageSumByMissionType(worker, year);
     Map<Month, Map<Mission.Type, Double>> missionCounts = new HashMap<>();
     missionTypeByMonth.forEach(
-        (month, counts) -> {
-          Map<Mission.Type, Double> typeCounts =
-              counts.entrySet().stream().collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
-          missionCounts.put(month, typeCounts);
-        });
+            (month, counts) -> {
+              Map<Mission.Type, Double> typeCounts =
+                      counts.entrySet().stream().collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+              missionCounts.put(month, typeCounts);
+            });
     var lateReportedDaysByMonth = calendarService.lateReportedDaysByMonth(worker, year);
 
     double remainingDays = contractService.getRemainingDaysByWorker(worker);
@@ -92,24 +92,24 @@ public class CalendarController {
     model.addAttribute("workerCode", workerCodeOrAuth);
     model.addAttribute("currentYear", now().getYear());
     model.addAttribute(
-        "thYear",
-        new ThYear(
-            year,
-            "Work & Care days - " + worker.name(),
-            getColoredDates(year, worker),
-            colorDescription(),
-            missionCounts,
-            lateReportedDaysByMonth));
+            "thYear",
+            new ThYear(
+                    year,
+                    "Work & Care days - " + worker.name(),
+                    getColoredDates(year, worker),
+                    colorDescription(),
+                    missionCounts,
+                    lateReportedDaysByMonth));
 
     return "calendar";
   }
 
   private static Map<Color, String> colorDescription() {
     return Map.of(
-        BLUE, "Today",
-        GREEN, "Fully executed work day that has no care mission",
-        RED, "Days that fully have care missions, including vacation and team building events",
-        MAGENTA, "Days that have a mix of work and care missions");
+            BLUE, "Today",
+            GREEN, "Fully executed work day that has no care mission",
+            RED, "Days that fully have care missions, including vacation and team building events",
+            MAGENTA, "Days that have a mix of work and care missions");
   }
 
   private Map<LocalDate, Color> getColoredDates(int year, Worker worker) {

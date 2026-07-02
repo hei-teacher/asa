@@ -38,7 +38,7 @@ public class ThContractMapper {
                 case partnerContractor, studentContractor -> contractLevel.dailyPay();
                 case fullTimeEmployee -> contractLevel.monthlyPay();
               };
-          var dateFormater = DateTimeFormatter.ofPattern("dd MMM yyyy", java.util.Locale.ENGLISH);
+          var dateFormater = DateTimeFormatter.ofPattern("dd MMM yyyy", ENGLISH);
           log.info("entrance date = {}", current.entranceInstant());
           var entranceDate =
               dateFormater.format(current.entranceInstant().atZone(systemDefault()).toLocalDate());

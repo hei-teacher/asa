@@ -36,7 +36,7 @@ public class DailyExecutionController {
     return createDailyExecution(
         authentication,
         dmeForm,
-        new org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap());
+        RedirectAttributesModelMap());
   }
 
   @PostMapping("/daily-execution")

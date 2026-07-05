@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import school.hei.asa.endpoint.rest.controller.mapper.ThDailyExecutionFormMapper;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
@@ -33,10 +34,7 @@ public class DailyExecutionController {
   }
 
   public String createDailyExecution(Authentication authentication, ThDailyExecutionForm dmeForm) {
-    return createDailyExecution(
-        authentication,
-        dmeForm,
-        RedirectAttributesModelMap());
+    return createDailyExecution(authentication, dmeForm, new RedirectAttributesModelMap());
   }
 
   @PostMapping("/daily-execution")
@@ -48,8 +46,8 @@ public class DailyExecutionController {
     var remainingDays = contractService.getRemainingDaysByWorker(worker);
     if (remainingDays <= 0) {
       throw new IllegalStateException(
-          "Vous n'avez plus de jours disponibles sur votre contrat. Veuillez contacter votre"
-              + " administrateur.");
+          "You have no more days available under your contract. Please contact your"
+              + " administrator.");
     }
 
     var dailyExecution = thDailyExecutionFormMapper.toDomain(dmeForm, worker);
@@ -65,9 +63,9 @@ public class DailyExecutionController {
           worker, activeContractOpt.get(), (long) remainingDaysAfter);
       redirectAttributes.addFlashAttribute(
           "toastMessage",
-          "Attention : Il vous reste "
+          "Please note : You have "
               + (long) remainingDaysAfter
-              + " jour(s) sur votre contrat !");
+              + " day(s) left on your contract !");
       redirectAttributes.addFlashAttribute("toastType", "warning");
     }
 

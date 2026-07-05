@@ -1,7 +1,5 @@
 package school.hei.asa.service;
 
-import jakarta.mail.internet.AddressException;
-import jakarta.mail.internet.InternetAddress;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -13,10 +11,6 @@ import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.service.mapper.InternetAddressMapper;
 
-/**
- * Service responsable d'envoyer une alerte aux ACCOUNTANTS quand un worker a moins de {@code
- * asa.low.remaining.days.threshold} jours restants sur son contrat courant.
- */
 @Slf4j
 @Service
 public class LowRemainingDaysAlertService {
@@ -29,7 +23,7 @@ public class LowRemainingDaysAlertService {
   public LowRemainingDaysAlertService(
       Mailer mailer,
       @Value("${ACCOUNTANTS}") String accountants,
-      @Value("${asa.low.contract.days.threshold:10}") int lowRemainingDaysThreshold,
+      @Value("${asa.low.contract.days.threshold}") int lowRemainingDaysThreshold,
       InternetAddressMapper internetAddressMapper) {
     this.mailer = mailer;
     this.accountants = accountants;
@@ -41,14 +35,6 @@ public class LowRemainingDaysAlertService {
     return lowRemainingDaysThreshold;
   }
 
-  /**
-   * Vérifie si le nombre de jours restants est inférieur au seuil et envoie un mail si c'est le
-   * cas.
-   *
-   * @param worker le worker concerné
-   * @param contract le contrat actif
-   * @param remainingDays le nombre de jours restants après le pointage courant
-   */
   public void checkAndAlert(Worker worker, Contract contract, long remainingDays) {
     int threshold = getLowRemainingDaysThreshold();
     if (remainingDays < threshold) {
@@ -70,7 +56,7 @@ public class LowRemainingDaysAlertService {
 
     var subject =
         String.format(
-            "ASA - ALERTE : %s a seulement %d jour(s) restant(s) sur son contrat",
+            "ASA - ALERT: %s has only %d day(s) remaining on their contract",
             worker.name(), remainingDays);
 
     var dateFormatter =
@@ -81,17 +67,17 @@ public class LowRemainingDaysAlertService {
     var htmlBody =
         String.format(
             """
-            <p>Bonjour,</p>
+            <p>Hello,</p>
             <p>
-              Le worker <strong>%s</strong> (<em>%s</em>) a effectué un pointage
-              et il lui reste désormais <strong>%d jour(s)</strong> disponible(s)
-              sur son contrat courant (début : %s, durée totale : %d jours).
+              Worker <strong>%s</strong> (<em>%s</em>) has logged a check-in
+              and now has <strong>%d day(s)</strong> remaining
+              on their current contract (start: %s, total duration: %d days).
             </p>
             <p>
-              Le seuil d'alerte configuré est de <strong>%d jours</strong>.
-              Veuillez prendre les mesures nécessaires.
+              The configured alert threshold is <strong>%d days</strong>.
+              Please take the necessary action.
             </p>
-            <p>Cordialement,<br/>ASA</p>
+            <p>Regards,<br/>ASA</p>
             """,
             worker.name(),
             worker.code(),
@@ -100,14 +86,9 @@ public class LowRemainingDaysAlertService {
             contract.duration().toDays(),
             threshold);
 
-    try {
-      var to =
-          new InternetAddress(
-              worker.email() != null ? worker.email() : accountantAddresses.get(0).getAddress());
-      mailer.accept(new Email(to, accountantAddresses, List.of(), subject, htmlBody, List.of()));
-      log.info("Alert email sent to accountants for worker '{}'", worker.code());
-    } catch (AddressException e) {
-      log.error("Failed to send low-remaining-days alert email for worker '{}'", worker.code(), e);
-    }
+    var to = accountantAddresses.getFirst();
+    var cc = accountantAddresses.stream().skip(1).toList();
+    mailer.accept(new Email(to, cc, List.of(), subject, htmlBody, List.of()));
+    log.info("Alert email sent to accountants for worker '{}'", worker.code());
   }
 }

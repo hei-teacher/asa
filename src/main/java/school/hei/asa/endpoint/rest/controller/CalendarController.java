@@ -43,7 +43,7 @@ public class CalendarController {
       WorkerFromAuthentication workerFromAuthentication,
       WorkerToModelAdder workerToModelAdder,
       ContractService contractService,
-      @Value("${asa.low.contract.days.threshold:10}") int lowRemainingDaysThreshold) {
+      @Value("${asa.low.contract.days.threshold}") int lowRemainingDaysThreshold) {
     this.calendarService = calendarService;
     this.workerFromAuthentication = workerFromAuthentication;
     this.workerToModelAdder = workerToModelAdder;

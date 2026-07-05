@@ -105,10 +105,6 @@ public class ContractService {
     var activeContractOpt = contracts.stream().filter(c -> c.duration() != null).findFirst();
 
     if (activeContractOpt.isEmpty()) {
-      log.debug(
-          "Result: no contract with a defined duration → "
-              + "remainingDays = MAX_VALUE (no restriction)\n"
-              + "================================================================================");
       return Double.MAX_VALUE;
     }
 
@@ -121,31 +117,6 @@ public class ContractService {
     var actualWorkedDays = getActualWorkedDaysByDateByWorker(startDate, worker.code(), endDate);
     var workedDays = actualWorkedDays.equals("-") ? 0d : Double.parseDouble(actualWorkedDays);
     var remainingDays = contract.duration().toDays() - workedDays;
-
-    log.debug(
-        "Active Contract: [jobTitle="
-            + contract.jobTitle()
-            + ", level="
-            + contract.level()
-            + ", company="
-            + contract.company()
-            + "]\n"
-            + "Entrance Date: "
-            + startDate
-            + "\n"
-            + "End Date (for worked days): "
-            + endDate
-            + "\n"
-            + "Total Contract Duration: "
-            + contract.duration().toDays()
-            + " days\n"
-            + "Actual Worked Days: "
-            + workedDays
-            + " days\n"
-            + "Remaining Days: "
-            + remainingDays
-            + " days\n"
-            + "================================================================================");
 
     return remainingDays;
   }

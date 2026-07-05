@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +39,7 @@ public class ThContractMapper {
                 case partnerContractor, studentContractor -> contractLevel.dailyPay();
                 case fullTimeEmployee -> contractLevel.monthlyPay();
               };
-          var dateFormater = DateTimeFormatter.ofPattern("dd MMM yyyy", ENGLISH);
+          var dateFormater = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH);
           log.info("entrance date = {}", current.entranceInstant());
           var entranceDate =
               dateFormater.format(current.entranceInstant().atZone(systemDefault()).toLocalDate());

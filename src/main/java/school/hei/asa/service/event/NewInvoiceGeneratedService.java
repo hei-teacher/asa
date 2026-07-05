@@ -16,7 +16,6 @@ import school.hei.asa.service.mapper.InternetAddressMapper;
 
 @Service
 public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated> {
-
   private static final String INVOICES_FOLDER = "invoices/";
   private final String accountants;
   private final Mailer mailer;

@@ -17,7 +17,7 @@
                (${remainingDays <= 2} ? 'bg-red-600 text-white animate-pulse' : 
                (${remainingDays <= 3} ? 'bg-orange-500 text-white' : 
                (${remainingDays <= 5} ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white')))">
-    Attention : Il ne vous reste plus que <span th:text="${#numbers.formatDecimal(remainingDays, 0, 0)}"></span> jours sur votre contrat !
+    Please note : You have only <span th:text="${#numbers.formatDecimal(remainingDays, 0, 0)}"></span> days on your contract !
 </div>
 
 <div class="flex justify-between gap-6 py-6 bg-gray-50">
@@ -32,7 +32,7 @@
                       th:text="'J-' + ${#numbers.formatDecimal(remainingDays, 0, 0)}">
                 </span>
                 <div th:if="${showWarning}" class="absolute top-full left-0 mt-2 w-64 p-2 text-sm bg-gray-700 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
-                    Attention : Il ne vous reste plus que <span th:text="${#numbers.formatDecimal(remainingDays, 0, 0)}"></span> jours sur votre contrat !
+                    Please note : You have only<span th:text="${#numbers.formatDecimal(remainingDays, 0, 0)}"></span> days left on your contract !
                 </div>
             </div>
         </div>

@@ -118,7 +118,7 @@ public class InvoiceServiceIT extends FacadeIT {
             BigDecimal.valueOf(0.0d),
             "Zéro",
             "Banque: , Agence: , Compte: , Clé: , IBAN: ");
-    var actual = invoiceService.extractInvoiceData(newWorker(), invoiceForm);
+    var actual = invoiceService.extractInvoiceForm(newWorker(), invoiceForm);
 
     assertEquals(expected, actual);
   }

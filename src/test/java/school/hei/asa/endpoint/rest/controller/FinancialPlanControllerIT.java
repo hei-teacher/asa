@@ -17,7 +17,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.Worker;
+import school.hei.asa.repository.BankAccountRepository;
 import school.hei.asa.repository.ContractRepository;
+import school.hei.asa.repository.MissionExecutionRepository;
 import school.hei.asa.repository.WorkerRepository;
 import school.hei.asa.service.InvoiceService;
 
@@ -28,9 +30,22 @@ class FinancialPlanControllerIT extends FacadeIT {
   @MockBean ContractRepository contractRepository;
   @MockBean InvoiceService invoiceService;
   @MockBean WorkerRepository workerRepository;
+  @MockBean BankAccountRepository bankAccountRepository;
+  @MockBean MissionExecutionRepository missionExecutionRepository;
 
   @Test
   void oneMonth_complete_studentContract() {
+    var worker =
+        new Worker(
+            "W-101",
+            "Test Worker",
+            "worker@example.com",
+            "Full Worker Name",
+            "address",
+            "random city",
+            "nif",
+            "stat");
+
     var invoiceForm =
         new InvoiceForm(
             UUID.randomUUID().toString(),
@@ -49,22 +64,15 @@ class FinancialPlanControllerIT extends FacadeIT {
             null,
             null,
             null);
-    when(workerRepository.findAll())
-        .thenReturn(
-            List.of(
-                new Worker(
-                    "W-101",
-                    "Test Worker",
-                    "worker@example.com",
-                    "Full Worker Name",
-                    "address",
-                    "random city",
-                    "nif",
-                    "stat")));
 
+    when(workerRepository.findAll()).thenReturn(List.of(worker));
     when(contractRepository.findByYear(2026))
         .thenReturn(List.of(studentContract(JAN1_2026, 11, 50_000)));
-    when(invoiceService.extractInvoiceData(any(Worker.class), any(InvoiceForm.class)))
+    when(contractRepository.findAll()).thenReturn(List.of());
+    when(bankAccountRepository.findAll()).thenReturn(List.of());
+    when(missionExecutionRepository.missionExecutionsByDateBetweenAllWorkers(any(), any()))
+        .thenReturn(List.of());
+    when(invoiceService.extractInvoiceData(any(), any(), any(), any()))
         .thenReturn(
             new InvoiceForm(
                 "id",
@@ -83,6 +91,7 @@ class FinancialPlanControllerIT extends FacadeIT {
                 BigDecimal.valueOf(2000),
                 "Zéro",
                 "Banque: , Agence: , Compte: , Clé: , IBAN: "));
+
     var cost = subject.financialPlan(2026);
 
     assertEquals(

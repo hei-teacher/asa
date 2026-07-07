@@ -22,6 +22,7 @@ import org.springframework.ui.Model;
 import school.hei.asa.conf.FacadeITMockedThirdParties;
 import school.hei.asa.endpoint.rest.model.th.ThInvoice;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
+import school.hei.asa.endpoint.rest.model.th.WorkerModelAdderParam;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.InvoicePDFGenerator;
 import school.hei.asa.endpoint.rest.service.ThInvoiceService;
@@ -68,7 +69,8 @@ class InvoiceControllerIT extends FacadeITMockedThirdParties {
     doNothing().when(thInvoiceService).saveInvoiceReference(any(), any(Worker.class));
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
-    when(workerToModelAdder.apply(anyString(), any())).thenReturn(authenticatedWorker);
+    when(workerToModelAdder.apply(any(WorkerModelAdderParam.class), any()))
+        .thenReturn(authenticatedWorker);
     when(bankAccountRepository.findByWorkerCode("worker-code")).thenReturn(bankAccount);
   }
 

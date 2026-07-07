@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import school.hei.asa.endpoint.rest.controller.mapper.ThContractMapper;
 import school.hei.asa.endpoint.rest.controller.mapper.ThWorkerMapper;
 import school.hei.asa.endpoint.rest.model.th.ThWorker;
+import school.hei.asa.endpoint.rest.model.th.WorkerModelAdderParam;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.ThContractService;
 import school.hei.asa.model.*;
@@ -38,12 +39,10 @@ public class WorkerController {
       Model model,
       Authentication authentication,
       @RequestParam(required = false) String workerCode) {
-    var workerCodeOrAuth =
-        workerCode == null || workerCode.isBlank()
-            ? workerFromAuthentication.apply(authentication).get().code()
-            : workerCode;
+    var authenticatedWorker = workerFromAuthentication.apply(authentication).get().code();
+    var workerToModelAdderParam = new WorkerModelAdderParam(workerCode, authenticatedWorker);
 
-    var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
+    var worker = workerToModelAdder.apply(workerToModelAdderParam, model);
     var contracts = contractRepository.findAllByWorker(worker);
 
     var hasContract = !contracts.isEmpty();
@@ -76,7 +75,11 @@ public class WorkerController {
             ? workerFromAuthentication.apply(authentication).get().code()
             : workerCode;
 
-    var worker = workerToModelAdder.apply(workerCodeOrAuth, model);
+    var worker =
+        workerToModelAdder.apply(
+            new WorkerModelAdderParam(
+                workerCodeOrAuth, workerFromAuthentication.apply(authentication).get().code()),
+            model);
     var contracts = thContractMapper.toTh(contractRepository.findAllByWorker(worker));
     var hasMultipleContracts = contracts.size() > 1;
     var firstContractEnded =

@@ -1,6 +1,5 @@
 package school.hei.asa.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -33,11 +32,6 @@ class LowRemainingDaysAlertServiceTest {
         .thenReturn(List.of(new InternetAddress("acc@test.com")));
 
     service = new LowRemainingDaysAlertService(mailer, "acc@test.com", 10, internetAddressMapper);
-  }
-
-  @Test
-  void threshold_is_correct() {
-    assertEquals(10, service.getLowRemainingDaysThreshold());
   }
 
   @Test

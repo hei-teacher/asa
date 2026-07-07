@@ -31,25 +31,21 @@ public class LowRemainingDaysAlertService {
     this.internetAddressMapper = internetAddressMapper;
   }
 
-  public int getLowRemainingDaysThreshold() {
-    return lowRemainingDaysThreshold;
-  }
-
-  public void checkAndAlert(Worker worker, Contract contract, long remainingDays) {
-    int threshold = getLowRemainingDaysThreshold();
-    if (remainingDays < threshold) {
+  public boolean checkAndAlert(Worker worker, Contract contract, long remainingDays) {
+    if (remainingDays < lowRemainingDaysThreshold) {
       log.warn(
           "Worker '{}' has only {} day(s) remaining on contract starting {}. Threshold={}",
           worker.code(),
           remainingDays,
           contract.entranceInstant(),
-          threshold);
-      sendAlertToAccountants(worker, contract, remainingDays, threshold);
+          lowRemainingDaysThreshold);
+      sendAlertToAccountants(worker, contract, remainingDays);
+      return true;
     }
+    return false;
   }
 
-  private void sendAlertToAccountants(
-      Worker worker, Contract contract, long remainingDays, int threshold) {
+  private void sendAlertToAccountants(Worker worker, Contract contract, long remainingDays) {
     var accountantAddresses =
         internetAddressMapper.toInternetAddresses(
             Arrays.stream(this.accountants.split(",")).map(String::trim).toList());
@@ -84,7 +80,7 @@ public class LowRemainingDaysAlertService {
             remainingDays,
             formattedEntranceDate,
             contract.duration().toDays(),
-            threshold);
+            lowRemainingDaysThreshold);
 
     var to = accountantAddresses.getFirst();
     var cc = accountantAddresses.stream().skip(1).toList();

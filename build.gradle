@@ -158,7 +158,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-    implementation 'org.springframework.session:spring-session-jdbc'
     implementation 'org.xhtmlrenderer:flying-saucer-pdf:9.1.22'
     implementation 'ognl:ognl:3.2.21'
     implementation 'org.apache.pdfbox:pdfbox:2.0.30'

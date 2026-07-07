@@ -80,11 +80,11 @@ public class DailyExecutionController {
     var remaining = contractService.remainingDays(worker);
     if (remaining >= 0 && remaining < alertThreshold) {
       var msg =
-          "Attention : il ne reste que "
+          "Warning: only "
               + remaining
-              + " jour"
+              + " day"
               + (remaining > 1 ? "s" : "")
-              + " sur votre contrat.";
+              + " left on your contract.";
       redirectAttributes.addFlashAttribute("contractAlert", msg);
       try {
         sendAlertEmail(worker, remaining);
@@ -102,20 +102,20 @@ public class DailyExecutionController {
     if (accountantEmails.isEmpty()) {
       return;
     }
-    var subject = "ASA - ALERTE CONTRAT - " + worker.name() + " - Plus que " + remaining + " jours";
+    var subject = "ASA - CONTRACT ALERT - " + worker.name() + " - Only " + remaining + " days left";
     var body =
-        "Bonjour,<br><br>"
-            + "Le contrat de <b>"
+        "Hello,<br><br>"
+            + "The contract of <b>"
             + worker.name()
             + "</b> ("
             + worker.email()
-            + ") est bientôt expiré.<br>"
-            + "Il reste <b>"
+            + ") is about to expire.<br>"
+            + "Only <b>"
             + remaining
-            + "</b> jour"
+            + "</b> day"
             + (remaining > 1 ? "s" : "")
-            + " sur le contrat.<br><br>"
-            + "Cordialement,<br>ASA";
+            + " left on the contract.<br><br>"
+            + "Best regards,<br>ASA";
     mailer.accept(
         new Email(
             accountantEmails.getFirst(),

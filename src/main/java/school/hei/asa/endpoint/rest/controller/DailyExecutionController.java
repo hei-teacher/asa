@@ -17,6 +17,7 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.ThMissionService;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
+import school.hei.asa.model.Worker;
 import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.service.ContractService;
 import school.hei.asa.service.mapper.InternetAddressMapper;
@@ -71,7 +72,7 @@ public class DailyExecutionController {
 
     if (!contractService.hasRemainingDays(worker)) {
       throw new IllegalArgumentException(
-          "Cannot submit pointage: " + worker.name() + " has no remaining contract days.");
+          "Cannot submit report: " + worker.name() + " has no remaining contract days.");
     }
 
     var dailyExecution = thDailyExecutionFormMapper.toDomain(dmeForm, worker);
@@ -96,7 +97,7 @@ public class DailyExecutionController {
     return "redirect:/work-and-care-calendar";
   }
 
-  private void sendAlertEmail(school.hei.asa.model.Worker worker, long remaining) {
+  private void sendAlertEmail(Worker worker, long remaining) {
     var accountantEmails =
         internetAddressMapper.toInternetAddresses(Arrays.asList(accountants.split(",")));
     if (accountantEmails.isEmpty()) {

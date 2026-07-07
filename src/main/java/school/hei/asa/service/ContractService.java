@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.model.DailyExecution;
@@ -23,7 +22,6 @@ import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.WorkerRepository;
 
-@Slf4j
 @Service
 @AllArgsConstructor
 public class ContractService {
@@ -61,51 +59,14 @@ public class ContractService {
   public double getRemainingDaysByWorker(Worker worker) {
     var contracts = contractRepository.findAllByWorker(worker);
 
-    log.debug(
-        "\n================================================================================\n"
-            + "                              WORKER CONTRACT INFO\n"
-            + "================================================================================\n"
-            + "Worker: [code="
-            + worker.code()
-            + ", name="
-            + worker.name()
-            + ", email="
-            + worker.email()
-            + "]\n"
-            + "Contracts found: "
-            + contracts.size());
-    for (var c : contracts) {
-      log.debug(
-          "  - Contract: [jobTitle="
-              + c.jobTitle()
-              + ", level="
-              + c.level()
-              + ", company="
-              + c.company()
-              + ", entrance="
-              + c.entranceInstant()
-              + ", end="
-              + c.endInstant()
-              + ", duration="
-              + (c.duration() == null ? "null" : c.duration().toDays() + " days")
-              + "]");
-    }
-
     if (contracts.isEmpty()) {
-      log.debug(
-          "Result: no contract for worker → remainingDays = MAX_VALUE (no restriction)\n"
-              + "================================================================================");
       return Double.MAX_VALUE;
     }
 
-    // On prend le contrat le plus récent ayant une durée définie.
-    // findAllByWorker retourne les contrats triés par entranceInstant DESC,
-    // donc le premier avec une durée est le contrat pertinent, qu'il ait
-    // une date de fin ou non.
     var activeContractOpt = contracts.stream().filter(c -> c.duration() != null).findFirst();
 
     if (activeContractOpt.isEmpty()) {
-      return Double.MAX_VALUE;
+      return 0.0;
     }
 
     var contract = activeContractOpt.get();

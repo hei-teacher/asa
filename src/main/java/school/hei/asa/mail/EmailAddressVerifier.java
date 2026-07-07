@@ -2,23 +2,23 @@ package school.hei.asa.mail;
 
 import jakarta.mail.internet.InternetAddress;
 import java.util.function.Consumer;
-import lombok.extern.slf4j.Slf4j;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.asa.PojaGenerated;
+import software.amazon.awssdk.services.ses.model.VerifyEmailIdentityRequest;
 
-// import software.amazon.awssdk.services.ses.model.VerifyEmailIdentityRequest;
-
-@Slf4j
 @Component
+@AllArgsConstructor
 @PojaGenerated
 public class EmailAddressVerifier implements Consumer<InternetAddress> {
 
+  private final EmailConf emailConf;
+
   @Override
   public void accept(InternetAddress emailAddress) {
-    log.info("Email address verified (SMTP mode): {}", emailAddress.getAddress());
-    // Ancienne méthode SES (conservée pour référence)
-    // emailConf.getSesClient()
-    //     .verifyEmailIdentity(
-    //         VerifyEmailIdentityRequest.builder().emailAddress(emailAddress.getAddress()).build());
+    emailConf
+        .getSesClient()
+        .verifyEmailIdentity(
+            VerifyEmailIdentityRequest.builder().emailAddress(emailAddress.getAddress()).build());
   }
 }

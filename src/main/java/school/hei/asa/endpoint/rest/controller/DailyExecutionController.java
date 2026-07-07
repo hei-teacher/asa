@@ -1,11 +1,8 @@
 package school.hei.asa.endpoint.rest.controller;
 
-import static jakarta.mail.Message.RecipientType.TO;
 
-import jakarta.mail.internet.InternetAddress;
 import java.util.Arrays;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -67,14 +64,14 @@ public class DailyExecutionController {
 
   @PostMapping("/daily-execution")
   public String createDailyExecution(
-      Authentication authentication, ThDailyExecutionForm dmeForm,
+      Authentication authentication,
+      ThDailyExecutionForm dmeForm,
       RedirectAttributes redirectAttributes) {
     var worker = workerFromAuthentication.apply(authentication).get();
 
     if (!contractService.hasRemainingDays(worker)) {
       throw new IllegalArgumentException(
-          "Cannot submit pointage: " + worker.name()
-              + " has no remaining contract days.");
+          "Cannot submit pointage: " + worker.name() + " has no remaining contract days.");
     }
 
     var dailyExecution = thDailyExecutionFormMapper.toDomain(dmeForm, worker);
@@ -82,8 +79,12 @@ public class DailyExecutionController {
 
     var remaining = contractService.remainingDays(worker);
     if (remaining >= 0 && remaining < alertThreshold) {
-      var msg = "Attention : il ne reste que " + remaining + " jour"
-          + (remaining > 1 ? "s" : "") + " sur votre contrat.";
+      var msg =
+          "Attention : il ne reste que "
+              + remaining
+              + " jour"
+              + (remaining > 1 ? "s" : "")
+              + " sur votre contrat.";
       redirectAttributes.addFlashAttribute("contractAlert", msg);
       try {
         sendAlertEmail(worker, remaining);
@@ -96,25 +97,34 @@ public class DailyExecutionController {
   }
 
   private void sendAlertEmail(school.hei.asa.model.Worker worker, long remaining) {
-    var accountantEmails = internetAddressMapper.toInternetAddresses(
-        Arrays.asList(accountants.split(",")));
+    var accountantEmails =
+        internetAddressMapper.toInternetAddresses(Arrays.asList(accountants.split(",")));
     if (accountantEmails.isEmpty()) {
       return;
     }
-    var subject = "ASA - ALERTE CONTRAT - " + worker.name()
-        + " - Plus que " + remaining + " jours";
-    var body = "Bonjour,<br><br>"
-        + "Le contrat de <b>" + worker.name() + "</b> ("
-        + worker.email() + ") est bientôt expiré.<br>"
-        + "Il reste <b>" + remaining + "</b> jour"
-        + (remaining > 1 ? "s" : "") + " sur le contrat.<br><br>"
-        + "Cordialement,<br>ASA";
-    mailer.accept(new Email(
-        accountantEmails.getFirst(),
-        accountantEmails.size() > 1 ? accountantEmails.subList(1, accountantEmails.size()) : List.of(),
-        List.of(),
-        subject,
-        body,
-        List.of()));
+    var subject = "ASA - ALERTE CONTRAT - " + worker.name() + " - Plus que " + remaining + " jours";
+    var body =
+        "Bonjour,<br><br>"
+            + "Le contrat de <b>"
+            + worker.name()
+            + "</b> ("
+            + worker.email()
+            + ") est bientôt expiré.<br>"
+            + "Il reste <b>"
+            + remaining
+            + "</b> jour"
+            + (remaining > 1 ? "s" : "")
+            + " sur le contrat.<br><br>"
+            + "Cordialement,<br>ASA";
+    mailer.accept(
+        new Email(
+            accountantEmails.getFirst(),
+            accountantEmails.size() > 1
+                ? accountantEmails.subList(1, accountantEmails.size())
+                : List.of(),
+            List.of(),
+            subject,
+            body,
+            List.of()));
   }
 }

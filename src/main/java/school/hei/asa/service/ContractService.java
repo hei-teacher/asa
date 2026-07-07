@@ -92,10 +92,8 @@ public class ContractService {
 
   public boolean hasRemainingDays(Worker worker) {
     var contracts = contractRepository.findAllByWorker(worker);
-    var activeContract = contracts.stream()
-        .filter(c -> c.endInstant() == null)
-        .findFirst()
-        .orElse(null);
+    var activeContract =
+        contracts.stream().filter(c -> c.endInstant() == null).findFirst().orElse(null);
 
     if (activeContract == null) {
       return false;
@@ -113,10 +111,8 @@ public class ContractService {
 
   public long remainingDays(Worker worker) {
     var contracts = contractRepository.findAllByWorker(worker);
-    var activeContract = contracts.stream()
-        .filter(c -> c.endInstant() == null)
-        .findFirst()
-        .orElse(null);
+    var activeContract =
+        contracts.stream().filter(c -> c.endInstant() == null).findFirst().orElse(null);
 
     if (activeContract == null) {
       return -1;

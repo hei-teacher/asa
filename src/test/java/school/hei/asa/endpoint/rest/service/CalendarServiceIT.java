@@ -18,20 +18,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.controller.DailyExecutionController;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.SecurityConfig;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
+import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Product;
-import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.MissionRepository;
 import school.hei.asa.repository.ProductRepository;
 import school.hei.asa.repository.WorkerRepository;
 import school.hei.asa.service.CalendarService;
-import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 class CalendarServiceIT extends FacadeIT {
   @Autowired DailyExecutionController dailyExecutionController;
@@ -188,12 +188,17 @@ class CalendarServiceIT extends FacadeIT {
     jdbcTemplate.update(
         "INSERT INTO contract_level (code, type, daily_pay) VALUES (?, ?, ?) "
             + "ON CONFLICT DO NOTHING",
-        "L-CALENDAR", "partnerContractor", 100000.0);
+        "L-CALENDAR",
+        "partnerContractor",
+        100000.0);
     jdbcTemplate.update(
         "INSERT INTO contract (id, worker_code, level, entrance_instant, duration_in_days) "
             + "VALUES (?, ?, ?, ?::timestamp, ?) ON CONFLICT DO NOTHING",
-        "contract-calendar", authenticatedWorkerCode, "L-CALENDAR",
-        "2024-01-01 00:00:00", 365);
+        "contract-calendar",
+        authenticatedWorkerCode,
+        "L-CALENDAR",
+        "2024-01-01 00:00:00",
+        365);
 
     return authentication;
   }

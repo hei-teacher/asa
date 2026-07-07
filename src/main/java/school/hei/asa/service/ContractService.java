@@ -148,6 +148,15 @@ public class ContractService {
     return String.format(US, "%.1f", result);
   }
 
+  public void checkRemainingDaysAvailable(Worker worker) {
+    var remainingDays = getRemainingDaysByWorker(worker);
+    if (remainingDays <= 0) {
+      throw new IllegalStateException(
+          "You have no more days available under your contract. Please contact your"
+              + " administrator.");
+    }
+  }
+
   public List<Contract> findActiveContracts() {
     return contractRepository.findAllActiveContracts();
   }

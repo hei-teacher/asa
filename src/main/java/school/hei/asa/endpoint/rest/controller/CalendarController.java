@@ -84,7 +84,7 @@ public class CalendarController {
 
     double remainingDays = contractService.getRemainingDaysByWorker(worker);
 
-    boolean showWarning = remainingDays <   lowRemainingDaysThreshold;
+    boolean showWarning = remainingDays < lowRemainingDaysThreshold;
 
     model.addAttribute("remainingDays", remainingDays);
     model.addAttribute("showWarning", showWarning);

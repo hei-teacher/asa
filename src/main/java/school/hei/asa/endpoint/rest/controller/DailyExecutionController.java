@@ -34,16 +34,17 @@ public class DailyExecutionController {
   }
 
   public String createDailyExecution(Authentication authentication, ThDailyExecutionForm dmeForm) {
-    return createDailyExecution(authentication, dmeForm, new RedirectAttributesModelMap());
+    return createDailyExecutionWithRedirectAttributes(
+        authentication, dmeForm, new RedirectAttributesModelMap());
   }
 
   @PostMapping("/daily-execution")
-  public String createDailyExecution(
-          Authentication authentication,
-          ThDailyExecutionForm dmeForm,
-          RedirectAttributes redirectAttributes) {
+  public String createDailyExecutionWithRedirectAttributes(
+      Authentication authentication,
+      ThDailyExecutionForm dmeForm,
+      RedirectAttributes redirectAttributes) {
     var worker = workerFromAuthentication.apply(authentication).get();
-    var remainingDays = contractService.getRemainingDaysByWorker(worker);
+    contractService.checkRemainingDaysAvailable(worker);
     if (remainingDays <= 0) {
       throw new IllegalStateException(
               "You have no more days available under your contract. Please contact your"

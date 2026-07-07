@@ -56,6 +56,7 @@ public class MissionExecutionRepository {
     return jMissionExecutionRepository.countDistinctDatesByWorkerAndDateBetween(
         workerCode, startDate, endDate);
   }
+
   @Transactional
   public List<MissionExecution> missionExecutionsByDateBetweenAllWorkers(
       LocalDate startDate, LocalDate endDate) {

@@ -45,11 +45,6 @@ public class DailyExecutionController {
       RedirectAttributes redirectAttributes) {
     var worker = workerFromAuthentication.apply(authentication).get();
     contractService.checkRemainingDaysAvailable(worker);
-    if (remainingDays <= 0) {
-      throw new IllegalStateException(
-              "You have no more days available under your contract. Please contact your"
-                      + " administrator.");
-    }
 
     var dailyExecution = thDailyExecutionFormMapper.toDomain(dmeForm, worker);
     dailyExecutionRepository.save(dailyExecution);
@@ -60,15 +55,15 @@ public class DailyExecutionController {
 
     if (activeContractOpt.isPresent()) {
       boolean alertSent =
-              lowRemainingDaysAlertService.checkAndAlert(
-                      worker, activeContractOpt.get(), (long) remainingDaysAfter);
+          lowRemainingDaysAlertService.checkAndAlert(
+              worker, activeContractOpt.get(), (long) remainingDaysAfter);
 
       if (alertSent) {
         redirectAttributes.addFlashAttribute(
-                "toastMessage",
-                "Please note : You have "
-                        + (long) remainingDaysAfter
-                        + " day(s) left on your contract !");
+            "toastMessage",
+            "Please note : You have "
+                + (long) remainingDaysAfter
+                + " day(s) left on your contract !");
         redirectAttributes.addFlashAttribute("toastType", "warning");
       }
     }

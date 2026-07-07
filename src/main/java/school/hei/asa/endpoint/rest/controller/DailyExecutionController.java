@@ -44,12 +44,7 @@ public class DailyExecutionController {
       ThDailyExecutionForm dmeForm,
       RedirectAttributes redirectAttributes) {
     var worker = workerFromAuthentication.apply(authentication).get();
-    var remainingDays = contractService.getRemainingDaysByWorker(worker);
-    if (remainingDays <= 0) {
-      throw new IllegalStateException(
-          "You have no more days available under your contract. Please contact your"
-              + " administrator.");
-    }
+    contractService.checkRemainingDaysAvailable(worker);
 
     var dailyExecution = thDailyExecutionFormMapper.toDomain(dmeForm, worker);
     dailyExecutionRepository.save(dailyExecution);

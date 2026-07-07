@@ -83,8 +83,7 @@ public class LowRemainingDaysAlertService {
             lowRemainingDaysThreshold);
 
     var to = accountantAddresses.getFirst();
-    var cc = accountantAddresses.stream().skip(1).toList();
-    mailer.accept(new Email(to, cc, List.of(), subject, htmlBody, List.of()));
+    mailer.accept(new Email(to, List.of(), List.of(), subject, htmlBody, List.of()));
     log.info("Alert email sent to accountants for worker '{}'", worker.code());
   }
 }

@@ -39,15 +39,15 @@ public class DailyExecutionController {
 
   @PostMapping("/daily-execution")
   public String createDailyExecution(
-      Authentication authentication,
-      ThDailyExecutionForm dmeForm,
-      RedirectAttributes redirectAttributes) {
+          Authentication authentication,
+          ThDailyExecutionForm dmeForm,
+          RedirectAttributes redirectAttributes) {
     var worker = workerFromAuthentication.apply(authentication).get();
     var remainingDays = contractService.getRemainingDaysByWorker(worker);
     if (remainingDays <= 0) {
       throw new IllegalStateException(
-          "You have no more days available under your contract. Please contact your"
-              + " administrator.");
+              "You have no more days available under your contract. Please contact your"
+                      + " administrator.");
     }
 
     var dailyExecution = thDailyExecutionFormMapper.toDomain(dmeForm, worker);
@@ -57,16 +57,19 @@ public class DailyExecutionController {
     var contracts = contractService.getAllContractsByWorker(worker);
     var activeContractOpt = contracts.stream().filter(c -> c.duration() != null).findFirst();
 
-    if (activeContractOpt.isPresent()
-        && remainingDaysAfter < lowRemainingDaysAlertService.getLowRemainingDaysThreshold()) {
-      lowRemainingDaysAlertService.checkAndAlert(
-          worker, activeContractOpt.get(), (long) remainingDaysAfter);
-      redirectAttributes.addFlashAttribute(
-          "toastMessage",
-          "Please note : You have "
-              + (long) remainingDaysAfter
-              + " day(s) left on your contract !");
-      redirectAttributes.addFlashAttribute("toastType", "warning");
+    if (activeContractOpt.isPresent()) {
+      boolean alertSent =
+              lowRemainingDaysAlertService.checkAndAlert(
+                      worker, activeContractOpt.get(), (long) remainingDaysAfter);
+
+      if (alertSent) {
+        redirectAttributes.addFlashAttribute(
+                "toastMessage",
+                "Please note : You have "
+                        + (long) remainingDaysAfter
+                        + " day(s) left on your contract !");
+        redirectAttributes.addFlashAttribute("toastType", "warning");
+      }
     }
 
     return "redirect:/work-and-care-calendar";

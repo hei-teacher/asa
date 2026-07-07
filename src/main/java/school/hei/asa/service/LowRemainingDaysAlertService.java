@@ -21,70 +21,66 @@ public class LowRemainingDaysAlertService {
   private final int lowRemainingDaysThreshold;
 
   public LowRemainingDaysAlertService(
-      Mailer mailer,
-      @Value("${ACCOUNTANTS}") String accountants,
-      @Value("${asa.low.contract.days.threshold}") int lowRemainingDaysThreshold,
-      InternetAddressMapper internetAddressMapper) {
+          Mailer mailer,
+          @Value("${ACCOUNTANTS}") String accountants,
+          @Value("${asa.low.contract.days.threshold}") int lowRemainingDaysThreshold,
+          InternetAddressMapper internetAddressMapper) {
     this.mailer = mailer;
     this.accountants = accountants;
     this.lowRemainingDaysThreshold = lowRemainingDaysThreshold;
     this.internetAddressMapper = internetAddressMapper;
   }
 
-  public int getLowRemainingDaysThreshold() {
-    return lowRemainingDaysThreshold;
-  }
-
-  public void checkAndAlert(Worker worker, Contract contract, long remainingDays) {
-    int threshold = getLowRemainingDaysThreshold();
-    if (remainingDays < threshold) {
+  public boolean checkAndAlert(Worker worker, Contract contract, long remainingDays) {
+    if (remainingDays < lowRemainingDaysThreshold) {
       log.warn(
-          "Worker '{}' has only {} day(s) remaining on contract starting {}. Threshold={}",
-          worker.code(),
-          remainingDays,
-          contract.entranceInstant(),
-          threshold);
-      sendAlertToAccountants(worker, contract, remainingDays, threshold);
+              "Worker '{}' has only {} day(s) remaining on contract starting {}. Threshold={}",
+              worker.code(),
+              remainingDays,
+              contract.entranceInstant(),
+              lowRemainingDaysThreshold);
+      sendAlertToAccountants(worker, contract, remainingDays);
+      return true;
     }
+    return false;
   }
 
-  private void sendAlertToAccountants(
-      Worker worker, Contract contract, long remainingDays, int threshold) {
+  private void sendAlertToAccountants(Worker worker, Contract contract, long remainingDays) {
     var accountantAddresses =
-        internetAddressMapper.toInternetAddresses(
-            Arrays.stream(this.accountants.split(",")).map(String::trim).toList());
+            internetAddressMapper.toInternetAddresses(
+                    Arrays.stream(this.accountants.split(",")).map(String::trim).toList());
 
     var subject =
-        String.format(
-            "ASA - ALERT: %s has only %d day(s) remaining on their contract",
-            worker.name(), remainingDays);
+            String.format(
+                    "ASA - ALERT: %s has only %d day(s) remaining on their contract",
+                    worker.name(), remainingDays);
 
     var dateFormatter =
-        java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
-            .withZone(java.time.ZoneId.of("UTC"));
+            java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                    .withZone(java.time.ZoneId.of("UTC"));
     var formattedEntranceDate = dateFormatter.format(contract.entranceInstant());
 
     var htmlBody =
-        String.format(
-            """
-            <p>Hello,</p>
-            <p>
-              Worker <strong>%s</strong> (<em>%s</em>) has logged a check-in
-              and now has <strong>%d day(s)</strong> remaining
-              on their current contract (start: %s, total duration: %d days).
-            </p>
-            <p>
-              The configured alert threshold is <strong>%d days</strong>.
-              Please take the necessary action.
-            </p>
-            <p>Regards,<br/>ASA</p>
-            """,
-            worker.name(),
-            worker.code(),
-            remainingDays,
-            formattedEntranceDate,
-            contract.duration().toDays(),
-            threshold);
+            String.format(
+                    """
+                    <p>Hello,</p>
+                    <p>
+                      Worker <strong>%s</strong> (<em>%s</em>) has logged a check-in
+                      and now has <strong>%d day(s)</strong> remaining
+                      on their current contract (start: %s, total duration: %d days).
+                    </p>
+                    <p>
+                      The configured alert threshold is <strong>%d days</strong>.
+                      Please take the necessary action.
+                    </p>
+                    <p>Regards,<br/>ASA</p>
+                    """,
+                    worker.name(),
+                    worker.code(),
+                    remainingDays,
+                    formattedEntranceDate,
+                    contract.duration().toDays(),
+                    lowRemainingDaysThreshold);
 
     var to = accountantAddresses.getFirst();
     var cc = accountantAddresses.stream().skip(1).toList();

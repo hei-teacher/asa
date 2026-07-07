@@ -34,11 +34,12 @@ public class DailyExecutionController {
   }
 
   public String createDailyExecution(Authentication authentication, ThDailyExecutionForm dmeForm) {
-    return createDailyExecution(authentication, dmeForm, new RedirectAttributesModelMap());
+    return createDailyExecutionWithRedirectAttributes(
+        authentication, dmeForm, new RedirectAttributesModelMap());
   }
 
   @PostMapping("/daily-execution")
-  public String createDailyExecution(
+  public String createDailyExecutionWithRedirectAttributes(
       Authentication authentication,
       ThDailyExecutionForm dmeForm,
       RedirectAttributes redirectAttributes) {

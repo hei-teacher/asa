@@ -31,7 +31,6 @@ class FinancialPlanControllerIT extends FacadeIT {
 
   @Test
   void oneMonth_complete_studentContract_mockedService() {
-    // 1. Initialisation d'une map par défaut pour éviter les NullPointerException dans getDiff()
     Map<Month, Argent> defaultMonthlyMap = new EnumMap<>(Month.class);
     for (Month month : Month.values()) {
       defaultMonthlyMap.put(month, new Argent(0, Devise.MGA));

@@ -182,7 +182,7 @@ public class InvoiceService {
     var firstCurrentMonthDay = yearMonth.atDay(1);
     var lastCurrentMonthDay = yearMonth.atEndOfMonth();
     var hasUpgradedLevel =
-        hasContract
+        hasContract && workerContracts.size() > 1
             && LocalDate.ofInstant(workerContracts.getFirst().entranceInstant(), UTC)
                 .isBefore(lastCurrentMonthDay)
             && LocalDate.ofInstant(workerContracts.getFirst().entranceInstant(), UTC)

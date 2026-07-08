@@ -11,73 +11,147 @@
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
 
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-100 text-gray-800 min-h-screen">
 
 <div th:replace="fragments/header :: header"></div>
 
-
 <div class="m-6">
-    <h2 class="text-xl font-bold mb-2">Financial Statement</h2>
 
-    <div class="mb-4">
-        <p class="mt-2">
-            Financial Statement illustration, displaying planned, executed, and variance
-        </p>
+    <div class="mb-6 flex items-center justify-between">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">
+                Financial Statement
+            </h2>
+            <p class="mt-1 text-sm text-gray-500">
+                Financial plan illustration displaying planned, executed, and variance.
+            </p>
+        </div>
+
+        <span class="material-icons text-gray-400 text-3xl">
+            account_balance
+        </span>
     </div>
 
-    <div class="mb-4 flex items-center gap-2">
-        <label for="year" class="text-sm font-medium text-gray-700">Year:</label>
-        <select id="year" onchange="updateFilters()"
-                class="border border-gray-300 rounded px-3 py-2 text-sm bg-white cursor-pointer hover:bg-gray-50">
-            <option th:each="y : ${#numbers.sequence(2021, #dates.year(#dates.createNow()))}"
-                    th:value="${y}"
-                    th:text="${y}"
-                    th:selected="${y == currentYear}">
-            </option>
-        </select>
-    </div>
 
-    <div class="overflow-x-auto my-6 bg-white rounded-lg shadow">
-        <table class="min-w-full border-collapse text-sm">
+    <div class="mb-6 flex items-center gap-3">
+
+        <label for="year"
+               class="text-sm font-medium text-gray-500">
+            Year
+        </label>
+
+        <div class="relative">
+            <select id="year"
+                    onchange="updateFilters()"
+                    class="appearance-none
+                    w-40
+                       rounded-md
+                       border border-gray-200
+                       bg-white
+                       px-3 py-1.5 pr-8
+                       text-sm
+                       font-semibold
+                       text-gray-800
+                       shadow-sm
+                       hover:border-gray-300
+                       focus:outline-none
+                       focus:ring-1
+                       focus:ring-gray-400
+                       cursor-pointer">
+
+                <option th:each="y : ${#numbers.sequence(2021, #dates.year(#dates.createNow()))}"
+                        th:value="${y}"
+                        th:text="${y}"
+                        th:selected="${y == currentYear}">
+                </option>
+
+            </select>
+
+            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2
+                     text-gray-400 text-base pointer-events-none">
+            expand_more
+        </span>
+        </div>
+
+    </div>
+    <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+
+        <table class="min-w-full text-sm">
+
             <thead>
-            <tr class="bg-gray-100">
-                <th class="px-3 py-3 text-left font-semibold border border-gray-200 whitespace-nowrap">Type</th>
-                <th class="px-3 py-3 text-right font-semibold border border-gray-200 whitespace-nowrap"
-                    th:each="m : ${months}"
-                    th:text="${m.getDisplayName(T(java.time.format.TextStyle).SHORT, T(java.util.Locale).FRENCH)}">
+            <tr class="bg-gray-50">
+
+                <th class="px-4 py-3 text-left font-semibold text-gray-700 border-b">
+                    Type
                 </th>
+
+                <th th:each="m : ${months}"
+                    class="px-4 py-3 text-right font-semibold text-gray-700 border-b whitespace-nowrap"
+                    th:text="${m.getDisplayName(T(java.time.format.TextStyle).SHORT, T(java.util.Locale).ENGLISH)}">
+                </th>
+
             </tr>
             </thead>
+
+
             <tbody>
-            <tr>
-                <td class="px-3 py-2.5 border border-gray-200 font-medium whitespace-nowrap">Planned</td>
-                <td class="px-3 py-2.5 border border-gray-200 text-right tabular-nums whitespace-nowrap"
-                    th:each="m : ${months}"
+
+            <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 font-medium border-b">
+                    Planned
+                </td>
+
+                <td th:each="m : ${months}"
+                    class="px-4 py-3 text-right tabular-nums border-b text-gray-700"
                     th:text="${@numberFormatter.compact(plannedCost.get(m).ppMontant())}">
                 </td>
             </tr>
-            <tr>
-                <td class="px-3 py-2.5 border border-gray-200 font-medium whitespace-nowrap">Executed</td>
-                <td class="px-3 py-2.5 border border-gray-200 text-right tabular-nums whitespace-nowrap"
-                    th:each="m : ${months}"
+
+
+            <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 font-medium border-b">
+                    Executed
+                </td>
+
+                <td th:each="m : ${months}"
+                    class="px-4 py-3 text-right tabular-nums border-b text-gray-700"
                     th:text="${@numberFormatter.compact(executedCost.get(m).ppMontant())}">
                 </td>
             </tr>
-            <tr>
-                <td class="px-3 py-2.5 border border-gray-200 font-medium whitespace-nowrap">Diff</td>
-                <td class="px-3 py-2.5 border border-gray-200 text-right tabular-nums whitespace-nowrap"
-                    th:each="m : ${months}"
+
+
+            <tr class="hover:bg-gray-50 transition bg-gray-50">
+                <td class="px-4 py-3 font-semibold border-b">
+                    Diff
+                </td>
+
+                <td th:each="m : ${months}"
+                    class="px-4 py-3 text-right tabular-nums border-b font-semibold"
                     th:text="${@numberFormatter.compact(differenceFromPlanned.get(m).ppMontant())}">
                 </td>
             </tr>
+
             </tbody>
+
         </table>
+
     </div>
 
-    <p class="mt-4 text-sm text-gray-600">koContracts: <span class="font-mono text-gray-900" th:text="${koContracts}"></span></p>
+
+    <div class="mt-5 flex items-center gap-2 text-sm">
+        <span class="text-gray-500">
+            koContracts:
+        </span>
+
+        <span class="font-mono px-2 py-1 rounded-md bg-gray-100 text-gray-800 border"
+              th:text="${koContracts}">
+        </span>
+    </div>
+
 </div>
 
 <div th:replace="fragments/footer :: footer"></div>
+
 
 <script>
     function updateFilters() {

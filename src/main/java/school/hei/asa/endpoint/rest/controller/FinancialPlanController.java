@@ -23,7 +23,6 @@ public class FinancialPlanController {
   public String financialPlan(@RequestParam(required = false) Integer year, Model model) {
     var defaultYearValue = year != null ? year : now().getYear();
     var fp = financialPlanService.financialPlan(defaultYearValue);
-    log.info("FinancialPlanController#financialPlan: fp={}", fp);
     model.addAttribute("currentYear", defaultYearValue);
     model.addAttribute("months", Arrays.stream(Month.values()).toList());
     model.addAttribute("plannedCost", fp.plannedCost());

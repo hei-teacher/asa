@@ -23,7 +23,7 @@ public class LowRemainingDaysAlertService {
   public LowRemainingDaysAlertService(
       Mailer mailer,
       @Value("${ACCOUNTANTS}") String accountants,
-      @Value("${asa.low.contract.days.threshold}") int lowRemainingDaysThreshold,
+      @Value("${LOW_CONTRACT_DAYS_THRESOLD}") int lowRemainingDaysThreshold,
       InternetAddressMapper internetAddressMapper) {
     this.mailer = mailer;
     this.accountants = accountants;

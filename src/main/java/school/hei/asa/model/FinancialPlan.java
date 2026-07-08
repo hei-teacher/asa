@@ -1,5 +1,6 @@
 package school.hei.asa.model;
 
+import static java.time.LocalDate.now;
 import static java.time.Month.APRIL;
 import static java.time.Month.AUGUST;
 import static java.time.Month.DECEMBER;
@@ -16,6 +17,7 @@ import static java.util.stream.Collectors.joining;
 
 import gen.patrimoine.modele.Argent;
 import java.time.Month;
+import java.util.HashMap;
 import java.util.Map;
 import school.hei.asa.model.contract.Contract;
 
@@ -26,38 +28,14 @@ public record FinancialPlan(
 
   @Override
   public String toString() {
+    var diff = getDiff();
     return String.format(
         """
-                plannedCost = [
-                        jan: %s,
-                        feb: %s,
-                        mar: %s,
-                        apr: %s,
-                        may: %s,
-                        jun: %s,
-                        jul: %s,
-                        aug: %s,
-                        sep: %s,
-                        oct: %s,
-                        nov: %s,
-                        dec: %s
-                      ],
-                      executedCost = [
-                      jan: %s,
-                        feb: %s,
-                        mar: %s,
-                        apr: %s,
-                        may: %s,
-                        jun: %s,
-                        jul: %s,
-                        aug: %s,
-                        sep: %s,
-                        oct: %s,
-                        nov: %s,
-                        dec: %s
-                      ]
-                      koContracts = %s
-        """,
+        plannedCost = [ jan: %s, feb: %s, mar: %s, apr: %s, may: %s, jun: %s, jul: %s, aug: %s, sep: %s, oct: %s, nov: %s, dec: %s ],
+        executedCost = [ jan: %s, feb: %s, mar: %s, apr: %s, may: %s, jun: %s, jul: %s, aug: %s, sep: %s, oct: %s, nov: %s, dec: %s ] ,
+        differenceFromPlanned = [ jan: %s, feb: %s, mar: %s, apr: %s, may: %s, jun: %s, jul: %s, aug: %s, sep: %s, oct: %s, nov: %s, dec: %s ] ,
+        koContracts = %s
+""",
         plannedCost.get(JANUARY).ppMontant(),
         plannedCost.get(FEBRUARY).ppMontant(),
         plannedCost.get(MARCH).ppMontant(),
@@ -82,6 +60,18 @@ public record FinancialPlan(
         executedCost.get(OCTOBER).ppMontant(),
         executedCost.get(NOVEMBER).ppMontant(),
         executedCost.get(DECEMBER).ppMontant(),
+        diff.get(JANUARY).ppMontant(),
+        diff.get(FEBRUARY).ppMontant(),
+        diff.get(MARCH).ppMontant(),
+        diff.get(APRIL).ppMontant(),
+        diff.get(MAY).ppMontant(),
+        diff.get(JUNE).ppMontant(),
+        diff.get(JULY).ppMontant(),
+        diff.get(AUGUST).ppMontant(),
+        diff.get(SEPTEMBER).ppMontant(),
+        diff.get(OCTOBER).ppMontant(),
+        diff.get(NOVEMBER).ppMontant(),
+        diff.get(DECEMBER).ppMontant(),
         pp(koContracts));
   }
 
@@ -93,5 +83,13 @@ public record FinancialPlan(
                     "[%s,%s] %s",
                     c.worker().name(), c.entranceInstant(), koContracts.get(c).getMessage()))
         .collect(joining(", "));
+  }
+
+  public Map<Month, Argent> getDiff() {
+    var mapOfDiff = new HashMap<Month, Argent>();
+    for (Month month : Month.values()) {
+      mapOfDiff.put(month, plannedCost.get(month).minus(executedCost.get(month), now()));
+    }
+    return mapOfDiff;
   }
 }

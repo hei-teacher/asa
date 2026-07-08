@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asa - Financial Plan</title>
+
+    <link href="/main.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+<div th:replace="fragments/header :: header"></div>
+
+
+<div class="m-6">
+    <h2 class="text-xl font-bold mb-2">Financial Statement</h2>
+
+    <div class="mb-4">
+        <p class="mt-2">
+            Financial Statement illustration, displaying planned, executed, and variance
+        </p>
+    </div>
+
+    <div class="mb-4 flex items-center gap-2">
+        <label for="year" class="text-sm font-medium text-gray-700">Year:</label>
+        <select id="year" onchange="updateFilters()"
+                class="border border-gray-300 rounded px-3 py-2 text-sm bg-white cursor-pointer hover:bg-gray-50">
+            <option th:each="y : ${#numbers.sequence(2021, #dates.year(#dates.createNow()))}"
+                    th:value="${y}"
+                    th:text="${y}"
+                    th:selected="${y == currentYear}">
+            </option>
+        </select>
+    </div>
+
+    <div class="overflow-x-auto my-6 bg-white rounded-lg shadow">
+        <table class="min-w-full border-collapse text-sm">
+            <thead>
+            <tr class="bg-gray-100">
+                <th class="px-3 py-3 text-left font-semibold border border-gray-200 whitespace-nowrap">Type</th>
+                <th class="px-3 py-3 text-right font-semibold border border-gray-200 whitespace-nowrap"
+                    th:each="m : ${months}"
+                    th:text="${m.getDisplayName(T(java.time.format.TextStyle).SHORT, T(java.util.Locale).FRENCH)}">
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="px-3 py-2.5 border border-gray-200 font-medium whitespace-nowrap">Planned</td>
+                <td class="px-3 py-2.5 border border-gray-200 text-right tabular-nums whitespace-nowrap"
+                    th:each="m : ${months}"
+                    th:text="${@numberFormatter.compact(plannedCost.get(m).ppMontant())}">
+                </td>
+            </tr>
+            <tr>
+                <td class="px-3 py-2.5 border border-gray-200 font-medium whitespace-nowrap">Executed</td>
+                <td class="px-3 py-2.5 border border-gray-200 text-right tabular-nums whitespace-nowrap"
+                    th:each="m : ${months}"
+                    th:text="${@numberFormatter.compact(executedCost.get(m).ppMontant())}">
+                </td>
+            </tr>
+            <tr>
+                <td class="px-3 py-2.5 border border-gray-200 font-medium whitespace-nowrap">Diff</td>
+                <td class="px-3 py-2.5 border border-gray-200 text-right tabular-nums whitespace-nowrap"
+                    th:each="m : ${months}"
+                    th:text="${@numberFormatter.compact(differenceFromPlanned.get(m).ppMontant())}">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p class="mt-4 text-sm text-gray-600">koContracts: <span class="font-mono text-gray-900" th:text="${koContracts}"></span></p>
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+
+<script>
+    function updateFilters() {
+        const year = document.getElementById("year").value;
+        window.location.href = `/financial-plan?year=${year}`;
+    }
+</script>
+
+</body>
+</html>

@@ -60,8 +60,7 @@ public class InvoiceServiceIT extends FacadeIT {
     var invoiceData =
         new InvoiceForm(
             "some id",
-            YearMonth.of(
-                2025, Month.MAY), // 💡 Changé en MAI pour éviter le conflit avec l'ID 1 de Janvier
+            YearMonth.of(2025, Month.MAY),
             null,
             null,
             null,
@@ -239,8 +238,7 @@ public class InvoiceServiceIT extends FacadeIT {
     InvoiceReference actual = invoiceService.getInvoiceReference(invoiceId);
 
     assertNotNull(actual);
-    assertEquals(
-        invoiceId, actual.id()); // Remplace par ta méthode de récupération d'ID (ex: getId())
+    assertEquals(invoiceId, actual.id());
   }
 
   @Test

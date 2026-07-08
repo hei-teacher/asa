@@ -13,6 +13,7 @@ class NearOverdueReportNotificationRequestedTest {
   @Test
   void check_default_values_and_durations() {
     var event = new NearOverdueReportNotificationRequested();
+
     assertNotNull(event.getVerificationDate());
     assertEquals(LocalDate.now(), event.getVerificationDate());
     assertEquals(Duration.ofSeconds(45), event.maxConsumerDuration());

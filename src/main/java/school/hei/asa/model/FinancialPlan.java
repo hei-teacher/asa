@@ -28,7 +28,7 @@ public record FinancialPlan(
 
   @Override
   public String toString() {
-    var diff = getDiff();
+    var diff = getDifferenceFromPlanned();
     return String.format(
         """
         plannedCost = [ jan: %s, feb: %s, mar: %s, apr: %s, may: %s, jun: %s, jul: %s, aug: %s, sep: %s, oct: %s, nov: %s, dec: %s ],
@@ -85,7 +85,7 @@ public record FinancialPlan(
         .collect(joining(", "));
   }
 
-  public Map<Month, Argent> getDiff() {
+  public Map<Month, Argent> getDifferenceFromPlanned() {
     var mapOfDiff = new HashMap<Month, Argent>();
     for (Month month : Month.values()) {
       mapOfDiff.put(month, plannedCost.get(month).minus(executedCost.get(month), now()));

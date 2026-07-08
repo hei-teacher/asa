@@ -23,12 +23,14 @@ public class FinancialPlanController {
   public String financialPlan(@RequestParam(required = false) Integer year, Model model) {
     var defaultYearValue = year != null ? year : now().getYear();
     var fp = financialPlanService.financialPlan(defaultYearValue);
+
     model.addAttribute("currentYear", defaultYearValue);
     model.addAttribute("months", Arrays.stream(Month.values()).toList());
     model.addAttribute("plannedCost", fp.plannedCost());
     model.addAttribute("executedCost", fp.executedCost());
-    model.addAttribute("differenceFromPlanned", fp.getDiff());
+    model.addAttribute("differenceFromPlanned", fp.getDifferenceFromPlanned());
     model.addAttribute("koContracts", fp.koContracts());
+
     return "financial-plan";
   }
 }

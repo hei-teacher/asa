@@ -60,10 +60,7 @@ class DailyExecutionControllerIT extends FacadeIT {
   @BeforeEach
   void setUp() {
     authentication = mock(Authentication.class);
-    authenticatedWorker =
-        new Worker(
-            "worker-code", "code", "email", "full code", "address", "random city", "nif", "stat");
-    workerRepository.save(authenticatedWorker);
+    authenticatedWorker = workerRepository.findByCode("worker-code");
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
     var product = new Product("pcode", "pname", "pdescription");
@@ -71,21 +68,6 @@ class DailyExecutionControllerIT extends FacadeIT {
     var mission1 = new Mission("mission1-code", "title1", "description1", 10, product);
     var mission2 = new Mission("mission2-code", "title2", "description2", 2, product);
     missionRepository.saveAll(List.of(mission1, mission2));
-
-    jdbcTemplate.update(
-        "INSERT INTO contract_level (code, type, daily_pay) VALUES (?, ?, ?) "
-            + "ON CONFLICT DO NOTHING",
-        "L-TEST",
-        "studentContractor",
-        25000.0);
-    jdbcTemplate.update(
-        "INSERT INTO contract (id, worker_code, level, entrance_instant, duration_in_days) "
-            + "VALUES (?, ?, ?, ?::timestamp, ?) ON CONFLICT DO NOTHING",
-        "contract-daily-exec",
-        authenticatedWorker.code(),
-        "L-TEST",
-        "2025-01-01 00:00:00",
-        80);
 
     model = mock(Model.class);
   }

@@ -30,7 +30,12 @@ public class ThWorkerMapper {
     var contractType = hasContract ? contracts.getFirst().level().type().name() : null;
     var workerType = toWorkerType(contractType);
     return new ThWorker(
-        worker.code(), worker.name(), worker.email(),
-        workerType, entranceInstant, level, levelEntranceInstant);
+        worker.code(),
+        worker.name(),
+        worker.email(),
+        workerType,
+        entranceInstant,
+        level,
+        levelEntranceInstant);
   }
 }

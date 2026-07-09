@@ -4,6 +4,7 @@ import static java.time.ZoneId.systemDefault;
 import static java.util.Locale.FRENCH;
 import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
+import static school.hei.asa.model.contract.ContractType.fullTimeEmployee;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -94,10 +95,11 @@ public class ContractService {
       return false;
     }
 
-    var durationDays = (int) activeContract.duration().toDays();
-    if (durationDays <= 0) {
+    if (activeContract.level().type() == fullTimeEmployee) {
       return true;
     }
+
+    var durationDays = (int) activeContract.duration().toDays();
 
     var usedDays = usedDays(worker, activeContract);
 
@@ -113,10 +115,11 @@ public class ContractService {
       return -1;
     }
 
-    var durationDays = activeContract.duration().toDays();
-    if (durationDays <= 0) {
-      return Long.MAX_VALUE;
+    if (activeContract.level().type() == fullTimeEmployee) {
+      return Double.MAX_VALUE;
     }
+
+    var durationDays = activeContract.duration().toDays();
 
     var usedDays = usedDays(worker, activeContract);
     return durationDays - usedDays;

@@ -1,5 +1,7 @@
 package school.hei.asa.service;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +35,7 @@ public class LowRemainingDaysAlertService {
 
   public boolean checkAndAlert(Worker worker, Contract contract, long remainingDays) {
     if (remainingDays < lowRemainingDaysThreshold) {
-      log.warn(
+      log.info(
           "Worker '{}' has only {} day(s) remaining on contract starting {}. Threshold={}",
           worker.code(),
           remainingDays,
@@ -55,9 +57,7 @@ public class LowRemainingDaysAlertService {
             "ASA - ALERT: %s has only %d day(s) remaining on their contract",
             worker.name(), remainingDays);
 
-    var dateFormatter =
-        java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
-            .withZone(java.time.ZoneId.of("UTC"));
+    var dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withZone(ZoneId.of("UTC"));
     var formattedEntranceDate = dateFormatter.format(contract.entranceInstant());
 
     var htmlBody =
@@ -83,7 +83,10 @@ public class LowRemainingDaysAlertService {
             lowRemainingDaysThreshold);
 
     var to = accountantAddresses.getFirst();
-    mailer.accept(new Email(to, List.of(), List.of(), subject, htmlBody, List.of()));
+    var cc = accountantAddresses.stream().skip(1).toList();
+
+    log.info("Sending alert email to accountants for worker '{}'", worker.code());
+    mailer.accept(new Email(to, cc, List.of(), subject, htmlBody, List.of()));
     log.info("Alert email sent to accountants for worker '{}'", worker.code());
   }
 }

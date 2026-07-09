@@ -6,7 +6,9 @@ import static java.util.Comparator.naturalOrder;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,6 +121,19 @@ public class ThProductService {
         .filter(m -> !m.isUnpaidCare() || !noUnpaidCareMissions)
         .mapToDouble(ThMission::executedDays)
         .sum();
+  }
+
+  public List<Map<String, Object>> toProductChartData(List<ThProduct> products) {
+    List<Map<String, Object>> executedDaysByProduct = new ArrayList<>();
+    for (var product : products) {
+      Map<String, Object> dataPoint = new HashMap<>();
+      dataPoint.put("code", product.code());
+      dataPoint.put("name", product.name());
+      dataPoint.put("executedDays", product.executedDays());
+      dataPoint.put("studentExecutedDays", product.studentExecutedDays());
+      executedDaysByProduct.add(dataPoint);
+    }
+    return executedDaysByProduct;
   }
 
   private ThProduct filterUnpaidCareMissions(ThProduct product, boolean noUnpaidCareMissions) {

@@ -5,7 +5,9 @@ import static java.util.Comparator.naturalOrder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -94,6 +96,19 @@ public class ThMissionService {
               return isBetween || me.getDate().isEqual(startDate) || me.getDate().isEqual(endDate);
             })
         .toList();
+  }
+
+  public List<Map<String, Object>> toMissionChartData(List<ThMission> missions) {
+    List<Map<String, Object>> res = new ArrayList<>();
+    for (var mission : missions) {
+      Map<String, Object> dataPoint = new HashMap<>();
+      dataPoint.put("code", mission.getCode());
+      dataPoint.put("name", mission.getTitle());
+      dataPoint.put("executedDays", mission.executedDays());
+      dataPoint.put("studentExecutedDays", mission.studentExecutedDays());
+      res.add(dataPoint);
+    }
+    return res;
   }
 
   public List<ThMission> sortedMissionsWithoutMissionExecution() {

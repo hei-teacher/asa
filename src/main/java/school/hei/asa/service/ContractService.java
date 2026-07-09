@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class ContractService {
   private final DailyExecutionRepository dailyExecutionRepository;
   private final MissionService missionService;
   private CareProductCodeSupplier careProductCodeSupplier;
+  private final LowRemainingDaysAlertService lowRemainingDaysAlertService;
   private final DateTimeFormatter localDateFormatter =
       DateTimeFormatter.ofPattern("dd MMM yyyy", FRENCH);
 
@@ -116,6 +118,27 @@ public class ContractService {
           "You have no more days available under your contract. Please contact your"
               + " administrator.");
     }
+  }
+
+  public Optional<String> checkAndBuildLowDaysAlertMessage(Worker worker) {
+    var remainingDaysAfter = getRemainingDaysByWorker(worker);
+    var activeContractOpt =
+        getAllContractsByWorker(worker).stream().filter(c -> c.duration() != null).findFirst();
+
+    if (activeContractOpt.isEmpty()) {
+      return Optional.empty();
+    }
+
+    boolean alertSent =
+        lowRemainingDaysAlertService.checkAndAlert(
+            worker, activeContractOpt.get(), (long) remainingDaysAfter);
+
+    return alertSent
+        ? Optional.of(
+            "Please note : You have "
+                + (long) remainingDaysAfter
+                + " day(s) left on your contract !")
+        : Optional.empty();
   }
 
   public List<Contract> findActiveContracts() {

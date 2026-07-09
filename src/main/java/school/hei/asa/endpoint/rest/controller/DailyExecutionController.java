@@ -14,7 +14,6 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.ThMissionService;
 import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.service.ContractService;
-import school.hei.asa.service.LowRemainingDaysAlertService;
 
 @Controller
 @AllArgsConstructor
@@ -24,12 +23,10 @@ public class DailyExecutionController {
   private final WorkerFromAuthentication workerFromAuthentication;
   private final ThMissionService thMissionService;
   private final ContractService contractService;
-  private final LowRemainingDaysAlertService lowRemainingDaysAlertService;
 
   @GetMapping("/daily-execution")
   public String getDailyExecutionForm(Model model) {
-    var sortedMissions = thMissionService.sortedMissionsWithoutMissionExecution();
-    model.addAttribute("missions", sortedMissions);
+    model.addAttribute("missions", thMissionService.sortedMissionsWithoutMissionExecution());
     return "daily-execution";
   }
 
@@ -44,29 +41,16 @@ public class DailyExecutionController {
       ThDailyExecutionForm dmeForm,
       RedirectAttributes redirectAttributes) {
     var worker = workerFromAuthentication.apply(authentication).get();
+
     contractService.checkRemainingDaysAvailable(worker);
-
-    var dailyExecution = thDailyExecutionFormMapper.toDomain(dmeForm, worker);
-    dailyExecutionRepository.save(dailyExecution);
-
-    var remainingDaysAfter = contractService.getRemainingDaysByWorker(worker);
-    var contracts = contractService.getAllContractsByWorker(worker);
-    var activeContractOpt = contracts.stream().filter(c -> c.duration() != null).findFirst();
-
-    if (activeContractOpt.isPresent()) {
-      boolean alertSent =
-          lowRemainingDaysAlertService.checkAndAlert(
-              worker, activeContractOpt.get(), (long) remainingDaysAfter);
-
-      if (alertSent) {
-        redirectAttributes.addFlashAttribute(
-            "toastMessage",
-            "Please note : You have "
-                + (long) remainingDaysAfter
-                + " day(s) left on your contract !");
-        redirectAttributes.addFlashAttribute("toastType", "warning");
-      }
-    }
+    dailyExecutionRepository.save(thDailyExecutionFormMapper.toDomain(dmeForm, worker));
+    contractService
+        .checkAndBuildLowDaysAlertMessage(worker)
+        .ifPresent(
+            message -> {
+              redirectAttributes.addFlashAttribute("toastMessage", message);
+              redirectAttributes.addFlashAttribute("toastType", "warning");
+            });
 
     return "redirect:/work-and-care-calendar";
   }

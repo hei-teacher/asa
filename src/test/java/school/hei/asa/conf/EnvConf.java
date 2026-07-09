@@ -26,6 +26,7 @@ public class EnvConf {
     registry.add("MAX_LATENESS_REPORT", () -> 4);
     registry.add("SENSITIVE_WORKERS_CODES", () -> "W-059,W-00");
     registry.add("asa.low.contract.days.threshold", () -> 10);
+    registry.add("LOW_CONTRACT_DAYS_THRESOLD", () -> "10");
     registry.add("aws.region", () -> "eu-west-3");
     registry.add("aws.s3.bucket", () -> "dummy-bucket");
     registry.add("aws.eventBridge.bus", () -> "dummy-bus");

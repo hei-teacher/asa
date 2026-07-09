@@ -96,7 +96,7 @@ public class DailyExecutionController {
     return "redirect:/work-and-care-calendar";
   }
 
-  private void sendAlertEmail(Worker worker, long remaining) {
+  private void sendAlertEmail(Worker worker, double remaining) {
     var accountantEmails =
         internetAddressMapper.toInternetAddresses(Arrays.asList(accountants.split(",")));
     if (accountantEmails.isEmpty()) {

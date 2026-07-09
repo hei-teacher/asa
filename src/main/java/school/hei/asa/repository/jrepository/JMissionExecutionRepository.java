@@ -40,12 +40,4 @@ public interface JMissionExecutionRepository extends JpaRepository<JMissionExecu
       @Param("startDate") Instant startDate,
       @Param("endDate") Instant endDate);
 
-  @Query(
-      "SELECT COUNT(DISTINCT me.date) FROM JMissionExecution me "
-          + "WHERE me.worker_code = :workerCode "
-          + "AND me.date BETWEEN :startDate AND :endDate")
-  long countDistinctDatesByWorkerAndDateBetween(
-      @Param("workerCode") String workerCode,
-      @Param("startDate") LocalDate startDate,
-      @Param("endDate") LocalDate endDate);
 }

@@ -20,7 +20,6 @@ import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.DailyExecutionRepository;
-import school.hei.asa.repository.MissionExecutionRepository;
 import school.hei.asa.repository.WorkerRepository;
 
 @Slf4j
@@ -30,7 +29,6 @@ public class ContractService {
   private final WorkerRepository workerRepository;
   private final ContractRepository contractRepository;
   private final DailyExecutionRepository dailyExecutionRepository;
-  private final MissionExecutionRepository missionExecutionRepository;
   private final MissionService missionService;
   private CareProductCodeSupplier careProductCodeSupplier;
   private final DateTimeFormatter localDateFormatter =
@@ -63,27 +61,24 @@ public class ContractService {
     if (executions.isEmpty()) {
       return "-";
     }
-    var result =
-        executions.stream()
-            .map(
-                dailyExecution -> {
-                  var type = dailyExecution.type(careProductCodeSupplier.get());
-                  if (type.equals(fullWork)) {
-                    return 1.0d;
-                  } else if (type.equals(fullCare)) {
-                    return 0.0d;
-                  }
-                  return dailyExecution.executions().stream()
-                      .map(
-                          me -> {
-                            return missionService.isUnpaidCare(me) ? 0.0d : me.dayPercentage();
-                          })
-                      .reduce(Double::sum)
-                      .get();
-                })
-            .reduce(Double::sum)
-            .get();
-    return String.format("%.1f", result);
+    return String.format("%.1f", actualWorkedDays(executions));
+  }
+
+  private double actualWorkedDays(List<DailyExecution> executions) {
+    return executions.stream()
+        .mapToDouble(
+            dailyExecution -> {
+              var type = dailyExecution.type(careProductCodeSupplier.get());
+              if (type.equals(fullWork)) {
+                return 1.0d;
+              } else if (type.equals(fullCare)) {
+                return 0.0d;
+              }
+              return dailyExecution.executions().stream()
+                  .mapToDouble(me -> missionService.isUnpaidCare(me) ? 0.0d : me.dayPercentage())
+                  .sum();
+            })
+        .sum();
   }
 
   public List<Contract> findActiveContracts() {
@@ -109,7 +104,7 @@ public class ContractService {
     return usedDays < durationDays;
   }
 
-  public long remainingDays(Worker worker) {
+  public double remainingDays(Worker worker) {
     var contracts = contractRepository.findAllByWorker(worker);
     var activeContract =
         contracts.stream().filter(c -> c.endInstant() == null).findFirst().orElse(null);
@@ -127,9 +122,11 @@ public class ContractService {
     return durationDays - usedDays;
   }
 
-  private long usedDays(Worker worker, Contract activeContract) {
+  private double usedDays(Worker worker, Contract activeContract) {
     var startDate = activeContract.entranceInstant().atZone(systemDefault()).toLocalDate();
     var now = LocalDate.now();
-    return missionExecutionRepository.countDistinctWorkDates(worker.code(), startDate, now);
+    var dailyExecutions =
+        dailyExecutionRepository.findByWorkerCodeAndDateBetween(worker.code(), startDate, now);
+    return actualWorkedDays(dailyExecutions);
   }
 }

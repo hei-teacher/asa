@@ -52,12 +52,6 @@ public class MissionExecutionRepository {
   }
 
   @Transactional
-  public long countDistinctWorkDates(String workerCode, LocalDate startDate, LocalDate endDate) {
-    return jMissionExecutionRepository.countDistinctDatesByWorkerAndDateBetween(
-        workerCode, startDate, endDate);
-  }
-
-  @Transactional
   public List<MissionExecution> missionExecutionsByDateBetweenAllWorkers(
       LocalDate startDate, LocalDate endDate) {
     return missionExecutionMapper.toDomain(

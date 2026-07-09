@@ -10,10 +10,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +35,10 @@ import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.MissionRepository;
 import school.hei.asa.repository.ProductRepository;
 import school.hei.asa.repository.WorkerRepository;
+import school.hei.asa.repository.jrepository.JContractRepository;
+import school.hei.asa.repository.model.JContract;
+import school.hei.asa.repository.model.JContractLevel;
+import school.hei.asa.repository.model.JWorker;
 
 class DailyExecutionControllerIT extends FacadeIT {
 
@@ -42,6 +48,7 @@ class DailyExecutionControllerIT extends FacadeIT {
   @Autowired MissionRepository missionRepository;
   @Autowired DailyExecutionRepository dailyExecutionRepository;
   @Autowired CalendarController calendarController;
+  @Autowired JContractRepository jContractRepository;
 
   @MockBean SecurityConfig securityConfig;
   @MockBean WorkerFromAuthentication workerFromAuthentication;
@@ -59,12 +66,31 @@ class DailyExecutionControllerIT extends FacadeIT {
     workerRepository.save(authenticatedWorker);
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
+    saveActiveContractFor(authenticatedWorker);
     var product = new Product("pcode", "pname", "pdescription");
     productRepository.save(product);
     var mission1 = new Mission("mission1-code", "title1", "description1", 10, product);
     var mission2 = new Mission("mission2-code", "title2", "description2", 2, product);
     missionRepository.saveAll(List.of(mission1, mission2));
     model = mock(Model.class);
+  }
+
+  private void saveActiveContractFor(Worker worker) {
+    var jWorker = new JWorker();
+    jWorker.setCode(worker.code());
+    var level = new JContractLevel();
+    level.setCode("L4P-2026");
+    var jContract = new JContract();
+    jContract.setId(UUID.randomUUID().toString());
+    jContract.setWorker(jWorker);
+    jContract.setLevel(level);
+    jContract.setEntranceInstant(Instant.parse("2019-01-01T00:00:00Z"));
+    jContract.setEndInstant(Instant.parse("2019-12-31T00:00:00Z"));
+    jContract.setDurationInDays(365);
+    jContract.setJobTitle("Test Job");
+    jContract.setCompany("Test Company");
+    jContract.setContractBucketKey("test-key");
+    jContractRepository.save(jContract);
   }
 
   @Test

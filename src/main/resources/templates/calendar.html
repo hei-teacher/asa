@@ -12,6 +12,10 @@
 <div th:replace="fragments/header :: header"></div>
 <div th:replace="fragments/toast :: toast"></div>
 
+<div th:if="${remainingDays == null}" class="text-center py-2 font-bold text-lg shadow-md w-full bg-red-600 text-white animate-pulse">
+    Please note : You do not have an active contract. Please contact your administrator.
+</div>
+
 <div th:if="${showWarning}" 
      th:class="'text-center py-2 font-bold text-lg shadow-md w-full ' + 
                (${remainingDays <= 2} ? 'bg-red-600 text-white animate-pulse' : 

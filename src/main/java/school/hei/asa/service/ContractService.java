@@ -58,17 +58,17 @@ public class ContractService {
     return executedDays(dailyExecutions);
   }
 
-  public double getRemainingDaysByWorker(Worker worker) {
+  public Double getRemainingDaysByWorker(Worker worker) {
     var contracts = contractRepository.findAllByWorker(worker);
 
     if (contracts.isEmpty()) {
-      return Double.MAX_VALUE;
+      return null;
     }
 
     var activeContractOpt = contracts.stream().filter(c -> c.duration() != null).findFirst();
 
     if (activeContractOpt.isEmpty()) {
-      return 0.0;
+      return null;
     }
 
     var contract = activeContractOpt.get();
@@ -112,8 +112,16 @@ public class ContractService {
   }
 
   public void checkRemainingDaysAvailable(Worker worker) {
+    var activeContractOpt =
+        getAllContractsByWorker(worker).stream().filter(c -> c.duration() != null).findFirst();
+
+    if (activeContractOpt.isEmpty()) {
+      throw new IllegalStateException(
+          "You do not have an active contract. Please contact your administrator.");
+    }
+
     var remainingDays = getRemainingDaysByWorker(worker);
-    if (remainingDays <= 0) {
+    if (remainingDays != null && remainingDays <= 0) {
       throw new IllegalStateException(
           "You have no more days available under your contract. Please contact your"
               + " administrator.");
@@ -125,18 +133,18 @@ public class ContractService {
     var activeContractOpt =
         getAllContractsByWorker(worker).stream().filter(c -> c.duration() != null).findFirst();
 
-    if (activeContractOpt.isEmpty()) {
+    if (activeContractOpt.isEmpty() || remainingDaysAfter == null) {
       return Optional.empty();
     }
 
     boolean alertSent =
         lowRemainingDaysAlertService.checkAndAlert(
-            worker, activeContractOpt.get(), (long) remainingDaysAfter);
+            worker, activeContractOpt.get(), remainingDaysAfter.longValue());
 
     return alertSent
         ? Optional.of(
             "Please note : You have "
-                + (long) remainingDaysAfter
+                + remainingDaysAfter.longValue()
                 + " day(s) left on your contract !")
         : Optional.empty();
   }

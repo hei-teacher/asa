@@ -10,7 +10,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
@@ -47,7 +45,6 @@ class DailyExecutionControllerIT extends FacadeIT {
   @Autowired MissionRepository missionRepository;
   @Autowired DailyExecutionRepository dailyExecutionRepository;
   @Autowired CalendarController calendarController;
-  @Autowired JdbcTemplate jdbcTemplate;
   @Autowired ContractService contractService;
   @MockBean SecurityConfig securityConfig;
   @MockBean WorkerFromAuthentication workerFromAuthentication;
@@ -60,10 +57,7 @@ class DailyExecutionControllerIT extends FacadeIT {
   @BeforeEach
   void setUp() {
     authentication = mock(Authentication.class);
-    authenticatedWorker =
-        new Worker(
-            "worker-code", "code", "email", "full code", "address", "random city", "nif", "stat");
-    workerRepository.save(authenticatedWorker);
+    authenticatedWorker = workerRepository.findByCode("worker-code");
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
     var product = new Product("pcode", "pname", "pdescription");
@@ -71,21 +65,6 @@ class DailyExecutionControllerIT extends FacadeIT {
     var mission1 = new Mission("mission1-code", "title1", "description1", 10, product);
     var mission2 = new Mission("mission2-code", "title2", "description2", 2, product);
     missionRepository.saveAll(List.of(mission1, mission2));
-
-    jdbcTemplate.update(
-        "INSERT INTO contract_level (code, type, daily_pay) VALUES (?, ?, ?) "
-            + "ON CONFLICT DO NOTHING",
-        "L-TEST",
-        "studentContractor",
-        25000.0);
-    jdbcTemplate.update(
-        "INSERT INTO contract (id, worker_code, level, entrance_instant, duration_in_days) "
-            + "VALUES (?, ?, ?, ?::timestamp, ?) ON CONFLICT DO NOTHING",
-        "contract-daily-exec",
-        authenticatedWorker.code(),
-        "L-TEST",
-        "2025-01-01 00:00:00",
-        80);
 
     model = mock(Model.class);
   }
@@ -240,35 +219,7 @@ class DailyExecutionControllerIT extends FacadeIT {
         new Mission("mission-ex-code", "title-ex", "desc-ex", 10, productExhausted);
     missionRepository.save(missionExhausted);
 
-    var workerNoDays =
-        new Worker("worker-no-days", "nodays", "nodays@test.com", "No Days", "", "", "", "");
-    workerRepository.save(workerNoDays);
-
-    jdbcTemplate.update(
-        "INSERT INTO contract_level (code, type, daily_pay) VALUES (?, ?, ?) "
-            + "ON CONFLICT DO NOTHING",
-        "L-TEST-EXHAUSTED",
-        "studentContractor",
-        25000.0);
-    jdbcTemplate.update(
-        "INSERT INTO contract (id, worker_code, level, entrance_instant, duration_in_days) "
-            + "VALUES (?, ?, ?, ?::timestamp, ?) ON CONFLICT DO NOTHING",
-        "contract-exhausted",
-        workerNoDays.code(),
-        "L-TEST-EXHAUSTED",
-        "2025-01-01 00:00:00",
-        1);
-
-    jdbcTemplate.update(
-        "INSERT INTO mission_execution (id, mission_code, worker_code, date, day_percentage, "
-            + "creation_instant, comment) VALUES (?, ?, ?, ?::date, ?, ?::timestamptz, ?)",
-        "me-exhausted",
-        "mission-ex-code",
-        workerNoDays.code(),
-        "2025-01-01",
-        1.0,
-        Timestamp.valueOf("2025-01-01 12:00:00"),
-        "already used day");
+    var workerNoDays = workerRepository.findByCode("worker-no-days");
 
     var hasRemaining = contractService.hasRemainingDays(workerNoDays);
     assertEquals(false, hasRemaining);
@@ -282,25 +233,7 @@ class DailyExecutionControllerIT extends FacadeIT {
         new Mission("mission-rem-code", "title-rem", "desc-rem", 10, productRemaining);
     missionRepository.save(missionRemaining);
 
-    var workerRemaining =
-        new Worker(
-            "worker-remaining", "remaining", "remaining@test.com", "Remaining", "", "", "", "");
-    workerRepository.save(workerRemaining);
-
-    jdbcTemplate.update(
-        "INSERT INTO contract_level (code, type, daily_pay) VALUES (?, ?, ?) "
-            + "ON CONFLICT DO NOTHING",
-        "L-TEST-REMAINING",
-        "studentContractor",
-        25000.0);
-    jdbcTemplate.update(
-        "INSERT INTO contract (id, worker_code, level, entrance_instant, duration_in_days) "
-            + "VALUES (?, ?, ?, ?::timestamp, ?) ON CONFLICT DO NOTHING",
-        "contract-remaining",
-        workerRemaining.code(),
-        "L-TEST-REMAINING",
-        "2025-01-01 00:00:00",
-        80);
+    var workerRemaining = workerRepository.findByCode("worker-remaining");
 
     var hasRemaining = contractService.hasRemainingDays(workerRemaining);
     assertEquals(true, hasRemaining);
@@ -314,35 +247,8 @@ class DailyExecutionControllerIT extends FacadeIT {
         new Mission("mission-alert-code", "title-alert", "desc-alert", 10, productAlert);
     missionRepository.save(missionAlert);
 
-    var workerAlert =
-        new Worker("worker-alert", "alert", "alert@test.com", "Alert Worker", "", "", "", "");
-    workerRepository.save(workerAlert);
+    var workerAlert = workerRepository.findByCode("worker-alert");
     when(workerFromAuthentication.apply(authentication)).thenReturn(Optional.of(workerAlert));
-
-    jdbcTemplate.update(
-        "INSERT INTO contract_level (code, type, daily_pay) VALUES (?, ?, ?) "
-            + "ON CONFLICT DO NOTHING",
-        "L-TEST-ALERT",
-        "studentContractor",
-        25000.0);
-    jdbcTemplate.update(
-        "INSERT INTO contract (id, worker_code, level, entrance_instant, duration_in_days) "
-            + "VALUES (?, ?, ?, ?::timestamp, ?) ON CONFLICT DO NOTHING",
-        "contract-alert",
-        workerAlert.code(),
-        "L-TEST-ALERT",
-        "2025-01-01 00:00:00",
-        10);
-    jdbcTemplate.update(
-        "INSERT INTO mission_execution (id, mission_code, worker_code, date, day_percentage, "
-            + "creation_instant, comment) VALUES (?, ?, ?, ?::date, ?, ?::timestamptz, ?)",
-        "me-used-day",
-        "mission-alert-code",
-        workerAlert.code(),
-        "2025-01-01",
-        1.0,
-        Timestamp.valueOf("2025-01-01 12:00:00"),
-        "first day");
 
     var dmeForm =
         new ThDailyExecutionForm(

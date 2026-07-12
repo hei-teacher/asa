@@ -149,6 +149,11 @@ public class ContractService {
         : Optional.empty();
   }
 
+  public boolean isRemainingDaysLow(Double remainingDays) {
+    return remainingDays != null
+        && lowRemainingDaysAlertService.isBelowThreshold(remainingDays.longValue());
+  }
+
   public List<Contract> findActiveContracts() {
     return contractRepository.findAllActiveContracts();
   }

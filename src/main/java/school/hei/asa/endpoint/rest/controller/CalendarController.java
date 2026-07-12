@@ -15,7 +15,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,19 +35,16 @@ public class CalendarController {
   private final WorkerFromAuthentication workerFromAuthentication;
   private final WorkerToModelAdder workerToModelAdder;
   private final ContractService contractService;
-  private final int lowRemainingDaysThreshold;
 
   public CalendarController(
       CalendarService calendarService,
       WorkerFromAuthentication workerFromAuthentication,
       WorkerToModelAdder workerToModelAdder,
-      ContractService contractService,
-      @Value("${asa.low.contract.days.threshold}") int lowRemainingDaysThreshold) {
+      ContractService contractService) {
     this.calendarService = calendarService;
     this.workerFromAuthentication = workerFromAuthentication;
     this.workerToModelAdder = workerToModelAdder;
     this.contractService = contractService;
-    this.lowRemainingDaysThreshold = lowRemainingDaysThreshold;
   }
 
   @GetMapping("/work-and-care-calendar")
@@ -84,7 +80,7 @@ public class CalendarController {
 
     Double remainingDays = contractService.getRemainingDaysByWorker(worker);
 
-    boolean showWarning = remainingDays != null && remainingDays < lowRemainingDaysThreshold;
+    boolean showWarning = contractService.isRemainingDaysLow(remainingDays);
 
     model.addAttribute("remainingDays", remainingDays);
     model.addAttribute("showWarning", showWarning);
@@ -114,7 +110,7 @@ public class CalendarController {
 
   private Map<LocalDate, Color> getColoredDates(int year, Worker worker) {
     Map<LocalDate, Color> coloredDays = new HashMap<>();
-    coloredDays.put(now(), BLUE); // put it first so that today is re-colored if fully executed
+    coloredDays.put(now(), BLUE);
     var datesByDailyExecutionType = calendarService.datesByDailyExecutionType(worker, year);
     datesByDailyExecutionType.get(fullWork).forEach(date -> coloredDays.put(date, GREEN));
     datesByDailyExecutionType.get(fullCare).forEach(date -> coloredDays.put(date, RED));

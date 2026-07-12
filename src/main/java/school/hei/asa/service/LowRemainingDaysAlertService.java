@@ -34,17 +34,15 @@ public class LowRemainingDaysAlertService {
   }
 
   public boolean checkAndAlert(Worker worker, Contract contract, long remainingDays) {
-    if (remainingDays < lowRemainingDaysThreshold) {
-      log.info(
-          "Worker '{}' has only {} day(s) remaining on contract starting {}. Threshold={}",
-          worker.code(),
-          remainingDays,
-          contract.entranceInstant(),
-          lowRemainingDaysThreshold);
+    if (isBelowThreshold(remainingDays)) {
       sendAlertToAccountants(worker, contract, remainingDays);
       return true;
     }
     return false;
+  }
+
+  public boolean isBelowThreshold(long remainingDays) {
+    return remainingDays < lowRemainingDaysThreshold;
   }
 
   private void sendAlertToAccountants(Worker worker, Contract contract, long remainingDays) {

@@ -62,7 +62,7 @@ class InvoiceFormMapperTest {
     assertThat(result.getYearMonth()).isEqualTo("2024-05");
     assertThat(result.getReferenceDate()).isEqualTo(LocalDate.of(2024, 5, 1));
     assertThat(result.getIssueDate()).isEqualTo(LocalDate.of(2024, 5, 10));
-    assertThat(result.getDescription()).isEqualTo("Frais de scolarité");
+    assertThat(result.getDescription()).isEqualTo("Description");
     assertThat(result.getUnitPrice()).isEqualByComparingTo(BigDecimal.valueOf(100));
     assertThat(result.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(200));
     assertThat(result.getHasUpgradedLevel()).isTrue();

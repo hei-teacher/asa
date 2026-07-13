@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,4 +33,7 @@ public class JInvoiceReference {
   @ManyToOne
   @JoinColumn(name = "worker_code")
   private JWorker worker;
+
+  @OneToOne(mappedBy = "invoiceReference")
+  private JInvoice invoice;
 }

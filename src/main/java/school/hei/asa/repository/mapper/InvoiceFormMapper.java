@@ -6,21 +6,24 @@ import school.hei.asa.repository.model.JInvoice;
 
 @Component
 public class InvoiceFormMapper {
-  public InvoiceForm toEntity(InvoiceForm invoiceForm) {
-    return new JInvoice(
-        invoiceForm.id(),
-        invoiceForm.yearMonth(),
-        invoiceForm.referenceDate(),
-        invoiceForm.issueDate(),
-        invoiceForm.description(),
-        invoiceForm.unitPrice(),
-        invoiceForm.amount(),
-        invoiceForm.hasUpgradedLevel(),
-        invoiceForm.extraQuantity(),
-        invoiceForm.extraUnitPrice(),
-        invoiceForm.extraAmount(),
-        invoiceForm.total(),
-        invoiceForm.parsedAmount(),
-        invoiceForm.rib());
+  public JInvoice toEntity(InvoiceForm invoiceForm) {
+    var jInvoice = new JInvoice();
+    jInvoice.setId(invoiceForm.id());
+    jInvoice.setYearMonth(invoiceForm.yearMonth().toString());
+    jInvoice.setReferenceDate(invoiceForm.referenceDate());
+    jInvoice.setIssueDate(invoiceForm.issueDate());
+    jInvoice.setDescription(invoiceForm.description());
+    jInvoice.setUnitPrice(invoiceForm.unitPrice());
+    jInvoice.setAmount(invoiceForm.amount());
+    jInvoice.setHasUpgradedLevel(invoiceForm.hasUpgradedLevel());
+    jInvoice.setExtraDescription(invoiceForm.extraDescription());
+    jInvoice.setExtraQuantity(invoiceForm.extraQuantity());
+    jInvoice.setExtraUnitPrice(invoiceForm.extraUnitPrice());
+    jInvoice.setExtraAmount(invoiceForm.extraAmount());
+    jInvoice.setTotal(invoiceForm.total());
+    jInvoice.setParsedAmount(invoiceForm.parsedAmount());
+    jInvoice.setRib(invoiceForm.rib());
+
+    return jInvoice;
   }
 }

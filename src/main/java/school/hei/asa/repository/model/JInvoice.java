@@ -8,10 +8,12 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "invoice_data")
 @Getter
+@Setter
 public class JInvoice {
   @Id private String id;
   private String yearMonth;

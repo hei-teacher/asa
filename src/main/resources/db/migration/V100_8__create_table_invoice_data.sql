@@ -14,8 +14,8 @@ CREATE TABLE invoice_data (
                          total NUMERIC(19,2),
                          parsed_amount TEXT,
                          rib TEXT,
-                         invoice_id VARCHAR,
+                         invoice_ref_id VARCHAR,
                          CONSTRAINT fk_invoice_reference
-                             FOREIGN KEY (invoice_id)
+                             FOREIGN KEY (invoice_ref_id)
                                  REFERENCES invoice(id)
 );

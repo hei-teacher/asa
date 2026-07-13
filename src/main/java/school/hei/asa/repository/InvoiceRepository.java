@@ -1,16 +1,20 @@
 package school.hei.asa.repository;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.repository.jrepository.JInvoiceDataRepository;
+import school.hei.asa.repository.mapper.InvoiceFormMapper;
 
 @Repository
 @AllArgsConstructor
 public class InvoiceRepository {
   private JInvoiceDataRepository invoiceDataRepository;
+  private InvoiceFormMapper invoiceFormMapper;
 
-  public InvoiceForm saveInvoice(InvoiceForm invoiceForm) {
-    return invoiceDataRepository.save(invoiceForm);
+  @Transactional
+  public void saveInvoice(InvoiceForm invoiceForm) {
+    invoiceDataRepository.save(invoiceFormMapper.toEntity(invoiceForm));
   }
 }

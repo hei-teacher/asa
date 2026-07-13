@@ -28,6 +28,7 @@ import school.hei.asa.number.NumberParser;
 import school.hei.asa.repository.BankAccountRepository;
 import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.InvoiceReferenceRepository;
+import school.hei.asa.repository.InvoiceRepository;
 import school.hei.asa.repository.MissionExecutionRepository;
 
 @Slf4j
@@ -42,6 +43,7 @@ public class InvoiceService {
   private final InvoiceReferenceRepository invoiceReferenceRepository;
   private final MissionService missionService;
   private final EventProducer<NewInvoiceGenerated> eventProducer;
+  private final InvoiceRepository invoiceRepository;
 
   public Optional<InvoiceReference> findInvoiceReference(Worker worker, YearMonth yearMonth) {
     var invoiceReferenceList = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker);
@@ -259,5 +261,10 @@ public class InvoiceService {
         .filter(me -> !missionService.isUnpaidCare(me))
         .mapToDouble(MissionExecution::dayPercentage)
         .sum();
+  }
+
+  public void saveInvoice(InvoiceForm invoiceForm, Worker worker) {
+    saveInvoiceReference(invoiceForm, worker);
+    invoiceRepository.saveInvoice(invoiceForm);
   }
 }

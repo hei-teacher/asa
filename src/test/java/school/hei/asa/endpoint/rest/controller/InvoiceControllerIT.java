@@ -66,7 +66,7 @@ class InvoiceControllerIT extends FacadeITMockedThirdParties {
     model = mock(Model.class);
     when(thInvoiceService.generateInvoiceFileName(any(Worker.class)))
         .thenReturn("invoice_2025_08.pdf");
-    doNothing().when(thInvoiceService).saveInvoiceReference(any(), any(Worker.class));
+    doNothing().when(thInvoiceService).saveInvoice(any(), any(Worker.class));
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
     when(workerToModelAdder.apply(any(WorkerModelAdderParam.class), any()))

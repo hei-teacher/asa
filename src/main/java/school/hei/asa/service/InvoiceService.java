@@ -7,6 +7,7 @@ import static java.util.Comparator.naturalOrder;
 import static school.hei.asa.number.NullToBigDecimalHanlder.toBigDecimalOrZero;
 import static school.hei.asa.number.NullToBigDecimalHanlder.toDoubleOrZero;
 
+import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -263,8 +264,9 @@ public class InvoiceService {
         .sum();
   }
 
+  @Transactional
   public void saveInvoice(InvoiceForm invoiceForm, Worker worker) {
     saveInvoiceReference(invoiceForm, worker);
-    invoiceRepository.saveInvoice(invoiceForm);
+    invoiceRepository.saveInvoiceForm(invoiceForm);
   }
 }

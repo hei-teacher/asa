@@ -14,7 +14,7 @@ public class InvoiceRepository {
   private InvoiceFormMapper invoiceFormMapper;
 
   @Transactional
-  public void saveInvoice(InvoiceForm invoiceForm) {
+  public void saveInvoiceForm(InvoiceForm invoiceForm) {
     invoiceDataRepository.save(invoiceFormMapper.toEntity(invoiceForm));
   }
 }

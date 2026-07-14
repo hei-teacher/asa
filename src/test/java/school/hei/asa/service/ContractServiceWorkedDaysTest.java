@@ -51,7 +51,6 @@ class ContractServiceWorkedDaysTest {
 
     var result = contractService.getActualWorkedDaysByDateByWorker(date, "W-001", date);
 
-    // Locale-dependent formatting: French locale gives "1,0"
     var expected = String.format("%.1f", 1.0);
     assertEquals(expected, result);
   }
@@ -90,7 +89,6 @@ class ContractServiceWorkedDaysTest {
 
     var result = contractService.getActualWorkedDaysByDateByWorker(date, "W-001", date);
 
-    // 0.5 (work) + 0.5 (care but isUnpaidCare=false) = 1.0
     var expected = String.format("%.1f", 1.0);
     assertEquals(expected, result);
   }

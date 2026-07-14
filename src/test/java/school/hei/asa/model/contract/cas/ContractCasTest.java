@@ -168,10 +168,6 @@ class ContractCasTest {
     var compteWorker = (Compte) possessions.iterator().next();
     var fluxArgents = compteWorker.getFluxArgents();
 
-    // Month 1 (June, 30 days): (30 - 1 + 1) / 30 * 15 = 15 full days
-    // Remaining: 45 - 15 = 30
-    // Month 2: 15 days -> remaining 15
-    // Month 3: 15 days
     assertEquals(3, fluxArgents.size());
 
     var totalPaid = fluxArgents.stream().mapToDouble(f -> montant(f.getFluxMensuel())).sum();
@@ -236,10 +232,6 @@ class ContractCasTest {
     var compteWorker = (Compte) possessions.iterator().next();
     var fluxArgents = compteWorker.getFluxArgents();
 
-    // Jan has 31 days: (31 - 20 + 1) / 31 * 20 = 12/31 * 20 = 7.74... -> truncated to 7 days
-    // Remaining: 40 - 7 = 33
-    // Month 2: 20 days -> remaining 13
-    // Month 3: 13 days -> last month
     assertEquals(3, fluxArgents.size());
 
     var firstFluxMontant = montant(fluxArgents.stream().findFirst().get().getFluxMensuel());

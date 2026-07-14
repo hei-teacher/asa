@@ -112,7 +112,7 @@ class InvoiceControllerIT extends FacadeITMockedThirdParties {
     when(thInvoiceService.extractInvoice(any(Worker.class), any())).thenReturn(fakeInvoice);
 
     File fakeFile = File.createTempFile("temp", ".pdf");
-    Files.write(fakeFile.toPath(), new byte[] {1, 2, 3}); // contenu dummy
+    Files.write(fakeFile.toPath(), new byte[] {1, 2, 3});
     when(invoicePDFGenerator.apply(any(Worker.class), any(), any())).thenReturn(fakeFile);
 
     var invoiceForm =

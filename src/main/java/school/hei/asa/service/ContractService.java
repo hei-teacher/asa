@@ -150,11 +150,6 @@ public class ContractService {
     return durationDays - usedDays;
   }
 
-  /**
-   * Checks whether the worker's contract is close to expiring. If so, publishes a
-   * ContractAlertRequested event and returns the warning message to display to the worker. Returns
-   * empty if no alert is needed.
-   */
   public Optional<String> checkAndNotifyContractAlert(Worker worker) {
     var remaining = remainingDays(worker);
     if (remaining < 0 || remaining >= alertThreshold) {

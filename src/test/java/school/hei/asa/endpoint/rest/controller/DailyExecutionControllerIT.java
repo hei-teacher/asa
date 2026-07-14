@@ -81,7 +81,6 @@ class DailyExecutionControllerIT extends FacadeIT {
             "mission2-code",
             "0.6",
             "missionComment2",
-            // duplicate of mission2 (missionCode2, missionPercentage2, missionComment2)
             "mission2-code",
             "0.6",
             "missionComment2",

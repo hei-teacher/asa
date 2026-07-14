@@ -81,7 +81,7 @@ public class MissionControllerIT extends FacadeIT {
     verify(model).addAttribute(eq("months"), any(Map.class));
     verify(model).addAttribute(eq("products"), any(List.class));
     verify(model).addAttribute(eq("total"), any(Map.class));
-    verify(model).addAttribute(eq("worker"), eq(authenticatedWorker)); // actual worker
+    verify(model).addAttribute(eq("worker"), eq(authenticatedWorker));
     verify(model).addAttribute(eq("workers"), any(List.class));
     verify(model).addAttribute(eq("workerName"), eq("John"));
     assertEquals("missions", viewName);

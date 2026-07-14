@@ -9,67 +9,60 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import jakarta.mail.internet.InternetAddress;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.hei.asa.mail.Mailer;
+import org.mockito.ArgumentCaptor;
+import school.hei.asa.endpoint.event.EventProducer;
+import school.hei.asa.endpoint.event.model.LowRemainingDaysAlertRequested;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.model.contract.ContractLevel;
-import school.hei.asa.service.mapper.InternetAddressMapper;
 
 class LowRemainingDaysAlertServiceTest {
 
-  private Mailer mailer;
-  private InternetAddressMapper internetAddressMapper;
+  private EventProducer<LowRemainingDaysAlertRequested> eventProducer;
   private ContractService contractService;
   private LowRemainingDaysAlertService service;
 
   @BeforeEach
-  void setUp() throws Exception {
-    mailer = mock(Mailer.class);
-    internetAddressMapper = mock(InternetAddressMapper.class);
+  void setUp() {
+    eventProducer = mock(EventProducer.class);
     contractService = mock(ContractService.class);
-    when(internetAddressMapper.toInternetAddresses(any()))
-        .thenReturn(List.of(new InternetAddress("acc@test.com")));
 
-    service =
-        new LowRemainingDaysAlertService(
-            mailer, "acc@test.com", 10, internetAddressMapper, contractService);
+    service = new LowRemainingDaysAlertService(eventProducer, 10, contractService);
   }
 
   @Test
-  void check_and_alert_does_not_send_mail_if_above_threshold() {
-    var worker = worker();
-    var contract = contract(worker);
+  void check_and_alert_does_not_send_event_if_above_threshold() {
+    service.checkAndAlert(worker(), 15);
 
-    service.checkAndAlert(worker, contract, 15);
-
-    verify(mailer, never()).accept(any());
+    verify(eventProducer, never()).accept(any());
   }
 
   @Test
-  void check_and_alert_sends_mail_if_below_threshold() {
-    var worker = worker();
-    var contract = contract(worker);
+  void check_and_alert_sends_event_if_below_threshold() {
+    service.checkAndAlert(worker(), 5);
 
-    service.checkAndAlert(worker, contract, 5);
-
-    verify(mailer).accept(any());
+    ArgumentCaptor<Collection<LowRemainingDaysAlertRequested>> captor =
+        ArgumentCaptor.forClass(Collection.class);
+    verify(eventProducer).accept(captor.capture());
+    var event = List.copyOf(captor.getValue()).getFirst();
+    assertEquals("W-1", event.getWorkerCode());
+    assertEquals(5, event.getRemainingDays());
   }
 
   @Test
   void check_and_alert_handles_null_worker_email() {
     var worker = new Worker("W-1", "Name", null, "Full Name", "Addr", "City", "NIF", "STAT");
-    var contract = contract(worker);
 
-    service.checkAndAlert(worker, contract, 5);
+    service.checkAndAlert(worker, 5);
 
-    verify(mailer).accept(any());
+    verify(eventProducer).accept(any());
   }
 
   @Test
@@ -88,7 +81,7 @@ class LowRemainingDaysAlertServiceTest {
     assertEquals(
         "You do not have an active contract. Please contact your administrator.",
         exception.getMessage());
-    verify(mailer, never()).accept(any());
+    verify(eventProducer, never()).accept(any());
   }
 
   @Test
@@ -104,7 +97,7 @@ class LowRemainingDaysAlertServiceTest {
             () -> service.checkRemainingDaysAndBuildAlertMessage(worker));
 
     assertTrue(exception.getMessage().contains("no more days available"));
-    verify(mailer, never()).accept(any());
+    verify(eventProducer, never()).accept(any());
   }
 
   @Test
@@ -117,7 +110,7 @@ class LowRemainingDaysAlertServiceTest {
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
 
     assertEquals(Optional.of("Please note : You have 5 day(s) left on your contract !"), message);
-    verify(mailer).accept(any());
+    verify(eventProducer).accept(any());
   }
 
   @Test
@@ -130,7 +123,7 @@ class LowRemainingDaysAlertServiceTest {
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
 
     assertEquals(Optional.empty(), message);
-    verify(mailer, never()).accept(any());
+    verify(eventProducer, never()).accept(any());
   }
 
   private static Worker worker() {

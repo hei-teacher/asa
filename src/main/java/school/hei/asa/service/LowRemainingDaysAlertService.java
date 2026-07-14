@@ -28,35 +28,25 @@ public class LowRemainingDaysAlertService {
 
   public Optional<String> checkRemainingDaysAndBuildAlertMessage(Worker worker) {
     var activeContract = contractService.getActiveContractOrThrow(worker);
-    var remainingDays = contractService.getRemainingDaysForContract(worker, activeContract);
+    var remainingDays = (long) contractService.getRemainingDaysForContract(worker, activeContract);
 
-    boolean alertSent = checkAndAlert(worker, (long) remainingDays);
-
-    return alertSent
-        ? Optional.of(
-            "Please note : You have " + (long) remainingDays + " day(s) left on your contract !")
-        : Optional.empty();
-  }
-
-  public boolean checkAndAlert(Worker worker, long remainingDays) {
-    if (isBelowThreshold(remainingDays)) {
-      requestAlertEmail(worker, remainingDays);
-      return true;
+    if (!isBelowThreshold(remainingDays)) {
+      return Optional.empty();
     }
-    return false;
+
+    log.info("Requesting alert email to accountants for worker '{}'", worker.code());
+    eventProducer.accept(
+        List.of(
+            LowRemainingDaysAlertRequested.builder()
+                .workerCode(worker.code())
+                .remainingDays(remainingDays)
+                .build()));
+
+    return Optional.of(
+        "Please note : You have " + remainingDays + " day(s) left on your contract !");
   }
 
   public boolean isBelowThreshold(long remainingDays) {
     return remainingDays < lowRemainingDaysThreshold;
-  }
-
-  private void requestAlertEmail(Worker worker, long remainingDays) {
-    log.info("Requesting alert email to accountants for worker '{}'", worker.code());
-    var event =
-        LowRemainingDaysAlertRequested.builder()
-            .workerCode(worker.code())
-            .remainingDays(remainingDays)
-            .build();
-    eventProducer.accept(List.of(event));
   }
 }

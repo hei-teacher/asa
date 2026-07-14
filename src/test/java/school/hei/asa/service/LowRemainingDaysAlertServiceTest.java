@@ -37,34 +37,6 @@ class LowRemainingDaysAlertServiceTest {
   }
 
   @Test
-  void check_and_alert_does_not_send_event_if_above_threshold() {
-    service.checkAndAlert(worker(), 15);
-
-    verify(eventProducer, never()).accept(any());
-  }
-
-  @Test
-  void check_and_alert_sends_event_if_below_threshold() {
-    service.checkAndAlert(worker(), 5);
-
-    ArgumentCaptor<Collection<LowRemainingDaysAlertRequested>> captor =
-        ArgumentCaptor.forClass(Collection.class);
-    verify(eventProducer).accept(captor.capture());
-    var event = List.copyOf(captor.getValue()).getFirst();
-    assertEquals("W-1", event.getWorkerCode());
-    assertEquals(5, event.getRemainingDays());
-  }
-
-  @Test
-  void check_and_alert_handles_null_worker_email() {
-    var worker = new Worker("W-1", "Name", null, "Full Name", "Addr", "City", "NIF", "STAT");
-
-    service.checkAndAlert(worker, 5);
-
-    verify(eventProducer).accept(any());
-  }
-
-  @Test
   void check_remaining_days_throws_when_no_active_contract() {
     var worker = worker();
     when(contractService.getActiveContractOrThrow(worker))
@@ -93,7 +65,12 @@ class LowRemainingDaysAlertServiceTest {
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
 
     assertEquals(Optional.of("Please note : You have 5 day(s) left on your contract !"), message);
-    verify(eventProducer).accept(any());
+    ArgumentCaptor<Collection<LowRemainingDaysAlertRequested>> captor =
+        ArgumentCaptor.forClass(Collection.class);
+    verify(eventProducer).accept(captor.capture());
+    var event = List.copyOf(captor.getValue()).getFirst();
+    assertEquals("W-1", event.getWorkerCode());
+    assertEquals(5, event.getRemainingDays());
   }
 
   @Test
@@ -107,6 +84,19 @@ class LowRemainingDaysAlertServiceTest {
 
     assertEquals(Optional.empty(), message);
     verify(eventProducer, never()).accept(any());
+  }
+
+  @Test
+  void check_remaining_days_handles_null_worker_email() {
+    var worker = new Worker("W-1", "Name", null, "Full Name", "Addr", "City", "NIF", "STAT");
+    var contract = contract(worker);
+    when(contractService.getActiveContractOrThrow(worker)).thenReturn(contract);
+    when(contractService.getRemainingDaysForContract(worker, contract)).thenReturn(5d);
+
+    Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
+
+    assertEquals(Optional.of("Please note : You have 5 day(s) left on your contract !"), message);
+    verify(eventProducer).accept(any());
   }
 
   private static Worker worker() {

@@ -24,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import school.hei.asa.conf.FacadeIT;
+import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.SecurityConfig;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
@@ -49,6 +50,7 @@ class DailyExecutionControllerIT extends FacadeIT {
   @MockBean SecurityConfig securityConfig;
   @MockBean WorkerFromAuthentication workerFromAuthentication;
   @MockBean Mailer mailer;
+  @MockBean EventProducer eventProducer;
 
   Authentication authentication;
   Worker authenticatedWorker;
@@ -272,7 +274,7 @@ class DailyExecutionControllerIT extends FacadeIT {
     dailyExecutionController.createDailyExecution(authentication, dmeForm, redirectAttrs);
 
     var flashAlert = redirectAttrs.getFlashAttributes().get("contractAlert");
-    assertEquals("Attention : il ne reste que 8 jours sur votre contrat.", flashAlert);
+    assertEquals("Warning: only 8 days left on your contract.", flashAlert);
   }
 
   private String getFutureResult(Future<String> future) {

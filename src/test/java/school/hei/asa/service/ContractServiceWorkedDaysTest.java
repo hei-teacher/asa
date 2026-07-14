@@ -2,6 +2,7 @@ package school.hei.asa.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.time.Duration;
@@ -10,12 +11,15 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import school.hei.asa.CareProductCodeSupplier;
+import school.hei.asa.endpoint.event.EventProducer;
+import school.hei.asa.endpoint.event.model.ContractAlertRequested;
 import school.hei.asa.model.*;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.model.contract.ContractLevel;
 import school.hei.asa.model.contract.ContractType;
 import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.DailyExecutionRepository;
+import school.hei.asa.repository.MissionExecutionRepository;
 import school.hei.asa.repository.WorkerRepository;
 
 class ContractServiceWorkedDaysTest {
@@ -24,16 +28,23 @@ class ContractServiceWorkedDaysTest {
   private final ContractRepository contractRepository = mock(ContractRepository.class);
   private final DailyExecutionRepository dailyExecutionRepository =
       mock(DailyExecutionRepository.class);
+  private final MissionExecutionRepository missionExecutionRepository =
+      mock(MissionExecutionRepository.class);
   private final MissionService missionService = mock(MissionService.class);
   private final CareProductCodeSupplier careProductCodeSupplier =
       mock(CareProductCodeSupplier.class);
+  @SuppressWarnings("unchecked")
+  private final EventProducer<ContractAlertRequested> eventProducer = mock(EventProducer.class);
   private final ContractService contractService =
       new ContractService(
           workerRepository,
           contractRepository,
           dailyExecutionRepository,
+          missionExecutionRepository,
           missionService,
-          careProductCodeSupplier);
+          careProductCodeSupplier,
+          eventProducer,
+          10);
 
   private final Worker worker =
       new Worker("W-001", "John", "john@test.com", "John", "Addr", "City", "NIF", "STAT");
@@ -107,8 +118,8 @@ class ContractServiceWorkedDaysTest {
             "Company",
             null);
     when(contractRepository.findAllByWorker(worker)).thenReturn(List.of(contract));
-    when(dailyExecutionRepository.findByWorkerCodeAndDateBetween(any(), any(), any()))
-        .thenReturn(List.of());
+    when(missionExecutionRepository.countDistinctWorkDates(eq("W-001"), any(), any()))
+        .thenReturn(0L);
 
     assertTrue(contractService.hasRemainingDays(worker));
   }
@@ -123,17 +134,12 @@ class ContractServiceWorkedDaysTest {
             new ContractLevel("L1", ContractType.partnerContractor, null, 50_000.0),
             entrance,
             null,
-            Duration.ofDays(0),
+            Duration.ofDays(1),
             "Company",
             null);
     when(contractRepository.findAllByWorker(worker)).thenReturn(List.of(contract));
-    var product = new Product("WORK", "Work", "D");
-    var mission = new Mission("M01", "M", "D", 10, product);
-    var date = LocalDate.now();
-    var me = new MissionExecution(mission, worker, date, 1.0, "c", Instant.now());
-    var de = new DailyExecution(worker, date, List.of(me));
-    when(dailyExecutionRepository.findByWorkerCodeAndDateBetween(any(), any(), any()))
-        .thenReturn(List.of(de));
+    when(missionExecutionRepository.countDistinctWorkDates(eq("W-001"), any(), any()))
+        .thenReturn(1L);
 
     assertFalse(contractService.hasRemainingDays(worker));
   }

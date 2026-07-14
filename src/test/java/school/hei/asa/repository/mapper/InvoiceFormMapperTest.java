@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.repository.jrepository.JInvoiceReferenceRepository;
-import school.hei.asa.repository.model.JInvoice;
+import school.hei.asa.repository.model.JInvoiceForm;
 import school.hei.asa.repository.model.JInvoiceReference;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,14 +30,14 @@ class InvoiceFormMapperTest {
   }
 
   @Test
-  void toEntity_mapsAllFieldsCorrectly() {
+  void to_entity_maps_all_fields_correctly() {
     var invoiceForm =
         new InvoiceForm(
             "invoice-id-1",
             YearMonth.of(2024, 5),
             LocalDate.of(2024, 5, 1),
             LocalDate.of(2024, 5, 10),
-            "Frais de scolarité",
+            "Description",
             2.0,
             BigDecimal.valueOf(100),
             BigDecimal.valueOf(200),
@@ -56,7 +56,7 @@ class InvoiceFormMapperTest {
     when(jInvoiceReferenceRepository.getReferenceById("invoice-id-1"))
         .thenReturn(jInvoiceReference);
 
-    JInvoice result = invoiceFormMapper.toEntity(invoiceForm);
+    JInvoiceForm result = invoiceFormMapper.toEntity(invoiceForm);
 
     assertThat(result.getId()).isEqualTo("invoice-id-1");
     assertThat(result.getYearMonth()).isEqualTo("2024-05");

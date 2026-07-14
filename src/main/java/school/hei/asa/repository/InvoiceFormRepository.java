@@ -9,7 +9,7 @@ import school.hei.asa.repository.mapper.InvoiceFormMapper;
 
 @Repository
 @AllArgsConstructor
-public class InvoiceRepository {
+public class InvoiceFormRepository {
   private JInvoiceDataRepository invoiceDataRepository;
   private InvoiceFormMapper invoiceFormMapper;
 

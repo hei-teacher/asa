@@ -28,8 +28,8 @@ import school.hei.asa.number.NumberConverter;
 import school.hei.asa.number.NumberParser;
 import school.hei.asa.repository.BankAccountRepository;
 import school.hei.asa.repository.ContractRepository;
+import school.hei.asa.repository.InvoiceFormRepository;
 import school.hei.asa.repository.InvoiceReferenceRepository;
-import school.hei.asa.repository.InvoiceRepository;
 import school.hei.asa.repository.MissionExecutionRepository;
 
 @Slf4j
@@ -44,7 +44,7 @@ public class InvoiceService {
   private final InvoiceReferenceRepository invoiceReferenceRepository;
   private final MissionService missionService;
   private final EventProducer<NewInvoiceGenerated> eventProducer;
-  private final InvoiceRepository invoiceRepository;
+  private final InvoiceFormRepository invoiceFormRepository;
 
   public Optional<InvoiceReference> findInvoiceReference(Worker worker, YearMonth yearMonth) {
     var invoiceReferenceList = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker);
@@ -267,6 +267,6 @@ public class InvoiceService {
   @Transactional
   public void saveInvoice(InvoiceForm invoiceForm, Worker worker) {
     saveInvoiceReference(invoiceForm, worker);
-    invoiceRepository.saveInvoiceForm(invoiceForm);
+    invoiceFormRepository.saveInvoiceForm(invoiceForm);
   }
 }

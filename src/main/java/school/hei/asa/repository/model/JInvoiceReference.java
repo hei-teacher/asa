@@ -35,5 +35,5 @@ public class JInvoiceReference {
   private JWorker worker;
 
   @OneToOne(mappedBy = "invoiceReference")
-  private JInvoice invoice;
+  private JInvoiceForm invoice;
 }

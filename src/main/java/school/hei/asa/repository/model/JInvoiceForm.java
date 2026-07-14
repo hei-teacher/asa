@@ -14,7 +14,7 @@ import lombok.Setter;
 @Table(name = "invoice_data")
 @Getter
 @Setter
-public class JInvoice {
+public class JInvoiceForm {
   @Id private String id;
   private String yearMonth;
   private LocalDate referenceDate;

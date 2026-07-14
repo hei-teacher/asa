@@ -111,42 +111,37 @@ public class ContractService {
     return String.format(US, "%.1f", result);
   }
 
-  public void checkRemainingDaysAvailable(Worker worker) {
-    var activeContractOpt =
-        getAllContractsByWorker(worker).stream().filter(c -> c.duration() != null).findFirst();
-
-    if (activeContractOpt.isEmpty()) {
-      throw new IllegalStateException(
-          "You do not have an active contract. Please contact your administrator.");
-    }
-
+  public Optional<String> checkRemainingDaysAndBuildAlertMessage(Worker worker) {
+    var activeContract = getActiveContractOrThrow(worker);
     var remainingDays = getRemainingDaysByWorker(worker);
+
     if (remainingDays != null && remainingDays <= 0) {
       throw new IllegalStateException(
           "You have no more days available under your contract. Please contact your"
               + " administrator.");
     }
-  }
-
-  public Optional<String> checkAndBuildLowDaysAlertMessage(Worker worker) {
-    var remainingDaysAfter = getRemainingDaysByWorker(worker);
-    var activeContractOpt =
-        getAllContractsByWorker(worker).stream().filter(c -> c.duration() != null).findFirst();
-
-    if (activeContractOpt.isEmpty() || remainingDaysAfter == null) {
-      return Optional.empty();
-    }
 
     boolean alertSent =
-        lowRemainingDaysAlertService.checkAndAlert(
-            worker, activeContractOpt.get(), remainingDaysAfter.longValue());
+        remainingDays != null
+            && lowRemainingDaysAlertService.checkAndAlert(
+                worker, activeContract, remainingDays.longValue());
 
     return alertSent
         ? Optional.of(
             "Please note : You have "
-                + remainingDaysAfter.longValue()
+                + remainingDays.longValue()
                 + " day(s) left on your contract !")
         : Optional.empty();
+  }
+
+  private Contract getActiveContractOrThrow(Worker worker) {
+    return getAllContractsByWorker(worker).stream()
+        .filter(c -> c.duration() != null)
+        .findFirst()
+        .orElseThrow(
+            () ->
+                new IllegalStateException(
+                    "You do not have an active contract. Please contact your administrator."));
   }
 
   public boolean isRemainingDaysLow(Double remainingDays) {

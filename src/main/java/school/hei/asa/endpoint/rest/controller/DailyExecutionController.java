@@ -26,7 +26,8 @@ public class DailyExecutionController {
 
   @GetMapping("/daily-execution")
   public String getDailyExecutionForm(Model model) {
-    model.addAttribute("missions", thMissionService.sortedMissionsWithoutMissionExecution());
+    var sortedMissions = thMissionService.sortedMissionsWithoutMissionExecution();
+    model.addAttribute("missions", sortedMissions);
     return "daily-execution";
   }
 
@@ -42,15 +43,14 @@ public class DailyExecutionController {
       RedirectAttributes redirectAttributes) {
     var worker = workerFromAuthentication.apply(authentication).get();
 
-    contractService.checkRemainingDaysAvailable(worker);
-    dailyExecutionRepository.save(thDailyExecutionFormMapper.toDomain(dmeForm, worker));
     contractService
-        .checkAndBuildLowDaysAlertMessage(worker)
+        .checkRemainingDaysAndBuildAlertMessage(worker)
         .ifPresent(
             message -> {
               redirectAttributes.addFlashAttribute("toastMessage", message);
               redirectAttributes.addFlashAttribute("toastType", "warning");
             });
+    dailyExecutionRepository.save(thDailyExecutionFormMapper.toDomain(dmeForm, worker));
 
     return "redirect:/work-and-care-calendar";
   }

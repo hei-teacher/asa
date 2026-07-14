@@ -15,13 +15,10 @@ import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.model.th.ThMission;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.ThMissionService;
-import school.hei.asa.mail.Email;
-import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.service.ContractService;
-import school.hei.asa.service.mapper.InternetAddressMapper;
 
 class DailyExecutionControllerTest {
 
@@ -33,19 +30,13 @@ class DailyExecutionControllerTest {
       mock(WorkerFromAuthentication.class);
   private final ThMissionService thMissionService = mock(ThMissionService.class);
   private final ContractService contractService = mock(ContractService.class);
-  private final Mailer mailer = mock(Mailer.class);
-  private final InternetAddressMapper internetAddressMapper = mock(InternetAddressMapper.class);
   private final DailyExecutionController controller =
       new DailyExecutionController(
           thDailyExecutionFormMapper,
           dailyExecutionRepository,
           workerFromAuthentication,
           thMissionService,
-          contractService,
-          mailer,
-          internetAddressMapper,
-          "acc1@test.com",
-          10);
+          contractService);
 
   private final Worker worker =
       new Worker("W-001", "John", "john@test.com", "John", "Addr", "City", "NIF", "STAT");
@@ -67,77 +58,46 @@ class DailyExecutionControllerTest {
     var authentication = mock(Authentication.class);
     var form =
         new ThDailyExecutionForm(
-            "2026-01-15",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null);
+            "2026-01-15", null, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, null);
     var redirectAttributes = new RedirectAttributesModelMap();
     var dailyExecution = mock(DailyExecution.class);
 
     when(workerFromAuthentication.apply(authentication)).thenReturn(Optional.of(worker));
     when(contractService.hasRemainingDays(worker)).thenReturn(true);
     when(thDailyExecutionFormMapper.toDomain(form, worker)).thenReturn(dailyExecution);
-    when(contractService.remainingDays(worker)).thenReturn(15.0);
+    when(contractService.checkAndNotifyContractAlert(worker)).thenReturn(Optional.empty());
 
     var viewName = controller.createDailyExecution(authentication, form, redirectAttributes);
 
     assertEquals("redirect:/work-and-care-calendar", viewName);
     verify(dailyExecutionRepository).save(dailyExecution);
     assertNull(redirectAttributes.getFlashAttributes().get("contractAlert"));
-    verify(mailer, never()).accept(any());
   }
 
   @Test
-  void createDailyExecution_with_few_remaining_days_sends_alert() {
+  void createDailyExecution_with_few_remaining_days_sets_flash_alert() {
     var authentication = mock(Authentication.class);
     var form =
         new ThDailyExecutionForm(
-            "2026-01-15",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null);
+            "2026-01-15", null, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, null);
     var redirectAttributes = new RedirectAttributesModelMap();
     var dailyExecution = mock(DailyExecution.class);
 
     when(workerFromAuthentication.apply(authentication)).thenReturn(Optional.of(worker));
     when(contractService.hasRemainingDays(worker)).thenReturn(true);
     when(thDailyExecutionFormMapper.toDomain(form, worker)).thenReturn(dailyExecution);
-    when(contractService.remainingDays(worker)).thenReturn(3.0);
-    var internetAddress = mock(jakarta.mail.internet.InternetAddress.class);
-    when(internetAddressMapper.toInternetAddresses(anyList())).thenReturn(List.of(internetAddress));
+    when(contractService.checkAndNotifyContractAlert(worker))
+        .thenReturn(Optional.of("Warning: only 3 day(s) left on your contract."));
 
     var viewName = controller.createDailyExecution(authentication, form, redirectAttributes);
 
     assertEquals("redirect:/work-and-care-calendar", viewName);
     verify(dailyExecutionRepository).save(dailyExecution);
     assertEquals(
-        "Warning: only 3 days left on your contract.",
+        "Warning: only 3 day(s) left on your contract.",
         redirectAttributes.getFlashAttributes().get("contractAlert"));
-    verify(mailer).accept(any(Email.class));
   }
 
   @Test
@@ -145,22 +105,8 @@ class DailyExecutionControllerTest {
     var authentication = mock(Authentication.class);
     var form =
         new ThDailyExecutionForm(
-            "2026-01-15",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null);
+            "2026-01-15", null, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, null);
     var redirectAttributes = new RedirectAttributesModelMap();
 
     when(workerFromAuthentication.apply(authentication)).thenReturn(Optional.of(worker));
@@ -170,6 +116,5 @@ class DailyExecutionControllerTest {
         IllegalArgumentException.class,
         () -> controller.createDailyExecution(authentication, form, redirectAttributes));
     verify(dailyExecutionRepository, never()).save(any());
-    verify(mailer, never()).accept(any());
   }
 }

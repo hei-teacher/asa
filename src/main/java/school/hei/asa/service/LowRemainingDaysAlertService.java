@@ -30,12 +30,6 @@ public class LowRemainingDaysAlertService {
     var activeContract = contractService.getActiveContractOrThrow(worker);
     var remainingDays = contractService.getRemainingDaysForContract(worker, activeContract);
 
-    if (remainingDays <= 0) {
-      throw new IllegalStateException(
-          "You have no more days available under your contract. Please contact your"
-              + " administrator.");
-    }
-
     boolean alertSent = checkAndAlert(worker, (long) remainingDays);
 
     return alertSent

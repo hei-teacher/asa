@@ -2,7 +2,6 @@ package school.hei.asa.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -81,22 +80,6 @@ class LowRemainingDaysAlertServiceTest {
     assertEquals(
         "You do not have an active contract. Please contact your administrator.",
         exception.getMessage());
-    verify(eventProducer, never()).accept(any());
-  }
-
-  @Test
-  void check_remaining_days_throws_when_no_days_left() {
-    var worker = worker();
-    var contract = contract(worker);
-    when(contractService.getActiveContractOrThrow(worker)).thenReturn(contract);
-    when(contractService.getRemainingDaysForContract(worker, contract)).thenReturn(0d);
-
-    var exception =
-        assertThrows(
-            IllegalStateException.class,
-            () -> service.checkRemainingDaysAndBuildAlertMessage(worker));
-
-    assertTrue(exception.getMessage().contains("no more days available"));
     verify(eventProducer, never()).accept(any());
   }
 

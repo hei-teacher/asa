@@ -4,6 +4,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,16 +22,37 @@ public class LowRemainingDaysAlertService {
   private final String accountants;
   private final InternetAddressMapper internetAddressMapper;
   private final int lowRemainingDaysThreshold;
+  private final ContractService contractService;
 
   public LowRemainingDaysAlertService(
       Mailer mailer,
       @Value("${ACCOUNTANTS}") String accountants,
       @Value("${LOW_CONTRACT_DAYS_THRESOLD}") int lowRemainingDaysThreshold,
-      InternetAddressMapper internetAddressMapper) {
+      InternetAddressMapper internetAddressMapper,
+      ContractService contractService) {
     this.mailer = mailer;
     this.accountants = accountants;
     this.lowRemainingDaysThreshold = lowRemainingDaysThreshold;
     this.internetAddressMapper = internetAddressMapper;
+    this.contractService = contractService;
+  }
+
+  public Optional<String> checkRemainingDaysAndBuildAlertMessage(Worker worker) {
+    var activeContract = contractService.getActiveContractOrThrow(worker);
+    var remainingDays = contractService.getRemainingDaysByWorker(worker, activeContract);
+
+    if (remainingDays <= 0) {
+      throw new IllegalStateException(
+          "You have no more days available under your contract. Please contact your"
+              + " administrator.");
+    }
+
+    boolean alertSent = checkAndAlert(worker, activeContract, (long) remainingDays);
+
+    return alertSent
+        ? Optional.of(
+            "Please note : You have " + (long) remainingDays + " day(s) left on your contract !")
+        : Optional.empty();
   }
 
   public boolean checkAndAlert(Worker worker, Contract contract, long remainingDays) {

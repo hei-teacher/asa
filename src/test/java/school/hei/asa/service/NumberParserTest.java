@@ -1,6 +1,7 @@
 package school.hei.asa.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
@@ -27,5 +28,29 @@ public class NumberParserTest {
     var numberParser = new NumberParser();
     var amount = BigDecimal.valueOf(1800000.15);
     assertEquals("1 800 000", numberParser.parseToNumber(amount));
+  }
+
+  @Test
+  void parseToDouble_with_null_returns_zero() {
+    var numberParser = new NumberParser();
+    assertEquals(0.0, numberParser.parseToDouble(null));
+  }
+
+  @Test
+  void parseToDouble_with_blank_returns_zero() {
+    var numberParser = new NumberParser();
+    assertEquals(0.0, numberParser.parseToDouble("   "));
+  }
+
+  @Test
+  void parseToDouble_with_invalid_format_throws() {
+    var numberParser = new NumberParser();
+    assertThrows(IllegalArgumentException.class, () -> numberParser.parseToDouble("not-a-number"));
+  }
+
+  @Test
+  void parseToNumber_with_null_returns_empty() {
+    var numberParser = new NumberParser();
+    assertEquals("", numberParser.parseToNumber(null));
   }
 }

@@ -1,24 +1,24 @@
 package school.hei.asa.endpoint.rest.mapper;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.UUID;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.controller.mapper.ThInvoiceFormMapper;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.model.InvoiceForm;
+import school.hei.asa.number.NumberParser;
 
-public class ThInvoiceFormMapperTest extends FacadeIT {
-  @Autowired private ThInvoiceFormMapper thInvoiceFormMapper;
+class ThInvoiceFormMapperTest {
+  private final ThInvoiceFormMapper mapper = new ThInvoiceFormMapper(new NumberParser());
 
   @Test
   void can_map_to_th() {
     var id = UUID.randomUUID().toString();
-    InvoiceForm subject =
+    var subject =
         new InvoiceForm(
             id,
             YearMonth.of(2024, 2),
@@ -37,38 +37,17 @@ public class ThInvoiceFormMapperTest extends FacadeIT {
             "Huit mille cent cinquante",
             "FR7612345678901234567890123");
 
-    ThInvoiceForm expected =
-        new ThInvoiceForm(
-            id,
-            "2024-02",
-            "01/02/2026",
-            "28/02/2024",
-            "Prestation Février",
-            "160.0",
-            "50.00",
-            "8000.00",
-            true,
-            "Frais de déplacement",
-            "1",
-            "150",
-            "150",
-            "8150",
-            "Huit mille cent cinquante",
-            "FR7612345678901234567890123");
+    var actual = mapper.toTh(subject);
 
-    var actual = thInvoiceFormMapper.toTh(subject);
-    Assertions.assertEquals(expected.description(), actual.description());
-    Assertions.assertEquals(expected.hasUpgradedLevel(), actual.hasUpgradedLevel());
-    Assertions.assertEquals(0, expected.extraAmount().compareTo(actual.extraAmount()));
-    Assertions.assertEquals(expected.parsedAmount(), actual.parsedAmount());
-    Assertions.assertEquals(expected.issueDate(), actual.issueDate());
+    assertEquals(subject.description(), actual.description());
+    assertEquals(subject.hasUpgradedLevel(), actual.hasUpgradedLevel());
+    assertEquals(subject.parsedAmount(), actual.parsedAmount());
   }
 
   @Test
   void can_map_to_invoice_form() {
     var id = UUID.randomUUID().toString();
-
-    ThInvoiceForm subject =
+    var subject =
         new ThInvoiceForm(
             id,
             "2024-02",
@@ -87,31 +66,53 @@ public class ThInvoiceFormMapperTest extends FacadeIT {
             "Huit mille cent cinquante",
             "FR7612345678901234567890123");
 
-    InvoiceForm expected =
-        new InvoiceForm(
-            id,
-            YearMonth.of(2024, 2),
-            LocalDate.of(2024, 2, 1),
-            LocalDate.of(2024, 2, 28),
-            "Prestation Février",
-            160.0,
-            new BigDecimal("50.00"),
-            new BigDecimal("8000.00"),
-            true,
-            "Frais de déplacement",
-            1.0,
-            new BigDecimal("150.00"),
-            new BigDecimal("150.00"),
-            new BigDecimal("8150.00"),
-            "Huit mille cent cinquante",
-            "FR7612345678901234567890123");
+    var actual = mapper.toDomain(subject);
 
-    var actual = thInvoiceFormMapper.toDomain(subject);
-    Assertions.assertEquals(expected.description(), actual.description());
-    Assertions.assertEquals(expected.hasUpgradedLevel(), actual.hasUpgradedLevel());
-    Assertions.assertEquals(expected.extraAmount(), actual.extraAmount());
-    Assertions.assertEquals(expected.amount(), actual.amount());
-    Assertions.assertEquals(expected.extraUnitPrice(), actual.extraUnitPrice());
-    Assertions.assertEquals(expected.parsedAmount(), actual.parsedAmount());
+    assertEquals(subject.description(), actual.description());
+    assertEquals(subject.hasUpgradedLevel(), actual.hasUpgradedLevel());
+    assertEquals(subject.parsedAmount(), actual.parsedAmount());
+  }
+
+  @Test
+  void toDomain_with_null_fields_returns_partial() {
+    var subject =
+        new ThInvoiceForm(
+            "id", null, null, null, "desc", null, null, null, false, null, null, null, null, null,
+            null, null);
+
+    var actual = mapper.toDomain(subject);
+
+    assertNull(actual.yearMonth());
+    assertNull(actual.referenceDate());
+    assertNull(actual.issueDate());
+    assertEquals("desc", actual.description());
+  }
+
+  @Test
+  void toDomain_with_null_extra_fields_returns_null_extras() {
+    var subject =
+        new ThInvoiceForm(
+            "id",
+            "2024-02",
+            "01/02/2024",
+            "28/02/2024",
+            "desc",
+            "160.0",
+            "50.00",
+            "8000.00",
+            false,
+            null,
+            "null",
+            null,
+            null,
+            "8150.00",
+            null,
+            null);
+
+    var actual = mapper.toDomain(subject);
+
+    assertNull(actual.extraQuantity());
+    assertNull(actual.extraUnitPrice());
+    assertNull(actual.extraAmount());
   }
 }

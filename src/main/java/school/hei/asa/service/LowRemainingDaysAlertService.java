@@ -28,7 +28,7 @@ public class LowRemainingDaysAlertService {
 
   public Optional<String> checkRemainingDaysAndBuildAlertMessage(Worker worker) {
     var activeContract = contractService.getActiveContractOrThrow(worker);
-    var remainingDays = contractService.getRemainingDaysByWorker(worker, activeContract);
+    var remainingDays = contractService.getRemainingDaysForContract(worker, activeContract);
 
     if (remainingDays <= 0) {
       throw new IllegalStateException(

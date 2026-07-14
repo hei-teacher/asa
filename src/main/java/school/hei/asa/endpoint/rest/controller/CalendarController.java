@@ -85,7 +85,7 @@ public class CalendarController {
     Double remainingDays = null;
     boolean showWarning = false;
     try {
-      remainingDays = contractService.getRemainingDaysByWorker(worker);
+      remainingDays = contractService.getRemainingDaysOnActiveContract(worker);
       showWarning = lowRemainingDaysAlertService.isBelowThreshold(remainingDays.longValue());
     } catch (IllegalStateException ignored) {
       // No active contract: calendar still renders with the null-remainingDays banner.

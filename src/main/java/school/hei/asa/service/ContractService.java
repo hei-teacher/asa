@@ -56,11 +56,11 @@ public class ContractService {
     return executedDays(dailyExecutions);
   }
 
-  public double getRemainingDaysByWorker(Worker worker) {
-    return getRemainingDaysByWorker(worker, getActiveContractOrThrow(worker));
+  public double getRemainingDaysOnActiveContract(Worker worker) {
+    return getRemainingDaysForContract(worker, getActiveContractOrThrow(worker));
   }
 
-  public double getRemainingDaysByWorker(Worker worker, Contract contract) {
+  public double getRemainingDaysForContract(Worker worker, Contract contract) {
     var startDate = contract.entranceInstant().atZone(systemDefault()).toLocalDate();
     var endDate =
         contract.endInstant() == null

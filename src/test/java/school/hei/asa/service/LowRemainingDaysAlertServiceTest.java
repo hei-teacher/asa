@@ -89,7 +89,7 @@ class LowRemainingDaysAlertServiceTest {
     var worker = worker();
     var contract = contract(worker);
     when(contractService.getActiveContractOrThrow(worker)).thenReturn(contract);
-    when(contractService.getRemainingDaysByWorker(worker, contract)).thenReturn(0d);
+    when(contractService.getRemainingDaysForContract(worker, contract)).thenReturn(0d);
 
     var exception =
         assertThrows(
@@ -105,7 +105,7 @@ class LowRemainingDaysAlertServiceTest {
     var worker = worker();
     var contract = contract(worker);
     when(contractService.getActiveContractOrThrow(worker)).thenReturn(contract);
-    when(contractService.getRemainingDaysByWorker(worker, contract)).thenReturn(5d);
+    when(contractService.getRemainingDaysForContract(worker, contract)).thenReturn(5d);
 
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
 
@@ -118,7 +118,7 @@ class LowRemainingDaysAlertServiceTest {
     var worker = worker();
     var contract = contract(worker);
     when(contractService.getActiveContractOrThrow(worker)).thenReturn(contract);
-    when(contractService.getRemainingDaysByWorker(worker, contract)).thenReturn(15d);
+    when(contractService.getRemainingDaysForContract(worker, contract)).thenReturn(15d);
 
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
 

@@ -22,11 +22,11 @@ public class DailyExecutionController {
   private final ContractService contractService;
 
   public DailyExecutionController(
-          ThDailyExecutionFormMapper thDailyExecutionFormMapper,
-          DailyExecutionRepository dailyExecutionRepository,
-          WorkerFromAuthentication workerFromAuthentication,
-          ThMissionService thMissionService,
-          ContractService contractService) {
+      ThDailyExecutionFormMapper thDailyExecutionFormMapper,
+      DailyExecutionRepository dailyExecutionRepository,
+      WorkerFromAuthentication workerFromAuthentication,
+      ThMissionService thMissionService,
+      ContractService contractService) {
     this.thDailyExecutionFormMapper = thDailyExecutionFormMapper;
     this.dailyExecutionRepository = dailyExecutionRepository;
     this.workerFromAuthentication = workerFromAuthentication;
@@ -43,21 +43,21 @@ public class DailyExecutionController {
 
   @PostMapping("/daily-execution")
   public String createDailyExecution(
-          Authentication authentication,
-          ThDailyExecutionForm dmeForm,
-          RedirectAttributes redirectAttributes) {
+      Authentication authentication,
+      ThDailyExecutionForm dmeForm,
+      RedirectAttributes redirectAttributes) {
     var worker = workerFromAuthentication.apply(authentication).get();
 
     if (!contractService.hasRemainingDays(worker)) {
       throw new IllegalArgumentException(
-              "Cannot submit report: " + worker.name() + " has no remaining contract days.");
+          "Cannot submit report: " + worker.name() + " has no remaining contract days.");
     }
 
     dailyExecutionRepository.save(thDailyExecutionFormMapper.toDomain(dmeForm, worker));
 
     contractService
-            .checkAndNotifyContractAlert(worker)
-            .ifPresent(msg -> redirectAttributes.addFlashAttribute("contractAlert", msg));
+        .checkAndNotifyContractAlert(worker)
+        .ifPresent(msg -> redirectAttributes.addFlashAttribute("contractAlert", msg));
 
     return "redirect:/work-and-care-calendar";
   }

@@ -18,17 +18,17 @@ import lombok.ToString;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ContractAlertRequested extends PojaEvent {
 
-    private String workerName;
-    private String workerEmail;
-    private double remainingDays;
+  private String workerName;
+  private String workerEmail;
+  private double remainingDays;
 
-    @Override
-    public Duration maxConsumerDuration() {
-        return Duration.ofSeconds(45);
-    }
+  @Override
+  public Duration maxConsumerDuration() {
+    return Duration.ofSeconds(45);
+  }
 
-    @Override
-    public Duration maxConsumerBackoffBetweenRetries() {
-        return Duration.ofSeconds(30);
-    }
+  @Override
+  public Duration maxConsumerBackoffBetweenRetries() {
+    return Duration.ofSeconds(30);
+  }
 }

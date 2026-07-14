@@ -57,4 +57,8 @@ public class MissionExecutionRepository {
     return missionExecutionMapper.toDomain(
         jMissionExecutionRepository.findByDateBetween(startDate, endDate));
   }
+
+  public long countDistinctWorkDates(String code, LocalDate startDate, LocalDate now) {
+    return 0;
+  }
 }

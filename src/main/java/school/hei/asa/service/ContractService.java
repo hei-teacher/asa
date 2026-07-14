@@ -4,36 +4,60 @@ import static java.time.ZoneId.systemDefault;
 import static java.util.Locale.FRENCH;
 import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
-import static school.hei.asa.model.contract.ContractType.fullTimeEmployee;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.hei.asa.CareProductCodeSupplier;
+import school.hei.asa.endpoint.event.EventProducer;
+import school.hei.asa.endpoint.event.model.ContractAlertRequested;
 import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.DailyExecutionRepository;
+import school.hei.asa.repository.MissionExecutionRepository;
 import school.hei.asa.repository.WorkerRepository;
 
 @Slf4j
 @Service
-@AllArgsConstructor
 public class ContractService {
   private final WorkerRepository workerRepository;
   private final ContractRepository contractRepository;
   private final DailyExecutionRepository dailyExecutionRepository;
+  private final MissionExecutionRepository missionExecutionRepository;
   private final MissionService missionService;
-  private CareProductCodeSupplier careProductCodeSupplier;
+  private final CareProductCodeSupplier careProductCodeSupplier;
+  private final EventProducer<ContractAlertRequested> eventProducer;
+  private final int alertThreshold;
   private final DateTimeFormatter localDateFormatter =
       DateTimeFormatter.ofPattern("dd MMM yyyy", FRENCH);
+
+  public ContractService(
+      WorkerRepository workerRepository,
+      ContractRepository contractRepository,
+      DailyExecutionRepository dailyExecutionRepository,
+      MissionExecutionRepository missionExecutionRepository,
+      MissionService missionService,
+      CareProductCodeSupplier careProductCodeSupplier,
+      EventProducer<ContractAlertRequested> eventProducer,
+      @Value("${asa.contract.alert.threshold}") int alertThreshold) {
+    this.workerRepository = workerRepository;
+    this.contractRepository = contractRepository;
+    this.dailyExecutionRepository = dailyExecutionRepository;
+    this.missionExecutionRepository = missionExecutionRepository;
+    this.missionService = missionService;
+    this.careProductCodeSupplier = careProductCodeSupplier;
+    this.eventProducer = eventProducer;
+    this.alertThreshold = alertThreshold;
+  }
 
   public Map<Worker, List<Contract>> totalWorkDaysPerWorker() {
     return contractRepository.findAll().stream().collect(Collectors.groupingBy(Contract::worker));
@@ -62,24 +86,27 @@ public class ContractService {
     if (executions.isEmpty()) {
       return "-";
     }
-    return String.format("%.1f", actualWorkedDays(executions));
-  }
-
-  private double actualWorkedDays(List<DailyExecution> executions) {
-    return executions.stream()
-        .mapToDouble(
-            dailyExecution -> {
-              var type = dailyExecution.type(careProductCodeSupplier.get());
-              if (type.equals(fullWork)) {
-                return 1.0d;
-              } else if (type.equals(fullCare)) {
-                return 0.0d;
-              }
-              return dailyExecution.executions().stream()
-                  .mapToDouble(me -> missionService.isUnpaidCare(me) ? 0.0d : me.dayPercentage())
-                  .sum();
-            })
-        .sum();
+    var result =
+        executions.stream()
+            .map(
+                dailyExecution -> {
+                  var type = dailyExecution.type(careProductCodeSupplier.get());
+                  if (type.equals(fullWork)) {
+                    return 1.0d;
+                  } else if (type.equals(fullCare)) {
+                    return 0.0d;
+                  }
+                  return dailyExecution.executions().stream()
+                      .map(
+                          me -> {
+                            return missionService.isUnpaidCare(me) ? 0.0d : me.dayPercentage();
+                          })
+                      .reduce(Double::sum)
+                      .get();
+                })
+            .reduce(Double::sum)
+            .get();
+    return String.format("%.1f", result);
   }
 
   public List<Contract> findActiveContracts() {
@@ -95,18 +122,17 @@ public class ContractService {
       return false;
     }
 
-    if (activeContract.level().type() == fullTimeEmployee) {
+    var durationDays = (int) activeContract.duration().toDays();
+    if (durationDays <= 0) {
       return true;
     }
-
-    var durationDays = (int) activeContract.duration().toDays();
 
     var usedDays = usedDays(worker, activeContract);
 
     return usedDays < durationDays;
   }
 
-  public double remainingDays(Worker worker) {
+  public long remainingDays(Worker worker) {
     var contracts = contractRepository.findAllByWorker(worker);
     var activeContract =
         contracts.stream().filter(c -> c.endInstant() == null).findFirst().orElse(null);
@@ -115,21 +141,45 @@ public class ContractService {
       return -1;
     }
 
-    if (activeContract.level().type() == fullTimeEmployee) {
-      return Double.MAX_VALUE;
-    }
-
     var durationDays = activeContract.duration().toDays();
+    if (durationDays <= 0) {
+      return Long.MAX_VALUE;
+    }
 
     var usedDays = usedDays(worker, activeContract);
     return durationDays - usedDays;
   }
 
-  private double usedDays(Worker worker, Contract activeContract) {
+  /**
+   * Checks whether the worker's contract is close to expiring. If so, publishes a
+   * ContractAlertRequested event and returns the warning message to display to the worker. Returns
+   * empty if no alert is needed.
+   */
+  public Optional<String> checkAndNotifyContractAlert(Worker worker) {
+    var remaining = remainingDays(worker);
+    if (remaining < 0 || remaining >= alertThreshold) {
+      return Optional.empty();
+    }
+
+    try {
+      eventProducer.accept(
+          List.of(
+              ContractAlertRequested.builder()
+                  .workerName(worker.name())
+                  .workerEmail(worker.email())
+                  .remainingDays(remaining)
+                  .build()));
+    } catch (Exception e) {
+      log.error("Failed to send contract alert event", e);
+    }
+
+    var plural = remaining > 1 ? "s" : "";
+    return Optional.of("Warning: only " + remaining + " day" + plural + " left on your contract.");
+  }
+
+  private long usedDays(Worker worker, Contract activeContract) {
     var startDate = activeContract.entranceInstant().atZone(systemDefault()).toLocalDate();
     var now = LocalDate.now();
-    var dailyExecutions =
-        dailyExecutionRepository.findByWorkerCodeAndDateBetween(worker.code(), startDate, now);
-    return actualWorkedDays(dailyExecutions);
+    return missionExecutionRepository.countDistinctWorkDates(worker.code(), startDate, now);
   }
 }

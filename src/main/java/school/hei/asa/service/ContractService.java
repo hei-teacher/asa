@@ -60,6 +60,14 @@ public class ContractService {
     return getRemainingDaysForContract(worker, getActiveContractOrThrow(worker));
   }
 
+  public double getRemainingDaysOnActiveContractOrZero(Worker worker) {
+    return getAllContractsByWorker(worker).stream()
+        .filter(c -> c.duration() != null)
+        .findFirst()
+        .map(contract -> getRemainingDaysForContract(worker, contract))
+        .orElse(0d);
+  }
+
   public double getRemainingDaysForContract(Worker worker, Contract contract) {
     var startDate = contract.entranceInstant().atZone(systemDefault()).toLocalDate();
     var endDate =

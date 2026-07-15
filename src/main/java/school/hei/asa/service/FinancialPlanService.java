@@ -62,11 +62,13 @@ public class FinancialPlanService {
       var endDate = startDate.plusMonths(1);
       var patrimoineAtEnd = patrimoine.projectionFuture(endDate);
       var patrimoineAtStart = patrimoine.projectionFuture(startDate);
-      map.put(
-          Month.of(m),
+      var plannedCost =
           patrimoineAtEnd
               .getValeurComptable()
-              .minus(patrimoineAtStart.getValeurComptable(), endDate));
+              .minus(patrimoineAtStart.getValeurComptable(), endDate);
+      map.put(
+          Month.of(m),
+          new Argent(Math.abs(Double.parseDouble(plannedCost.ppMontant())), plannedCost.devise()));
     }
 
     return map;
@@ -133,7 +135,7 @@ public class FinancialPlanService {
           m,
           amount.compareTo(BigDecimal.ZERO) == 0
               ? new Argent(0, MGA)
-              : new Argent(amount.doubleValue(), MGA).mult(-1));
+              : new Argent(Math.abs(amount.doubleValue()), MGA));
     }
     return map;
   }

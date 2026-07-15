@@ -3,6 +3,8 @@ package school.hei.asa.service.event;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+
+import jakarta.mail.internet.InternetAddress;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.model.ContractAlertRequested;
@@ -36,12 +38,12 @@ public class ContractAlertRequestedService implements Consumer<ContractAlertRequ
     mailer.accept(buildAlertEmail(event, accountantEmails));
   }
 
-  private List<jakarta.mail.internet.InternetAddress> toAccountantEmails() {
+  private List<InternetAddress> toAccountantEmails() {
     return internetAddressMapper.toInternetAddresses(Arrays.asList(accountants.split(",")));
   }
 
   private Email buildAlertEmail(
-      ContractAlertRequested event, List<jakarta.mail.internet.InternetAddress> accountantEmails) {
+      ContractAlertRequested event, List<InternetAddress> accountantEmails) {
     var remaining = (long) event.getRemainingDays();
     var plural = remaining > 1 ? "s" : "";
 

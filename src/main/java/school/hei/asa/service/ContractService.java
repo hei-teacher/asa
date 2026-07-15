@@ -127,12 +127,12 @@ public class ContractService {
       return true;
     }
 
-    var usedDays = usedDays(worker, activeContract);
+    var workDays = usedDays(worker, activeContract);
 
-    return usedDays < durationDays;
+    return workDays < durationDays;
   }
 
-  public long remainingDays(Worker worker) {
+  public long getRemainingDaysByWorker(Worker worker) {
     var contracts = contractRepository.findAllByWorker(worker);
     var activeContract =
         contracts.stream().filter(c -> c.endInstant() == null).findFirst().orElse(null);
@@ -151,7 +151,7 @@ public class ContractService {
   }
 
   public Optional<String> checkAndNotifyContractAlert(Worker worker) {
-    var remaining = remainingDays(worker);
+    var remaining = getRemainingDaysByWorker(worker);
     if (remaining < 0 || remaining >= alertThreshold) {
       return Optional.empty();
     }

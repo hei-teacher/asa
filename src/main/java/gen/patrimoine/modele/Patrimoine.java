@@ -20,7 +20,7 @@ import lombok.Getter;
 @EqualsAndHashCode(callSuper = false)
 @Getter
 public final class Patrimoine extends Objectivable
-    implements Serializable /*note(no-serializable)*/ {
+    implements Serializable {
 
   private final String nom;
   private final Devise devise;

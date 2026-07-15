@@ -32,7 +32,6 @@ public class CasSetAnalyzer implements Consumer<CasSet> {
   }
 
   private void visualise(Set<Cas> set, ToutCas patrimoineTout) {
-    // Purposefully removed from original patrimoine version, as we don't need Swing visualizer
   }
 
   private static void verifie(ToutCas patrimoineTout) {

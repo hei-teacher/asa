@@ -24,7 +24,7 @@ public class ContractMapper {
     return jwlhList.stream().map(jContract -> toDomain(jContract, new Cache())).toList();
   }
 
-  /*package-private*/ Contract toDomain(JContract jContract, Cache cache) {
+  Contract toDomain(JContract jContract, Cache cache) {
     var entranceInstant = jContract.getEntranceInstant();
     var startDate = entranceInstant.atZone(systemDefault()).toLocalDate();
     return new Contract(

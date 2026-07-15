@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @EqualsAndHashCode
-public class Personne implements Serializable /*note(no-serializable)*/ {
+public class Personne implements Serializable {
   @Accessors(fluent = true)
   @Getter
   private final String nom;
@@ -34,7 +34,7 @@ public class Personne implements Serializable /*note(no-serializable)*/ {
             .collect(toSet()));
   }
 
-  /*no-public*/ void addPatrimoine(Patrimoine patrimoine) {
+  void addPatrimoine(Patrimoine patrimoine) {
     patrimoines.add(patrimoine);
   }
 }

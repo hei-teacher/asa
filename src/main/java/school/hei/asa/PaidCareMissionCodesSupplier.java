@@ -12,12 +12,6 @@ import org.springframework.context.annotation.Configuration;
 public class PaidCareMissionCodesSupplier implements Supplier<List<String>> {
   private final List<String> paidCareMissionCodes;
 
-  /**
-   * Constructs a supplier for paid care mission codes.
-   *
-   * @param paidCareMissionCodes A comma-separated string of paid care mission codes (e.g.,
-   *     "PC,MC").
-   */
   public PaidCareMissionCodesSupplier(
       @Value("${asa.paid.care.mission.codes}") String paidCareMissionCodes) {
     this.paidCareMissionCodes = Arrays.asList(paidCareMissionCodes.split(","));

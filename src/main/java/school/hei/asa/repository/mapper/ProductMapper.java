@@ -21,7 +21,7 @@ public class ProductMapper {
     return jProducts.stream().map(jProduct -> toDomain(jProduct, cache)).toList();
   }
 
-  /*package-private*/ Product toDomain(JProduct jProduct, Cache cache) {
+  Product toDomain(JProduct jProduct, Cache cache) {
     var code = jProduct.getCode();
     if (cache.contains(Product.class, code)) {
       return cache.get(Product.class, code);
@@ -39,7 +39,7 @@ public class ProductMapper {
     return toEntity(product, new Cache());
   }
 
-  /*package-private*/ JProduct toEntity(Product product, Cache cache) {
+  JProduct toEntity(Product product, Cache cache) {
     var code = product.code();
     if (cache.contains(JProduct.class, code)) {
       return cache.get(JProduct.class, code);

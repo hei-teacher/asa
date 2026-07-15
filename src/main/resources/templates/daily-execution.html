@@ -18,7 +18,6 @@
                 `<option value="${mission.code}">${mission.code} ${mission.title}</option>`
             ).join('');
 
-            // common classes
             const labelClasses = "block text-gray-800 font-medium mb-1";
             const inputClasses = "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400";
 
@@ -26,7 +25,7 @@
                 const inputGroup = document.createElement("div");
                 inputGroup.className = "flex flex-wrap gap-4 mb-4 items-start";
                 inputGroup.innerHTML = `
-                <!-- Mission Selection -->
+
                 <div class="flex-1 min-w-[180px]">
                     <label for="mission-code-${i}" class="${labelClasses}">Mission:</label>
                     <select id="mission-code-${i}" name="missionCode${i}" class="${inputClasses}">
@@ -34,13 +33,13 @@
                         ${missionsOption}
                     </select>
                 </div>
-                <!-- Percentage Input -->
+
                 <div class="w-1/6 min-w-[80px]">
                     <label for="mission-percentage-${i}" class="${labelClasses}">Percentage:</label>
                     <input type="number" step="0.1" min="0" max="1" id="mission-percentage-${i}"
                            name="missionPercentage${i}" class="${inputClasses}" />
                 </div>
-                <!-- Comment Box -->
+
                 <div class="flex-grow">
                     <label for="mission-comment-${i}" class="${labelClasses}">Comment:</label>
                     <textarea id="mission-comment-${i}" rows="1" name="missionComment${i}" class="${inputClasses}"></textarea>
@@ -76,7 +75,7 @@
     </p>
 
     <form th:action="@{/daily-execution}" method="post" class="space-y-8">
-        <!-- Date Picker -->
+
         <div class="relative w-1/4">
             <label for="date" class="block text-gray-700 font-semibold mb-2">The day:</label>
             <div class="relative">
@@ -93,7 +92,7 @@
             </div>
         </div>
 
-        <!-- Dynamic Inputs Container -->
+
         <div id="inputContainer"></div>
 
         <button type="submit"

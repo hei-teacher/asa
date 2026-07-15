@@ -21,7 +21,7 @@
 </div>
 
 <div class="flex justify-between gap-6 py-6 bg-gray-50">
-    <!-- Left section: Main title and Worker Selector -->
+
     <div class="px-6">
         <h1 th:text="${thYear.year()} + ' - ' + ${thYear.title()}"
             class="text-2xl font-semibold">
@@ -30,7 +30,7 @@
             <div th:replace="fragments/selectors/workerAndYear :: apply(work-and-care-calendar, Myself)"></div>
         </div>
     </div>
-    <!-- Right section: Color Description -->
+
     <div class="px-6">
         <h2 class="text-2xl font-semibold">Color description</h2>
         <ul class="mt-2">
@@ -105,7 +105,7 @@
                     </span>
                 </div>
 
-                <!-- Modal -->
+
                 <div id="infoModal" class="fixed inset-0 bg-gray-900/30 backdrop-blur-sm hidden flex items-center justify-center">
                     <div class="bg-white p-4 rounded shadow-lg w-80">
                         <h2 id="modalTitle" class="text-lg font-semibold mb-2"></h2>

@@ -27,7 +27,7 @@ public class ToutCas extends Cas {
             .flatMap(cas -> cas.patrimoine().getPossesseurs().keySet().stream())
             .collect(toSet());
     Map<Personne, Double> possesseurs = new HashMap<>();
-    toutPersonnes.forEach(p -> possesseurs.put(p, Double.NaN)); // TODO: NaN?
+    toutPersonnes.forEach(p -> possesseurs.put(p, Double.NaN));
     return possesseurs;
   }
 

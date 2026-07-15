@@ -15,7 +15,7 @@ public class WorkerMapper {
     return toDomain(jWorker, new Cache());
   }
 
-  /*package-private*/ Worker toDomain(JWorker jWorker, Cache cache) {
+  Worker toDomain(JWorker jWorker, Cache cache) {
     var code = jWorker.getCode();
     if (cache.contains(Worker.class, code)) {
       return cache.get(Worker.class, code);

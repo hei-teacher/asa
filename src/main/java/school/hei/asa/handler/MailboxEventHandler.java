@@ -43,17 +43,12 @@ public class MailboxEventHandler implements RequestHandler<SQSEvent, String> {
       List<SQSMessage> messages = event.getRecords();
       consumableEventTyper
           .apply(messages)
-          .forEach(ConsumableEvent::newRandomVisibilityTimeout); // note(init-visibility)
+          .forEach(ConsumableEvent::newRandomVisibilityTimeout);
       log.info("SQS messages: {}", messages);
 
       try (var applicationContext = applicationContext()) {
         getRuntime()
             .addShutdownHook(
-                // in case, say, the execution timed out
-                // TODO: no, we have no control over when AWS shuts the JVM down
-                //   Best is to regularly check whether we are nearing end of allowedTime,
-                //   in which case we close resources before timing out.
-                //   Frontal functions might have the same issue also.
                 new Thread(() -> onHandled(applicationContext)));
         var eventConsumer = applicationContext.getBean(EventConsumer.class);
         var messageConverter = applicationContext.getBean(ConsumableEventTyper.class);

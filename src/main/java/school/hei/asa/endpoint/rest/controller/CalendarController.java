@@ -92,7 +92,7 @@ public class CalendarController {
 
   private Map<LocalDate, Color> getColoredDates(int year, Worker worker) {
     Map<LocalDate, Color> coloredDays = new HashMap<>();
-    coloredDays.put(now(), BLUE); // put it first so that today is re-colored if fully executed
+    coloredDays.put(now(), BLUE);
     var datesByDailyExecutionType = calendarService.datesByDailyExecutionType(worker, year);
     datesByDailyExecutionType.get(fullWork).forEach(date -> coloredDays.put(date, GREEN));
     datesByDailyExecutionType.get(fullCare).forEach(date -> coloredDays.put(date, RED));

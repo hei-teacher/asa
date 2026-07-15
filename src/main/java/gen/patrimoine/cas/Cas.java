@@ -21,7 +21,6 @@ public abstract class Cas {
   @Getter protected final LocalDate ajd;
   @Getter protected final LocalDate finSimulation;
 
-  // lazy init required as spec is declarative, not procedural
   private final Supplier<Patrimoine> newPatrimoineSupplier;
   protected Patrimoine patrimoine;
 

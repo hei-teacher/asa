@@ -35,7 +35,7 @@ public class MissionExecutionMapper {
     return jme;
   }
 
-  /*package-private*/ MissionExecution toDomain(JMissionExecution jme, Cache cache) {
+  MissionExecution toDomain(JMissionExecution jme, Cache cache) {
     var jWorkerCode = jme.getWorker_code();
     var jMissionCode = jme.getMission_code();
     return new MissionExecution(
@@ -66,7 +66,7 @@ public class MissionExecutionMapper {
     return jmeList.stream().map(jme -> toDomain(jme, cache)).toList();
   }
 
-  /*package-private*/ List<MissionExecution> toDomain(
+  List<MissionExecution> toDomain(
       List<JMissionExecution> jmeList, Cache cache) {
     return jmeList.stream().map(jme -> toDomain(jme, cache)).toList();
   }

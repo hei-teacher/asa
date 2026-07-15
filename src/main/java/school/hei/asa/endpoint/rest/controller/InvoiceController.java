@@ -94,7 +94,7 @@ public class InvoiceController {
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();
     log.info("invoice id : {}", invoice.invoiceData().id());
     log.info("saving reference to database...");
-    thInvoiceService.saveInvoiceReference(invoice.invoiceData(), worker);
+    thInvoiceService.saveInvoice(invoice.invoiceData(), worker);
     log.info("Generating name for bucket key...");
     var fileName = thInvoiceService.generateInvoiceFileName(worker);
     log.info("uploading...");

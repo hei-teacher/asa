@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -61,9 +62,7 @@ public class ContractService {
   }
 
   public double getRemainingDaysOnActiveContractOrZero(Worker worker) {
-    return getAllContractsByWorker(worker).stream()
-        .filter(c -> c.duration() != null)
-        .findFirst()
+    return findActiveContract(worker)
         .map(contract -> getRemainingDaysForContract(worker, contract))
         .orElse(0d);
   }
@@ -107,13 +106,15 @@ public class ContractService {
   }
 
   public Contract getActiveContractOrThrow(Worker worker) {
-    return getAllContractsByWorker(worker).stream()
-        .filter(c -> c.duration() != null)
-        .findFirst()
+    return findActiveContract(worker)
         .orElseThrow(
             () ->
                 new IllegalStateException(
                     "You do not have an active contract. Please contact your administrator."));
+  }
+
+  private Optional<Contract> findActiveContract(Worker worker) {
+    return getAllContractsByWorker(worker).stream().filter(c -> c.duration() != null).findFirst();
   }
 
   public List<Contract> findActiveContracts() {

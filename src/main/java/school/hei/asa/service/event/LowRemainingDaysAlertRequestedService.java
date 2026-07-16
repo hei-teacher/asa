@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.model.LowRemainingDaysAlertRequested;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
+import school.hei.asa.number.DaysFormatter;
 import school.hei.asa.repository.WorkerRepository;
 import school.hei.asa.service.ContractService;
 import school.hei.asa.service.mapper.InternetAddressMapper;
@@ -52,10 +53,12 @@ public class LowRemainingDaysAlertRequestedService
         internetAddressMapper.toInternetAddresses(
             Arrays.stream(this.accountants.split(",")).map(String::trim).toList());
 
+    var formattedRemainingDays = DaysFormatter.format(remainingDays);
+
     var subject =
         String.format(
-            "ASA - ALERT: %s has only %d day(s) remaining on their contract",
-            worker.name(), remainingDays);
+            "ASA - ALERT: %s has only %s day(s) remaining on their contract",
+            worker.name(), formattedRemainingDays);
 
     var dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withZone(ZoneId.of("UTC"));
     var formattedEntranceDate = dateFormatter.format(contract.entranceInstant());
@@ -66,7 +69,7 @@ public class LowRemainingDaysAlertRequestedService
             <p>Hello,</p>
             <p>
               Worker <strong>%s</strong> (<em>%s</em>) has logged a check-in
-              and now has <strong>%d day(s)</strong> remaining
+              and now has <strong>%s day(s)</strong> remaining
               on their current contract (start: %s, total duration: %d days).
             </p>
             <p>
@@ -77,7 +80,7 @@ public class LowRemainingDaysAlertRequestedService
             """,
             worker.name(),
             worker.code(),
-            remainingDays,
+            formattedRemainingDays,
             formattedEntranceDate,
             contract.duration().toDays(),
             lowRemainingDaysThreshold);

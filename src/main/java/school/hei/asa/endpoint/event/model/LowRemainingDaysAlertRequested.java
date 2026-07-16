@@ -18,7 +18,7 @@ import lombok.ToString;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LowRemainingDaysAlertRequested extends PojaEvent {
   private String workerCode;
-  private long remainingDays;
+  private double remainingDays;
 
   @Override
   public Duration maxConsumerDuration() {

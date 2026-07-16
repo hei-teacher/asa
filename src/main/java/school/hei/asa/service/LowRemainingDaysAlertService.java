@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.endpoint.event.model.LowRemainingDaysAlertRequested;
 import school.hei.asa.model.Worker;
+import school.hei.asa.number.DaysFormatter;
 
 @Slf4j
 @Service
@@ -28,7 +29,7 @@ public class LowRemainingDaysAlertService {
 
   public Optional<String> checkRemainingDaysAndBuildAlertMessage(Worker worker) {
     var activeContract = contractService.getActiveContractOrThrow(worker);
-    var remainingDays = (long) contractService.getRemainingDaysForContract(worker, activeContract);
+    var remainingDays = contractService.getRemainingDaysForContract(worker, activeContract);
 
     if (!isBelowThreshold(remainingDays)) {
       return Optional.empty();
@@ -43,10 +44,12 @@ public class LowRemainingDaysAlertService {
                 .build()));
 
     return Optional.of(
-        "Please note : You have " + remainingDays + " day(s) left on your contract !");
+        "Please note : You have "
+            + DaysFormatter.format(remainingDays)
+            + " day(s) left on your contract !");
   }
 
-  public boolean isBelowThreshold(long remainingDays) {
+  public boolean isBelowThreshold(double remainingDays) {
     return remainingDays < lowRemainingDaysThreshold;
   }
 }

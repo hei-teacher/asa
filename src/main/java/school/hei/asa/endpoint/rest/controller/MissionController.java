@@ -76,8 +76,7 @@ public class MissionController {
     var thMissionsPerProductsByWorkerCode =
         thMissionService.getUniqueMissionsByTitle(thProductsByWorkerCode);
     model.addAttribute(
-        "executedDaysByProductMission",
-        thMissionService.toMissionChartData(thMissionsPerProductsByWorkerCode));
+        "executedDaysByProductMission", toListOfMap(thMissionsPerProductsByWorkerCode));
 
     var thMissionsByWorkerCode =
         thMissionService.getAllMissionsFromProducts(thProductsByWorkerCode);
@@ -140,6 +139,19 @@ public class MissionController {
     workerToModelAdder.apply(new WorkerModelAdderParam(workerCode, authenticatedWorker), model);
 
     return "mission-executions";
+  }
+
+  private List<Map<String, Object>> toListOfMap(List<ThMission> thMissions) {
+    List<Map<String, Object>> res = new ArrayList<>();
+    for (var mission : thMissions) {
+      Map<String, Object> dataPoint = new HashMap<>();
+      dataPoint.put("code", mission.getCode());
+      dataPoint.put("name", mission.getTitle());
+      dataPoint.put("executedDays", mission.executedDays());
+      dataPoint.put("studentExecutedDays", mission.studentExecutedDays());
+      res.add(dataPoint);
+    }
+    return res;
   }
 
   private Map<LocalDate, List<DailyExecution>> dailyExecutionsByDate(

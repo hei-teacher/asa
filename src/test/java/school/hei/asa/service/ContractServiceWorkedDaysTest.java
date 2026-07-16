@@ -2,7 +2,6 @@ package school.hei.asa.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.time.Duration;
@@ -33,8 +32,10 @@ class ContractServiceWorkedDaysTest {
   private final MissionService missionService = mock(MissionService.class);
   private final CareProductCodeSupplier careProductCodeSupplier =
       mock(CareProductCodeSupplier.class);
+
   @SuppressWarnings("unchecked")
   private final EventProducer<ContractAlertRequested> eventProducer = mock(EventProducer.class);
+
   private final ContractService contractService =
       new ContractService(
           workerRepository,
@@ -118,8 +119,8 @@ class ContractServiceWorkedDaysTest {
             "Company",
             null);
     when(contractRepository.findAllByWorker(worker)).thenReturn(List.of(contract));
-    when(missionExecutionRepository.countDistinctWorkDates(eq("W-001"), any(), any()))
-        .thenReturn(0L);
+    when(dailyExecutionRepository.findByWorkerCodeAndDateBetween(any(), any(), any()))
+        .thenReturn(List.of());
 
     assertTrue(contractService.hasRemainingDays(worker));
   }
@@ -137,9 +138,19 @@ class ContractServiceWorkedDaysTest {
             Duration.ofDays(1),
             "Company",
             null);
+    var product = new Product("WORK", "Work", "D");
+    var careProduct = new Product("CARE", "Care", "D");
+    var careMission = new Mission("CARE", "Care", "D", 10, careProduct);
+    var workMission = new Mission("WORK", "Work", "D", 10, product);
+    var date = LocalDate.now();
+    var meCare = new MissionExecution(careMission, worker, date, 0.0, "c", Instant.now());
+    var meWork = new MissionExecution(workMission, worker, date, 1.0, "w", Instant.now());
+    var de = new DailyExecution(worker, date, List.of(meCare, meWork));
     when(contractRepository.findAllByWorker(worker)).thenReturn(List.of(contract));
-    when(missionExecutionRepository.countDistinctWorkDates(eq("W-001"), any(), any()))
-        .thenReturn(1L);
+    when(dailyExecutionRepository.findByWorkerCodeAndDateBetween(any(), any(), any()))
+        .thenReturn(List.of(de));
+    when(careProductCodeSupplier.get()).thenReturn("CARE");
+    when(missionService.isUnpaidCare(any())).thenReturn(false);
 
     assertFalse(contractService.hasRemainingDays(worker));
   }

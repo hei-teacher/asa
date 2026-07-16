@@ -122,12 +122,15 @@ public class ContractService {
       return false;
     }
 
-    var durationDays = (int) activeContract.duration().toDays();
+    var durationDays = Math.toIntExact(activeContract.duration().toDays());
     if (durationDays <= 0) {
       return true;
     }
 
-    var workDays = usedDays(worker, activeContract);
+    var startDate = activeContract.entranceInstant().atZone(systemDefault()).toLocalDate();
+    var now = LocalDate.now();
+    var workedStr = getActualWorkedDaysByDateByWorker(startDate, worker.code(), now);
+    var workDays = workedStr.equals("-") ? 0.0 : Double.parseDouble(workedStr);
 
     return workDays < durationDays;
   }
@@ -146,8 +149,11 @@ public class ContractService {
       return Long.MAX_VALUE;
     }
 
-    var usedDays = usedDays(worker, activeContract);
-    return durationDays - usedDays;
+    var startDate = activeContract.entranceInstant().atZone(systemDefault()).toLocalDate();
+    var now = LocalDate.now();
+    var workedStr = getActualWorkedDaysByDateByWorker(startDate, worker.code(), now);
+    var usedDays = workedStr.equals("-") ? 0.0 : Double.parseDouble(workedStr);
+    return (long) (durationDays - usedDays);
   }
 
   public Optional<String> checkAndNotifyContractAlert(Worker worker) {
@@ -170,11 +176,5 @@ public class ContractService {
 
     var plural = remaining > 1 ? "s" : "";
     return Optional.of("Warning: only " + remaining + " day" + plural + " left on your contract.");
-  }
-
-  private long usedDays(Worker worker, Contract activeContract) {
-    var startDate = activeContract.entranceInstant().atZone(systemDefault()).toLocalDate();
-    var now = LocalDate.now();
-    return missionExecutionRepository.countDistinctWorkDates(worker.code(), startDate, now);
   }
 }

@@ -3,7 +3,6 @@ package school.hei.asa.service;
 import static java.util.Locale.FRENCH;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static school.hei.asa.model.contract.ContractType.*;
 
@@ -11,7 +10,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.endpoint.event.EventProducer;
@@ -39,8 +37,10 @@ class ContractServiceTest {
   private final MissionService missionService = mock(MissionService.class);
   private final CareProductCodeSupplier careProductCodeSupplier =
       mock(CareProductCodeSupplier.class);
+
   @SuppressWarnings("unchecked")
   private final EventProducer<ContractAlertRequested> eventProducer = mock(EventProducer.class);
+
   private final int alertThreshold = 10;
   private final ContractService contractService =
       new ContractService(
@@ -158,9 +158,19 @@ class ContractServiceTest {
             Duration.ofDays(10),
             "Company",
             null);
+    var product = new Product("WORK", "Work", "D");
+    var careProduct = new Product("CARE", "Care", "D");
+    var careMission = new Mission("CARE", "Care", "D", 10, careProduct);
+    var workMission = new Mission("WORK", "Work", "D", 10, product);
+    var date = LocalDate.now();
+    var meCare = new MissionExecution(careMission, worker, date, 0.0, "c", Instant.now());
+    var meWork = new MissionExecution(workMission, worker, date, 1.0, "w", Instant.now());
+    var de = new DailyExecution(worker, date, List.of(meCare, meWork));
     when(contractRepository.findAllByWorker(worker)).thenReturn(List.of(contract));
-    when(missionExecutionRepository.countDistinctWorkDates(eq("W-001"), any(), any()))
-        .thenReturn(1L);
+    when(dailyExecutionRepository.findByWorkerCodeAndDateBetween(any(), any(), any()))
+        .thenReturn(List.of(de));
+    when(careProductCodeSupplier.get()).thenReturn("CARE");
+    when(missionService.isUnpaidCare(any())).thenReturn(false);
 
     assertTrue(contractService.hasRemainingDays(worker));
   }
@@ -179,9 +189,19 @@ class ContractServiceTest {
             Duration.ofDays(1),
             "Company",
             null);
+    var product = new Product("WORK", "Work", "D");
+    var careProduct = new Product("CARE", "Care", "D");
+    var careMission = new Mission("CARE", "Care", "D", 10, careProduct);
+    var workMission = new Mission("WORK", "Work", "D", 10, product);
+    var date = LocalDate.now();
+    var meCare = new MissionExecution(careMission, worker, date, 0.0, "c", Instant.now());
+    var meWork = new MissionExecution(workMission, worker, date, 1.0, "w", Instant.now());
+    var de = new DailyExecution(worker, date, List.of(meCare, meWork));
     when(contractRepository.findAllByWorker(worker)).thenReturn(List.of(contract));
-    when(missionExecutionRepository.countDistinctWorkDates(eq("W-001"), any(), any()))
-        .thenReturn(1L);
+    when(dailyExecutionRepository.findByWorkerCodeAndDateBetween(any(), any(), any()))
+        .thenReturn(List.of(de));
+    when(careProductCodeSupplier.get()).thenReturn("CARE");
+    when(missionService.isUnpaidCare(any())).thenReturn(false);
 
     assertFalse(contractService.hasRemainingDays(worker));
   }
@@ -191,7 +211,7 @@ class ContractServiceTest {
     var w = new Worker("W-001", "John", "john@test.com", "John", "Addr", "City", "NIF", "STAT");
     when(contractRepository.findAllByWorker(w)).thenReturn(List.of());
 
-    assertEquals(-1, contractService.remainingDays(w));
+    assertEquals(-1, contractService.getRemainingDaysByWorker(w));
   }
 
   @Test
@@ -209,7 +229,7 @@ class ContractServiceTest {
             null);
     when(contractRepository.findAllByWorker(w)).thenReturn(List.of(contract));
 
-    assertEquals(Long.MAX_VALUE, contractService.remainingDays(w));
+    assertEquals(Long.MAX_VALUE, contractService.getRemainingDaysByWorker(w));
   }
 
   @Test
@@ -226,11 +246,21 @@ class ContractServiceTest {
             Duration.ofDays(10),
             "Company",
             null);
+    var product = new Product("WORK", "Work", "D");
+    var careProduct = new Product("CARE", "Care", "D");
+    var careMission = new Mission("CARE", "Care", "D", 10, careProduct);
+    var workMission = new Mission("WORK", "Work", "D", 10, product);
+    var date = LocalDate.now();
+    var meCare = new MissionExecution(careMission, worker, date, 0.0, "c", Instant.now());
+    var meWork = new MissionExecution(workMission, worker, date, 1.0, "w", Instant.now());
+    var de = new DailyExecution(worker, date, List.of(meCare, meWork));
     when(contractRepository.findAllByWorker(worker)).thenReturn(List.of(contract));
-    when(missionExecutionRepository.countDistinctWorkDates(eq("W-001"), any(), any()))
-        .thenReturn(1L);
+    when(dailyExecutionRepository.findByWorkerCodeAndDateBetween(any(), any(), any()))
+        .thenReturn(List.of(de));
+    when(careProductCodeSupplier.get()).thenReturn("CARE");
+    when(missionService.isUnpaidCare(any())).thenReturn(false);
 
-    assertEquals(9L, contractService.remainingDays(worker));
+    assertEquals(9L, contractService.getRemainingDaysByWorker(worker));
   }
 
   @Test
@@ -277,9 +307,19 @@ class ContractServiceTest {
             Duration.ofDays(100),
             "Company",
             null);
+    var product = new Product("WORK", "Work", "D");
+    var careProduct = new Product("CARE", "Care", "D");
+    var careMission = new Mission("CARE", "Care", "D", 10, careProduct);
+    var workMission = new Mission("WORK", "Work", "D", 10, product);
+    var date = LocalDate.now();
+    var meCare = new MissionExecution(careMission, worker, date, 0.0, "c", Instant.now());
+    var meWork = new MissionExecution(workMission, worker, date, 1.0, "w", Instant.now());
+    var de = new DailyExecution(worker, date, List.of(meCare, meWork));
     when(contractRepository.findAllByWorker(worker)).thenReturn(List.of(contract));
-    when(missionExecutionRepository.countDistinctWorkDates(eq("W-001"), any(), any()))
-        .thenReturn(1L);
+    when(dailyExecutionRepository.findByWorkerCodeAndDateBetween(any(), any(), any()))
+        .thenReturn(List.of(de));
+    when(careProductCodeSupplier.get()).thenReturn("CARE");
+    when(missionService.isUnpaidCare(any())).thenReturn(false);
 
     var result = contractService.checkAndNotifyContractAlert(worker);
 
@@ -301,9 +341,19 @@ class ContractServiceTest {
             Duration.ofDays(10),
             "Company",
             null);
+    var product = new Product("WORK", "Work", "D");
+    var careProduct = new Product("CARE", "Care", "D");
+    var careMission = new Mission("CARE", "Care", "D", 10, careProduct);
+    var workMission = new Mission("WORK", "Work", "D", 10, product);
+    var date = LocalDate.now();
+    var meCare = new MissionExecution(careMission, worker, date, 0.0, "c", Instant.now());
+    var meWork = new MissionExecution(workMission, worker, date, 5.0, "w", Instant.now());
+    var de = new DailyExecution(worker, date, List.of(meCare, meWork));
     when(contractRepository.findAllByWorker(worker)).thenReturn(List.of(contract));
-    when(missionExecutionRepository.countDistinctWorkDates(eq("W-001"), any(), any()))
-        .thenReturn(5L);
+    when(dailyExecutionRepository.findByWorkerCodeAndDateBetween(any(), any(), any()))
+        .thenReturn(List.of(de));
+    when(careProductCodeSupplier.get()).thenReturn("CARE");
+    when(missionService.isUnpaidCare(any())).thenReturn(false);
 
     var result = contractService.checkAndNotifyContractAlert(worker);
 
@@ -326,9 +376,19 @@ class ContractServiceTest {
             Duration.ofDays(10),
             "Company",
             null);
+    var product = new Product("WORK", "Work", "D");
+    var careProduct = new Product("CARE", "Care", "D");
+    var careMission = new Mission("CARE", "Care", "D", 10, careProduct);
+    var workMission = new Mission("WORK", "Work", "D", 10, product);
+    var date = LocalDate.now();
+    var meCare = new MissionExecution(careMission, worker, date, 0.0, "c", Instant.now());
+    var meWork = new MissionExecution(workMission, worker, date, 9.0, "w", Instant.now());
+    var de = new DailyExecution(worker, date, List.of(meCare, meWork));
     when(contractRepository.findAllByWorker(worker)).thenReturn(List.of(contract));
-    when(missionExecutionRepository.countDistinctWorkDates(eq("W-001"), any(), any()))
-        .thenReturn(9L);
+    when(dailyExecutionRepository.findByWorkerCodeAndDateBetween(any(), any(), any()))
+        .thenReturn(List.of(de));
+    when(careProductCodeSupplier.get()).thenReturn("CARE");
+    when(missionService.isUnpaidCare(any())).thenReturn(false);
 
     var result = contractService.checkAndNotifyContractAlert(worker);
 
@@ -351,9 +411,19 @@ class ContractServiceTest {
             Duration.ofDays(10),
             "Company",
             null);
+    var product = new Product("WORK", "Work", "D");
+    var careProduct = new Product("CARE", "Care", "D");
+    var careMission = new Mission("CARE", "Care", "D", 10, careProduct);
+    var workMission = new Mission("WORK", "Work", "D", 10, product);
+    var date = LocalDate.now();
+    var meCare = new MissionExecution(careMission, worker, date, 0.0, "c", Instant.now());
+    var meWork = new MissionExecution(workMission, worker, date, 3.0, "w", Instant.now());
+    var de = new DailyExecution(worker, date, List.of(meCare, meWork));
     when(contractRepository.findAllByWorker(worker)).thenReturn(List.of(contract));
-    when(missionExecutionRepository.countDistinctWorkDates(eq("W-001"), any(), any()))
-        .thenReturn(3L);
+    when(dailyExecutionRepository.findByWorkerCodeAndDateBetween(any(), any(), any()))
+        .thenReturn(List.of(de));
+    when(careProductCodeSupplier.get()).thenReturn("CARE");
+    when(missionService.isUnpaidCare(any())).thenReturn(false);
     doThrow(new RuntimeException("EventBridge down")).when(eventProducer).accept(any());
 
     var result = contractService.checkAndNotifyContractAlert(worker);

@@ -17,13 +17,12 @@ class ContractAlertRequestedServiceTest {
     var mailer = mock(Mailer.class);
     var internetAddressMapper = mock(InternetAddressMapper.class);
     var service =
-        new ContractAlertRequestedService(mailer, internetAddressMapper, "acc1@test.com,acc2@test.com");
+        new ContractAlertRequestedService(
+            mailer, internetAddressMapper, "acc1@test.com,acc2@test.com");
 
     when(internetAddressMapper.toInternetAddresses(anyList()))
         .thenReturn(
-            List.of(
-                new InternetAddress("acc1@test.com"),
-                new InternetAddress("acc2@test.com")));
+            List.of(new InternetAddress("acc1@test.com"), new InternetAddress("acc2@test.com")));
 
     var event =
         ContractAlertRequested.builder()
@@ -41,8 +40,7 @@ class ContractAlertRequestedServiceTest {
   void accept_singular_day() throws Exception {
     var mailer = mock(Mailer.class);
     var internetAddressMapper = mock(InternetAddressMapper.class);
-    var service =
-        new ContractAlertRequestedService(mailer, internetAddressMapper, "acc@test.com");
+    var service = new ContractAlertRequestedService(mailer, internetAddressMapper, "acc@test.com");
 
     when(internetAddressMapper.toInternetAddresses(anyList()))
         .thenReturn(List.of(new InternetAddress("acc@test.com")));
@@ -63,8 +61,7 @@ class ContractAlertRequestedServiceTest {
   void accept_empty_accountants_does_not_send() {
     var mailer = mock(Mailer.class);
     var internetAddressMapper = mock(InternetAddressMapper.class);
-    var service =
-        new ContractAlertRequestedService(mailer, internetAddressMapper, "acc@test.com");
+    var service = new ContractAlertRequestedService(mailer, internetAddressMapper, "acc@test.com");
 
     when(internetAddressMapper.toInternetAddresses(anyList())).thenReturn(List.of());
 

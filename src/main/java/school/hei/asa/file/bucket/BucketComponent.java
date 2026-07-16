@@ -78,6 +78,21 @@ public class BucketComponent {
     return destination;
   }
 
+  private String prefixFromBucketKey(String bucketKey) {
+    return lastNameSplitByDot(bucketKey)[0];
+  }
+
+  private String suffixFromBucketKey(String bucketKey) {
+    var splitByDot = lastNameSplitByDot(bucketKey);
+    return splitByDot.length == 1 ? "" : splitByDot[splitByDot.length - 1];
+  }
+
+  private String[] lastNameSplitByDot(String bucketKey) {
+    var splitByDash = bucketKey.split("/");
+    var lastName = splitByDash[splitByDash.length - 1];
+    return lastName.split("\\.");
+  }
+
   public URL presign(String bucketKey, Duration expiration) {
     GetObjectRequest getObjectRequest =
         GetObjectRequest.builder().bucket(bucketConf.getBucketName()).key(bucketKey).build();
@@ -94,20 +109,5 @@ public class BucketComponent {
 
   public String getBucketName() {
     return bucketConf.getBucketName();
-  }
-
-  private String prefixFromBucketKey(String bucketKey) {
-    return lastNameSplitByDot(bucketKey)[0];
-  }
-
-  private String suffixFromBucketKey(String bucketKey) {
-    var splitByDot = lastNameSplitByDot(bucketKey);
-    return splitByDot.length == 1 ? "" : splitByDot[splitByDot.length - 1];
-  }
-
-  private String[] lastNameSplitByDot(String bucketKey) {
-    var splitByDash = bucketKey.split("/");
-    var lastName = splitByDash[splitByDash.length - 1];
-    return lastName.split("\\.");
   }
 }

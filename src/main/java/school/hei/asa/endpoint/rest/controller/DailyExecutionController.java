@@ -49,8 +49,9 @@ public class DailyExecutionController {
     var worker = workerFromAuthentication.apply(authentication).get();
 
     if (!contractService.hasRemainingDays(worker)) {
-      throw new IllegalArgumentException(
-          "Cannot submit report: " + worker.name() + " has no remaining contract days.");
+      redirectAttributes.addFlashAttribute(
+          "error", "Cannot submit report: " + worker.name() + " has no remaining contract days.");
+      return "redirect:/daily-execution";
     }
 
     dailyExecutionRepository.save(thDailyExecutionFormMapper.toDomain(dmeForm, worker));

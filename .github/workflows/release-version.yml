@@ -17,14 +17,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.6
         with:
+          # secrets.GITHUB_TOKEN is not enough for releasing on protected branch
+          # Use a Personal Access Token from someone who has sufficient privileges
           token: ${{ secrets.POJA_GH_TOKEN_FOR_CONVENTIONAL_CHANGELOG }}
 
 
+      #############################################################################
+      ####### DETERMINE NEXT VERSION AND BUILD WITH APPROPRIATE VERSION ###########
+      #############################################################################
+
+      # We will use conventional-changelog which only supports yaml, yml and toml version file
       - name: From gradle.properties to version.yml
         run: |
           cp gradle.properties version.yml
           sed -i 's/=/: /g' version.yml
           git status
+
+      # conventional-ch increments the patch version even when
+      # it skipped commiting due to empty changelog. In such a case,
+      # we have to retrieve the old (unchanged) version using our own means.
+      # https://github.com/conventional-changelog/standard-version/issues/730
 
       - name: Read old version file
         id: read-old-version
@@ -75,6 +87,7 @@ jobs:
           git add gradle.properties
           git commit --amend --no-edit
           git push -f
+          # Also update tag since commit was amended
           git tag -d v${{ env.semver }}
           git tag v${{ env.semver }}
           git push --delete origin v${{ env.semver }}

@@ -3,7 +3,11 @@ package school.hei.asa.repository.mapper;
 import java.util.HashMap;
 import java.util.Map;
 
-class Cache {
+/**
+ * Due to bidirectional associations, circular dependency can occur when mapping. To cut the circle,
+ * cache mapped objects so that they can be read from memory instead of being recomputed.
+ */
+/*package-private*/ class Cache {
   private final Map<Class<?>, Map<String, Object>> memory = new HashMap<>();
 
   public void put(String id, Object o) {

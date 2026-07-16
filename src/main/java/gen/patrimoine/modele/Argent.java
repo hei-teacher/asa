@@ -27,7 +27,10 @@ public class Argent implements Serializable {
     if (o == null || getClass() != o.getClass()) return false;
     Argent argent = (Argent) o;
     return Objects.equals(devise, argent.devise)
-        && abs(montant - argent.montant) < 1;
+        &&
+        // we are only interested in major unit equality
+        // eg: cents in EUR does NOT interest us
+        abs(montant - argent.montant) < 1;
   }
 
   @Override

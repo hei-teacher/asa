@@ -11,7 +11,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode(callSuper = false)
 public abstract sealed class Possession extends Objectivable
-    implements Serializable
+    implements Serializable /*note(no-serializable)*/
     permits AchatMaterielAuComptant,
         Compte,
         CompteCorrection,

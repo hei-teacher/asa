@@ -23,7 +23,7 @@ public class MissionMapper {
     return toDomain(jMission, new Cache());
   }
 
-  Mission toDomain(JMission jMission, Cache cache) {
+  /*package-private*/ Mission toDomain(JMission jMission, Cache cache) {
     var missionCode = jMission.getCode();
     if (cache.contains(Mission.class, missionCode)) {
       return cache.get(Mission.class, missionCode);
@@ -53,7 +53,7 @@ public class MissionMapper {
     return toEntity(mission, new Cache());
   }
 
-  JMission toEntity(Mission mission, Cache cache) {
+  /*package-private*/ JMission toEntity(Mission mission, Cache cache) {
     var jMission = new JMission();
     jMission.setCode(mission.code());
     jMission.setTitle(mission.title());

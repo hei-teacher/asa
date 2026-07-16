@@ -54,6 +54,8 @@ public final class FluxArgent extends Possession {
             .filter(d -> d.getDayOfMonth() == dateOperation)
             .sorted()
             .map(d -> Pair.of(fluxMensuel, d))
+            // Addition must be done at a given time since Devise fluctuates
+            // TODO: test with Transfert between Compte with different Devise
             .reduce(Pair.of(compte.valeurComptable, t), FluxArgent::add)
             .first();
     var argentFutur =

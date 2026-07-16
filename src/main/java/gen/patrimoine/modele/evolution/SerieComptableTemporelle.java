@@ -33,7 +33,7 @@ public class SerieComptableTemporelle {
 
     for (var possession : ep.getPatrimoine().getPossessions()) {
       if (possession instanceof FluxArgent) {
-        continue;
+        continue; // valeur comptable toujours 0
       }
       var serie = new ArrayList<Integer>();
 
@@ -94,6 +94,9 @@ public class SerieComptableTemporelle {
   }
 
   public static int parseMontant(Argent a) {
+    // Argent::montant is PURPOSEFULLY private so that people do NOT manipulate it directly.
+    // Indeed, operations such as those on Devise can only be handled correctly internally.
+    // ppMontant explicitely indicates that it should only be used for printing purpose.
     return (int) parseDouble(a.ppMontant());
   }
 }

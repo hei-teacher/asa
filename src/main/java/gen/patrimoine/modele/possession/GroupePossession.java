@@ -20,7 +20,7 @@ public final class GroupePossession extends Possession {
             .map(Possession::valeurComptable)
             .reduce(new Argent(0, devise), (a1, a2) -> a1.add(a2, t)));
     this.possessions = possessions;
-    typeAgregat(possessions);
+    typeAgregat(possessions); // sanity check: fails if set is inconsistent
   }
 
   @Override

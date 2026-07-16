@@ -91,7 +91,7 @@ public class ContractCas extends Cas {
         compteCompany,
         compteWorker,
         LocalDate.of(entranceDate.getYear(), entranceDate.getMonthValue(), 1).plusMonths(1),
-        entranceDate().plusYears(99),
+        entranceDate().plusYears(99), // TODO: check end when Contract.endDate is added,
         PAY_DAY,
         new Argent(contract.level().monthlyPay(), devise));
   }
@@ -100,9 +100,11 @@ public class ContractCas extends Cas {
   protected void suivi() {}
 
   private void payContractorAllMonths(Compte compteWorker) {
+    // First month, potentially partial
     var daysToPayMonth1 = contractorDaysToPayMonth1();
     payContractorMonthNth(1, compteWorker, daysToPayMonth1);
 
+    // Intermediate months, all full
     var remainingDays = contract.duration().toDays() - daysToPayMonth1;
     var monthNth = 2;
     var daysPerMonth = contractTypeToDaysPerMonth.apply(contract.level().type());
@@ -112,6 +114,7 @@ public class ContractCas extends Cas {
       monthNth++;
     }
 
+    // Last month, potentially partial
     payContractorMonthNth(monthNth, compteWorker, remainingDays);
   }
 
@@ -124,7 +127,7 @@ public class ContractCas extends Cas {
         String.format("[Mois %s] %s", monthNth, contract.ppId()),
         compteCompany,
         compteWorker,
-        payDateOfMonth0.plusMonths(monthNth)
+        payDateOfMonth0.plusMonths(monthNth), // TODO: emit warn if > Contract.endDate when added
         new Argent(contract.level().dailyPay() * daysToPay, devise));
   }
 

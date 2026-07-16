@@ -63,6 +63,10 @@ public class SecurityConfig {
                               request, response, authentication);
                         })
                     .failureHandler(
+                        // On success redirection from Casdoor URL instead of
+                        // custom domain URL
+                        // so it is incorrectly interpreted as authorization_request_not_found.
+                        // Redo the call and it will be Ok.
                         (request, response, exception) -> {
                           log.error("❌ OAuth2 login FAILURE", exception);
                           log.error("Message: {}", exception.getMessage());

@@ -23,7 +23,7 @@
     <div th:replace="fragments/header :: header"></div>
 
     <div class="flex flex-1 overflow-hidden">
-
+      <!-- Left section -->
       <div class="w-1/2 p-5 bg-gray-100 box-border h-full overflow-y-auto">
         <h1 class="text-4xl px-3 font-bold text-[#3F2F6A] mt-3 mb-4">
           Get your invoice
@@ -71,7 +71,7 @@
                   </div>
                 </div>
               </div>
-
+              <!-- The "download" form  -->
               <form
                 method="get"
                 action="/download-invoice"
@@ -142,7 +142,7 @@
         </div>
       </div>
 
-
+      <!-- Right section -->
       <div
         class="w-1/2 h-full overflow-auto"
         th:if="${yearMonthReference != null}"

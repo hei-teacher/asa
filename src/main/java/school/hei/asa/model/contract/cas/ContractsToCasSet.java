@@ -43,10 +43,11 @@ public class ContractsToCasSet implements Function<Set<Contract>, CasSet> {
 
     var objectif =
         new Argent(
-            0,
+            0, // since company.patrimoine exactly cancels workers.patrimoine
             DEVISE);
     var casSet = new CasSet(setOfCas, objectif);
     new CasSetAnalyzer()
+        // CRITICAL: CasSetAnalyzer::verifie will execute all operations
         .accept(casSet);
 
     return casSet;

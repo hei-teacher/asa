@@ -58,8 +58,22 @@ class DailyExecutionControllerTest {
     var authentication = mock(Authentication.class);
     var form =
         new ThDailyExecutionForm(
-            "2026-01-15", null, null, null, null, null, null,
-            null, null, null, null, null, null, null, null, null);
+            "2026-01-15",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
     var redirectAttributes = new RedirectAttributesModelMap();
     var dailyExecution = mock(DailyExecution.class);
 
@@ -80,8 +94,22 @@ class DailyExecutionControllerTest {
     var authentication = mock(Authentication.class);
     var form =
         new ThDailyExecutionForm(
-            "2026-01-15", null, null, null, null, null, null,
-            null, null, null, null, null, null, null, null, null);
+            "2026-01-15",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
     var redirectAttributes = new RedirectAttributesModelMap();
     var dailyExecution = mock(DailyExecution.class);
 
@@ -105,8 +133,22 @@ class DailyExecutionControllerTest {
     var authentication = mock(Authentication.class);
     var form =
         new ThDailyExecutionForm(
-            "2026-01-15", null, null, null, null, null, null,
-            null, null, null, null, null, null, null, null, null);
+            "2026-01-15",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
     var redirectAttributes = new RedirectAttributesModelMap();
 
     when(workerFromAuthentication.apply(authentication)).thenReturn(Optional.of(worker));

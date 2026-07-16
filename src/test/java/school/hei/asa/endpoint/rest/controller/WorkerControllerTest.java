@@ -61,17 +61,23 @@ class WorkerControllerTest {
     var authentication = mock(Authentication.class);
     var model = new ConcurrentModel();
     var contracts = List.<Contract>of();
-    var thWorker = new ThWorker("W-001", "John", "john@test.com", "Prestataire", null, null, null);
 
     when(workerFromAuthentication.apply(authentication)).thenReturn(Optional.of(worker));
     when(workerToModelAdder.apply(any(WorkerModelAdderParam.class), eq(model))).thenReturn(worker);
     when(contractRepository.findAllByWorker(any(Worker.class))).thenReturn(contracts);
-    when(thWorkerMapper.toThWorker(worker, contracts)).thenReturn(thWorker);
 
     var result = controller.getWorker(model, authentication, null);
 
     assertEquals("worker", result);
-    assertEquals(thWorker, model.getAttribute("worker"));
+    var thWorker = (ThWorker) model.getAttribute("worker");
+    assertNotNull(thWorker);
+    assertEquals("W-001", thWorker.code());
+    assertEquals("John", thWorker.name());
+    assertEquals("john@test.com", thWorker.email());
+    assertNull(thWorker.workerType());
+    assertNull(thWorker.entranceInstant());
+    assertNull(thWorker.level());
+    assertNull(thWorker.levelEntranceInstant());
   }
 
   @Test

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import school.hei.asa.endpoint.rest.controller.mapper.ThContractMapper;
 import school.hei.asa.endpoint.rest.controller.mapper.ThWorkerMapper;
+import school.hei.asa.endpoint.rest.model.th.ThWorker;
 import school.hei.asa.endpoint.rest.model.th.WorkerModelAdderParam;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.ThContractService;
@@ -44,7 +45,23 @@ public class WorkerController {
     var worker = workerToModelAdder.apply(workerToModelAdderParam, model);
     var contracts = contractRepository.findAllByWorker(worker);
 
-    model.addAttribute("worker", thWorkerMapper.toThWorker(worker, contracts));
+    var hasContract = !contracts.isEmpty();
+    var entranceInstant = hasContract ? contracts.getLast().entranceInstant() : null;
+    var level = hasContract ? contracts.getLast().level().code() : null;
+    var levelEntranceInstant = hasContract ? contracts.getLast().entranceInstant() : null;
+    var contractType = hasContract ? contracts.getLast().level().type().name() : null;
+    var workerType = thWorkerMapper.toWorkerType(contractType);
+
+    model.addAttribute(
+        "worker",
+        new ThWorker(
+            worker.code(),
+            worker.name(),
+            worker.email(),
+            workerType,
+            entranceInstant,
+            level,
+            levelEntranceInstant));
     return "worker";
   }
 

@@ -17,19 +17,22 @@ public class LowRemainingDaysAlertService {
   private final EventProducer<LowRemainingDaysAlertRequested> eventProducer;
   private final int lowRemainingDaysThreshold;
   private final ContractService contractService;
+  private final CalendarService calendarService;
 
   public LowRemainingDaysAlertService(
       EventProducer<LowRemainingDaysAlertRequested> eventProducer,
       @Value("${LOW_CONTRACT_DAYS_THRESOLD}") int lowRemainingDaysThreshold,
-      ContractService contractService) {
+      ContractService contractService,
+      CalendarService calendarService) {
     this.eventProducer = eventProducer;
     this.lowRemainingDaysThreshold = lowRemainingDaysThreshold;
     this.contractService = contractService;
+    this.calendarService = calendarService;
   }
 
   public Optional<String> checkRemainingDaysAndBuildAlertMessage(Worker worker) {
     var activeContract = contractService.getActiveContractOrThrow(worker);
-    var remainingDays = contractService.getRemainingDaysForContract(worker, activeContract);
+    var remainingDays = calendarService.getRemainingDaysForContract(worker, activeContract);
 
     if (!isBelowThreshold(remainingDays)) {
       return Optional.empty();

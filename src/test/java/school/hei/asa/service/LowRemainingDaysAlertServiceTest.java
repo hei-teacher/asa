@@ -26,14 +26,16 @@ class LowRemainingDaysAlertServiceTest {
 
   private EventProducer<LowRemainingDaysAlertRequested> eventProducer;
   private ContractService contractService;
+  private CalendarService calendarService;
   private LowRemainingDaysAlertService service;
 
   @BeforeEach
   void setUp() {
     eventProducer = mock(EventProducer.class);
     contractService = mock(ContractService.class);
+    calendarService = mock(CalendarService.class);
 
-    service = new LowRemainingDaysAlertService(eventProducer, 10, contractService);
+    service = new LowRemainingDaysAlertService(eventProducer, 10, contractService, calendarService);
   }
 
   @Test
@@ -60,7 +62,7 @@ class LowRemainingDaysAlertServiceTest {
     var worker = worker();
     var contract = contract(worker);
     when(contractService.getActiveContractOrThrow(worker)).thenReturn(contract);
-    when(contractService.getRemainingDaysForContract(worker, contract)).thenReturn(5d);
+    when(calendarService.getRemainingDaysForContract(worker, contract)).thenReturn(5d);
 
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
 
@@ -78,7 +80,7 @@ class LowRemainingDaysAlertServiceTest {
     var worker = worker();
     var contract = contract(worker);
     when(contractService.getActiveContractOrThrow(worker)).thenReturn(contract);
-    when(contractService.getRemainingDaysForContract(worker, contract)).thenReturn(15d);
+    when(calendarService.getRemainingDaysForContract(worker, contract)).thenReturn(15d);
 
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
 
@@ -91,7 +93,7 @@ class LowRemainingDaysAlertServiceTest {
     var worker = new Worker("W-1", "Name", null, "Full Name", "Addr", "City", "NIF", "STAT");
     var contract = contract(worker);
     when(contractService.getActiveContractOrThrow(worker)).thenReturn(contract);
-    when(contractService.getRemainingDaysForContract(worker, contract)).thenReturn(5d);
+    when(calendarService.getRemainingDaysForContract(worker, contract)).thenReturn(5d);
 
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
 

@@ -26,7 +26,6 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.CalendarService;
-import school.hei.asa.service.ContractService;
 import school.hei.asa.service.LowRemainingDaysAlertService;
 
 @Controller
@@ -35,19 +34,16 @@ public class CalendarController {
   private final CalendarService calendarService;
   private final WorkerFromAuthentication workerFromAuthentication;
   private final WorkerToModelAdder workerToModelAdder;
-  private final ContractService contractService;
   private final LowRemainingDaysAlertService lowRemainingDaysAlertService;
 
   public CalendarController(
       CalendarService calendarService,
       WorkerFromAuthentication workerFromAuthentication,
       WorkerToModelAdder workerToModelAdder,
-      ContractService contractService,
       LowRemainingDaysAlertService lowRemainingDaysAlertService) {
     this.calendarService = calendarService;
     this.workerFromAuthentication = workerFromAuthentication;
     this.workerToModelAdder = workerToModelAdder;
-    this.contractService = contractService;
     this.lowRemainingDaysAlertService = lowRemainingDaysAlertService;
   }
 
@@ -60,16 +56,18 @@ public class CalendarController {
     year = year == null ? now().getYear() : year;
     model.addAttribute("year", year);
 
+    var authenticatedWorkerCode =
+        workerFromAuthentication
+            .apply(authentication)
+            .orElseThrow(() -> new IllegalStateException("Authenticated worker not found."))
+            .code();
+
     var workerCodeOrAuth =
-        workerCode == null || workerCode.isBlank()
-            ? workerFromAuthentication.apply(authentication).get().code()
-            : workerCode;
+        workerCode == null || workerCode.isBlank() ? authenticatedWorkerCode : workerCode;
 
     var worker =
         workerToModelAdder.apply(
-            new WorkerModelAdderParam(
-                workerCode, workerFromAuthentication.apply(authentication).get().code()),
-            model);
+            new WorkerModelAdderParam(workerCode, authenticatedWorkerCode), model);
 
     var missionTypeByMonth =
         calendarService.missionExecutionPercentageSumByMissionType(worker, year);
@@ -82,8 +80,8 @@ public class CalendarController {
         });
     var lateReportedDaysByMonth = calendarService.lateReportedDaysByMonth(worker, year);
 
-    double remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
-    boolean showWarning = lowRemainingDaysAlertService.isBelowThreshold((long) remainingDays);
+    double remainingDays = calendarService.getRemainingDaysOnActiveContractOrZero(worker);
+    boolean showWarning = lowRemainingDaysAlertService.isBelowThreshold(remainingDays);
 
     model.addAttribute("remainingDays", remainingDays);
     model.addAttribute("showWarning", showWarning);

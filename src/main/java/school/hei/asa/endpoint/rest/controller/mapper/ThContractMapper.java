@@ -16,14 +16,14 @@ import org.springframework.stereotype.Component;
 import school.hei.asa.endpoint.rest.model.th.ThContract;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
-import school.hei.asa.service.ContractService;
+import school.hei.asa.service.CalendarService;
 
 @Slf4j
 @AllArgsConstructor
 @Component
 public class ThContractMapper {
   private final ThWorkerMapper thWorkerMapper;
-  private final ContractService contractService;
+  private final CalendarService calendarService;
 
   public List<ThContract> toTh(List<Contract> contracts) {
     log.info("mapping contracts to Th...");
@@ -61,7 +61,7 @@ public class ThContractMapper {
                   current.jobTitle(),
                   current.duration() == null ? "-" : current.duration().toDays() + "",
                   current.contractBucketKey(),
-                  contractService.getActualWorkedDaysByDateByWorker(
+                  calendarService.getActualWorkedDaysByDateByWorker(
                       startDate, current.worker().code(), localEndDate)));
         });
     log.info("Successfully mapping contracts to Th !");

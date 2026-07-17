@@ -1,15 +1,11 @@
 package school.hei.asa.repository.mapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static school.hei.asa.model.contract.ContractType.studentContractor;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.hei.asa.model.DailyExecution;
@@ -28,17 +24,13 @@ public class ContractMapperTest {
 
   @BeforeEach
   void setUp() {
-    dailyExecutionRepository = mock(DailyExecutionRepository.class);
-    contractMapper =
-        new ContractMapper(new WorkerMapper(), new ContractLevelMapper(), dailyExecutionRepository);
+    contractMapper = new ContractMapper(new WorkerMapper(), new ContractLevelMapper());
   }
 
   @Test
   void mapping_to_domain() {
     var w = newWorker();
     var de = mock(DailyExecution.class);
-    when(dailyExecutionRepository.findByWorkerCodeAndDateBetween(eq(w.code()), any(), any()))
-        .thenReturn(List.of(de));
     var expected = newModel(w, de);
     var jContract = newEntity();
 

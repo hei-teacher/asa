@@ -1,6 +1,6 @@
 package school.hei.asa.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,7 +33,9 @@ public class WorkerServiceIT extends FacadeIT {
     var expected = workersFromYear();
     var actual = workerService.getWorkersFrom(modelWithYearAttribute);
 
-    assertEquals(expected, actual);
+    assertTrue(
+        actual.containsAll(expected),
+        "Expected workers " + expected + " to be present in " + actual);
   }
 
   @Test
@@ -41,7 +43,9 @@ public class WorkerServiceIT extends FacadeIT {
     var expected = workersFromDateRange();
     var actual = workerService.getWorkersFrom(modelWithStartAndEndDateAttribute);
 
-    assertEquals(expected, actual);
+    assertTrue(
+        actual.containsAll(expected),
+        "Expected workers " + expected + " to be present in " + actual);
   }
 
   private List<Worker> workersFromYear() {

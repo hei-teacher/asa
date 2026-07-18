@@ -2,8 +2,8 @@ package school.hei.asa.service;
 
 import java.util.List;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.endpoint.event.model.LowRemainingDaysAlertRequested;
@@ -12,29 +12,18 @@ import school.hei.asa.number.DaysFormatter;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class LowRemainingDaysAlertService {
 
   private final EventProducer<LowRemainingDaysAlertRequested> eventProducer;
-  private final int lowRemainingDaysThreshold;
   private final ContractService contractService;
   private final CalendarService calendarService;
-
-  public LowRemainingDaysAlertService(
-      EventProducer<LowRemainingDaysAlertRequested> eventProducer,
-      @Value("${LOW_CONTRACT_DAYS_THRESOLD}") int lowRemainingDaysThreshold,
-      ContractService contractService,
-      CalendarService calendarService) {
-    this.eventProducer = eventProducer;
-    this.lowRemainingDaysThreshold = lowRemainingDaysThreshold;
-    this.contractService = contractService;
-    this.calendarService = calendarService;
-  }
 
   public Optional<String> checkRemainingDaysAndBuildAlertMessage(Worker worker) {
     var activeContract = contractService.getActiveContractOrThrow(worker);
     var remainingDays = calendarService.getRemainingDaysForContract(worker, activeContract);
 
-    if (!isBelowThreshold(remainingDays)) {
+    if (!contractService.isBelowThreshold(remainingDays)) {
       return Optional.empty();
     }
 
@@ -50,9 +39,5 @@ public class LowRemainingDaysAlertService {
         "Please note : You have "
             + DaysFormatter.format(remainingDays)
             + " day(s) left on your contract !");
-  }
-
-  public boolean isBelowThreshold(double remainingDays) {
-    return remainingDays < lowRemainingDaysThreshold;
   }
 }

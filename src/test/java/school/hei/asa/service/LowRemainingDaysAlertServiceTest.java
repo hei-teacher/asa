@@ -35,7 +35,7 @@ class LowRemainingDaysAlertServiceTest {
     contractService = mock(ContractService.class);
     calendarService = mock(CalendarService.class);
 
-    service = new LowRemainingDaysAlertService(eventProducer, 10, contractService, calendarService);
+    service = new LowRemainingDaysAlertService(eventProducer, contractService, calendarService);
   }
 
   @Test
@@ -63,6 +63,7 @@ class LowRemainingDaysAlertServiceTest {
     var contract = contract(worker);
     when(contractService.getActiveContractOrThrow(worker)).thenReturn(contract);
     when(calendarService.getRemainingDaysForContract(worker, contract)).thenReturn(5d);
+    when(contractService.isBelowThreshold(5d)).thenReturn(true);
 
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
 
@@ -81,6 +82,7 @@ class LowRemainingDaysAlertServiceTest {
     var contract = contract(worker);
     when(contractService.getActiveContractOrThrow(worker)).thenReturn(contract);
     when(calendarService.getRemainingDaysForContract(worker, contract)).thenReturn(15d);
+    when(contractService.isBelowThreshold(15d)).thenReturn(false);
 
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
 
@@ -94,6 +96,7 @@ class LowRemainingDaysAlertServiceTest {
     var contract = contract(worker);
     when(contractService.getActiveContractOrThrow(worker)).thenReturn(contract);
     when(calendarService.getRemainingDaysForContract(worker, contract)).thenReturn(5d);
+    when(contractService.isBelowThreshold(5d)).thenReturn(true);
 
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
 

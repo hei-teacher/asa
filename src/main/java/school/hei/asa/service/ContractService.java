@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
@@ -13,10 +13,19 @@ import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.WorkerRepository;
 
 @Service
-@AllArgsConstructor
 public class ContractService {
   private final WorkerRepository workerRepository;
   private final ContractRepository contractRepository;
+  private final int lowRemainingDaysThreshold;
+
+  public ContractService(
+      WorkerRepository workerRepository,
+      ContractRepository contractRepository,
+      @Value("${LOW_CONTRACT_DAYS_THRESOLD}") int lowRemainingDaysThreshold) {
+    this.workerRepository = workerRepository;
+    this.contractRepository = contractRepository;
+    this.lowRemainingDaysThreshold = lowRemainingDaysThreshold;
+  }
 
   public Map<Worker, List<Contract>> totalWorkDaysPerWorker() {
     return contractRepository.findAll().stream().collect(Collectors.groupingBy(Contract::worker));
@@ -48,5 +57,9 @@ public class ContractService {
 
   public List<Contract> findActiveContracts() {
     return contractRepository.findAllActiveContracts();
+  }
+
+  public boolean isBelowThreshold(double remainingDays) {
+    return remainingDays < lowRemainingDaysThreshold;
   }
 }

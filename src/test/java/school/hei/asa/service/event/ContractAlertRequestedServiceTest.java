@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 import jakarta.mail.internet.InternetAddress;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import school.hei.asa.concurrency.Workers;
 import school.hei.asa.endpoint.event.model.ContractAlertRequested;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
@@ -12,13 +13,15 @@ import school.hei.asa.service.mapper.InternetAddressMapper;
 
 class ContractAlertRequestedServiceTest {
 
+  private final Workers workers = new Workers();
+
   @Test
   void accept_sends_alert_email_to_accountants() throws Exception {
     var mailer = mock(Mailer.class);
     var internetAddressMapper = mock(InternetAddressMapper.class);
     var service =
         new ContractAlertRequestedService(
-            mailer, internetAddressMapper, "acc1@test.com,acc2@test.com");
+            mailer, internetAddressMapper, workers, "acc1@test.com,acc2@test.com");
 
     when(internetAddressMapper.toInternetAddresses(anyList()))
         .thenReturn(
@@ -40,7 +43,8 @@ class ContractAlertRequestedServiceTest {
   void accept_singular_day() throws Exception {
     var mailer = mock(Mailer.class);
     var internetAddressMapper = mock(InternetAddressMapper.class);
-    var service = new ContractAlertRequestedService(mailer, internetAddressMapper, "acc@test.com");
+    var service =
+        new ContractAlertRequestedService(mailer, internetAddressMapper, workers, "acc@test.com");
 
     when(internetAddressMapper.toInternetAddresses(anyList()))
         .thenReturn(List.of(new InternetAddress("acc@test.com")));
@@ -61,7 +65,8 @@ class ContractAlertRequestedServiceTest {
   void accept_empty_accountants_does_not_send() {
     var mailer = mock(Mailer.class);
     var internetAddressMapper = mock(InternetAddressMapper.class);
-    var service = new ContractAlertRequestedService(mailer, internetAddressMapper, "acc@test.com");
+    var service =
+        new ContractAlertRequestedService(mailer, internetAddressMapper, workers, "acc@test.com");
 
     when(internetAddressMapper.toInternetAddresses(anyList())).thenReturn(List.of());
 

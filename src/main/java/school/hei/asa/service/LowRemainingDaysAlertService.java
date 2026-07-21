@@ -17,11 +17,10 @@ public class LowRemainingDaysAlertService {
 
   private final EventProducer<LowRemainingDaysAlertRequested> eventProducer;
   private final ContractService contractService;
-  private final CalendarService calendarService;
 
   public Optional<String> checkRemainingDaysAndBuildAlertMessage(Worker worker) {
     var activeContract = contractService.getActiveContractOrThrow(worker);
-    var remainingDays = calendarService.getRemainingDaysForContract(worker, activeContract);
+    var remainingDays = contractService.getRemainingDaysForContract(worker, activeContract);
 
     if (!contractService.isBelowThreshold(remainingDays)) {
       return Optional.empty();

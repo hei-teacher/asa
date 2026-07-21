@@ -5,13 +5,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.Test;
+import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.repository.ContractRepository;
+import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.WorkerRepository;
 
 class ContractServiceTest {
 
   private final ContractService contractService =
-      new ContractService(mock(WorkerRepository.class), mock(ContractRepository.class), 10);
+      new ContractService(
+          mock(WorkerRepository.class),
+          mock(ContractRepository.class),
+          mock(DailyExecutionRepository.class),
+          mock(CareProductCodeSupplier.class),
+          mock(MissionService.class),
+          10);
 
   @Test
   void is_below_threshold_returns_true_when_remaining_days_under_threshold() {

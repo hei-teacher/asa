@@ -26,16 +26,14 @@ class LowRemainingDaysAlertServiceTest {
 
   private EventProducer<LowRemainingDaysAlertRequested> eventProducer;
   private ContractService contractService;
-  private CalendarService calendarService;
   private LowRemainingDaysAlertService service;
 
   @BeforeEach
   void setUp() {
     eventProducer = mock(EventProducer.class);
     contractService = mock(ContractService.class);
-    calendarService = mock(CalendarService.class);
 
-    service = new LowRemainingDaysAlertService(eventProducer, contractService, calendarService);
+    service = new LowRemainingDaysAlertService(eventProducer, contractService);
   }
 
   @Test
@@ -62,7 +60,7 @@ class LowRemainingDaysAlertServiceTest {
     var worker = worker();
     var contract = contract(worker);
     when(contractService.getActiveContractOrThrow(worker)).thenReturn(contract);
-    when(calendarService.getRemainingDaysForContract(worker, contract)).thenReturn(5d);
+    when(contractService.getRemainingDaysForContract(worker, contract)).thenReturn(5d);
     when(contractService.isBelowThreshold(5d)).thenReturn(true);
 
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
@@ -81,7 +79,7 @@ class LowRemainingDaysAlertServiceTest {
     var worker = worker();
     var contract = contract(worker);
     when(contractService.getActiveContractOrThrow(worker)).thenReturn(contract);
-    when(calendarService.getRemainingDaysForContract(worker, contract)).thenReturn(15d);
+    when(contractService.getRemainingDaysForContract(worker, contract)).thenReturn(15d);
     when(contractService.isBelowThreshold(15d)).thenReturn(false);
 
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
@@ -95,7 +93,7 @@ class LowRemainingDaysAlertServiceTest {
     var worker = new Worker("W-1", "Name", null, "Full Name", "Addr", "City", "NIF", "STAT");
     var contract = contract(worker);
     when(contractService.getActiveContractOrThrow(worker)).thenReturn(contract);
-    when(calendarService.getRemainingDaysForContract(worker, contract)).thenReturn(5d);
+    when(contractService.getRemainingDaysForContract(worker, contract)).thenReturn(5d);
     when(contractService.isBelowThreshold(5d)).thenReturn(true);
 
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);

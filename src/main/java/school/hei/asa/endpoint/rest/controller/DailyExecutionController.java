@@ -7,7 +7,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import school.hei.asa.endpoint.rest.controller.mapper.ThDailyExecutionFormMapper;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
@@ -31,17 +30,14 @@ public class DailyExecutionController {
     return "daily-execution";
   }
 
-  public String createDailyExecution(Authentication authentication, ThDailyExecutionForm dmeForm) {
-    return createDailyExecutionWithRedirectAttributes(
-        authentication, dmeForm, new RedirectAttributesModelMap());
-  }
-
   @PostMapping("/daily-execution")
   public String createDailyExecutionWithRedirectAttributes(
       Authentication authentication,
       ThDailyExecutionForm dmeForm,
       RedirectAttributes redirectAttributes) {
     var worker = workerFromAuthentication.apply(authentication).get();
+
+    dailyExecutionRepository.save(thDailyExecutionFormMapper.toDomain(dmeForm, worker));
 
     lowRemainingDaysAlertService
         .checkRemainingDaysAndBuildAlertMessage(worker)
@@ -50,7 +46,6 @@ public class DailyExecutionController {
               redirectAttributes.addFlashAttribute("toastMessage", message);
               redirectAttributes.addFlashAttribute("toastType", "warning");
             });
-    dailyExecutionRepository.save(thDailyExecutionFormMapper.toDomain(dmeForm, worker));
 
     return "redirect:/work-and-care-calendar";
   }

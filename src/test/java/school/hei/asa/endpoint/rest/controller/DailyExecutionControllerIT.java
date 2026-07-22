@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.SecurityConfig;
@@ -87,7 +88,8 @@ class DailyExecutionControllerIT extends FacadeIT {
             null,
             null);
 
-    dailyExecutionController.createDailyExecution(authentication, dmeForm);
+    dailyExecutionController.createDailyExecutionWithRedirectAttributes(
+        authentication, dmeForm, new RedirectAttributesModelMap());
 
     var savedWorker = workerRepository.findByCode(authenticatedWorker.code());
     var dailyExecutions =
@@ -127,10 +129,13 @@ class DailyExecutionControllerIT extends FacadeIT {
             null,
             null);
 
-    dailyExecutionController.createDailyExecution(authentication, dmeForm);
+    dailyExecutionController.createDailyExecutionWithRedirectAttributes(
+        authentication, dmeForm, new RedirectAttributesModelMap());
     assertThrows(
         Exception.class,
-        () -> dailyExecutionController.createDailyExecution(authentication, dmeForm));
+        () ->
+            dailyExecutionController.createDailyExecutionWithRedirectAttributes(
+                authentication, dmeForm, new RedirectAttributesModelMap()));
   }
 
   @Test
@@ -172,7 +177,8 @@ class DailyExecutionControllerIT extends FacadeIT {
               () -> {
                 try {
                   latch.await();
-                  return dailyExecutionController.createDailyExecution(authentication, dmeForm);
+                  return dailyExecutionController.createDailyExecutionWithRedirectAttributes(
+                      authentication, dmeForm, new RedirectAttributesModelMap());
                 } catch (Exception e) {
                   return e.getMessage();
                 }

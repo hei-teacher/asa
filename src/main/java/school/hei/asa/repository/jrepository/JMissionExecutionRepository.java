@@ -39,4 +39,5 @@ public interface JMissionExecutionRepository extends JpaRepository<JMissionExecu
       @Param("workerCode") String workerCode,
       @Param("startDate") Instant startDate,
       @Param("endDate") Instant endDate);
+
 }

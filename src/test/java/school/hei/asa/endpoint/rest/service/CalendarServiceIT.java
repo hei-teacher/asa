@@ -185,21 +185,6 @@ class CalendarServiceIT extends FacadeIT {
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
 
-    jdbcTemplate.update(
-        "INSERT INTO contract_level (code, type, daily_pay) VALUES (?, ?, ?) "
-            + "ON CONFLICT DO NOTHING",
-        "L-CALENDAR",
-        "partnerContractor",
-        100000.0);
-    jdbcTemplate.update(
-        "INSERT INTO contract (id, worker_code, level, entrance_instant, duration_in_days) "
-            + "VALUES (?, ?, ?, ?::timestamp, ?) ON CONFLICT DO NOTHING",
-        "contract-calendar",
-        authenticatedWorkerCode,
-        "L-CALENDAR",
-        "2024-01-01 00:00:00",
-        365);
-
     return authentication;
   }
 

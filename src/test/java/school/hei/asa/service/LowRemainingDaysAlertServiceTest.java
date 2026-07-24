@@ -74,8 +74,26 @@ class LowRemainingDaysAlertServiceTest {
   }
 
   @Test
+  void check_remaining_days_returns_empty_when_remaining_days_are_zero() {
+    var worker = worker();
+    when(contractService.findActiveContract(worker)).thenReturn(Optional.of(mock(Contract.class)));
+    when(contractService.getRemainingDaysOnActiveContractOrZero(worker)).thenReturn(0d);
+
+    Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
+
+    assertEquals(Optional.empty(), message);
+    verify(eventProducer, never()).accept(any());
+  }
+
+  @Test
   void is_below_threshold_returns_true_when_remaining_days_under_threshold() {
     assertTrue(service.isBelowThreshold(5));
+  }
+
+  @Test
+  void is_below_threshold_returns_false_when_remaining_days_are_zero_or_negative() {
+    assertFalse(service.isBelowThreshold(0));
+    assertFalse(service.isBelowThreshold(-1));
   }
 
   @Test

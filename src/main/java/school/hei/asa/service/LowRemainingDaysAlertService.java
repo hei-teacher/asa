@@ -34,7 +34,7 @@ public class LowRemainingDaysAlertService {
 
     var remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
 
-    if (!isBelowThreshold(remainingDays)) {
+    if (remainingDays <= 0 || !isBelowThreshold(remainingDays)) {
       return Optional.empty();
     }
 
@@ -53,6 +53,6 @@ public class LowRemainingDaysAlertService {
   }
 
   public boolean isBelowThreshold(double remainingDays) {
-    return remainingDays < lowRemainingDaysThreshold;
+    return remainingDays > 0 && remainingDays < lowRemainingDaysThreshold;
   }
 }

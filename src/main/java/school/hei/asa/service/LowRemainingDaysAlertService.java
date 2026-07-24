@@ -28,7 +28,7 @@ public class LowRemainingDaysAlertService {
   }
 
   public Optional<String> checkRemainingDaysAndBuildAlertMessage(Worker worker) {
-    if (contractService.findActiveContract(worker).isEmpty()) {
+    if (contractService.findActiveContractByWorker(worker).isEmpty()) {
       return Optional.empty();
     }
 

@@ -75,7 +75,7 @@ public class CalendarController {
     boolean showWarning = false;
     boolean hasUsableContract = false;
 
-    if (contractService.findActiveContract(worker).isPresent()) {
+    if (contractService.findActiveContractByWorker(worker).isPresent()) {
       double daysLeft = contractService.getRemainingDaysOnActiveContractOrZero(worker);
       if (daysLeft > 0) {
         hasUsableContract = true;

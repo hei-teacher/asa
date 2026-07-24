@@ -47,14 +47,14 @@ public class ContractService {
   }
 
   public Contract getActiveContractOrThrow(Worker worker) {
-    return findActiveContract(worker)
+    return findActiveContractByWorker(worker)
         .orElseThrow(
             () ->
                 new IllegalStateException(
                     "You do not have an active contract. Please contact your administrator."));
   }
 
-  public Optional<Contract> findActiveContract(Worker worker) {
+  public Optional<Contract> findActiveContractByWorker(Worker worker) {
     return getAllContractsByWorker(worker).stream().filter(c -> c.duration() != null).findFirst();
   }
 
@@ -63,7 +63,7 @@ public class ContractService {
   }
 
   public double getRemainingDaysOnActiveContractOrZero(Worker worker) {
-    var activeContractOpt = findActiveContract(worker);
+    var activeContractOpt = findActiveContractByWorker(worker);
     if (activeContractOpt.isEmpty()) {
       return 0d;
     }

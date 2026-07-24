@@ -71,22 +71,23 @@ public class CalendarController {
         });
     var lateReportedDaysByMonth = calendarService.lateReportedDaysByMonth(worker, year);
 
-    Double remainingDays = null;
-    boolean showWarning = false;
-    boolean hasUsableContract = false;
+    var remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
+    var hasUsableContract =
+        contractService.findActiveContractByWorker(worker).isPresent() && remainingDays > 0;
 
-    if (contractService.findActiveContractByWorker(worker).isPresent()) {
-      double daysLeft = contractService.getRemainingDaysOnActiveContractOrZero(worker);
-      if (daysLeft > 0) {
-        hasUsableContract = true;
-        remainingDays = daysLeft;
-        showWarning = lowRemainingDaysAlertService.isBelowThreshold(daysLeft);
-      }
-    }
-
-    model.addAttribute("remainingDays", remainingDays);
-    model.addAttribute("showWarning", showWarning);
+    model.addAttribute("remainingDays", hasUsableContract ? remainingDays : null);
     model.addAttribute("hasUsableContract", hasUsableContract);
+
+    if (hasUsableContract) {
+      lowRemainingDaysAlertService
+          .checkRemainingDaysAndBuildAlertMessage(worker)
+          .ifPresent(
+              message -> {
+                model.addAttribute("toastMessage", message);
+                model.addAttribute("toastType", "warning");
+                model.addAttribute("showWarning", true);
+              });
+    }
 
     model.addAttribute("workerCode", workerCodeOrAuth);
     model.addAttribute("currentYear", now().getYear());

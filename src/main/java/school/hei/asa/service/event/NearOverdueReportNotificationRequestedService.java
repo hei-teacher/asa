@@ -94,7 +94,7 @@ public class NearOverdueReportNotificationRequestedService
           try {
             mailer.accept(
                 new Email(
-                    new InternetAddress(worker.address()),
+                    new InternetAddress(worker.email()),
                     accountants,
                     List.of(),
                     String.format(

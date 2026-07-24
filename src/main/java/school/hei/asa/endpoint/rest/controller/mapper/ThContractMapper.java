@@ -57,10 +57,7 @@ public class ThContractMapper {
           var actualWorkedDays =
               dailyExecutions.isEmpty()
                   ? "-"
-                  : String.format(
-                      Locale.US,
-                      "%.1f",
-                      Double.valueOf(contractService.executedDays(dailyExecutions)));
+                  : String.valueOf(contractService.executedDays(dailyExecutions));
           result.add(
               new ThContract(
                   contractLevel.code(),

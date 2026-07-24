@@ -55,7 +55,7 @@ public class ContractService {
   }
 
   public Optional<Contract> findActiveContractByWorker(Worker worker) {
-    return getAllContractsByWorker(worker).stream().filter(c -> c.duration() != null).findFirst();
+    return contractRepository.findActiveContractByWorker(worker);
   }
 
   public List<Contract> findActiveContracts() {
@@ -76,7 +76,8 @@ public class ContractService {
             : contract.endInstant().atZone(systemDefault()).toLocalDate();
     var actualWorkedDays = getActualWorkedDaysByDateByWorker(startDate, worker.code(), endDate);
     var workedDays = actualWorkedDays.equals("-") ? 0d : Double.parseDouble(actualWorkedDays);
-    return contract.duration().toDays() - workedDays;
+    var contractDurationInDays = contract.duration().toDays();
+    return contractDurationInDays - workedDays;
   }
 
   public double executedDays(List<DailyExecution> executions) {

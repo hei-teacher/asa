@@ -49,6 +49,22 @@ class LowRemainingDaysAlertServiceTest {
   }
 
   @Test
+  void check_remaining_days_returns_alert_message_when_remaining_days_are_zero() {
+    var worker = worker();
+    when(contractService.getRemainingDaysOnActiveContractOrZero(worker)).thenReturn(0d);
+
+    Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
+
+    assertEquals(Optional.of("Please note : You have 0 day(s) left on your contract !"), message);
+    ArgumentCaptor<Collection<LowRemainingDaysAlertRequested>> captor =
+        ArgumentCaptor.forClass(Collection.class);
+    verify(eventProducer).accept(captor.capture());
+    var event = List.copyOf(captor.getValue()).getFirst();
+    assertEquals("W-1", event.getWorkerCode());
+    assertEquals(0, event.getRemainingDays());
+  }
+
+  @Test
   void check_remaining_days_returns_empty_when_above_threshold() {
     var worker = worker();
     when(contractService.getRemainingDaysOnActiveContractOrZero(worker)).thenReturn(15d);
@@ -60,9 +76,9 @@ class LowRemainingDaysAlertServiceTest {
   }
 
   @Test
-  void check_remaining_days_returns_empty_when_remaining_days_are_zero() {
+  void check_remaining_days_returns_empty_when_remaining_days_are_negative() {
     var worker = worker();
-    when(contractService.getRemainingDaysOnActiveContractOrZero(worker)).thenReturn(0d);
+    when(contractService.getRemainingDaysOnActiveContractOrZero(worker)).thenReturn(-1d);
 
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
 
@@ -73,11 +89,11 @@ class LowRemainingDaysAlertServiceTest {
   @Test
   void is_below_threshold_returns_true_when_remaining_days_under_threshold() {
     assertTrue(service.isBelowThreshold(5));
+    assertTrue(service.isBelowThreshold(0));
   }
 
   @Test
-  void is_below_threshold_returns_false_when_remaining_days_are_zero_or_negative() {
-    assertFalse(service.isBelowThreshold(0));
+  void is_below_threshold_returns_false_when_remaining_days_are_negative() {
     assertFalse(service.isBelowThreshold(-1));
   }
 

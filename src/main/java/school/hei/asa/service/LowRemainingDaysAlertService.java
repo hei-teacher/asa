@@ -30,25 +30,25 @@ public class LowRemainingDaysAlertService {
   public Optional<String> checkRemainingDaysAndBuildAlertMessage(Worker worker) {
     var remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
 
-    if (remainingDays <= 0 || !isBelowThreshold(remainingDays)) {
-      return Optional.empty();
+    if (remainingDays >= 0 && isBelowThreshold(remainingDays)) {
+      log.info("Requesting alert email to accountants for worker '{}'", worker.code());
+      eventProducer.accept(
+          List.of(
+              LowRemainingDaysAlertRequested.builder()
+                  .workerCode(worker.code())
+                  .remainingDays(remainingDays)
+                  .build()));
+
+      return Optional.of(
+          "Please note : You have "
+              + DaysFormatter.format(remainingDays)
+              + " day(s) left on your contract !");
     }
 
-    log.info("Requesting alert email to accountants for worker '{}'", worker.code());
-    eventProducer.accept(
-        List.of(
-            LowRemainingDaysAlertRequested.builder()
-                .workerCode(worker.code())
-                .remainingDays(remainingDays)
-                .build()));
-
-    return Optional.of(
-        "Please note : You have "
-            + DaysFormatter.format(remainingDays)
-            + " day(s) left on your contract !");
+    return Optional.empty();
   }
 
   public boolean isBelowThreshold(double remainingDays) {
-    return remainingDays > 0 && remainingDays < lowRemainingDaysThreshold;
+    return remainingDays >= 0 && remainingDays < lowRemainingDaysThreshold;
   }
 }

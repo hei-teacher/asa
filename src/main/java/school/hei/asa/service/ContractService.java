@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.model.DailyExecution;
@@ -21,25 +22,13 @@ import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.WorkerRepository;
 
 @Service
+@AllArgsConstructor
 public class ContractService {
   private final WorkerRepository workerRepository;
   private final ContractRepository contractRepository;
   private final DailyExecutionRepository dailyExecutionRepository;
   private final CareProductCodeSupplier careProductCodeSupplier;
   private final MissionService missionService;
-
-  public ContractService(
-      WorkerRepository workerRepository,
-      ContractRepository contractRepository,
-      DailyExecutionRepository dailyExecutionRepository,
-      CareProductCodeSupplier careProductCodeSupplier,
-      MissionService missionService) {
-    this.workerRepository = workerRepository;
-    this.contractRepository = contractRepository;
-    this.dailyExecutionRepository = dailyExecutionRepository;
-    this.careProductCodeSupplier = careProductCodeSupplier;
-    this.missionService = missionService;
-  }
 
   public Map<Worker, List<Contract>> totalWorkDaysPerWorker() {
     return contractRepository.findAll().stream().collect(Collectors.groupingBy(Contract::worker));

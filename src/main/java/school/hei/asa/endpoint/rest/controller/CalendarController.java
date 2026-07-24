@@ -28,6 +28,7 @@ import school.hei.asa.model.Mission;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.CalendarService;
 import school.hei.asa.service.ContractService;
+import school.hei.asa.service.LowRemainingDaysAlertService;
 
 @AllArgsConstructor
 @Controller
@@ -37,6 +38,7 @@ public class CalendarController {
   private final WorkerFromAuthentication workerFromAuthentication;
   private final WorkerToModelAdder workerToModelAdder;
   private final ContractService contractService;
+  private final LowRemainingDaysAlertService lowRemainingDaysAlertService;
 
   @GetMapping("/work-and-care-calendar")
   public String getCalendar(
@@ -72,7 +74,7 @@ public class CalendarController {
     var lateReportedDaysByMonth = calendarService.lateReportedDaysByMonth(worker, year);
 
     double remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
-    boolean showWarning = contractService.isBelowThreshold(remainingDays);
+    boolean showWarning = lowRemainingDaysAlertService.isBelowThreshold(remainingDays);
 
     model.addAttribute("remainingDays", remainingDays);
     model.addAttribute("showWarning", showWarning);

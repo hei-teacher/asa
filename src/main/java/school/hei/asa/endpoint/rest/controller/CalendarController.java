@@ -49,18 +49,16 @@ public class CalendarController {
     year = year == null ? now().getYear() : year;
     model.addAttribute("year", year);
 
-    var authenticatedWorkerCode =
-        workerFromAuthentication
-            .apply(authentication)
-            .orElseThrow(() -> new IllegalStateException("Authenticated worker not found."))
-            .code();
-
     var workerCodeOrAuth =
-        workerCode == null || workerCode.isBlank() ? authenticatedWorkerCode : workerCode;
+        workerCode == null || workerCode.isBlank()
+            ? workerFromAuthentication.apply(authentication).get().code()
+            : workerCode;
 
     var worker =
         workerToModelAdder.apply(
-            new WorkerModelAdderParam(workerCode, authenticatedWorkerCode), model);
+            new WorkerModelAdderParam(
+                workerCode, workerFromAuthentication.apply(authentication).get().code()),
+            model);
 
     var missionTypeByMonth =
         calendarService.missionExecutionPercentageSumByMissionType(worker, year);

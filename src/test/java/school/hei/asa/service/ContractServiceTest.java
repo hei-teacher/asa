@@ -6,7 +6,9 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.Test;
 import school.hei.asa.CareProductCodeSupplier;
+import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.repository.ContractRepository;
+import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.WorkerRepository;
 
 class ContractServiceTest {
@@ -15,8 +17,10 @@ class ContractServiceTest {
       new ContractService(
           mock(WorkerRepository.class),
           mock(ContractRepository.class),
+          mock(DailyExecutionRepository.class),
           mock(CareProductCodeSupplier.class),
           mock(MissionService.class),
+          mock(EventProducer.class),
           10);
 
   @Test

@@ -2,7 +2,6 @@ package school.hei.asa.service;
 
 import static java.time.Month.DECEMBER;
 import static java.time.Month.JANUARY;
-import static java.time.ZoneId.systemDefault;
 
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
@@ -17,7 +16,6 @@ import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.WorkerCalendar;
-import school.hei.asa.model.contract.Contract;
 import school.hei.asa.repository.DailyExecutionRepository;
 
 @AllArgsConstructor
@@ -27,8 +25,6 @@ public class CalendarService {
   private final DailyExecutionRepository dailyExecutionRepository;
   private final CareProductCodeSupplier careProductCodeSupplier;
   private final PaidCareMissionCodesSupplier paidCareMissionCodesSupplier;
-  private final MissionService missionService;
-  private final ContractService contractService;
 
   @Transactional
   public Map<DailyExecution.Type, List<LocalDate>> datesByDailyExecutionType(
@@ -66,30 +62,5 @@ public class CalendarService {
             new school.hei.asa.model.ProductConf(
                 careProductCodeSupplier.get(), paidCareMissionCodesSupplier.get()))
         .lateReportedDaysByMonth();
-  }
-
-  public double getRemainingDaysOnActiveContractOrZero(Worker worker) {
-    return contractService
-        .findActiveContract(worker)
-        .map(contract -> getRemainingDaysForContract(worker, contract))
-        .orElse(0d);
-  }
-
-  public double getRemainingDaysForContract(Worker worker, Contract contract) {
-    var startDate = contract.entranceInstant().atZone(systemDefault()).toLocalDate();
-    var endDate =
-        contract.endInstant() == null
-            ? LocalDate.now()
-            : contract.endInstant().atZone(systemDefault()).toLocalDate();
-    var actualWorkedDays = getActualWorkedDaysByDateByWorker(startDate, worker.code(), endDate);
-    var workedDays = actualWorkedDays.equals("-") ? 0d : Double.parseDouble(actualWorkedDays);
-    return contract.duration().toDays() - workedDays;
-  }
-
-  public String getActualWorkedDaysByDateByWorker(
-      LocalDate startDate, String workerCode, LocalDate endDate) {
-    var dailyExecutions =
-        dailyExecutionRepository.findByWorkerCodeAndDateBetween(workerCode, startDate, endDate);
-    return contractService.executedDays(dailyExecutions);
   }
 }

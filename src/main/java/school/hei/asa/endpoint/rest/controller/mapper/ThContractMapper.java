@@ -16,19 +16,20 @@ import org.springframework.stereotype.Component;
 import school.hei.asa.endpoint.rest.model.th.ThContract;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
-import school.hei.asa.service.CalendarService;
+import school.hei.asa.repository.DailyExecutionRepository;
+import school.hei.asa.service.ContractService;
 
 @Slf4j
 @AllArgsConstructor
 @Component
 public class ThContractMapper {
   private final ThWorkerMapper thWorkerMapper;
-  private final CalendarService calendarService;
+  private final ContractService contractService;
+  private final DailyExecutionRepository dailyExecutionRepository;
 
   public List<ThContract> toTh(List<Contract> contracts) {
     log.info("mapping contracts to Th...");
     List<ThContract> result = new ArrayList<>();
-
     contracts.forEach(
         current -> {
           log.info("mapping {} for {}", current.level().code(), current.worker().name());
@@ -50,6 +51,16 @@ public class ThContractMapper {
           var startDate = LocalDate.parse(entranceDate, dateFormater);
           var localEndDate =
               !endDate.equals("-") ? LocalDate.parse(endDate, dateFormater) : LocalDate.now();
+          var dailyExecutions =
+              dailyExecutionRepository.findByWorkerCodeAndDateBetween(
+                  current.worker().code(), startDate, localEndDate);
+          var actualWorkedDays =
+              dailyExecutions.isEmpty()
+                  ? "-"
+                  : String.format(
+                      Locale.US,
+                      "%.1f",
+                      Double.valueOf(contractService.executedDays(dailyExecutions)));
           result.add(
               new ThContract(
                   contractLevel.code(),
@@ -61,11 +72,9 @@ public class ThContractMapper {
                   current.jobTitle(),
                   current.duration() == null ? "-" : current.duration().toDays() + "",
                   current.contractBucketKey(),
-                  calendarService.getActualWorkedDaysByDateByWorker(
-                      startDate, current.worker().code(), localEndDate)));
+                  actualWorkedDays));
         });
     log.info("Successfully mapping contracts to Th !");
-
     return result;
   }
 

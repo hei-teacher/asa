@@ -27,8 +27,6 @@ import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.SecurityConfig;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
-import school.hei.asa.model.Mission;
-import school.hei.asa.model.Product;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.MissionRepository;
@@ -57,11 +55,6 @@ class DailyExecutionControllerIT extends FacadeIT {
     authenticatedWorker = workerRepository.findByCode("worker-code");
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
-    var product = new Product("pcode", "pname", "pdescription");
-    productRepository.save(product);
-    var mission1 = new Mission("mission1-code", "title1", "description1", 10, product);
-    var mission2 = new Mission("mission2-code", "title2", "description2", 2, product);
-    missionRepository.saveAll(List.of(mission1, mission2));
     model = mock(Model.class);
   }
 

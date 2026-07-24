@@ -18,7 +18,6 @@ import org.mockito.ArgumentCaptor;
 import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.endpoint.event.model.LowRemainingDaysAlertRequested;
 import school.hei.asa.model.Worker;
-import school.hei.asa.model.contract.Contract;
 
 class LowRemainingDaysAlertServiceTest {
 
@@ -34,21 +33,8 @@ class LowRemainingDaysAlertServiceTest {
   }
 
   @Test
-  void check_remaining_days_returns_empty_when_no_active_contract() {
-    var worker = worker();
-    when(contractService.findActiveContractByWorker(worker)).thenReturn(Optional.empty());
-
-    Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
-
-    assertEquals(Optional.empty(), message);
-    verify(eventProducer, never()).accept(any());
-  }
-
-  @Test
   void check_remaining_days_returns_alert_message_when_below_threshold() {
     var worker = worker();
-    when(contractService.findActiveContractByWorker(worker))
-        .thenReturn(Optional.of(mock(Contract.class)));
     when(contractService.getRemainingDaysOnActiveContractOrZero(worker)).thenReturn(5d);
 
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
@@ -65,8 +51,6 @@ class LowRemainingDaysAlertServiceTest {
   @Test
   void check_remaining_days_returns_empty_when_above_threshold() {
     var worker = worker();
-    when(contractService.findActiveContractByWorker(worker))
-        .thenReturn(Optional.of(mock(Contract.class)));
     when(contractService.getRemainingDaysOnActiveContractOrZero(worker)).thenReturn(15d);
 
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);
@@ -78,8 +62,6 @@ class LowRemainingDaysAlertServiceTest {
   @Test
   void check_remaining_days_returns_empty_when_remaining_days_are_zero() {
     var worker = worker();
-    when(contractService.findActiveContractByWorker(worker))
-        .thenReturn(Optional.of(mock(Contract.class)));
     when(contractService.getRemainingDaysOnActiveContractOrZero(worker)).thenReturn(0d);
 
     Optional<String> message = service.checkRemainingDaysAndBuildAlertMessage(worker);

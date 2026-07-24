@@ -28,10 +28,6 @@ public class LowRemainingDaysAlertService {
   }
 
   public Optional<String> checkRemainingDaysAndBuildAlertMessage(Worker worker) {
-    if (contractService.findActiveContractByWorker(worker).isEmpty()) {
-      return Optional.empty();
-    }
-
     var remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
 
     if (remainingDays <= 0 || !isBelowThreshold(remainingDays)) {

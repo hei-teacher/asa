@@ -1,6 +1,7 @@
 package school.hei.asa.service;
 
 import static java.time.ZoneId.systemDefault;
+import static java.util.Locale.US;
 import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
 
@@ -84,9 +85,8 @@ public class ContractService {
         contract.endInstant() == null
             ? LocalDate.now()
             : contract.endInstant().atZone(systemDefault()).toLocalDate();
-    var dailyExecutions =
-        dailyExecutionRepository.findByWorkerCodeAndDateBetween(worker.code(), startDate, endDate);
-    var workedDays = executedDays(dailyExecutions);
+    var actualWorkedDays = getActualWorkedDaysByDateByWorker(startDate, worker.code(), endDate);
+    var workedDays = actualWorkedDays.equals("-") ? 0d : Double.parseDouble(actualWorkedDays);
     return contract.duration().toDays() - workedDays;
   }
 
@@ -105,5 +105,15 @@ public class ContractService {
                   .reduce(0.0d, Double::sum);
             })
         .reduce(0.0d, Double::sum);
+  }
+
+  public String getActualWorkedDaysByDateByWorker(
+      LocalDate startDate, String workerCode, LocalDate endDate) {
+    var dailyExecutions =
+        dailyExecutionRepository.findByWorkerCodeAndDateBetween(workerCode, startDate, endDate);
+    if (dailyExecutions.isEmpty()) {
+      return "-";
+    }
+    return String.format(US, "%.1f", executedDays(dailyExecutions));
   }
 }

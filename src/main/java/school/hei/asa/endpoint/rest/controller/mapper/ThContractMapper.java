@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import school.hei.asa.endpoint.rest.model.th.ThContract;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
-import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.service.ContractService;
 
 @Slf4j
@@ -25,7 +24,6 @@ import school.hei.asa.service.ContractService;
 public class ThContractMapper {
   private final ThWorkerMapper thWorkerMapper;
   private final ContractService contractService;
-  private final DailyExecutionRepository dailyExecutionRepository;
 
   public List<ThContract> toTh(List<Contract> contracts) {
     log.info("mapping contracts to Th...");
@@ -51,13 +49,6 @@ public class ThContractMapper {
           var startDate = LocalDate.parse(entranceDate, dateFormater);
           var localEndDate =
               !endDate.equals("-") ? LocalDate.parse(endDate, dateFormater) : LocalDate.now();
-          var dailyExecutions =
-              dailyExecutionRepository.findByWorkerCodeAndDateBetween(
-                  current.worker().code(), startDate, localEndDate);
-          var actualWorkedDays =
-              dailyExecutions.isEmpty()
-                  ? "-"
-                  : String.valueOf(contractService.executedDays(dailyExecutions));
           result.add(
               new ThContract(
                   contractLevel.code(),
@@ -69,7 +60,8 @@ public class ThContractMapper {
                   current.jobTitle(),
                   current.duration() == null ? "-" : current.duration().toDays() + "",
                   current.contractBucketKey(),
-                  actualWorkedDays));
+                  contractService.getActualWorkedDaysByDateByWorker(
+                      startDate, current.worker().code(), localEndDate)));
         });
     log.info("Successfully mapping contracts to Th !");
     return result;

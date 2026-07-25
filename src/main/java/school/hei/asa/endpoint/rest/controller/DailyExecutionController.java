@@ -37,7 +37,9 @@ public class DailyExecutionController {
   }
 
   public String createDailyExecution(
-      Authentication authentication, ThDailyExecutionForm dmeForm, RedirectAttributes redirectAttributes) {
+      Authentication authentication,
+      ThDailyExecutionForm dmeForm,
+      RedirectAttributes redirectAttributes) {
     var worker = workerFromAuthentication.apply(authentication).get();
     var dailyExecution = thDailyExecutionFormMapper.toDomain(dmeForm, worker);
 

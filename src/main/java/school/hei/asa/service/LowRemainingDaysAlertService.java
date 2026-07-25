@@ -44,9 +44,7 @@ public class LowRemainingDaysAlertService {
                 .build()));
 
     return Optional.of(
-        "Please note : You have "
-            + formatDays(remainingDays)
-            + " day(s) left on your contract !");
+        "Please note : You have " + formatDays(remainingDays) + " day(s) left on your contract !");
   }
 
   private static String formatDays(double days) {

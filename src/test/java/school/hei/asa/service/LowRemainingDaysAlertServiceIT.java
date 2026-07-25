@@ -33,7 +33,16 @@ class LowRemainingDaysAlertServiceIT extends FacadeIT {
 
   @BeforeEach
   void setUp() {
-    worker = new Worker("alert-test-worker", "Test", "test@test.com", "Test Worker", "addr", "city", "nif", "stat");
+    worker =
+        new Worker(
+            "alert-test-worker",
+            "Test",
+            "test@test.com",
+            "Test Worker",
+            "addr",
+            "city",
+            "nif",
+            "stat");
     workerRepository.save(worker);
   }
 

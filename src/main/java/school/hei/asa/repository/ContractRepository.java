@@ -2,6 +2,7 @@ package school.hei.asa.repository;
 
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import school.hei.asa.model.Worker;
@@ -23,6 +24,14 @@ public class ContractRepository {
     return contractMapper.toDomain(
         jContractRepository.findAllByWorkerOrderByEntranceInstantDesc(
             workerMapper.toEntity(worker)));
+  }
+
+  @Transactional
+  public Optional<Contract> findActiveContractByWorker(Worker worker) {
+    return jContractRepository
+        .findFirstByWorkerAndDurationInDaysIsNotNullOrderByEntranceInstantDesc(
+            workerMapper.toEntity(worker))
+        .map(jContract -> contractMapper.toDomain(List.of(jContract)).getFirst());
   }
 
   public List<Contract> findAll() {

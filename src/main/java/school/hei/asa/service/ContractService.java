@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,10 @@ public class ContractService {
 
   public List<Contract> getAllContractsByWorker(Worker worker) {
     return contractRepository.findAllByWorker(worker);
+  }
+
+  public Optional<Contract> findActiveContractByWorker(Worker worker) {
+    return contractRepository.findActiveContractByWorker(worker);
   }
 
   public String getActualWorkedDaysByDateByWorker(

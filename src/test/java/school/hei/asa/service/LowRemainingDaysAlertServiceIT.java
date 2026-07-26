@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.WorkerRepository;
 import school.hei.asa.repository.jrepository.JContractRepository;
+import school.hei.asa.repository.jrepository.JWorkerRepository;
 import school.hei.asa.repository.model.JContract;
 import school.hei.asa.repository.model.JContractLevel;
 import school.hei.asa.repository.model.JWorker;
@@ -26,6 +28,7 @@ class LowRemainingDaysAlertServiceIT extends FacadeIT {
   @Autowired LowRemainingDaysAlertService lowRemainingDaysAlertService;
   @Autowired WorkerRepository workerRepository;
   @Autowired JContractRepository jContractRepository;
+  @Autowired JWorkerRepository jWorkerRepository;
 
   @MockBean EventProducer eventProducer;
 
@@ -44,6 +47,21 @@ class LowRemainingDaysAlertServiceIT extends FacadeIT {
             "nif",
             "stat");
     workerRepository.save(worker);
+  }
+
+  @AfterEach
+  void tearDown() {
+    if (worker == null) {
+      return;
+    }
+    var jWorker = jWorkerRepository.findByCode(worker.code());
+    if (jWorker == null) {
+      return;
+    }
+    jContractRepository
+        .findAllByWorkerOrderByEntranceInstantDesc(jWorker)
+        .forEach(jContractRepository::delete);
+    jWorkerRepository.delete(jWorker);
   }
 
   @Test

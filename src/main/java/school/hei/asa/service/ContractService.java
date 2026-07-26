@@ -2,6 +2,7 @@ package school.hei.asa.service;
 
 import static java.time.ZoneId.systemDefault;
 import static java.util.Locale.FRENCH;
+import static java.util.Locale.US;
 import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
 
@@ -103,7 +104,7 @@ public class ContractService {
                 })
             .reduce(Double::sum)
             .get();
-    return String.format("%.1f", result);
+    return String.format(US, "%.1f", result);
   }
 
   public List<Contract> findActiveContracts() {

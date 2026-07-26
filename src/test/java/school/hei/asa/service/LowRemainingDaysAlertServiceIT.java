@@ -65,14 +65,32 @@ class LowRemainingDaysAlertServiceIT extends FacadeIT {
   }
 
   @Test
-  void alert_triggered_when_remaining_days_below_threshold() {
+  void alert_message_built_without_sending_email_when_remaining_days_below_threshold() {
     saveContract(5, "2026-07-01T00:00:00Z");
 
     var result = lowRemainingDaysAlertService.checkRemainingDaysAndBuildAlertMessage(worker);
 
     assertTrue(result.isPresent());
     assertTrue(result.get().contains("day(s) left"));
+    verify(eventProducer, never()).accept(any());
+  }
+
+  @Test
+  void send_alert_email_when_remaining_days_below_threshold() {
+    saveContract(5, "2026-07-01T00:00:00Z");
+
+    lowRemainingDaysAlertService.sendAlertEmailIfLowRemainingDays(worker);
+
     verify(eventProducer).accept(any(List.class));
+  }
+
+  @Test
+  void no_alert_email_when_remaining_days_above_threshold() {
+    saveContract(15, "2026-08-01T00:00:00Z");
+
+    lowRemainingDaysAlertService.sendAlertEmailIfLowRemainingDays(worker);
+
+    verify(eventProducer, never()).accept(any());
   }
 
   @Test

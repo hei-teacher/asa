@@ -45,6 +45,8 @@ public class DailyExecutionController {
 
     dailyExecutionRepository.save(dailyExecution);
 
+    lowRemainingDaysAlertService.sendAlertEmailIfLowRemainingDays(worker);
+
     lowRemainingDaysAlertService
         .checkRemainingDaysAndBuildAlertMessage(worker)
         .ifPresent(

@@ -35,6 +35,17 @@ public class LowRemainingDaysAlertService {
       return Optional.empty();
     }
 
+    return Optional.of(
+        "Please note : You have " + formatDays(remainingDays) + " day(s) left on your contract !");
+  }
+
+  public void sendAlertEmailIfLowRemainingDays(Worker worker) {
+    var remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
+
+    if (remainingDays == 0 || remainingDays >= lowRemainingDaysThreshold) {
+      return;
+    }
+
     log.info("Requesting alert email to accountants for worker '{}'", worker.code());
     eventProducer.accept(
         List.of(
@@ -42,9 +53,6 @@ public class LowRemainingDaysAlertService {
                 .workerCode(worker.code())
                 .remainingDays((int) remainingDays)
                 .build()));
-
-    return Optional.of(
-        "Please note : You have " + formatDays(remainingDays) + " day(s) left on your contract !");
   }
 
   private static String formatDays(double days) {

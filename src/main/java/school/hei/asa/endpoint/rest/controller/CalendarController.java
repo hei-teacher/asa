@@ -28,6 +28,7 @@ import school.hei.asa.model.Mission;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.CalendarService;
 import school.hei.asa.service.ContractService;
+import school.hei.asa.service.LowRemainingDaysAlertService;
 
 @AllArgsConstructor
 @Controller
@@ -37,6 +38,7 @@ public class CalendarController {
   private final WorkerFromAuthentication workerFromAuthentication;
   private final WorkerToModelAdder workerToModelAdder;
   private final ContractService contractService;
+  private final LowRemainingDaysAlertService lowRemainingDaysAlertService;
 
   @GetMapping("/work-and-care-calendar")
   public String getCalendar(
@@ -70,11 +72,14 @@ public class CalendarController {
     var lateReportedDaysByMonth = calendarService.lateReportedDaysByMonth(worker, year);
 
     var remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
-    var hasUsableContract =
-        contractService.findActiveContractByWorker(worker).isPresent() && remainingDays > 0;
+    var hasActiveContract = contractService.findActiveContractByWorker(worker).isPresent();
+    var showWarning =
+        lowRemainingDaysAlertService.checkRemainingDaysAndBuildAlertMessage(worker).isPresent()
+            || (hasActiveContract && remainingDays == 0);
 
-    model.addAttribute("remainingDays", hasUsableContract ? remainingDays : null);
-    model.addAttribute("hasUsableContract", hasUsableContract);
+    model.addAttribute("remainingDays", hasActiveContract ? remainingDays : null);
+    model.addAttribute("hasUsableContract", hasActiveContract);
+    model.addAttribute("showWarning", showWarning);
 
     model.addAttribute("workerCode", workerCodeOrAuth);
     model.addAttribute("currentYear", now().getYear());

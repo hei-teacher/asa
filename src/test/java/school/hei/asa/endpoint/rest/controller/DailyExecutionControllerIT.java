@@ -10,10 +10,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import jakarta.persistence.EntityManager;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.ui.Model;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
@@ -29,10 +34,15 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Product;
 import school.hei.asa.model.Worker;
+import school.hei.asa.model.contract.ContractType;
 import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.MissionRepository;
 import school.hei.asa.repository.ProductRepository;
 import school.hei.asa.repository.WorkerRepository;
+import school.hei.asa.repository.jrepository.JContractRepository;
+import school.hei.asa.repository.mapper.WorkerMapper;
+import school.hei.asa.repository.model.JContract;
+import school.hei.asa.repository.model.JContractLevel;
 
 class DailyExecutionControllerIT extends FacadeIT {
 
@@ -42,6 +52,10 @@ class DailyExecutionControllerIT extends FacadeIT {
   @Autowired MissionRepository missionRepository;
   @Autowired DailyExecutionRepository dailyExecutionRepository;
   @Autowired CalendarController calendarController;
+  @Autowired JContractRepository jContractRepository;
+  @Autowired WorkerMapper workerMapper;
+  @Autowired EntityManager entityManager;
+  @Autowired PlatformTransactionManager transactionManager;
 
   @MockBean SecurityConfig securityConfig;
   @MockBean WorkerFromAuthentication workerFromAuthentication;
@@ -59,6 +73,32 @@ class DailyExecutionControllerIT extends FacadeIT {
     workerRepository.save(authenticatedWorker);
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
+
+    var contractLevelCode = "level-code-" + UUID.randomUUID();
+    new TransactionTemplate(transactionManager)
+        .execute(
+            status -> {
+              var jContractLevel = new JContractLevel();
+              jContractLevel.setCode(contractLevelCode);
+              jContractLevel.setType(ContractType.fullTimeEmployee);
+              jContractLevel.setMonthlyPay(1000.0);
+              jContractLevel.setDailyPay(50.0);
+              entityManager.persist(jContractLevel);
+              return null;
+            });
+
+    var jContract = new JContract();
+    jContract.setId("contract-test-id-" + UUID.randomUUID());
+    jContract.setWorker(workerMapper.toEntity(authenticatedWorker));
+    jContract.setLevel(entityManager.find(JContractLevel.class, contractLevelCode));
+    jContract.setEntranceInstant(Instant.parse("2010-01-01T00:00:00Z"));
+    jContract.setEndInstant(Instant.parse("2010-12-31T00:00:00Z"));
+    jContract.setJobTitle("job-title");
+    jContract.setDurationInDays(180);
+    jContract.setCompany("company");
+    jContract.setContractBucketKey("contract-bucket-key");
+    jContractRepository.save(jContract);
+
     var product = new Product("pcode", "pname", "pdescription");
     productRepository.save(product);
     var mission1 = new Mission("mission1-code", "title1", "description1", 10, product);
@@ -69,7 +109,6 @@ class DailyExecutionControllerIT extends FacadeIT {
 
   @Test
   void save_then_read_with_duplicates_ok_if_sum_of_set_is_100() {
-    setUp();
     var dmeForm =
         new ThDailyExecutionForm(
             "2024-12-03",
@@ -79,7 +118,6 @@ class DailyExecutionControllerIT extends FacadeIT {
             "mission2-code",
             "0.6",
             "missionComment2",
-            // duplicate of mission2 (missionCode2, missionPercentage2, missionComment2)
             "mission2-code",
             "0.6",
             "missionComment2",
@@ -110,7 +148,6 @@ class DailyExecutionControllerIT extends FacadeIT {
 
   @Test
   void cannot_save_if_mission_execution_already_exists() {
-    setUp();
     var dmeForm =
         new ThDailyExecutionForm(
             "2024-12-01",
@@ -145,7 +182,6 @@ class DailyExecutionControllerIT extends FacadeIT {
 
   @Test
   void concurrently_create_daily_execution() {
-    setUp();
     var dmeForm =
         new ThDailyExecutionForm(
             "2024-12-01",
@@ -196,7 +232,6 @@ class DailyExecutionControllerIT extends FacadeIT {
 
   @Test
   void can_get_daily_execution_form() {
-    setUp();
     var viewName = dailyExecutionController.getDailyExecutionForm(model);
 
     verify(model).addAttribute(eq("missions"), any(List.class));

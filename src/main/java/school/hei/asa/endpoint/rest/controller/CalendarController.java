@@ -72,13 +72,16 @@ public class CalendarController {
     var lateReportedDaysByMonth = calendarService.lateReportedDaysByMonth(worker, year);
 
     var remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
-    var hasActiveContract = contractService.findActiveContractByWorker(worker).isPresent();
+    var hasUsableContract =
+        contractService.findActiveContractByWorker(worker).isPresent() && remainingDays > 0;
     var showWarning =
-        lowRemainingDaysAlertService.checkRemainingDaysAndBuildAlertMessage(worker).isPresent()
-            || (hasActiveContract && remainingDays == 0);
+        hasUsableContract
+            && lowRemainingDaysAlertService
+                .checkRemainingDaysAndBuildAlertMessage(worker)
+                .isPresent();
 
-    model.addAttribute("remainingDays", hasActiveContract ? remainingDays : null);
-    model.addAttribute("hasUsableContract", hasActiveContract);
+    model.addAttribute("remainingDays", hasUsableContract ? remainingDays : null);
+    model.addAttribute("hasUsableContract", hasUsableContract);
     model.addAttribute("showWarning", showWarning);
 
     model.addAttribute("workerCode", workerCodeOrAuth);

@@ -44,11 +44,11 @@ public class DailyExecutionController {
       RedirectAttributes redirectAttributes) {
     var worker = workerFromAuthentication.apply(authentication).get();
 
-    if (contractService.findActiveContractByWorker(worker).isEmpty()) {
-      redirectAttributes.addFlashAttribute(
-          "toastMessage", "Unable to punch in : you have no active contract.");
-      redirectAttributes.addFlashAttribute("toastType", "error");
-      return "redirect:/work-and-care-calendar";
+    var remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
+    var hasUsableContract =
+        contractService.findActiveContractByWorker(worker).isPresent() && remainingDays > 0;
+    if (!hasUsableContract) {
+      throw new IllegalStateException("Unable to punch in : you have no active contract.");
     }
 
     var dailyExecution = thDailyExecutionFormMapper.toDomain(dmeForm, worker);

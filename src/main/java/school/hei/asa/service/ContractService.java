@@ -48,7 +48,7 @@ public class ContractService {
       MissionService missionService,
       CareProductCodeSupplier careProductCodeSupplier,
       EventProducer<ContractAlertRequested> eventProducer,
-      @Value("${asa.contract.alert.threshold}") int alertThreshold) {
+      @Value("${ASA_CONTRACT_ALERT_THRESOLD}") int alertThreshold) {
     this.workerRepository = workerRepository;
     this.contractRepository = contractRepository;
     this.dailyExecutionRepository = dailyExecutionRepository;
@@ -106,11 +106,15 @@ public class ContractService {
                 })
             .reduce(Double::sum)
             .get();
-    return String.format("%.1f", result);
+    return String.format(java.util.Locale.US, "%.1f", result);
   }
 
   public List<Contract> findActiveContracts() {
     return contractRepository.findAllActiveContracts();
+  }
+
+  public int alertThreshold() {
+    return alertThreshold;
   }
 
   public boolean hasRemainingDays(Worker worker) {

@@ -9,28 +9,34 @@ import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
 import static school.hei.asa.model.DailyExecution.Type.mixedWorkAndCare;
 
+import jakarta.persistence.EntityManager;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.controller.DailyExecutionController;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.SecurityConfig;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
-import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Product;
 import school.hei.asa.model.Worker;
+import school.hei.asa.model.contract.ContractType;
 import school.hei.asa.repository.MissionRepository;
 import school.hei.asa.repository.ProductRepository;
 import school.hei.asa.repository.WorkerRepository;
+import school.hei.asa.repository.model.JContract;
+import school.hei.asa.repository.model.JContractLevel;
+import school.hei.asa.repository.model.JWorker;
 import school.hei.asa.service.CalendarService;
 
 class CalendarServiceIT extends FacadeIT {
@@ -41,18 +47,54 @@ class CalendarServiceIT extends FacadeIT {
 
   @MockBean SecurityConfig securityConfig;
   @MockBean WorkerFromAuthentication workerFromAuthentication;
-  @MockBean Mailer mailer;
 
   Authentication authentication;
+  RedirectAttributes redirectAttributes;
   String authenticatedWorkerCode = "worker-code";
 
   @Autowired CalendarService calendarService;
-  @Autowired JdbcTemplate jdbcTemplate;
+  @Autowired EntityManager entityManager;
+  @Autowired TransactionTemplate transactionTemplate;
+
+  @AfterEach
+  void tearDown() {
+    transactionTemplate.execute(status -> {
+      entityManager.createQuery("delete from JContract where id = 'contract-calendar'")
+          .executeUpdate();
+      entityManager.createQuery("delete from JContractLevel where code = 'L-CALENDAR'")
+          .executeUpdate();
+      return null;
+    });
+  }
 
   @BeforeEach
   void setUp() {
     authentication = authentication();
+    redirectAttributes = mock(RedirectAttributes.class);
     setUpProductsAndMissions();
+    addContract();
+  }
+
+  private void addContract() {
+    transactionTemplate.execute(status -> {
+      var jContractLevel = new JContractLevel();
+      jContractLevel.setCode("L-CALENDAR");
+      jContractLevel.setType(ContractType.partnerContractor);
+      jContractLevel.setDailyPay(100000.0);
+      entityManager.persist(jContractLevel);
+
+      var jWorker = entityManager.find(JWorker.class, authenticatedWorkerCode);
+      var jContract = new JContract();
+      jContract.setId("contract-calendar");
+      jContract.setWorker(jWorker);
+      jContract.setLevel(jContractLevel);
+      jContract.setEntranceInstant(Instant.parse("2024-01-01T00:00:00Z"));
+      jContract.setDurationInDays(365);
+      jContract.setJobTitle("job_title");
+      jContract.setContractBucketKey("contract_bucket_key");
+      entityManager.persist(jContract);
+      return null;
+    });
   }
 
   @Test
@@ -76,7 +118,7 @@ class CalendarServiceIT extends FacadeIT {
             null,
             null,
             null),
-        new RedirectAttributesModelMap());
+        redirectAttributes);
 
     var worker = workerRepository.findByCode(authenticatedWorkerCode);
     var datesByDailyExecutionType = calendarService.datesByDailyExecutionType(worker, 2024);
@@ -109,7 +151,7 @@ class CalendarServiceIT extends FacadeIT {
             null,
             null,
             null),
-        new RedirectAttributesModelMap());
+        redirectAttributes);
     dailyExecutionController.createDailyExecution(
         authentication,
         new ThDailyExecutionForm(
@@ -129,7 +171,7 @@ class CalendarServiceIT extends FacadeIT {
             null,
             null,
             null),
-        new RedirectAttributesModelMap());
+        redirectAttributes);
 
     var worker = workerRepository.findByCode(authenticatedWorkerCode);
     var datesByDailyExecutionType = calendarService.datesByDailyExecutionType(worker, 2025);
@@ -159,7 +201,7 @@ class CalendarServiceIT extends FacadeIT {
             null,
             null,
             null),
-        new RedirectAttributesModelMap());
+        redirectAttributes);
 
     var worker = workerRepository.findByCode(authenticatedWorkerCode);
     var datesByDailyExecutionType = calendarService.datesByDailyExecutionType(worker, 2024);
@@ -184,7 +226,6 @@ class CalendarServiceIT extends FacadeIT {
     workerRepository.save(authenticatedWorker);
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
-
     return authentication;
   }
 

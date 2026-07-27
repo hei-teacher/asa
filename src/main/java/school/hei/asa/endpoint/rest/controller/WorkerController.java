@@ -46,10 +46,10 @@ public class WorkerController {
     var contracts = contractRepository.findAllByWorker(worker);
 
     var hasContract = !contracts.isEmpty();
-    var entranceInstant = hasContract ? contracts.getLast().entranceInstant() : null;
-    var level = hasContract ? contracts.getLast().level().code() : null;
-    var levelEntranceInstant = hasContract ? contracts.getLast().entranceInstant() : null;
-    var contractType = hasContract ? contracts.getLast().level().type().name() : null;
+    var entranceInstant = hasContract ? contracts.getFirst().entranceInstant() : null;
+    var level = hasContract ? contracts.getFirst().level().code() : null;
+    var levelEntranceInstant = hasContract ? contracts.getFirst().entranceInstant() : null;
+    var contractType = hasContract ? contracts.getFirst().level().type().name() : null;
     var workerType = thWorkerMapper.toWorkerType(contractType);
 
     model.addAttribute(

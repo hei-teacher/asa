@@ -1,5 +1,7 @@
 package school.hei.asa.endpoint.rest.controller;
 
+    import static java.time.LocalDate.now;
+
 import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import school.hei.asa.endpoint.rest.model.th.WorkerModelAdderParam;
 import school.hei.asa.model.Worker;
+import school.hei.asa.service.CalendarService;
 import school.hei.asa.service.SensitiveWorkerFilter;
 import school.hei.asa.service.WorkerService;
 
@@ -16,6 +19,7 @@ import school.hei.asa.service.WorkerService;
 public class WorkerToModelAdder implements BiFunction<WorkerModelAdderParam, Model, Worker> {
   private final WorkerService workerService;
   private final SensitiveWorkerFilter sensitiveWorkerFilter;
+  private final CalendarService calendarService;
 
   @Override
   public Worker apply(WorkerModelAdderParam workerModelAdderParam, Model model) {
@@ -33,6 +37,12 @@ public class WorkerToModelAdder implements BiFunction<WorkerModelAdderParam, Mod
     model.addAttribute("worker", worker);
     model.addAttribute("workerName", worker == null ? "All workers" : worker.name());
     model.addAttribute("workers", workersSensitiveWorkerFiltered);
+    if (worker != null) {
+      var year = model.getAttribute("year");
+      calendarService
+          .contractAlertMessage(worker, year instanceof Integer y ? y : now().getYear())
+          .ifPresent(msg -> model.addAttribute("contractAlert", msg));
+    }
     return worker;
   }
 }

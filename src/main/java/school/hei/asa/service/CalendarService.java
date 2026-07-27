@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.asa.CareProductCodeSupplier;
@@ -27,6 +28,7 @@ public class CalendarService {
   private final CareProductCodeSupplier careProductCodeSupplier;
   private final PaidCareMissionCodesSupplier paidCareMissionCodesSupplier;
   private final Mailer mailer;
+  private final ContractAlertService contractAlertService;
 
   @Transactional
   public Map<DailyExecution.Type, List<LocalDate>> datesByDailyExecutionType(
@@ -64,5 +66,9 @@ public class CalendarService {
             new school.hei.asa.model.ProductConf(
                 careProductCodeSupplier.get(), paidCareMissionCodesSupplier.get()))
         .lateReportedDaysByMonth();
+  }
+
+  public Optional<String> contractAlertMessage(Worker worker, int year) {
+    return contractAlertService.contractAlertMessage(worker);
   }
 }

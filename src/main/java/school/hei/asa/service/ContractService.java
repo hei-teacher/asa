@@ -13,11 +13,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.hei.asa.CareProductCodeSupplier;
-import school.hei.asa.endpoint.event.EventProducer;
-import school.hei.asa.endpoint.event.model.ContractAlertRequested;
 import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
@@ -35,8 +32,6 @@ public class ContractService {
   private final MissionExecutionRepository missionExecutionRepository;
   private final MissionService missionService;
   private final CareProductCodeSupplier careProductCodeSupplier;
-  private final EventProducer<ContractAlertRequested> eventProducer;
-  private final int alertThreshold;
   private final DateTimeFormatter localDateFormatter =
       DateTimeFormatter.ofPattern("dd MMM yyyy", FRENCH);
 
@@ -46,17 +41,13 @@ public class ContractService {
       DailyExecutionRepository dailyExecutionRepository,
       MissionExecutionRepository missionExecutionRepository,
       MissionService missionService,
-      CareProductCodeSupplier careProductCodeSupplier,
-      EventProducer<ContractAlertRequested> eventProducer,
-      @Value("${ASA_CONTRACT_ALERT_THRESOLD}") int alertThreshold) {
+      CareProductCodeSupplier careProductCodeSupplier) {
     this.workerRepository = workerRepository;
     this.contractRepository = contractRepository;
     this.dailyExecutionRepository = dailyExecutionRepository;
     this.missionExecutionRepository = missionExecutionRepository;
     this.missionService = missionService;
     this.careProductCodeSupplier = careProductCodeSupplier;
-    this.eventProducer = eventProducer;
-    this.alertThreshold = alertThreshold;
   }
 
   public Map<Worker, List<Contract>> totalWorkDaysPerWorker() {
@@ -113,10 +104,6 @@ public class ContractService {
     return contractRepository.findAllActiveContracts();
   }
 
-  public int alertThreshold() {
-    return alertThreshold;
-  }
-
   public boolean hasRemainingDays(Worker worker) {
     var contracts = contractRepository.findAllByWorker(worker);
     var activeContract =
@@ -158,27 +145,5 @@ public class ContractService {
     var workedStr = getActualWorkedDaysByDateByWorker(startDate, worker.code(), now);
     var usedDays = workedStr.equals("-") ? 0.0 : Double.parseDouble(workedStr);
     return (long) (durationDays - usedDays);
-  }
-
-  public Optional<String> checkAndNotifyContractAlert(Worker worker) {
-    var remaining = getRemainingDaysByWorker(worker);
-    if (remaining < 0 || remaining >= alertThreshold) {
-      return Optional.empty();
-    }
-
-    try {
-      eventProducer.accept(
-          List.of(
-              ContractAlertRequested.builder()
-                  .workerName(worker.name())
-                  .workerEmail(worker.email())
-                  .remainingDays(remaining)
-                  .build()));
-    } catch (Exception e) {
-      log.error("Failed to send contract alert event", e);
-    }
-
-    var plural = remaining > 1 ? "s" : "";
-    return Optional.of("Warning: only " + remaining + " day" + plural + " left on your contract.");
   }
 }

@@ -11,6 +11,7 @@ import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.ThMissionService;
 import school.hei.asa.repository.DailyExecutionRepository;
+import school.hei.asa.service.ContractAlertService;
 import school.hei.asa.service.ContractService;
 
 @Controller
@@ -20,18 +21,21 @@ public class DailyExecutionController {
   private final WorkerFromAuthentication workerFromAuthentication;
   private final ThMissionService thMissionService;
   private final ContractService contractService;
+  private final ContractAlertService contractAlertService;
 
   public DailyExecutionController(
       ThDailyExecutionFormMapper thDailyExecutionFormMapper,
       DailyExecutionRepository dailyExecutionRepository,
       WorkerFromAuthentication workerFromAuthentication,
       ThMissionService thMissionService,
-      ContractService contractService) {
+      ContractService contractService,
+      ContractAlertService contractAlertService) {
     this.thDailyExecutionFormMapper = thDailyExecutionFormMapper;
     this.dailyExecutionRepository = dailyExecutionRepository;
     this.workerFromAuthentication = workerFromAuthentication;
     this.thMissionService = thMissionService;
     this.contractService = contractService;
+    this.contractAlertService = contractAlertService;
   }
 
   @GetMapping("/daily-execution")
@@ -56,7 +60,7 @@ public class DailyExecutionController {
 
     dailyExecutionRepository.save(thDailyExecutionFormMapper.toDomain(dmeForm, worker));
 
-    contractService
+    contractAlertService
         .checkAndNotifyContractAlert(worker)
         .ifPresent(msg -> redirectAttributes.addFlashAttribute("contractAlert", msg));
 

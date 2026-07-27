@@ -7,7 +7,6 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.asa.model.contract.Contract;
-import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.model.JContract;
 import school.hei.asa.repository.model.JWorker;
 
@@ -17,8 +16,6 @@ public class ContractMapper {
 
   private final WorkerMapper workerMapper;
   private final ContractLevelMapper contractLevelMapper;
-
-  private final DailyExecutionRepository dailyExecutionRepository;
 
   public List<Contract> toDomain(List<JContract> jwlhList) {
     return jwlhList.stream().map(jContract -> toDomain(jContract, new Cache())).toList();

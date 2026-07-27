@@ -34,9 +34,9 @@ public class ThInvoiceService {
     return invoiceService.generateInvoiceFileName(worker);
   }
 
-  public void saveInvoiceReference(ThInvoiceForm thInvoiceForm, Worker worker) {
+  public void saveInvoice(ThInvoiceForm thInvoiceForm, Worker worker) {
     var invoiceData = thInvoiceFormMapper.toDomain(thInvoiceForm);
-    invoiceService.saveInvoiceReference(invoiceData, worker);
+    invoiceService.saveInvoice(invoiceData, worker);
   }
 
   public List<ThMonthInvoiceStatus> getMonthInvoiceStatusForWorker(Worker worker, int year) {

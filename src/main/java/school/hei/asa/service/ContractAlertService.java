@@ -26,15 +26,11 @@ public class ContractAlertService {
     this.alertThreshold = alertThreshold;
   }
 
-  public Optional<String> checkAndNotifyContractAlert(Worker worker) {
+  public void sendContractAlert(Worker worker) {
     var remaining = contractService.getRemainingDaysByWorker(worker);
-    if (remaining >= alertThreshold) {
-      return Optional.empty();
+    if (remaining < alertThreshold) {
+      sendEvent(worker, remaining);
     }
-
-    sendEvent(worker, remaining);
-
-    return alertMessage(remaining);
   }
 
   public Optional<String> contractAlertMessage(Worker worker) {

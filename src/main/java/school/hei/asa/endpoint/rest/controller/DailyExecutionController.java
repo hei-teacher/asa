@@ -26,9 +26,15 @@ public class DailyExecutionController {
   private final ContractAlertService contractAlertService;
 
   @GetMapping("/daily-execution")
-  public String getDailyExecutionForm(Model model) {
+  public String getDailyExecutionForm(Authentication authentication, Model model) {
     var sortedMissions = thMissionService.sortedMissionsWithoutMissionExecution();
     model.addAttribute("missions", sortedMissions);
+
+    var worker = workerFromAuthentication.apply(authentication).get();
+    contractAlertService
+        .contractAlertMessage(worker)
+        .ifPresent(msg -> model.addAttribute("contractAlert", msg));
+
     return "daily-execution";
   }
 
@@ -47,9 +53,7 @@ public class DailyExecutionController {
 
     dailyExecutionRepository.save(thDailyExecutionFormMapper.toDomain(dmeForm, worker));
 
-    contractAlertService
-        .checkAndNotifyContractAlert(worker)
-        .ifPresent(msg -> redirectAttributes.addFlashAttribute("contractAlert", msg));
+    contractAlertService.sendContractAlert(worker);
 
     return "redirect:/work-and-care-calendar";
   }

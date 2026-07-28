@@ -1,5 +1,7 @@
 package school.hei.asa.endpoint.rest.controller;
 
+import static java.time.LocalDate.now;
+
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -12,6 +14,7 @@ import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.ThMissionService;
 import school.hei.asa.repository.DailyExecutionRepository;
+import school.hei.asa.service.CalendarService;
 import school.hei.asa.service.ContractAlertService;
 import school.hei.asa.service.ContractService;
 
@@ -24,6 +27,7 @@ public class DailyExecutionController {
   private final ThMissionService thMissionService;
   private final ContractService contractService;
   private final ContractAlertService contractAlertService;
+  private final CalendarService calendarService;
 
   @GetMapping("/daily-execution")
   public String getDailyExecutionForm(Authentication authentication, Model model) {
@@ -31,12 +35,9 @@ public class DailyExecutionController {
     model.addAttribute("missions", sortedMissions);
 
     var worker = workerFromAuthentication.apply(authentication).get();
-    var remaining = contractService.getRemainingDaysByWorker(worker);
-    if (remaining == 0) {
-      model.addAttribute("contractAlert", "Your contract has no remaining days left.");
-    } else if (remaining < 0) {
-      model.addAttribute("contractAlert", "Your contract is overdue.");
-    }
+    calendarService
+        .contractAlertMessage(worker, now().getYear())
+        .ifPresent(msg -> model.addAttribute("contractAlert", msg));
 
     return "daily-execution";
   }

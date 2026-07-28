@@ -33,14 +33,6 @@ public class ContractAlertService {
     }
   }
 
-  public Optional<String> contractAlertMessage(Worker worker) {
-    var remaining = contractService.getRemainingDaysByWorker(worker);
-    if (remaining < alertThreshold) {
-      return alertMessage(remaining);
-    }
-    return Optional.empty();
-  }
-
   private Optional<String> alertMessage(long remaining) {
     var plural = remaining > 1 ? "s" : "";
     return Optional.of("Warning: only " + remaining + " day" + plural + " left on your contract.");

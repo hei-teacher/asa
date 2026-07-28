@@ -9,7 +9,7 @@ import java.time.Month;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.PaidCareMissionCodesSupplier;
@@ -20,7 +20,6 @@ import school.hei.asa.model.Worker;
 import school.hei.asa.model.WorkerCalendar;
 import school.hei.asa.repository.DailyExecutionRepository;
 
-@AllArgsConstructor
 @Service
 public class CalendarService {
 
@@ -28,8 +27,23 @@ public class CalendarService {
   private final CareProductCodeSupplier careProductCodeSupplier;
   private final PaidCareMissionCodesSupplier paidCareMissionCodesSupplier;
   private final Mailer mailer;
-  private final ContractAlertService contractAlertService;
   private final ContractService contractService;
+  private final int alertThreshold;
+
+  public CalendarService(
+      DailyExecutionRepository dailyExecutionRepository,
+      CareProductCodeSupplier careProductCodeSupplier,
+      PaidCareMissionCodesSupplier paidCareMissionCodesSupplier,
+      Mailer mailer,
+      ContractService contractService,
+      @Value("${ASA_CONTRACT_ALERT_THRESOLD}") int alertThreshold) {
+    this.dailyExecutionRepository = dailyExecutionRepository;
+    this.careProductCodeSupplier = careProductCodeSupplier;
+    this.paidCareMissionCodesSupplier = paidCareMissionCodesSupplier;
+    this.mailer = mailer;
+    this.contractService = contractService;
+    this.alertThreshold = alertThreshold;
+  }
 
   @Transactional
   public Map<DailyExecution.Type, List<LocalDate>> datesByDailyExecutionType(
@@ -70,18 +84,12 @@ public class CalendarService {
   }
 
   public Optional<String> contractAlertMessage(Worker worker, int year) {
-    var calendar =
-        new WorkerCalendar(
+    return new WorkerCalendar(
             worker,
             List.of(),
             year,
             new school.hei.asa.model.ProductConf(
-                careProductCodeSupplier.get(), paidCareMissionCodesSupplier.get()));
-    var remaining = contractService.getRemainingDaysByWorker(worker);
-    var exhaustionError = calendar.contractAlertMessage(remaining);
-    if (exhaustionError.isPresent()) {
-      return exhaustionError;
-    }
-    return contractAlertService.contractAlertMessage(worker);
+                careProductCodeSupplier.get(), paidCareMissionCodesSupplier.get()))
+        .contractAlertMessage(contractService, alertThreshold);
   }
 }

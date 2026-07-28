@@ -55,7 +55,7 @@ public class ContractAlertService {
       eventProducer.accept(
           List.of(
               ContractAlertRequested.builder()
-                  .workerName(worker.name())
+                  .workerCode(worker.code())
                   .workerEmail(worker.email())
                   .remainingDays(remaining)
                   .build()));

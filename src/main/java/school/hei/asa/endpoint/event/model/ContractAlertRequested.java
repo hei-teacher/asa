@@ -18,7 +18,7 @@ import lombok.ToString;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ContractAlertRequested extends PojaEvent {
 
-  private String workerName;
+  private String workerCode;
   private String workerEmail;
   private double remainingDays;
 

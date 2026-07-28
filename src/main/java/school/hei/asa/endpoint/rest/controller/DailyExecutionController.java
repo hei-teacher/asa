@@ -9,24 +9,20 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import school.hei.asa.endpoint.rest.controller.mapper.ThDailyExecutionFormMapper;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.ThMissionService;
-import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.service.CalendarService;
-import school.hei.asa.service.ContractAlertService;
 import school.hei.asa.service.ContractService;
+import school.hei.asa.service.DailyExecutionService;
 
 @AllArgsConstructor
 @Controller
 public class DailyExecutionController {
-  private final ThDailyExecutionFormMapper thDailyExecutionFormMapper;
-  private final DailyExecutionRepository dailyExecutionRepository;
   private final WorkerFromAuthentication workerFromAuthentication;
   private final ThMissionService thMissionService;
   private final ContractService contractService;
-  private final ContractAlertService contractAlertService;
+  private final DailyExecutionService dailyExecutionService;
   private final CalendarService calendarService;
 
   @GetMapping("/daily-execution")
@@ -55,9 +51,7 @@ public class DailyExecutionController {
       return "redirect:/daily-execution";
     }
 
-    dailyExecutionRepository.save(thDailyExecutionFormMapper.toDomain(dmeForm, worker));
-
-    contractAlertService.sendContractAlert(worker);
+    dailyExecutionService.saveAndAlert(dmeForm, worker);
 
     return "redirect:/work-and-care-calendar";
   }

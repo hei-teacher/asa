@@ -1,7 +1,6 @@
 package school.hei.asa.service;
 
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -29,26 +28,17 @@ public class ContractAlertService {
   public void sendContractAlert(Worker worker) {
     var remaining = contractService.getRemainingDaysByWorker(worker);
     if (remaining < alertThreshold) {
-      sendEvent(worker, remaining);
-    }
-  }
-
-  private Optional<String> alertMessage(long remaining) {
-    var plural = remaining > 1 ? "s" : "";
-    return Optional.of("Warning: only " + remaining + " day" + plural + " left on your contract.");
-  }
-
-  private void sendEvent(Worker worker, long remaining) {
-    try {
-      eventProducer.accept(
-          List.of(
-              ContractAlertRequested.builder()
-                  .workerCode(worker.code())
-                  .workerEmail(worker.email())
-                  .remainingDays(remaining)
-                  .build()));
-    } catch (Exception e) {
-      log.error("Failed to send contract alert event", e);
+      try {
+        eventProducer.accept(
+            List.of(
+                ContractAlertRequested.builder()
+                    .workerCode(worker.code())
+                    .workerEmail(worker.email())
+                    .remainingDays(remaining)
+                    .build()));
+      } catch (Exception e) {
+        log.error("Failed to send contract alert event", e);
+      }
     }
   }
 }

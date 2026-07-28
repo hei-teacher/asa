@@ -84,12 +84,6 @@ public class CalendarService {
   }
 
   public Optional<String> contractAlertMessage(Worker worker, int year) {
-    return new WorkerCalendar(
-            worker,
-            List.of(),
-            year,
-            new school.hei.asa.model.ProductConf(
-                careProductCodeSupplier.get(), paidCareMissionCodesSupplier.get()))
-        .contractAlertMessage(contractService, alertThreshold);
+    return contractService.contractAlertMessage(worker, alertThreshold);
   }
 }

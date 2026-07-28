@@ -49,9 +49,9 @@ public class DailyExecutionController {
       RedirectAttributes redirectAttributes) {
     var worker = workerFromAuthentication.apply(authentication).get();
 
-    if (!contractService.hasRemainingDays(worker)) {
-      redirectAttributes.addFlashAttribute(
-          "error", "Cannot submit report: " + worker.name() + " has no remaining contract days.");
+    var remainingError = contractService.checkRemainingDays(worker);
+    if (remainingError.isPresent()) {
+      redirectAttributes.addFlashAttribute("error", remainingError.get());
       return "redirect:/daily-execution";
     }
 

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import school.hei.asa.concurrency.Workers;
 import school.hei.asa.endpoint.event.model.ContractAlertRequested;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
@@ -17,17 +16,14 @@ public class ContractAlertRequestedService implements Consumer<ContractAlertRequ
 
   private final Mailer mailer;
   private final InternetAddressMapper internetAddressMapper;
-  private final Workers workers;
   private final String accountants;
 
   public ContractAlertRequestedService(
       Mailer mailer,
       InternetAddressMapper internetAddressMapper,
-      Workers workers,
       @Value("${ACCOUNTANTS}") String accountants) {
     this.mailer = mailer;
     this.internetAddressMapper = internetAddressMapper;
-    this.workers = workers;
     this.accountants = accountants;
   }
 
@@ -39,12 +35,7 @@ public class ContractAlertRequestedService implements Consumer<ContractAlertRequ
     }
 
     var email = buildAlertEmail(event, accountantEmails);
-    workers.invokeAll(
-        List.of(
-            () -> {
-              mailer.accept(email);
-              return null;
-            }));
+    mailer.accept(email);
   }
 
   private List<InternetAddress> toAccountantEmails() {
@@ -57,12 +48,12 @@ public class ContractAlertRequestedService implements Consumer<ContractAlertRequ
     var plural = remaining > 1 ? "s" : "";
 
     var subject =
-        "ASA - CONTRACT ALERT - " + event.getWorkerName() + " - Only " + remaining + " days left";
+        "ASA - CONTRACT ALERT - " + event.getWorkerCode() + " - Only " + remaining + " days left";
 
     var body =
         "Hello,<br><br>"
             + "The contract of <b>"
-            + event.getWorkerName()
+            + event.getWorkerCode()
             + "</b> ("
             + event.getWorkerEmail()
             + ") is about to expire.<br>"

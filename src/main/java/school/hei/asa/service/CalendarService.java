@@ -29,6 +29,7 @@ public class CalendarService {
   private final PaidCareMissionCodesSupplier paidCareMissionCodesSupplier;
   private final Mailer mailer;
   private final ContractAlertService contractAlertService;
+  private final ContractService contractService;
 
   @Transactional
   public Map<DailyExecution.Type, List<LocalDate>> datesByDailyExecutionType(
@@ -69,6 +70,18 @@ public class CalendarService {
   }
 
   public Optional<String> contractAlertMessage(Worker worker, int year) {
+    var calendar =
+        new WorkerCalendar(
+            worker,
+            List.of(),
+            year,
+            new school.hei.asa.model.ProductConf(
+                careProductCodeSupplier.get(), paidCareMissionCodesSupplier.get()));
+    var remaining = contractService.getRemainingDaysByWorker(worker);
+    var exhaustionError = calendar.contractAlertMessage(remaining);
+    if (exhaustionError.isPresent()) {
+      return exhaustionError;
+    }
     return contractAlertService.contractAlertMessage(worker);
   }
 }

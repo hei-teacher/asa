@@ -31,9 +31,12 @@ public class DailyExecutionController {
     model.addAttribute("missions", sortedMissions);
 
     var worker = workerFromAuthentication.apply(authentication).get();
-    contractAlertService
-        .contractAlertMessage(worker)
-        .ifPresent(msg -> model.addAttribute("contractAlert", msg));
+    var remaining = contractService.getRemainingDaysByWorker(worker);
+    if (remaining == 0) {
+      model.addAttribute("contractAlert", "Your contract has no remaining days left.");
+    } else if (remaining < 0) {
+      model.addAttribute("contractAlert", "Your contract is overdue.");
+    }
 
     return "daily-execution";
   }

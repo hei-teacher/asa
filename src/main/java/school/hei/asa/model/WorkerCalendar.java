@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -91,5 +92,15 @@ public class WorkerCalendar {
         dailyExecution.date().plusDays(MINIMUM_LATE_DAYS).atStartOfDay(UTC).toInstant();
     return dailyExecution.executions().stream()
         .anyMatch(missionExecution -> missionExecution.reportedAt().isAfter(deadline));
+  }
+
+  public Optional<String> contractAlertMessage(long remainingDays) {
+    if (remainingDays == 0) {
+      return Optional.of("Your contract has no remaining days left.");
+    }
+    if (remainingDays < 0) {
+      return Optional.of("Your contract is overdue.");
+    }
+    return Optional.empty();
   }
 }

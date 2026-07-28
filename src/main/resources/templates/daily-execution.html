@@ -56,6 +56,15 @@
 
 <div th:replace="fragments/header :: header"></div>
 
+<div th:if="${contractAlert}" id="contractAlert"
+     class="mx-6 mt-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded shadow-md transition-all duration-500 ease-in-out"
+     role="alert">
+    <div class="flex items-center gap-2">
+        <i class="material-icons text-yellow-600">warning</i>
+        <p class="font-medium" th:text="${contractAlert}"></p>
+    </div>
+</div>
+
 <main class="mx-auto px-6 py-12">
     <h1 class="text-4xl font-bold text-[#3F2F6A] mb-6">What did you do that day?</h1>
 

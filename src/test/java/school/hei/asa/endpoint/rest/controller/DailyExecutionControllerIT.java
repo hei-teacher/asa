@@ -244,7 +244,7 @@ class DailyExecutionControllerIT extends FacadeIT {
 
   @Test
   void can_get_daily_execution_form() {
-    var viewName = dailyExecutionController.getDailyExecutionForm(model);
+    var viewName = dailyExecutionController.getDailyExecutionForm(authentication, model);
 
     verify(model).addAttribute(eq("missions"), any(List.class));
 

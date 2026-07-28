@@ -28,6 +28,7 @@ import school.hei.asa.model.Mission;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.CalendarService;
 import school.hei.asa.service.ContractService;
+import school.hei.asa.service.LowRemainingDaysAlertService;
 
 @AllArgsConstructor
 @Controller
@@ -37,6 +38,7 @@ public class CalendarController {
   private final WorkerFromAuthentication workerFromAuthentication;
   private final WorkerToModelAdder workerToModelAdder;
   private final ContractService contractService;
+  private final LowRemainingDaysAlertService lowRemainingDaysAlertService;
 
   @GetMapping("/work-and-care-calendar")
   public String getCalendar(
@@ -75,6 +77,15 @@ public class CalendarController {
 
     model.addAttribute("remainingDays", hasUsableContract ? remainingDays : null);
     model.addAttribute("hasUsableContract", hasUsableContract);
+
+    lowRemainingDaysAlertService
+        .checkRemainingDaysAndBuildAlertMessage(worker)
+        .ifPresent(
+            message -> {
+              model.addAttribute("toastMessage", message);
+              model.addAttribute("toastType", "warning");
+              model.addAttribute("warningBannerMessage", message);
+            });
 
     model.addAttribute("workerCode", workerCodeOrAuth);
     model.addAttribute("currentYear", now().getYear());

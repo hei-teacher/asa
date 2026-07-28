@@ -84,7 +84,7 @@ public class ContractService {
                 })
             .reduce(Double::sum)
             .get();
-      return String.format(US, "%.1f", result);
+    return String.format(US, "%.1f", result);
   }
 
   public List<Contract> findActiveContracts() {
@@ -119,7 +119,7 @@ public class ContractService {
         contracts.stream().filter(c -> c.endInstant() == null).findFirst().orElse(null);
 
     if (activeContract == null) {
-      return -1;
+      return 0;
     }
 
     var durationDays = activeContract.duration().toDays();
@@ -131,6 +131,7 @@ public class ContractService {
     var now = LocalDate.now();
     var workedStr = getActualWorkedDaysByDateByWorker(startDate, worker.code(), now);
     var usedDays = workedStr.equals("-") ? 0.0 : Double.parseDouble(workedStr);
-    return (long) (durationDays - usedDays);
+    var remaining = durationDays - usedDays;
+    return remaining > 0 ? (long) remaining : 0;
   }
 }

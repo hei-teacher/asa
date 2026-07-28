@@ -10,21 +10,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import jakarta.persistence.EntityManager;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import school.hei.asa.conf.FacadeIT;
@@ -34,14 +30,10 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Product;
 import school.hei.asa.model.Worker;
-import school.hei.asa.model.contract.ContractType;
 import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.MissionRepository;
 import school.hei.asa.repository.ProductRepository;
 import school.hei.asa.repository.WorkerRepository;
-import school.hei.asa.repository.model.JContract;
-import school.hei.asa.repository.model.JContractLevel;
-import school.hei.asa.repository.model.JWorker;
 
 class DailyExecutionControllerIT extends FacadeIT {
 
@@ -51,8 +43,6 @@ class DailyExecutionControllerIT extends FacadeIT {
   @Autowired MissionRepository missionRepository;
   @Autowired DailyExecutionRepository dailyExecutionRepository;
   @Autowired CalendarController calendarController;
-  @Autowired EntityManager entityManager;
-  @Autowired TransactionTemplate transactionTemplate;
 
   @MockBean SecurityConfig securityConfig;
   @MockBean WorkerFromAuthentication workerFromAuthentication;
@@ -62,20 +52,6 @@ class DailyExecutionControllerIT extends FacadeIT {
   Model model;
   RedirectAttributes redirectAttributes;
 
-  @AfterEach
-  void tearDown() {
-    transactionTemplate.execute(
-        status -> {
-          entityManager
-              .createQuery("delete from JContract where id = 'test-contract-id'")
-              .executeUpdate();
-          entityManager
-              .createQuery("delete from JContractLevel where code = 'L-TEST'")
-              .executeUpdate();
-          return null;
-        });
-  }
-
   @BeforeEach
   void setUp() {
     authentication = mock(Authentication.class);
@@ -83,7 +59,6 @@ class DailyExecutionControllerIT extends FacadeIT {
     authenticatedWorker =
         new Worker(
             "worker-code", "code", "email", "full code", "address", "random city", "nif", "stat");
-    workerRepository.save(authenticatedWorker);
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
     var product = new Product("pcode", "pname", "pdescription");
@@ -92,27 +67,6 @@ class DailyExecutionControllerIT extends FacadeIT {
     var mission2 = new Mission("mission2-code", "title2", "description2", 2, product);
     missionRepository.saveAll(List.of(mission1, mission2));
     model = mock(Model.class);
-
-    transactionTemplate.execute(
-        status -> {
-          var jContractLevel = new JContractLevel();
-          jContractLevel.setCode("L-TEST");
-          jContractLevel.setType(ContractType.studentContractor);
-          jContractLevel.setDailyPay(25000.0);
-          entityManager.persist(jContractLevel);
-
-          var jWorker = entityManager.find(JWorker.class, "worker-code");
-          var jContract = new JContract();
-          jContract.setId("test-contract-id");
-          jContract.setWorker(jWorker);
-          jContract.setLevel(jContractLevel);
-          jContract.setEntranceInstant(Instant.parse("2025-01-01T00:00:00Z"));
-          jContract.setDurationInDays(80);
-          jContract.setJobTitle("job_title");
-          jContract.setContractBucketKey("contract_bucket_key");
-          entityManager.persist(jContract);
-          return null;
-        });
   }
 
   @Test

@@ -10,6 +10,7 @@ import school.hei.asa.endpoint.rest.controller.mapper.ThDailyExecutionFormMapper
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.ThMissionService;
+import school.hei.asa.service.ContractService;
 import school.hei.asa.service.DailyExecutionService;
 import school.hei.asa.service.LowRemainingDaysAlertService;
 
@@ -21,12 +22,18 @@ public class DailyExecutionController {
   private final WorkerFromAuthentication workerFromAuthentication;
   private final ThMissionService thMissionService;
   private final LowRemainingDaysAlertService lowRemainingDaysAlertService;
+  private final ContractService contractService;
 
   @GetMapping("/daily-execution")
   public String getDailyExecutionForm(Model model, Authentication authentication) {
     var worker = workerFromAuthentication.apply(authentication).get();
     var sortedMissions = thMissionService.sortedMissionsWithoutMissionExecution();
     model.addAttribute("missions", sortedMissions);
+
+    var remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
+    var hasUsableContract =
+        contractService.findActiveContractByWorker(worker).isPresent() && remainingDays > 0;
+    model.addAttribute("hasUsableContract", hasUsableContract);
 
     lowRemainingDaysAlertService
         .verifyRemainingDaysAndBuildAlertMessage(worker)

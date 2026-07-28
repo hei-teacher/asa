@@ -56,6 +56,10 @@
 
 <div th:replace="fragments/header :: header"></div>
 
+<div th:if="${!hasUsableContract}" class="text-center py-2 font-bold text-lg shadow-md w-full bg-red-600 text-white animate-pulse">
+    Please note : You do not have an active contract. Please contact your administrator.
+</div>
+
 <div th:if="${warningBannerMessage}" class="text-center py-2 font-bold text-lg shadow-md w-full bg-yellow-400 text-black">
     <span th:text="${warningBannerMessage}"></span>
 </div>

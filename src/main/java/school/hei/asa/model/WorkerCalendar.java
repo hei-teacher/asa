@@ -92,5 +92,4 @@ public class WorkerCalendar {
     return dailyExecution.executions().stream()
         .anyMatch(missionExecution -> missionExecution.reportedAt().isAfter(deadline));
   }
-
 }

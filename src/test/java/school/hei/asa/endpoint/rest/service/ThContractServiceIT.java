@@ -34,30 +34,31 @@ class ThContractServiceIT extends FacadeIT {
   }
 
   private void addL5Contract() {
-    transactionTemplate.execute(status -> {
-      var jWorker = entityManager.find(JWorker.class, "W-P-2024-01");
-      var jContractLevel = entityManager.find(JContractLevel.class, "L5");
-      var jContract = new JContract();
-      jContract.setId("wlh_id_0");
-      jContract.setWorker(jWorker);
-      jContract.setLevel(jContractLevel);
-      jContract.setEntranceInstant(Instant.parse("2023-01-01T08:00:00Z"));
-      jContract.setDurationInDays(13);
-      jContract.setJobTitle("job_title");
-      jContract.setContractBucketKey("contract_bucket_key");
-      entityManager.persist(jContract);
-      return null;
-    });
+    transactionTemplate.execute(
+        status -> {
+          var jWorker = entityManager.find(JWorker.class, "W-P-2024-01");
+          var jContractLevel = entityManager.find(JContractLevel.class, "L5");
+          var jContract = new JContract();
+          jContract.setId("wlh_id_0");
+          jContract.setWorker(jWorker);
+          jContract.setLevel(jContractLevel);
+          jContract.setEntranceInstant(Instant.parse("2023-01-01T08:00:00Z"));
+          jContract.setDurationInDays(13);
+          jContract.setJobTitle("job_title");
+          jContract.setContractBucketKey("contract_bucket_key");
+          entityManager.persist(jContract);
+          return null;
+        });
   }
 
   @AfterEach
   void resetRequestContext() {
     RequestContextHolder.resetRequestAttributes();
-    transactionTemplate.execute(status -> {
-      entityManager.createQuery("delete from JContract where id = 'wlh_id_0'")
-          .executeUpdate();
-      return null;
-    });
+    transactionTemplate.execute(
+        status -> {
+          entityManager.createQuery("delete from JContract where id = 'wlh_id_0'").executeUpdate();
+          return null;
+        });
   }
 
   @Test

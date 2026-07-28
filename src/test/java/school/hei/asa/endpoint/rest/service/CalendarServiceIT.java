@@ -58,13 +58,16 @@ class CalendarServiceIT extends FacadeIT {
 
   @AfterEach
   void tearDown() {
-    transactionTemplate.execute(status -> {
-      entityManager.createQuery("delete from JContract where id = 'contract-calendar'")
-          .executeUpdate();
-      entityManager.createQuery("delete from JContractLevel where code = 'L-CALENDAR'")
-          .executeUpdate();
-      return null;
-    });
+    transactionTemplate.execute(
+        status -> {
+          entityManager
+              .createQuery("delete from JContract where id = 'contract-calendar'")
+              .executeUpdate();
+          entityManager
+              .createQuery("delete from JContractLevel where code = 'L-CALENDAR'")
+              .executeUpdate();
+          return null;
+        });
   }
 
   @BeforeEach
@@ -76,25 +79,26 @@ class CalendarServiceIT extends FacadeIT {
   }
 
   private void addContract() {
-    transactionTemplate.execute(status -> {
-      var jContractLevel = new JContractLevel();
-      jContractLevel.setCode("L-CALENDAR");
-      jContractLevel.setType(ContractType.partnerContractor);
-      jContractLevel.setDailyPay(100000.0);
-      entityManager.persist(jContractLevel);
+    transactionTemplate.execute(
+        status -> {
+          var jContractLevel = new JContractLevel();
+          jContractLevel.setCode("L-CALENDAR");
+          jContractLevel.setType(ContractType.partnerContractor);
+          jContractLevel.setDailyPay(100000.0);
+          entityManager.persist(jContractLevel);
 
-      var jWorker = entityManager.find(JWorker.class, authenticatedWorkerCode);
-      var jContract = new JContract();
-      jContract.setId("contract-calendar");
-      jContract.setWorker(jWorker);
-      jContract.setLevel(jContractLevel);
-      jContract.setEntranceInstant(Instant.parse("2024-01-01T00:00:00Z"));
-      jContract.setDurationInDays(365);
-      jContract.setJobTitle("job_title");
-      jContract.setContractBucketKey("contract_bucket_key");
-      entityManager.persist(jContract);
-      return null;
-    });
+          var jWorker = entityManager.find(JWorker.class, authenticatedWorkerCode);
+          var jContract = new JContract();
+          jContract.setId("contract-calendar");
+          jContract.setWorker(jWorker);
+          jContract.setLevel(jContractLevel);
+          jContract.setEntranceInstant(Instant.parse("2024-01-01T00:00:00Z"));
+          jContract.setDurationInDays(365);
+          jContract.setJobTitle("job_title");
+          jContract.setContractBucketKey("contract_bucket_key");
+          entityManager.persist(jContract);
+          return null;
+        });
   }
 
   @Test

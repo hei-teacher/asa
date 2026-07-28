@@ -1,6 +1,6 @@
 package school.hei.asa.endpoint.rest.controller;
 
-    import static java.time.LocalDate.now;
+import static java.time.LocalDate.now;
 
 import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;

@@ -64,13 +64,16 @@ class DailyExecutionControllerIT extends FacadeIT {
 
   @AfterEach
   void tearDown() {
-    transactionTemplate.execute(status -> {
-      entityManager.createQuery("delete from JContract where id = 'test-contract-id'")
-          .executeUpdate();
-      entityManager.createQuery("delete from JContractLevel where code = 'L-TEST'")
-          .executeUpdate();
-      return null;
-    });
+    transactionTemplate.execute(
+        status -> {
+          entityManager
+              .createQuery("delete from JContract where id = 'test-contract-id'")
+              .executeUpdate();
+          entityManager
+              .createQuery("delete from JContractLevel where code = 'L-TEST'")
+              .executeUpdate();
+          return null;
+        });
   }
 
   @BeforeEach
@@ -90,25 +93,26 @@ class DailyExecutionControllerIT extends FacadeIT {
     missionRepository.saveAll(List.of(mission1, mission2));
     model = mock(Model.class);
 
-    transactionTemplate.execute(status -> {
-      var jContractLevel = new JContractLevel();
-      jContractLevel.setCode("L-TEST");
-      jContractLevel.setType(ContractType.studentContractor);
-      jContractLevel.setDailyPay(25000.0);
-      entityManager.persist(jContractLevel);
+    transactionTemplate.execute(
+        status -> {
+          var jContractLevel = new JContractLevel();
+          jContractLevel.setCode("L-TEST");
+          jContractLevel.setType(ContractType.studentContractor);
+          jContractLevel.setDailyPay(25000.0);
+          entityManager.persist(jContractLevel);
 
-      var jWorker = entityManager.find(JWorker.class, "worker-code");
-      var jContract = new JContract();
-      jContract.setId("test-contract-id");
-      jContract.setWorker(jWorker);
-      jContract.setLevel(jContractLevel);
-      jContract.setEntranceInstant(Instant.parse("2025-01-01T00:00:00Z"));
-      jContract.setDurationInDays(80);
-      jContract.setJobTitle("job_title");
-      jContract.setContractBucketKey("contract_bucket_key");
-      entityManager.persist(jContract);
-      return null;
-    });
+          var jWorker = entityManager.find(JWorker.class, "worker-code");
+          var jContract = new JContract();
+          jContract.setId("test-contract-id");
+          jContract.setWorker(jWorker);
+          jContract.setLevel(jContractLevel);
+          jContract.setEntranceInstant(Instant.parse("2025-01-01T00:00:00Z"));
+          jContract.setDurationInDays(80);
+          jContract.setJobTitle("job_title");
+          jContract.setContractBucketKey("contract_bucket_key");
+          entityManager.persist(jContract);
+          return null;
+        });
   }
 
   @Test
@@ -175,7 +179,9 @@ class DailyExecutionControllerIT extends FacadeIT {
     dailyExecutionController.createDailyExecution(authentication, dmeForm, redirectAttributes);
     assertThrows(
         Exception.class,
-        () -> dailyExecutionController.createDailyExecution(authentication, dmeForm, redirectAttributes));
+        () ->
+            dailyExecutionController.createDailyExecution(
+                authentication, dmeForm, redirectAttributes));
   }
 
   @Test
@@ -216,7 +222,8 @@ class DailyExecutionControllerIT extends FacadeIT {
               () -> {
                 try {
                   latch.await();
-                  return dailyExecutionController.createDailyExecution(authentication, dmeForm, redirectAttributes);
+                  return dailyExecutionController.createDailyExecution(
+                      authentication, dmeForm, redirectAttributes);
                 } catch (Exception e) {
                   return e.getMessage();
                 }

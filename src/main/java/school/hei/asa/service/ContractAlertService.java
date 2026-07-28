@@ -39,10 +39,10 @@ public class ContractAlertService {
 
   public Optional<String> contractAlertMessage(Worker worker) {
     var remaining = contractService.getRemainingDaysByWorker(worker);
-    if (remaining < 0 || remaining >= alertThreshold) {
-      return Optional.empty();
+    if (remaining >= 0 && remaining < alertThreshold) {
+      return alertMessage(remaining);
     }
-    return alertMessage(remaining);
+    return Optional.empty();
   }
 
   private Optional<String> alertMessage(long remaining) {

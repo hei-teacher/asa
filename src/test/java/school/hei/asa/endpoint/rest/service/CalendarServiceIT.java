@@ -9,19 +9,14 @@ import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
 import static school.hei.asa.model.DailyExecution.Type.mixedWorkAndCare;
 
-import jakarta.persistence.EntityManager;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.controller.DailyExecutionController;
@@ -31,14 +26,9 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Product;
 import school.hei.asa.model.Worker;
-import school.hei.asa.model.contract.ContractType;
 import school.hei.asa.repository.MissionRepository;
 import school.hei.asa.repository.ProductRepository;
 import school.hei.asa.repository.WorkerRepository;
-import school.hei.asa.repository.jrepository.JContractRepository;
-import school.hei.asa.repository.mapper.WorkerMapper;
-import school.hei.asa.repository.model.JContract;
-import school.hei.asa.repository.model.JContractLevel;
 import school.hei.asa.service.CalendarService;
 
 class CalendarServiceIT extends FacadeIT {
@@ -46,10 +36,6 @@ class CalendarServiceIT extends FacadeIT {
   @Autowired WorkerRepository workerRepository;
   @Autowired ProductRepository productRepository;
   @Autowired MissionRepository missionRepository;
-  @Autowired JContractRepository jContractRepository;
-  @Autowired WorkerMapper workerMapper;
-  @Autowired EntityManager entityManager;
-  @Autowired PlatformTransactionManager transactionManager;
 
   @MockBean SecurityConfig securityConfig;
   @MockBean WorkerFromAuthentication workerFromAuthentication;
@@ -62,7 +48,6 @@ class CalendarServiceIT extends FacadeIT {
   @BeforeEach
   void setUp() {
     authentication = authentication();
-    setUpActiveContract();
     setUpProductsAndMissions();
   }
 
@@ -207,34 +192,5 @@ class CalendarServiceIT extends FacadeIT {
     var mission2 = new Mission("mission2-code", "title2", "description2", 2, product);
     var careMission = new Mission("careMission-code", "", "", 2, careProduct);
     missionRepository.saveAll(List.of(mission1, mission2, careMission));
-  }
-
-  private void setUpActiveContract() {
-    var worker = workerRepository.findByCode(authenticatedWorkerCode);
-    var contractLevelCode = "level-code-" + UUID.randomUUID();
-
-    new TransactionTemplate(transactionManager)
-        .execute(
-            status -> {
-              var jContractLevel = new JContractLevel();
-              jContractLevel.setCode(contractLevelCode);
-              jContractLevel.setType(ContractType.fullTimeEmployee);
-              jContractLevel.setMonthlyPay(1000.0);
-              jContractLevel.setDailyPay(50.0);
-              entityManager.persist(jContractLevel);
-              return null;
-            });
-
-    var jContract = new JContract();
-    jContract.setId("contract-test-id-" + UUID.randomUUID());
-    jContract.setWorker(workerMapper.toEntity(worker));
-    jContract.setLevel(entityManager.find(JContractLevel.class, contractLevelCode));
-    jContract.setEntranceInstant(Instant.parse("2010-01-01T00:00:00Z"));
-    jContract.setEndInstant(Instant.parse("2010-12-31T00:00:00Z"));
-    jContract.setJobTitle("job-title");
-    jContract.setDurationInDays(180);
-    jContract.setCompany("company");
-    jContract.setContractBucketKey("contract-bucket-key");
-    jContractRepository.save(jContract);
   }
 }

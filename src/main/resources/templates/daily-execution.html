@@ -56,6 +56,10 @@
 
 <div th:replace="fragments/header :: header"></div>
 
+<div th:if="${warningBannerMessage}" class="text-center py-2 font-bold text-lg shadow-md w-full bg-yellow-400 text-black">
+    <span th:text="${warningBannerMessage}"></span>
+</div>
+
 <main class="mx-auto px-6 py-12">
     <h1 class="text-4xl font-bold text-[#3F2F6A] mb-6">What did you do that day?</h1>
 

@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
-import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.SecurityConfig;
@@ -90,8 +89,7 @@ class DailyExecutionControllerIT extends FacadeIT {
             null,
             null);
 
-    dailyExecutionController.createDailyExecution(
-        authentication, dmeForm, new RedirectAttributesModelMap());
+    dailyExecutionController.createDailyExecution(authentication, dmeForm);
 
     var savedWorker = workerRepository.findByCode(authenticatedWorker.code());
     var dailyExecutions =
@@ -130,13 +128,10 @@ class DailyExecutionControllerIT extends FacadeIT {
             null,
             null);
 
-    dailyExecutionController.createDailyExecution(
-        authentication, dmeForm, new RedirectAttributesModelMap());
+    dailyExecutionController.createDailyExecution(authentication, dmeForm);
     assertThrows(
         Exception.class,
-        () ->
-            dailyExecutionController.createDailyExecution(
-                authentication, dmeForm, new RedirectAttributesModelMap()));
+        () -> dailyExecutionController.createDailyExecution(authentication, dmeForm));
   }
 
   @Test
@@ -177,8 +172,7 @@ class DailyExecutionControllerIT extends FacadeIT {
               () -> {
                 try {
                   latch.await();
-                  return dailyExecutionController.createDailyExecution(
-                      authentication, dmeForm, new RedirectAttributesModelMap());
+                  return dailyExecutionController.createDailyExecution(authentication, dmeForm);
                 } catch (Exception e) {
                   return e.getMessage();
                 }
@@ -199,7 +193,7 @@ class DailyExecutionControllerIT extends FacadeIT {
 
   @Test
   void can_get_daily_execution_form() {
-    var viewName = dailyExecutionController.getDailyExecutionForm(model);
+    var viewName = dailyExecutionController.getDailyExecutionForm(model, authentication);
 
     verify(model).addAttribute(eq("missions"), any(List.class));
 

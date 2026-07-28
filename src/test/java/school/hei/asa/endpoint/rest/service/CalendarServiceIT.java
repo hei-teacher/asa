@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.controller.DailyExecutionController;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
@@ -71,8 +70,7 @@ class CalendarServiceIT extends FacadeIT {
             null,
             null,
             null,
-            null),
-        new RedirectAttributesModelMap());
+            null));
 
     var worker = workerRepository.findByCode(authenticatedWorkerCode);
     var datesByDailyExecutionType = calendarService.datesByDailyExecutionType(worker, 2024);
@@ -104,8 +102,7 @@ class CalendarServiceIT extends FacadeIT {
             null,
             null,
             null,
-            null),
-        new RedirectAttributesModelMap());
+            null));
     dailyExecutionController.createDailyExecution(
         authentication,
         new ThDailyExecutionForm(
@@ -124,8 +121,7 @@ class CalendarServiceIT extends FacadeIT {
             null,
             null,
             null,
-            null),
-        new RedirectAttributesModelMap());
+            null));
 
     var worker = workerRepository.findByCode(authenticatedWorkerCode);
     var datesByDailyExecutionType = calendarService.datesByDailyExecutionType(worker, 2025);
@@ -154,8 +150,7 @@ class CalendarServiceIT extends FacadeIT {
             null,
             null,
             null,
-            null),
-        new RedirectAttributesModelMap());
+            null));
 
     var worker = workerRepository.findByCode(authenticatedWorkerCode);
     var datesByDailyExecutionType = calendarService.datesByDailyExecutionType(worker, 2024);

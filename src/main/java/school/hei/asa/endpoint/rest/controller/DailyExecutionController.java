@@ -36,7 +36,7 @@ public class DailyExecutionController {
     var worker = workerFromAuthentication.apply(authentication).get();
     var dailyExecution = thDailyExecutionFormMapper.toDomain(dmeForm, worker);
 
-    dailyExecutionService.verifyAndSave(dailyExecution);
+    dailyExecutionService.saveAndAlert(dailyExecution);
 
     return "redirect:/work-and-care-calendar";
   }

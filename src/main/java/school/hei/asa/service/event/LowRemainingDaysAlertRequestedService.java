@@ -2,7 +2,6 @@ package school.hei.asa.service.event;
 
 import static org.reflections.Reflections.log;
 
-import jakarta.mail.internet.InternetAddress;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -36,16 +35,13 @@ public class LowRemainingDaysAlertRequestedService
         internetAddressMapper.toInternetAddresses(
             Arrays.stream(this.accountants.split(",")).toList());
 
-    sendAlertToAccountants(accountantAddresses, event.getWorkerCode(), event.getRemainingDays());
-  }
-
-  private void sendAlertToAccountants(
-      List<InternetAddress> accountantAddresses, String workerCode, int remainingDays) {
     if (accountantAddresses.isEmpty()) {
       log.info("No accountant address found. Skipping alert email.");
       return;
     }
 
+    var workerCode = event.getWorkerCode();
+    var remainingDays = event.getRemainingDays();
     var subject = String.format("ASA - ALERT: low remaining days - Worker %s", workerCode);
     var body =
         String.format(

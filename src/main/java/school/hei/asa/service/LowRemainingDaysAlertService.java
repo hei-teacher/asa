@@ -31,7 +31,7 @@ public class LowRemainingDaysAlertService {
   public Optional<String> checkRemainingDaysAndBuildAlertMessage(Worker worker) {
     var remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
 
-    if (remainingDays == 0 || remainingDays >= lowRemainingDaysThreshold) {
+    if (!isBelowThreshold(remainingDays)) {
       return Optional.empty();
     }
 
@@ -42,7 +42,7 @@ public class LowRemainingDaysAlertService {
   public void sendAlertEmailIfLowRemainingDays(Worker worker) {
     var remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
 
-    if (remainingDays == 0 || remainingDays >= lowRemainingDaysThreshold) {
+    if (!isBelowThreshold(remainingDays)) {
       return;
     }
 
@@ -53,6 +53,10 @@ public class LowRemainingDaysAlertService {
                 .workerCode(worker.code())
                 .remainingDays((int) remainingDays)
                 .build()));
+  }
+
+  private boolean isBelowThreshold(double remainingDays) {
+    return remainingDays > 0 && remainingDays < lowRemainingDaysThreshold;
   }
 
   private static String formatDays(double days) {

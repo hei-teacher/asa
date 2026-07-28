@@ -16,12 +16,12 @@
     Please note : You do not have an active contract. Please contact your administrator.
 </div>
 
-<div th:if="${showWarning}"
+<div th:if="${alertMessage != null}"
      th:class="'text-center py-2 font-bold text-lg shadow-md w-full ' +
                (${remainingDays <= 2} ? 'bg-red-600 text-white animate-pulse' :
                (${remainingDays <= 3} ? 'bg-orange-500 text-white' :
                (${remainingDays <= 5} ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white')))">
-    Please note : You have only <span th:text="${T(school.hei.asa.number.DaysFormatter).format(remainingDays)}"></span> days on your contract !
+    <span th:text="${alertMessage}"></span>
 </div>
 
 <div class="flex justify-between gap-6 py-6 bg-gray-50">
@@ -35,8 +35,8 @@
                 <span class="text-white font-bold text-2xl px-4 py-1.5 bg-[#16163F] rounded-full shadow-sm cursor-pointer"
                       th:text="'J-' + ${T(school.hei.asa.number.DaysFormatter).format(remainingDays)}">
                 </span>
-                <div th:if="${showWarning}" class="absolute top-full left-0 mt-2 w-64 p-2 text-sm bg-gray-700 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
-                    Please note : You have only<span th:text="${T(school.hei.asa.number.DaysFormatter).format(remainingDays)}"></span> days left on your contract !
+                <div th:if="${alertMessage != null}" class="absolute top-full left-0 mt-2 w-64 p-2 text-sm bg-gray-700 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
+                    <span th:text="${alertMessage}"></span>
                 </div>
             </div>
         </div>

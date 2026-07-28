@@ -74,15 +74,16 @@ public class CalendarController {
     var remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
     var hasUsableContract =
         contractService.findActiveContractByWorker(worker).isPresent() && remainingDays > 0;
-    var showWarning =
+    var alertMessage =
         hasUsableContract
-            && lowRemainingDaysAlertService
+            ? lowRemainingDaysAlertService
                 .checkRemainingDaysAndBuildAlertMessage(worker)
-                .isPresent();
+                .orElse(null)
+            : null;
 
     model.addAttribute("remainingDays", hasUsableContract ? remainingDays : null);
     model.addAttribute("hasUsableContract", hasUsableContract);
-    model.addAttribute("showWarning", showWarning);
+    model.addAttribute("alertMessage", alertMessage);
 
     model.addAttribute("workerCode", workerCodeOrAuth);
     model.addAttribute("currentYear", now().getYear());

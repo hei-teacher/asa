@@ -10,7 +10,6 @@
 
 <body>
 <div th:replace="fragments/header :: header"></div>
-<div th:replace="fragments/toast :: toast"></div>
 
 <div th:if="${warningBannerMessage != null}"
      th:class="${#strings.contains(warningBannerMessage, 'do not have an active contract')}
@@ -26,11 +25,6 @@
             <h1 th:text="${thYear.year()} + ' - ' + ${thYear.title()}"
                 class="text-2xl font-semibold">
             </h1>
-            <div th:if="${remainingDays != null and remainingDays < 100000}" class="relative group flex items-center">
-                <span class="text-white font-bold text-2xl px-4 py-1.5 bg-[#16163F] rounded-full shadow-sm cursor-pointer"
-                      th:text="'J-' + ${T(school.hei.asa.number.DaysFormatter).format(remainingDays)}">
-                </span>
-            </div>
         </div>
         <div class="pt-5">
             <div th:replace="fragments/selectors/workerAndYear :: apply(work-and-care-calendar, Myself)"></div>

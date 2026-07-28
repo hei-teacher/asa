@@ -27,7 +27,6 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.CalendarService;
-import school.hei.asa.service.ContractService;
 import school.hei.asa.service.LowRemainingDaysAlertService;
 
 @AllArgsConstructor
@@ -37,7 +36,6 @@ public class CalendarController {
   private final CalendarService calendarService;
   private final WorkerFromAuthentication workerFromAuthentication;
   private final WorkerToModelAdder workerToModelAdder;
-  private final ContractService contractService;
   private final LowRemainingDaysAlertService lowRemainingDaysAlertService;
 
   @GetMapping("/work-and-care-calendar")
@@ -47,7 +45,6 @@ public class CalendarController {
       @RequestParam(required = false) String workerCode,
       @RequestParam(required = false) Integer year) {
     year = year == null ? now().getYear() : year;
-    model.addAttribute("year", year);
 
     var workerCodeOrAuth =
         workerCode == null || workerCode.isBlank()
@@ -70,17 +67,11 @@ public class CalendarController {
           missionCounts.put(month, typeCounts);
         });
     var lateReportedDaysByMonth = calendarService.lateReportedDaysByMonth(worker, year);
-
-    var remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
-    model.addAttribute("remainingDays", remainingDays > 0 ? remainingDays : null);
-
     var warningBannerMessage =
         lowRemainingDaysAlertService.verifyRemainingDaysAndBuildAlertMessage(worker).orElse(null);
+
+    model.addAttribute("year", year);
     model.addAttribute("warningBannerMessage", warningBannerMessage);
-    if (remainingDays > 0 && warningBannerMessage != null) {
-      model.addAttribute("toastMessage", warningBannerMessage);
-      model.addAttribute("toastType", "warning");
-    }
     model.addAttribute("workerCode", workerCodeOrAuth);
     model.addAttribute("currentYear", now().getYear());
     model.addAttribute(

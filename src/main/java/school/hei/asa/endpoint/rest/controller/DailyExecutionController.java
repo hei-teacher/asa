@@ -26,10 +26,10 @@ public class DailyExecutionController {
   public String getDailyExecutionForm(Model model, Authentication authentication) {
     var worker = workerFromAuthentication.apply(authentication).get();
     var sortedMissions = thMissionService.sortedMissionsWithoutMissionExecution();
-    model.addAttribute("missions", sortedMissions);
-
     var warningBannerMessage =
         lowRemainingDaysAlertService.verifyRemainingDaysAndBuildAlertMessage(worker).orElse(null);
+
+    model.addAttribute("missions", sortedMissions);
     model.addAttribute("warningBannerMessage", warningBannerMessage);
 
     return "daily-execution";

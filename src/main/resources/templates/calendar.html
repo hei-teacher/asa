@@ -12,12 +12,11 @@
 <div th:replace="fragments/header :: header"></div>
 <div th:replace="fragments/toast :: toast"></div>
 
-<div th:if="${!hasUsableContract}" class="text-center py-2 font-bold text-lg shadow-md w-full bg-red-600 text-white animate-pulse">
-    Please note : You do not have an active contract. Please contact your administrator.
-</div>
-
-<div th:if="${warningBannerMessage}" class="text-center py-2 font-bold text-lg shadow-md w-full bg-yellow-400 text-black">
-    <span th:text="${warningBannerMessage}"></span>
+<div th:if="${warningBannerMessage != null}"
+     th:class="${#strings.contains(warningBannerMessage, 'do not have an active contract')}
+         ? 'text-center py-2 font-bold text-lg shadow-md w-full bg-red-600 text-white animate-pulse'
+         : 'text-center py-2 font-bold text-lg shadow-md w-full bg-yellow-400 text-black'"
+     th:text="${warningBannerMessage}">
 </div>
 
 <div class="flex justify-between gap-6 py-6 bg-gray-50">

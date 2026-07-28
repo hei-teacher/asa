@@ -31,6 +31,11 @@ public class LowRemainingDaysAlertService {
   public Optional<String> verifyRemainingDaysAndBuildAlertMessage(Worker worker) {
     var remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
 
+    if (remainingDays <= 0) {
+      return Optional.of(
+          "Please note : You do not have an active contract. Please contact your administrator.");
+    }
+
     if (!isBelowThreshold(remainingDays)) {
       return Optional.empty();
     }

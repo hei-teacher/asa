@@ -55,12 +55,13 @@ class LowRemainingDaysAlertServiceIT extends FacadeIT {
   }
 
   @Test
-  void no_alert_when_no_active_contract() {
+  void alert_message_when_no_active_contract() {
     var result =
         lowRemainingDaysAlertService.verifyRemainingDaysAndBuildAlertMessage(
             workerWithoutContract());
 
-    assertTrue(result.isEmpty());
+    assertTrue(result.isPresent());
+    assertTrue(result.get().contains("do not have an active contract"));
     verify(eventProducer, never()).accept(any());
   }
 

@@ -79,7 +79,7 @@ public class CalendarController {
     model.addAttribute("hasUsableContract", hasUsableContract);
 
     lowRemainingDaysAlertService
-        .checkRemainingDaysAndBuildAlertMessage(worker)
+        .verifyRemainingDaysAndBuildAlertMessage(worker)
         .ifPresent(
             message -> {
               model.addAttribute("toastMessage", message);

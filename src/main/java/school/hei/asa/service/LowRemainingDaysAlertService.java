@@ -28,7 +28,7 @@ public class LowRemainingDaysAlertService {
     this.lowRemainingDaysThreshold = lowRemainingDaysThreshold;
   }
 
-  public Optional<String> checkRemainingDaysAndBuildAlertMessage(Worker worker) {
+  public Optional<String> verifyRemainingDaysAndBuildAlertMessage(Worker worker) {
     var remainingDays = contractService.getRemainingDaysOnActiveContractOrZero(worker);
 
     if (!isBelowThreshold(remainingDays)) {

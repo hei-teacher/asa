@@ -29,49 +29,41 @@ public class ContractAlertRequestedService implements Consumer<ContractAlertRequ
 
   @Override
   public void accept(ContractAlertRequested event) {
-    var accountantEmails = toAccountantEmails();
+    var accountantEmails =
+        internetAddressMapper.toInternetAddresses(Arrays.asList(accountants.split(",")));
     if (accountantEmails.isEmpty()) {
       return;
     }
 
-    var email = buildAlertEmail(event, accountantEmails);
-    mailer.accept(email);
-  }
-
-  private List<InternetAddress> toAccountantEmails() {
-    return internetAddressMapper.toInternetAddresses(Arrays.asList(accountants.split(",")));
-  }
-
-  private Email buildAlertEmail(
-      ContractAlertRequested event, List<InternetAddress> accountantEmails) {
     var remaining = (long) event.getRemainingDays();
     var plural = remaining > 1 ? "s" : "";
 
-    var subject =
-        "ASA - CONTRACT ALERT - " + event.getWorkerCode() + " - Only " + remaining + " days left";
+    var email =
+        new Email(
+            accountantEmails.getFirst(),
+            accountantEmails.size() > 1
+                ? accountantEmails.subList(1, accountantEmails.size())
+                : List.of(),
+            List.of(),
+            "ASA - CONTRACT ALERT - "
+                + event.getWorkerCode()
+                + " - Only "
+                + remaining
+                + " days left",
+            "Hello,<br><br>"
+                + "The contract of <b>"
+                + event.getWorkerCode()
+                + "</b> ("
+                + event.getWorkerEmail()
+                + ") is about to expire.<br>"
+                + "Only <b>"
+                + remaining
+                + "</b> day"
+                + plural
+                + " left on the contract.<br><br>"
+                + "Best regards,<br>ASA",
+            List.of());
 
-    var body =
-        "Hello,<br><br>"
-            + "The contract of <b>"
-            + event.getWorkerCode()
-            + "</b> ("
-            + event.getWorkerEmail()
-            + ") is about to expire.<br>"
-            + "Only <b>"
-            + remaining
-            + "</b> day"
-            + plural
-            + " left on the contract.<br><br>"
-            + "Best regards,<br>ASA";
-
-    return new Email(
-        accountantEmails.getFirst(),
-        accountantEmails.size() > 1
-            ? accountantEmails.subList(1, accountantEmails.size())
-            : List.of(),
-        List.of(),
-        subject,
-        body,
-        List.of());
+    mailer.accept(email);
   }
 }

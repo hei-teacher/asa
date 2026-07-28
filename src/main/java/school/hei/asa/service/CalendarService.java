@@ -27,7 +27,7 @@ public class CalendarService {
   private final CareProductCodeSupplier careProductCodeSupplier;
   private final PaidCareMissionCodesSupplier paidCareMissionCodesSupplier;
   private final Mailer mailer;
-  private final ContractService contractService;
+  private final ContractAlertService contractAlertService;
   private final int alertThreshold;
 
   public CalendarService(
@@ -35,13 +35,13 @@ public class CalendarService {
       CareProductCodeSupplier careProductCodeSupplier,
       PaidCareMissionCodesSupplier paidCareMissionCodesSupplier,
       Mailer mailer,
-      ContractService contractService,
+      ContractAlertService contractAlertService,
       @Value("${ASA_CONTRACT_ALERT_THRESOLD}") int alertThreshold) {
     this.dailyExecutionRepository = dailyExecutionRepository;
     this.careProductCodeSupplier = careProductCodeSupplier;
     this.paidCareMissionCodesSupplier = paidCareMissionCodesSupplier;
     this.mailer = mailer;
-    this.contractService = contractService;
+    this.contractAlertService = contractAlertService;
     this.alertThreshold = alertThreshold;
   }
 
@@ -84,6 +84,6 @@ public class CalendarService {
   }
 
   public Optional<String> contractAlertMessage(Worker worker, int year) {
-    return contractService.contractAlertMessage(worker, alertThreshold);
+    return contractAlertService.contractAlertMessage(worker, alertThreshold);
   }
 }

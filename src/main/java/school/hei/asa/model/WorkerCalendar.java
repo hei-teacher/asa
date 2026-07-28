@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import school.hei.asa.service.ContractService;
+import school.hei.asa.service.ContractAlertService;
 
 @Accessors(fluent = true)
 @Getter
@@ -95,18 +95,8 @@ public class WorkerCalendar {
         .anyMatch(missionExecution -> missionExecution.reportedAt().isAfter(deadline));
   }
 
-  public Optional<String> contractAlertMessage(ContractService contractService, int threshold) {
-    var remaining = contractService.getRemainingDaysByWorker(this.worker);
-    if (remaining == 0) {
-      return Optional.of("Your contract has no remaining days left.");
-    }
-    if (remaining < 0) {
-      return Optional.of("Your contract is overdue.");
-    }
-    if (remaining < threshold) {
-      var plural = remaining > 1 ? "s" : "";
-      return Optional.of("Warning: only " + remaining + " day" + plural + " left on your contract.");
-    }
-    return Optional.empty();
+  public Optional<String> contractAlertMessage(
+      ContractAlertService contractAlertService, int threshold) {
+    return contractAlertService.contractAlertMessage(this.worker, threshold);
   }
 }

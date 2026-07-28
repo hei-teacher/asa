@@ -60,6 +60,8 @@ public class LowRemainingDaysAlertService {
   }
 
   private static String formatDays(double days) {
-    return days == (long) days ? String.valueOf((long) days) : String.format(US, "%.1f", days);
+    return days == Math.floor(days)
+        ? String.format(US, "%.0f", days)
+        : String.format(US, "%.1f", days);
   }
 }

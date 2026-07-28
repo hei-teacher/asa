@@ -22,6 +22,7 @@ import school.hei.asa.repository.model.JMissionExecution;
 @Repository
 public class DailyExecutionRepository {
 
+  private final ContractRepository contractRepository;
   private final MissionExecutionRepository missionExecutionRepository;
   private final JMissionExecutionRepository jMissionExecutionRepository;
   private final JWorkerRepository jWorkerRepository;
@@ -33,6 +34,9 @@ public class DailyExecutionRepository {
   @Transactional(isolation = SERIALIZABLE)
   public void save(DailyExecution dailyExecution) {
     var date = dailyExecution.date();
+    if (contractRepository.findActiveContractByWorker(dailyExecution.worker()).isEmpty()) {
+      throw new IllegalStateException("Unable to punch in : you have no active contract.");
+    }
     if (!missionExecutionRepository.findAllBy(dailyExecution.worker(), date).isEmpty()) {
       throw new IllegalArgumentException("Day already has MissionExecution: " + date);
     }

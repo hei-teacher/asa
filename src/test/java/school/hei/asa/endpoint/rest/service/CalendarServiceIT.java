@@ -16,13 +16,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.endpoint.rest.controller.DailyExecutionController;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.SecurityConfig;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
+import school.hei.asa.mail.Mailer;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Product;
 import school.hei.asa.model.Worker;
@@ -39,17 +41,17 @@ class CalendarServiceIT extends FacadeIT {
 
   @MockBean SecurityConfig securityConfig;
   @MockBean WorkerFromAuthentication workerFromAuthentication;
+  @MockBean Mailer mailer;
 
   Authentication authentication;
-  RedirectAttributes redirectAttributes;
   String authenticatedWorkerCode = "worker-code";
 
   @Autowired CalendarService calendarService;
+  @Autowired JdbcTemplate jdbcTemplate;
 
   @BeforeEach
   void setUp() {
     authentication = authentication();
-    redirectAttributes = mock(RedirectAttributes.class);
     setUpProductsAndMissions();
   }
 
@@ -74,7 +76,7 @@ class CalendarServiceIT extends FacadeIT {
             null,
             null,
             null),
-        redirectAttributes);
+        new RedirectAttributesModelMap());
 
     var worker = workerRepository.findByCode(authenticatedWorkerCode);
     var datesByDailyExecutionType = calendarService.datesByDailyExecutionType(worker, 2024);
@@ -107,7 +109,7 @@ class CalendarServiceIT extends FacadeIT {
             null,
             null,
             null),
-        redirectAttributes);
+        new RedirectAttributesModelMap());
     dailyExecutionController.createDailyExecution(
         authentication,
         new ThDailyExecutionForm(
@@ -127,7 +129,7 @@ class CalendarServiceIT extends FacadeIT {
             null,
             null,
             null),
-        redirectAttributes);
+        new RedirectAttributesModelMap());
 
     var worker = workerRepository.findByCode(authenticatedWorkerCode);
     var datesByDailyExecutionType = calendarService.datesByDailyExecutionType(worker, 2025);
@@ -157,7 +159,7 @@ class CalendarServiceIT extends FacadeIT {
             null,
             null,
             null),
-        redirectAttributes);
+        new RedirectAttributesModelMap());
 
     var worker = workerRepository.findByCode(authenticatedWorkerCode);
     var datesByDailyExecutionType = calendarService.datesByDailyExecutionType(worker, 2024);
@@ -179,8 +181,25 @@ class CalendarServiceIT extends FacadeIT {
             "random city",
             "nif",
             "stat");
+    workerRepository.save(authenticatedWorker);
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
+
+    jdbcTemplate.update(
+        "INSERT INTO contract_level (code, type, daily_pay) VALUES (?, ?, ?) "
+            + "ON CONFLICT DO NOTHING",
+        "L-CALENDAR",
+        "partnerContractor",
+        100000.0);
+    jdbcTemplate.update(
+        "INSERT INTO contract (id, worker_code, level, entrance_instant, duration_in_days) "
+            + "VALUES (?, ?, ?, ?::timestamp, ?) ON CONFLICT DO NOTHING",
+        "contract-calendar",
+        authenticatedWorkerCode,
+        "L-CALENDAR",
+        "2024-01-01 00:00:00",
+        365);
+
     return authentication;
   }
 

@@ -92,28 +92,6 @@ public class ContractService {
     return contractRepository.findAllActiveContracts();
   }
 
-  public boolean hasRemainingDays(Worker worker) {
-    var contracts = contractRepository.findAllByWorker(worker);
-    var activeContract =
-        contracts.stream().filter(c -> c.endInstant() == null).findFirst().orElse(null);
-
-    if (activeContract == null) {
-      return false;
-    }
-
-    var durationDays = Math.toIntExact(activeContract.duration().toDays());
-    if (durationDays <= 0) {
-      return true;
-    }
-
-    var startDate = activeContract.entranceInstant().atZone(systemDefault()).toLocalDate();
-    var now = LocalDate.now();
-    var workedStr = getActualWorkedDaysByDateByWorker(startDate, worker.code(), now);
-    var workDays = workedStr.equals("-") ? 0.0 : Double.parseDouble(workedStr);
-
-    return workDays < durationDays;
-  }
-
   public long getRemainingDaysByWorker(Worker worker) {
     var contracts = contractRepository.findAllByWorker(worker);
     var activeContract =
@@ -137,7 +115,7 @@ public class ContractService {
   }
 
   public Optional<String> checkRemainingDays(Worker worker) {
-    if (!hasRemainingDays(worker)) {
+    if (getRemainingDaysByWorker(worker) <= 0) {
       return Optional.of(
           "Cannot submit report: " + worker.name() + " has no remaining contract days.");
     }

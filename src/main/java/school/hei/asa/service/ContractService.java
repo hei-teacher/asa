@@ -10,7 +10,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +34,7 @@ public class ContractService {
   private final MissionService missionService;
   private final CareProductCodeSupplier careProductCodeSupplier;
   private final DateTimeFormatter localDateFormatter =
-          DateTimeFormatter.ofPattern("dd MMM yyyy", FRENCH);
+      DateTimeFormatter.ofPattern("dd MMM yyyy", FRENCH);
 
   public Map<Worker, List<Contract>> totalWorkDaysPerWorker() {
     return contractRepository.findAll().stream().collect(Collectors.groupingBy(Contract::worker));
@@ -54,9 +53,9 @@ public class ContractService {
   }
 
   public String getActualWorkedDaysByDateByWorker(
-          LocalDate startDate, String workerCode, LocalDate endDate) {
+      LocalDate startDate, String workerCode, LocalDate endDate) {
     var dailyExecutions =
-            dailyExecutionRepository.findByWorkerCodeAndDateBetween(workerCode, startDate, endDate);
+        dailyExecutionRepository.findByWorkerCodeAndDateBetween(workerCode, startDate, endDate);
     return executedDays(dailyExecutions);
   }
 
@@ -65,25 +64,25 @@ public class ContractService {
       return "-";
     }
     var result =
-            executions.stream()
-                    .map(
-                            dailyExecution -> {
-                              var type = dailyExecution.type(careProductCodeSupplier.get());
-                              if (type.equals(fullWork)) {
-                                return 1.0d;
-                              } else if (type.equals(fullCare)) {
-                                return 0.0d;
-                              }
-                              return dailyExecution.executions().stream()
-                                      .map(
-                                              me -> {
-                                                return missionService.isUnpaidCare(me) ? 0.0d : me.dayPercentage();
-                                              })
-                                      .reduce(Double::sum)
-                                      .get();
-                            })
-                    .reduce(Double::sum)
-                    .get();
+        executions.stream()
+            .map(
+                dailyExecution -> {
+                  var type = dailyExecution.type(careProductCodeSupplier.get());
+                  if (type.equals(fullWork)) {
+                    return 1.0d;
+                  } else if (type.equals(fullCare)) {
+                    return 0.0d;
+                  }
+                  return dailyExecution.executions().stream()
+                      .map(
+                          me -> {
+                            return missionService.isUnpaidCare(me) ? 0.0d : me.dayPercentage();
+                          })
+                      .reduce(Double::sum)
+                      .get();
+                })
+            .reduce(Double::sum)
+            .get();
     return String.format(java.util.Locale.US, "%.1f", result);
   }
 
@@ -94,7 +93,7 @@ public class ContractService {
   public boolean hasRemainingDays(Worker worker) {
     var contracts = contractRepository.findAllByWorker(worker);
     var activeContract =
-            contracts.stream().filter(c -> c.endInstant() == null).findFirst().orElse(null);
+        contracts.stream().filter(c -> c.endInstant() == null).findFirst().orElse(null);
 
     if (activeContract == null) {
       return false;
@@ -116,7 +115,7 @@ public class ContractService {
   public long getRemainingDaysByWorker(Worker worker) {
     var contracts = contractRepository.findAllByWorker(worker);
     var activeContract =
-            contracts.stream().filter(c -> c.endInstant() == null).findFirst().orElse(null);
+        contracts.stream().filter(c -> c.endInstant() == null).findFirst().orElse(null);
 
     if (activeContract == null) {
       return -1;

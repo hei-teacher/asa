@@ -83,7 +83,7 @@ public class CalendarService {
         .lateReportedDaysByMonth();
   }
 
-  public Optional<String> contractAlertMessage(Worker worker, int year) {
+  public Optional<String> contractAlertMessage(Worker worker) {
     return contractAlertService.contractAlertMessage(worker, alertThreshold);
   }
 }

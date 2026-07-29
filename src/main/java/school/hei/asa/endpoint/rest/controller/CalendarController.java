@@ -67,6 +67,10 @@ public class CalendarController {
         });
     var lateReportedDaysByMonth = calendarService.lateReportedDaysByMonth(worker, year);
 
+    calendarService
+        .contractAlertMessage(worker)
+        .ifPresent(msg -> model.addAttribute("contractAlert", msg));
+
     model.addAttribute("workerCode", workerCodeOrAuth);
     model.addAttribute("currentYear", now().getYear());
     model.addAttribute(

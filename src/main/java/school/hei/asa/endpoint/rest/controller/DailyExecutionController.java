@@ -1,6 +1,5 @@
 package school.hei.asa.endpoint.rest.controller;
 
-import static java.time.LocalDate.now;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -33,7 +32,7 @@ public class DailyExecutionController {
 
     var worker = workerFromAuthentication.apply(authentication).get();
     calendarService
-        .contractAlertMessage(worker, now().getYear())
+        .contractAlertMessage(worker)
         .ifPresent(msg -> model.addAttribute("contractAlert", msg));
 
     return "daily-execution";

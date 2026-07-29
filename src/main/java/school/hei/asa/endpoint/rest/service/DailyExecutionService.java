@@ -19,9 +19,9 @@ public class DailyExecutionService {
   private final ContractService contractService;
 
   public void saveAndAlert(ThDailyExecutionForm dmeForm, Worker worker) {
-    var remainingError = contractService.checkRemainingDays(worker);
-    if (remainingError.isPresent()) {
-      throw new ContractExhaustedException(remainingError.get());
+    if (contractService.getRemainingDaysByWorker(worker) <= 0) {
+      throw new ContractExhaustedException(
+          "Cannot submit report: " + worker.name() + " has no remaining contract days.");
     }
     dailyExecutionRepository.save(thDailyExecutionFormMapper.toDomain(dmeForm, worker));
     contractAlertService.sendContractAlert(worker);

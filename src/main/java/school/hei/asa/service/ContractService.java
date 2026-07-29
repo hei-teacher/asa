@@ -11,7 +11,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -93,9 +92,7 @@ public class ContractService {
   }
 
   public long getRemainingDaysByWorker(Worker worker) {
-    var contracts = contractRepository.findAllByWorker(worker);
-    var activeContract =
-        contracts.stream().filter(c -> c.endInstant() == null).findFirst().orElse(null);
+    var activeContract = contractRepository.findActiveByWorker(worker).orElse(null);
 
     if (activeContract == null) {
       return 0;
@@ -112,13 +109,5 @@ public class ContractService {
     var usedDays = workedStr.equals("-") ? 0.0 : Double.parseDouble(workedStr);
     var remaining = durationDays - usedDays;
     return remaining > 0 ? (long) remaining : 0;
-  }
-
-  public Optional<String> checkRemainingDays(Worker worker) {
-    if (getRemainingDaysByWorker(worker) <= 0) {
-      return Optional.of(
-          "Cannot submit report: " + worker.name() + " has no remaining contract days.");
-    }
-    return Optional.empty();
   }
 }

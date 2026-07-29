@@ -20,7 +20,7 @@ public class ContractAlertService {
   public ContractAlertService(
       ContractService contractService,
       EventProducer<ContractAlertRequested> eventProducer,
-      @Value("${ASA_CONTRACT_ALERT_THRESOLD}") int alertThreshold) {
+      @Value("${ASA_CONTRACT_ALERT_THRESHOLD}") int alertThreshold) {
     this.contractService = contractService;
     this.eventProducer = eventProducer;
     this.alertThreshold = alertThreshold;

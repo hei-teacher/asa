@@ -36,7 +36,7 @@ public class CalendarService {
       PaidCareMissionCodesSupplier paidCareMissionCodesSupplier,
       Mailer mailer,
       ContractAlertService contractAlertService,
-      @Value("${ASA_CONTRACT_ALERT_THRESOLD}") int alertThreshold) {
+      @Value("${ASA_CONTRACT_ALERT_THRESHOLD}") int alertThreshold) {
     this.dailyExecutionRepository = dailyExecutionRepository;
     this.careProductCodeSupplier = careProductCodeSupplier;
     this.paidCareMissionCodesSupplier = paidCareMissionCodesSupplier;

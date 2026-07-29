@@ -14,6 +14,7 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.DailyExecutionService;
 import school.hei.asa.endpoint.rest.service.ThMissionService;
 import school.hei.asa.service.CalendarService;
+import school.hei.asa.service.ContractExhaustedException;
 import school.hei.asa.service.ContractService;
 
 @AllArgsConstructor
@@ -45,13 +46,12 @@ public class DailyExecutionController {
       RedirectAttributes redirectAttributes) {
     var worker = workerFromAuthentication.apply(authentication).get();
 
-    var remainingError = contractService.checkRemainingDays(worker);
-    if (remainingError.isPresent()) {
-      redirectAttributes.addFlashAttribute("error", remainingError.get());
+    try {
+      dailyExecutionService.saveAndAlert(dmeForm, worker);
+    } catch (ContractExhaustedException e) {
+      redirectAttributes.addFlashAttribute("error", e.getMessage());
       return "redirect:/daily-execution";
     }
-
-    dailyExecutionService.saveAndAlert(dmeForm, worker);
 
     return "redirect:/work-and-care-calendar";
   }

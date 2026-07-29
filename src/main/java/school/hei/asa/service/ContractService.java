@@ -100,7 +100,7 @@ public class ContractService {
 
     var durationDays = activeContract.duration().toDays();
     if (durationDays <= 0) {
-      return Long.MAX_VALUE;
+      return 0;
     }
 
     var startDate = activeContract.entranceInstant().atZone(systemDefault()).toLocalDate();

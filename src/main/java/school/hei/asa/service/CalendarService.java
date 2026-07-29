@@ -8,8 +8,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.PaidCareMissionCodesSupplier;
@@ -27,22 +25,16 @@ public class CalendarService {
   private final CareProductCodeSupplier careProductCodeSupplier;
   private final PaidCareMissionCodesSupplier paidCareMissionCodesSupplier;
   private final Mailer mailer;
-  private final ContractAlertService contractAlertService;
-  private final int alertThreshold;
 
   public CalendarService(
       DailyExecutionRepository dailyExecutionRepository,
       CareProductCodeSupplier careProductCodeSupplier,
       PaidCareMissionCodesSupplier paidCareMissionCodesSupplier,
-      Mailer mailer,
-      ContractAlertService contractAlertService,
-      @Value("${ASA_CONTRACT_ALERT_THRESHOLD}") int alertThreshold) {
+      Mailer mailer) {
     this.dailyExecutionRepository = dailyExecutionRepository;
     this.careProductCodeSupplier = careProductCodeSupplier;
     this.paidCareMissionCodesSupplier = paidCareMissionCodesSupplier;
     this.mailer = mailer;
-    this.contractAlertService = contractAlertService;
-    this.alertThreshold = alertThreshold;
   }
 
   @Transactional
@@ -83,7 +75,4 @@ public class CalendarService {
         .lateReportedDaysByMonth();
   }
 
-  public Optional<String> contractAlertMessage(Worker worker) {
-    return contractAlertService.contractAlertMessage(worker, alertThreshold);
-  }
 }

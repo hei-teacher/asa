@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,14 +27,29 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Worker;
 import school.hei.asa.service.CalendarService;
+import school.hei.asa.service.ContractAlertService;
 
-@AllArgsConstructor
 @Controller
 public class CalendarController {
 
   private final CalendarService calendarService;
   private final WorkerFromAuthentication workerFromAuthentication;
   private final WorkerToModelAdder workerToModelAdder;
+  private final ContractAlertService contractAlertService;
+  private final int alertThreshold;
+
+  public CalendarController(
+      CalendarService calendarService,
+      WorkerFromAuthentication workerFromAuthentication,
+      WorkerToModelAdder workerToModelAdder,
+      ContractAlertService contractAlertService,
+      @Value("${ASA_CONTRACT_ALERT_THRESHOLD}") int alertThreshold) {
+    this.calendarService = calendarService;
+    this.workerFromAuthentication = workerFromAuthentication;
+    this.workerToModelAdder = workerToModelAdder;
+    this.contractAlertService = contractAlertService;
+    this.alertThreshold = alertThreshold;
+  }
 
   @GetMapping("/work-and-care-calendar")
   public String getCalendar(
@@ -67,8 +82,8 @@ public class CalendarController {
         });
     var lateReportedDaysByMonth = calendarService.lateReportedDaysByMonth(worker, year);
 
-    calendarService
-        .contractAlertMessage(worker)
+    contractAlertService
+        .contractAlertMessage(worker, alertThreshold)
         .ifPresent(msg -> model.addAttribute("contractAlert", msg));
 
     model.addAttribute("workerCode", workerCodeOrAuth);

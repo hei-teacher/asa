@@ -16,7 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import school.hei.asa.conf.FacadeIT;
@@ -47,7 +46,6 @@ class CalendarServiceIT extends FacadeIT {
   String authenticatedWorkerCode = "worker-code";
 
   @Autowired CalendarService calendarService;
-  @Autowired JdbcTemplate jdbcTemplate;
 
   @BeforeEach
   void setUp() {
@@ -184,21 +182,6 @@ class CalendarServiceIT extends FacadeIT {
     workerRepository.save(authenticatedWorker);
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
-
-    jdbcTemplate.update(
-        "INSERT INTO contract_level (code, type, daily_pay) VALUES (?, ?, ?) "
-            + "ON CONFLICT DO NOTHING",
-        "L-CALENDAR",
-        "partnerContractor",
-        100000.0);
-    jdbcTemplate.update(
-        "INSERT INTO contract (id, worker_code, level, entrance_instant, duration_in_days) "
-            + "VALUES (?, ?, ?, ?::timestamp, ?) ON CONFLICT DO NOTHING",
-        "contract-calendar",
-        authenticatedWorkerCode,
-        "L-CALENDAR",
-        "2024-01-01 00:00:00",
-        365);
 
     return authentication;
   }

@@ -36,6 +36,7 @@ import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.MissionRepository;
 import school.hei.asa.repository.ProductRepository;
 import school.hei.asa.repository.WorkerRepository;
+import school.hei.asa.service.ContractExhaustedException;
 
 class DailyExecutionControllerIT extends FacadeIT {
 
@@ -62,6 +63,7 @@ class DailyExecutionControllerIT extends FacadeIT {
     authenticatedWorker =
         new Worker(
             "worker-code", "code", "email", "full code", "address", "random city", "nif", "stat");
+    workerRepository.save(authenticatedWorker);
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
     var product = new Product("pcode", "pname", "pdescription");
@@ -223,10 +225,9 @@ class DailyExecutionControllerIT extends FacadeIT {
             null,
             null);
 
-    var result =
-        dailyExecutionController.createDailyExecution(authentication, dmeForm, redirectAttributes);
-    assertEquals("redirect:/daily-execution", result);
-    verify(redirectAttributes).addFlashAttribute(eq("error"), any(String.class));
+    assertThrows(
+        ContractExhaustedException.class,
+        () -> dailyExecutionController.createDailyExecution(authentication, dmeForm, redirectAttributes));
   }
 
   @Test

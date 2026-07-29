@@ -1,4 +1,4 @@
-INSERT INTO worker (code, name, email, full_name, address, city, nif, stat)
+INSERT INTO worker (code, name, email, fullname, address, city, nif, stat)
 VALUES ('worker-code', 'code', 'email', 'full code', 'address', 'random city', 'nif', 'stat');
 
 INSERT INTO contract_level (code, type, daily_pay)

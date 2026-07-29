@@ -24,6 +24,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import school.hei.asa.conf.FacadeIT;
+import school.hei.asa.endpoint.event.EventProducer;
+import school.hei.asa.endpoint.event.model.ContractAlertRequested;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.SecurityConfig;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
@@ -46,6 +48,7 @@ class DailyExecutionControllerIT extends FacadeIT {
 
   @MockBean SecurityConfig securityConfig;
   @MockBean WorkerFromAuthentication workerFromAuthentication;
+  @MockBean EventProducer<ContractAlertRequested> eventProducer;
 
   Authentication authentication;
   Worker authenticatedWorker;
@@ -149,7 +152,7 @@ class DailyExecutionControllerIT extends FacadeIT {
   void concurrently_create_daily_execution() {
     var dmeForm =
         new ThDailyExecutionForm(
-            "2024-12-01",
+            "2024-12-02",
             "mission1-code",
             "0.2",
             "missionComment1",
@@ -194,6 +197,64 @@ class DailyExecutionControllerIT extends FacadeIT {
     assertEquals(1, successCount);
 
     executor.shutdown();
+  }
+
+  @Test
+  void createDailyExecution_throws_when_contract_exhausted() {
+    var exhaustedWorker = workerRepository.findByCode("exhausted-test-worker");
+    when(workerFromAuthentication.apply(authentication)).thenReturn(Optional.of(exhaustedWorker));
+
+    var dmeForm =
+        new ThDailyExecutionForm(
+            "2024-12-03",
+            "mission1-code",
+            "1",
+            "missionComment1",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
+
+    var result =
+        dailyExecutionController.createDailyExecution(authentication, dmeForm, redirectAttributes);
+    assertEquals("redirect:/daily-execution", result);
+    verify(redirectAttributes).addFlashAttribute(eq("error"), any(String.class));
+  }
+
+  @Test
+  void createDailyExecution_calls_eventProducer_when_below_threshold() {
+    var alertWorker = workerRepository.findByCode("alert-test-worker");
+    when(workerFromAuthentication.apply(authentication)).thenReturn(Optional.of(alertWorker));
+
+    var dmeForm =
+        new ThDailyExecutionForm(
+            "2024-12-03",
+            "mission1-code",
+            "1",
+            "missionComment1",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
+
+    dailyExecutionController.createDailyExecution(authentication, dmeForm, redirectAttributes);
+    verify(eventProducer).accept(any());
   }
 
   @Test

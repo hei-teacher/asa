@@ -48,9 +48,6 @@ public class ContractAlertService {
     if (remaining == 0) {
       return Optional.of("Your contract has no remaining days left.");
     }
-    if (remaining < 0) {
-      return Optional.of("Your contract is overdue.");
-    }
     if (remaining < threshold) {
       var plural = remaining > 1 ? "s" : "";
       return Optional.of(

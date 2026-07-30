@@ -86,7 +86,6 @@ class FinancialPlanServiceIT extends FacadeIT {
     when(bankAccountRepository.findAll()).thenReturn(List.of());
     when(missionExecutionRepository.missionExecutionsByDateBetweenAllWorkers(yearStart, yearEnd))
         .thenReturn(List.of());
-
     when(invoiceService.extractInvoiceData(any(), any(), any(), any()))
         .thenAnswer(
             invocation -> {
@@ -115,11 +114,9 @@ class FinancialPlanServiceIT extends FacadeIT {
     assertNotNull(financialPlan);
     assertEquals("550000.0", financialPlan.plannedCost().get(Month.FEBRUARY).ppMontant().trim());
     assertEquals("0.0", financialPlan.plannedCost().get(Month.JANUARY).ppMontant().trim());
-
     assertEquals("302000.0", financialPlan.executedCost().get(Month.JANUARY).ppMontant().trim());
     assertEquals("302000.0", financialPlan.executedCost().get(Month.DECEMBER).ppMontant().trim());
     assertEquals(12, financialPlan.executedCost().size());
-
     assertTrue(financialPlan.koContracts().isEmpty());
 
     verify(contractRepository).findByYear(testYear);

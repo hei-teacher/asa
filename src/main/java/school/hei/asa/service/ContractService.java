@@ -5,6 +5,8 @@ import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -85,5 +87,13 @@ public class ContractService {
 
   public List<Contract> findActiveContracts() {
     return contractRepository.findAllActiveContracts();
+  }
+
+  public boolean isActiveContract(Contract contract, YearMonth yearMonth) {
+    if (contract.endInstant() == null) {
+      return true;
+    }
+    var endYearMonth = YearMonth.from(contract.endInstant().atZone(ZoneId.systemDefault()));
+    return !yearMonth.isAfter(endYearMonth);
   }
 }

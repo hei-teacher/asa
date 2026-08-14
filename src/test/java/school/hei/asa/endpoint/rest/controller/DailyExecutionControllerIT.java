@@ -59,6 +59,7 @@ class DailyExecutionControllerIT extends FacadeIT {
     workerRepository.save(authenticatedWorker);
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
+
     var product = new Product("pcode", "pname", "pdescription");
     productRepository.save(product);
     var mission1 = new Mission("mission1-code", "title1", "description1", 10, product);
@@ -69,7 +70,6 @@ class DailyExecutionControllerIT extends FacadeIT {
 
   @Test
   void save_then_read_with_duplicates_ok_if_sum_of_set_is_100() {
-    setUp();
     var dmeForm =
         new ThDailyExecutionForm(
             "2024-12-03",
@@ -79,7 +79,6 @@ class DailyExecutionControllerIT extends FacadeIT {
             "mission2-code",
             "0.6",
             "missionComment2",
-            // duplicate of mission2 (missionCode2, missionPercentage2, missionComment2)
             "mission2-code",
             "0.6",
             "missionComment2",
@@ -110,7 +109,6 @@ class DailyExecutionControllerIT extends FacadeIT {
 
   @Test
   void cannot_save_if_mission_execution_already_exists() {
-    setUp();
     var dmeForm =
         new ThDailyExecutionForm(
             "2024-12-01",
@@ -145,7 +143,6 @@ class DailyExecutionControllerIT extends FacadeIT {
 
   @Test
   void concurrently_create_daily_execution() {
-    setUp();
     var dmeForm =
         new ThDailyExecutionForm(
             "2024-12-01",
@@ -196,8 +193,7 @@ class DailyExecutionControllerIT extends FacadeIT {
 
   @Test
   void can_get_daily_execution_form() {
-    setUp();
-    var viewName = dailyExecutionController.getDailyExecutionForm(model);
+    var viewName = dailyExecutionController.getDailyExecutionForm(model, authentication);
 
     verify(model).addAttribute(eq("missions"), any(List.class));
 

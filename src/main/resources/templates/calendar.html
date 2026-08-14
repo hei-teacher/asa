@@ -11,12 +11,21 @@
 <body>
 <div th:replace="fragments/header :: header"></div>
 
+<div th:if="${warningBannerMessage != null}"
+     th:class="${#strings.contains(warningBannerMessage, 'do not have an active contract')}
+         ? 'text-center py-2 font-bold text-lg shadow-md w-full bg-red-600 text-white animate-pulse'
+         : 'text-center py-2 font-bold text-lg shadow-md w-full bg-yellow-400 text-black'"
+     th:text="${warningBannerMessage}">
+</div>
+
 <div class="flex justify-between gap-6 py-6 bg-gray-50">
     <!-- Left section: Main title and Worker Selector -->
     <div class="px-6">
-        <h1 th:text="${thYear.year()} + ' - ' + ${thYear.title()}"
-            class="text-2xl font-semibold">
-        </h1>
+        <div class="flex items-center gap-4">
+            <h1 th:text="${thYear.year()} + ' - ' + ${thYear.title()}"
+                class="text-2xl font-semibold">
+            </h1>
+        </div>
         <div class="pt-5">
             <div th:replace="fragments/selectors/workerAndYear :: apply(work-and-care-calendar, Myself)"></div>
         </div>
@@ -35,113 +44,113 @@
     </div>
 </div>
 
-    <div class="calendar bg-gray-50 py-6">
-        <div th:each="month : ${thYear.months()}" class="month grid gap-4 px-6">
-            <h2 th:text="${month.yearMonth().month}" class="text-center text-3xl font-semibold text-gray-800 mb-4"></h2>
+<div class="calendar bg-gray-50 py-6">
+    <div th:each="month : ${thYear.months()}" class="month grid gap-4 px-6">
+        <h2 th:text="${month.yearMonth().month}" class="text-center text-3xl font-semibold text-gray-800 mb-4"></h2>
 
-            <table class="w-full bg-white rounded-lg shadow-md">
-                <thead>
-                <tr class="bg-gray-200 text-gray-800">
-                    <th class="text-lg">Week</th>
-                    <th>Mon</th>
-                    <th>Tue</th>
-                    <th>Wed</th>
-                    <th>Thu</th>
-                    <th>Fri</th>
-                    <th>Sat</th>
-                    <th>Sun</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="week : ${month.weeks()}">
-                    <td th:text="${week}" class="border p-3 text-center text-gray-700 font-semibold"></td>
+        <table class="w-full bg-white rounded-lg shadow-md">
+            <thead>
+            <tr class="bg-gray-200 text-gray-800">
+                <th class="text-lg">Week</th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+                <th>Sun</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="week : ${month.weeks()}">
+                <td th:text="${week}" class="border p-3 text-center text-gray-700 font-semibold"></td>
 
-                    <td th:each="day : ${month.daysByWeek(week)}"
-                        th:text="${month.isFillerDay(day) ? '' : day}"
-                        th:style="'background-color: ' + ${thYear.hexColor(month, day)} + ';'"
-                        class="day-cell p-3 text-center border hover:bg-teal-200 transition-colors duration-200">
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                <td th:each="day : ${month.daysByWeek(week)}"
+                    th:text="${month.isFillerDay(day) ? '' : day}"
+                    th:style="'background-color: ' + ${thYear.hexColor(month, day)} + ';'"
+                    class="day-cell p-3 text-center border hover:bg-teal-200 transition-colors duration-200">
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-            <div class="mt-6 p-4 flex flex-col gap-3">
-                <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6">
-                    <span class="w-4 h-4 bg-green-400 rounded-full"></span>
-                    <span>Work Days:</span>
-                    <span th:text="${#numbers.formatDecimal(month.workDays, 1, 1)}"></span>
-                </div>
-                <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6">
-                    <span class="w-4 h-4 bg-fuchsia-600 rounded-full"></span>
-                    <span>Paid Care Days:</span>
-                    <span th:text="${#numbers.formatDecimal(month.paidCareDays, 1, 1)}"></span>
-                </div>
-                <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6">
-                    <span class="w-4 h-4 bg-red-600 rounded-full"></span>
-                    <span>Unpaid Care Days:</span>
-                    <span th:text="${#numbers.formatDecimal(month.unpaidCareDays, 1, 1)}"></span>
-                </div>
-                <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6 relative group">
-                    <span class="w-4 h-4 bg-gray-500 rounded-full"></span>
-                    <span class="relative cursor-pointer">Late Reported Days:
+        <div class="mt-6 p-4 flex flex-col gap-3">
+            <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6">
+                <span class="w-4 h-4 bg-green-400 rounded-full"></span>
+                <span>Work Days:</span>
+                <span th:text="${#numbers.formatDecimal(month.workDays, 1, 1)}"></span>
+            </div>
+            <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6">
+                <span class="w-4 h-4 bg-fuchsia-600 rounded-full"></span>
+                <span>Paid Care Days:</span>
+                <span th:text="${#numbers.formatDecimal(month.paidCareDays, 1, 1)}"></span>
+            </div>
+            <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6">
+                <span class="w-4 h-4 bg-red-600 rounded-full"></span>
+                <span>Unpaid Care Days:</span>
+                <span th:text="${#numbers.formatDecimal(month.unpaidCareDays, 1, 1)}"></span>
+            </div>
+            <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6 relative group">
+                <span class="w-4 h-4 bg-gray-500 rounded-full"></span>
+                <span class="relative cursor-pointer">Late Reported Days:
                     <div class="absolute bottom-full ml-10 mb-2 w-64 p-2 text-sm bg-gray-500 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity">
                         Jours pointés 3 jours plus tard ou plus
                     </div>
                     </span>
-                    <span th:text="${#numbers.formatDecimal(month.lateReportedDays.size(), 1, 1)}"
-                          class="cursor-pointer text-blue-600 hover:underline"
-                          onclick="openModal(this)"
-                          th:attr="data-month=${#strings.capitalize(month.yearMonth().month.name().toLowerCase())},
+                <span th:text="${#numbers.formatDecimal(month.lateReportedDays.size(), 1, 1)}"
+                      class="cursor-pointer text-blue-600 hover:underline"
+                      onclick="openModal(this)"
+                      th:attr="data-month=${#strings.capitalize(month.yearMonth().month.name().toLowerCase())},
                           data-dates=${#strings.arrayJoin(month.lateReportedDays, ',')}">
                     </span>
-                </div>
+            </div>
 
-                <!-- Modal -->
-                <div id="infoModal" class="fixed inset-0 bg-gray-900/30 backdrop-blur-sm hidden flex items-center justify-center">
-                    <div class="bg-white p-4 rounded shadow-lg w-80">
-                        <h2 id="modalTitle" class="text-lg font-semibold mb-2"></h2>
-                        <div>
-                            <ul id="modalDates" class="list-disc pl-5"></ul>
-                        </div>
+            <!-- Modal -->
+            <div id="infoModal" class="fixed inset-0 bg-gray-900/30 backdrop-blur-sm hidden flex items-center justify-center">
+                <div class="bg-white p-4 rounded shadow-lg w-80">
+                    <h2 id="modalTitle" class="text-lg font-semibold mb-2"></h2>
+                    <div>
+                        <ul id="modalDates" class="list-disc pl-5"></ul>
                     </div>
                 </div>
-
             </div>
+
         </div>
     </div>
+</div>
 
-    <script>
-        function openModal(element) {
-            const modal = document.getElementById("infoModal");
-            const monthName = element.getAttribute("data-month");
-            const dates = element.getAttribute("data-dates").split(",");
+<script>
+    function openModal(element) {
+        const modal = document.getElementById("infoModal");
+        const monthName = element.getAttribute("data-month");
+        const dates = element.getAttribute("data-dates").split(",");
 
-            document.getElementById("modalTitle").innerText = `Late Reported Days - ${monthName}`;
+        document.getElementById("modalTitle").innerText = `Late Reported Days - ${monthName}`;
 
-            const listContainer = document.getElementById("modalDates");
-            listContainer.innerHTML = "";
-            dates.forEach(date => {
-                const li = document.createElement("li");
-                li.innerText = date;
-                listContainer.appendChild(li);
-            });
-
-            modal.classList.remove("hidden");
-        }
-
-        document.getElementById("infoModal").addEventListener("click", function (e) {
-            if (e.target === this) {
-                this.classList.add("hidden");
-            }
+        const listContainer = document.getElementById("modalDates");
+        listContainer.innerHTML = "";
+        dates.forEach(date => {
+            const li = document.createElement("li");
+            li.innerText = date;
+            listContainer.appendChild(li);
         });
 
-        function updateFilters() {
-            const workerCode = document.getElementById("worker").value;
-            const year = document.getElementById("year").value;
-            window.location.href = `/work-and-care-calendar?workerCode=${workerCode}&year=${year}`;
+        modal.classList.remove("hidden");
+    }
+
+    document.getElementById("infoModal").addEventListener("click", function (e) {
+        if (e.target === this) {
+            this.classList.add("hidden");
         }
-    </script>
-    <div th:replace="fragments/footer :: footer"></div>
+    });
+
+    function updateFilters() {
+        const workerCode = document.getElementById("worker").value;
+        const year = document.getElementById("year").value;
+        window.location.href = `/work-and-care-calendar?workerCode=${workerCode}&year=${year}`;
+    }
+</script>
+<div th:replace="fragments/footer :: footer"></div>
 
 </body>
 </html>

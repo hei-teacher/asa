@@ -30,7 +30,6 @@ public class ContractRepository {
 
   @Transactional
   public Optional<Contract> findActiveContractByWorker(Worker worker) {
-    log.info("ContractRepository.findActiveContractByWorker(worker): {}", worker);
     return jContractRepository
         .findActiveContractByWorker(workerMapper.toEntity(worker).getCode())
         .map(jContract -> contractMapper.toDomain(List.of(jContract)).getFirst());

@@ -38,7 +38,7 @@ public class DailyExecutionRepository {
   public void save(DailyExecution dailyExecution) {
     var date = dailyExecution.date();
     var contract = contractRepository.findActiveContractByWorker(dailyExecution.worker());
-
+    log.info("COntract here {}", contract);
     if (contract.isEmpty()
         || contract.get().level().type() != fullTimeEmployee
             && contract.get().duration().toDays() == 0) {

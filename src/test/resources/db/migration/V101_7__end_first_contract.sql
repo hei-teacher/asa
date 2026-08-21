@@ -1,0 +1,1 @@
+update contract set end_instant = '2026-08-14 00:00:00' where id = '1234abcd';

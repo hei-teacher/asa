@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static school.hei.asa.model.contract.ContractType.partnerContractor;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -21,6 +22,7 @@ import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.Product;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
+import school.hei.asa.model.contract.ContractLevel;
 import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.WorkerRepository;
@@ -129,7 +131,7 @@ class ContractServiceTest {
     return new Contract(
         worker,
         "job_title",
-        null,
+        new ContractLevel("L5P-2026", partnerContractor, 0d, 50000d),
         entranceInstant,
         endInstant,
         Duration.ofDays(durationInDays),

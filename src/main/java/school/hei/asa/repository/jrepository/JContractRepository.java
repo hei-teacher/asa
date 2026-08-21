@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import school.hei.asa.repository.model.JContract;
 import school.hei.asa.repository.model.JWorker;
@@ -24,9 +25,14 @@ public interface JContractRepository extends JpaRepository<JContract, String> {
       """)
   List<JContract> findByYearBetween(int startYear, int endYear);
 
-  @Query("SELECT c FROM JContract c WHERE c.endInstant IS NULL AND c.durationInDays != 0")
+  @Query("SELECT c FROM JContract c WHERE c.endInstant IS NULL")
   List<JContract> findActiveContracts();
 
-  Optional<JContract> findFirstByWorkerAndDurationInDaysIsNotNullOrderByEntranceInstantDesc(
-      JWorker jWorker);
+  @Query(
+      """
+        SELECT c FROM JContract c
+        WHERE c.endInstant IS NULL
+        AND c.worker.code = :workerCode
+      """)
+  Optional<JContract> findActiveContractByWorker(@Param("workerCode") String workerCode);
 }

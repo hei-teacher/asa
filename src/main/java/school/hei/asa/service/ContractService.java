@@ -5,6 +5,7 @@ import static java.util.Locale.FRENCH;
 import static java.util.Locale.US;
 import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
+import static school.hei.asa.model.contract.ContractType.fullTimeEmployee;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -62,6 +63,10 @@ public class ContractService {
     var activeContractOpt = findActiveContractByWorker(worker);
     if (activeContractOpt.isEmpty()) {
       return 0d;
+    }
+
+    if (activeContractOpt.get().level().type().equals(fullTimeEmployee)) {
+      return Double.MAX_VALUE;
     }
 
     var contract = activeContractOpt.get();

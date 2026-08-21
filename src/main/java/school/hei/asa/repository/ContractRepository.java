@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
@@ -11,6 +12,7 @@ import school.hei.asa.repository.jrepository.JContractRepository;
 import school.hei.asa.repository.mapper.ContractMapper;
 import school.hei.asa.repository.mapper.WorkerMapper;
 
+@Slf4j
 @AllArgsConstructor
 @Repository
 public class ContractRepository {
@@ -28,9 +30,9 @@ public class ContractRepository {
 
   @Transactional
   public Optional<Contract> findActiveContractByWorker(Worker worker) {
+    log.info("ContractRepository.findActiveContractByWorker(worker): {}", worker);
     return jContractRepository
-        .findFirstByWorkerAndDurationInDaysIsNotNullOrderByEntranceInstantDesc(
-            workerMapper.toEntity(worker))
+        .findActiveContractByWorker(workerMapper.toEntity(worker).getCode())
         .map(jContract -> contractMapper.toDomain(List.of(jContract)).getFirst());
   }
 

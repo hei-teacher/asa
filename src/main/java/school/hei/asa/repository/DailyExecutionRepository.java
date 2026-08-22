@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import school.hei.asa.model.DailyExecution;
@@ -20,7 +19,6 @@ import school.hei.asa.repository.jrepository.JWorkerRepository;
 import school.hei.asa.repository.mapper.MissionExecutionMapper;
 import school.hei.asa.repository.model.JMissionExecution;
 
-@Slf4j
 @AllArgsConstructor
 @Repository
 public class DailyExecutionRepository {
@@ -38,7 +36,6 @@ public class DailyExecutionRepository {
   public void save(DailyExecution dailyExecution) {
     var date = dailyExecution.date();
     var contract = contractRepository.findActiveContractByWorker(dailyExecution.worker());
-    log.info("COntract here {}", contract);
     if (contract.isEmpty()
         || contract.get().level().type() != fullTimeEmployee
             && contract.get().duration().toDays() == 0) {

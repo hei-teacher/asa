@@ -103,7 +103,7 @@ public class InvoiceController {
     var fileName = thInvoiceService.generateInvoiceFileName(worker);
     log.info("uploading...");
     log.info("fileName = {}", fileName);
-    bucketComponent.upload(pdfFile, INVOICES_FOLDER + fileName);
+    //    bucketComponent.upload(pdfFile, INVOICES_FOLDER + fileName);
 
     log.info("sending mail copies...");
     invoiceService.sendGenerateInvoiceEvent(invoice.invoiceData().id());

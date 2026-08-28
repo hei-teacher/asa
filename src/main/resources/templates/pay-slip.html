@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Fiche de Paie</title>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond&amp;display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-size: 10px;
+            font-family: 'EB Garamond', serif;
+            font-weight: 400;
+            margin: 40px 0 40px 20px;
+        }
+
+        header {
+            margin-top: 50px;
+            margin-bottom: 10px;
+        }
+
+        .table-head {
+            width: 100%;
+        }
+
+        .table-head p {
+            margin: 2px 0;
+            letter-spacing: 0.2px;
+            line-height: 1.2;
+        }
+
+        .table-head p:first-child {
+            font-weight: 600;
+        }
+
+        .text-justify {
+            text-align: justify;
+        }
+
+        .grand-titre {
+            text-align: center;
+            font-family: 'EB Garamond', serif;
+            font-weight: 700;
+            font-size: 26px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 10px 0 20px 0;
+        }
+
+        #footer {
+            display: block;
+        }
+
+        #footer p {
+            margin: 2px 0;
+            letter-spacing: 0.08px;
+            line-height: 1.2;
+        }
+
+        #content {
+            page-break-inside: auto;
+            margin-top: 60px;
+        }
+
+        .field-section {
+            margin-top: 10px;
+        }
+
+        .field-section h2 {
+            font-family: 'EB Garamond', serif;
+            font-size: 15px;
+            font-weight: 700;
+            border-bottom: 1px solid black;
+            padding-bottom: 4px;
+            margin: 24px 0 10px 0;
+        }
+
+        .field-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            padding: 5px 0;
+            page-break-inside: avoid;
+        }
+
+        .field-label {
+            font-family: 'EB Garamond', serif;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .field-fill {
+            flex: 1;
+            border-bottom: 1px dotted #888888;
+            height: 1em;
+            margin: 0 4px;
+        }
+
+        .field-value {
+            font-family: 'EB Garamond', serif;
+            font-size: 14px;
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        @page {
+            size: A4;
+            margin-top: 50px;
+            margin-bottom: 120px;
+            @bottom-center {
+                content: element(footer)
+            }
+        }
+    </style>
+</head>
+<body>
+<div style="position:absolute; right:0; width:75px; height:75px;">
+    <img sizes="75px"
+         src="https://static.wixstatic.com/media/c6fa1c_88cd4438b50842cd89c29b47b21fdbcb~mv2.png/v1/fill/w_53,h_53,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/image-fotor-20230713142318.png"
+         alt="Numer"
+         style="object-fit:cover"></img>
+</div>
+<header>
+    <table class="table-head">
+        <tr>
+            <td>
+                <p th:text="${worker.fullname}"><strong></strong></p>
+                <p th:text="${worker.address}"></p>
+                <p th:text="${worker.city}"></p>
+                <p th:text="${'NIF: ' + worker.nif + ' -  STAT: ' + worker.stat}" class="text-justify"></p>
+            </td>
+        </tr>
+    </table>
+</header>
+
+<hr style="border: none; border-top: 0.3px solid #444; margin: 10px 0 2px 0;"/>
+
+<div id="footer">
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 43%; vertical-align: top;">
+                <p th:text="'Bulletin : BUL' + ${invoice.reference}" style="font-family: 'EB Garamond', serif; font-weight: 700;"></p>
+                <p th:text="'Date d\'émission : ' + ${invoice.issueDate}" style="font-family: 'EB Garamond', serif; font-weight: 700;"></p>
+                <p th:text="'Mois facturé : ' + ${yearMonth}" style="font-family: 'EB Garamond', serif; font-weight: 700;"></p>
+            </td>
+            <td style="width: 57%; vertical-align: top;">
+                <p><strong>NUMER MADAGASCAR (SARLU)</strong></p>
+                <p>LOT II J 161 R AMBOHIJATOVO</p>
+                <p>101 Antananarivo, Madagascar</p>
+                <p>RCS : 2022 B 007111 - NIF : 4011 84 6446 - STAT : 62022 11 2022 0 10730</p>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="content">
+    <p class="grand-titre">Fiche de Paie</p>
+
+    <section class="field-section">
+        <h2>Salarié</h2>
+        <div class="field-row">
+            <span class="field-label">Nom</span>
+            <span class="field-fill"></span>
+            <span class="field-value" th:text="${worker.fullname}"></span>
+        </div>
+        <div class="field-row">
+            <span class="field-label">Poste</span>
+            <span class="field-fill"></span>
+            <span class="field-value" th:text="${invoice.description}"></span>
+        </div>
+    </section>
+
+    <section class="field-section">
+        <h2>Période</h2>
+        <div class="field-row">
+            <span class="field-label">Mois</span>
+            <span class="field-fill"></span>
+            <span class="field-value" th:text="${yearMonth}"></span>
+        </div>
+        <div class="field-row">
+            <span class="field-label">Date d'émission</span>
+            <span class="field-fill"></span>
+            <span class="field-value" th:text="${invoice.issueDate}"></span>
+        </div>
+    </section>
+
+    <section class="field-section">
+        <h2>Rémunération</h2>
+        <div class="field-row">
+            <span class="field-label">Quantité (jours travaillés)</span>
+            <span class="field-fill"></span>
+            <span class="field-value" th:text="${invoice.quantity}"></span>
+        </div>
+        <div class="field-row">
+            <span class="field-label">Prix unitaire (Ariary)</span>
+            <span class="field-fill"></span>
+            <span class="field-value" th:text="${invoice.unitPrice}"></span>
+        </div>
+        <div class="field-row">
+            <span class="field-label">Montant (Ariary)</span>
+            <span class="field-fill"></span>
+            <span class="field-value" th:text="${invoice.amount}"></span>
+        </div>
+        <div class="field-row" th:if="${invoice.hasUpgradedLevel}">
+            <span class="field-label">Description complémentaire</span>
+            <span class="field-fill"></span>
+            <span class="field-value" th:text="${invoice.extraDescription}"></span>
+        </div>
+        <div class="field-row" th:if="${invoice.hasUpgradedLevel}">
+            <span class="field-label">Quantité complémentaire</span>
+            <span class="field-fill"></span>
+            <span class="field-value" th:text="${invoice.extraQuantity}"></span>
+        </div>
+        <div class="field-row" th:if="${invoice.hasUpgradedLevel}">
+            <span class="field-label">Prix unitaire complémentaire (Ariary)</span>
+            <span class="field-fill"></span>
+            <span class="field-value" th:text="${invoice.extraUnitPrice}"></span>
+        </div>
+        <div class="field-row" th:if="${invoice.hasUpgradedLevel}">
+            <span class="field-label">Montant complémentaire (Ariary)</span>
+            <span class="field-fill"></span>
+            <span class="field-value" th:text="${invoice.extraAmount}"></span>
+        </div>
+        <div class="field-row">
+            <span class="field-label" style="font-size: 15px; font-weight: 700;">Total (Ariary)</span>
+            <span class="field-fill"></span>
+            <span class="field-value" style="font-size: 15px; font-weight: 700;" th:text="${invoice.total}"></span>
+        </div>
+        <div class="field-row">
+            <span class="field-label">Montant total arrêté à la somme de</span>
+            <span class="field-fill"></span>
+            <span class="field-value" th:text="${invoice.parsedAmount + ' Ariary'}"></span>
+        </div>
+    </section>
+
+    <section class="field-section">
+        <h2>Paiement</h2>
+        <div class="field-row">
+            <span class="field-label">Mode de paiement (virement vers)</span>
+            <span class="field-fill"></span>
+            <span class="field-value" th:text="${invoice.rib}"></span>
+        </div>
+    </section>
+
+    <div style="margin-top: 60px; display: flex; gap: 8px; align-items: center;">
+        <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 400;">
+           Générée par <a href="https://asa.poja.io/">https://asa.poja.io/</a> le
+        </span>
+        <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 400;" th:text="${creationDate}"></span>
+        <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 400;">(UTC+0)</span>
+    </div>
+    <div style="margin-top: 2px; display: flex; gap: 8px; align-items: center;">
+        <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 400;">id:</span>
+        <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 400;" th:text="${invoiceId}"></span>
+    </div>
+</div>
+</body>
+</html>

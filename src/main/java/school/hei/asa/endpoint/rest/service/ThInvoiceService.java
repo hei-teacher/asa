@@ -73,7 +73,8 @@ public class ThInvoiceService {
     log.info("mapping invoice to th ...");
     var thInvoiceData = thInvoiceFormMapper.toTh(invoiceData);
     log.info("successfully mapped to th");
-    File data = invoicePDFGenerator.apply(worker, thInvoiceData, resolveTemplateName(worker));
+    var invoiceTemplateType = resolveTemplateName(worker);
+    File data = invoicePDFGenerator.apply(worker, thInvoiceData, invoiceTemplateType);
 
     try (PDDocument document = PDDocument.load(data)) {
       PDFRenderer pdfRenderer = new PDFRenderer(document);

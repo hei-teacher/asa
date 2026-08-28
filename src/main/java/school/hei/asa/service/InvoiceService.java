@@ -4,6 +4,7 @@ import static java.time.LocalDate.now;
 import static java.time.ZoneOffset.UTC;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
+import static school.hei.asa.model.contract.ContractType.fullTimeEmployee;
 import static school.hei.asa.number.NullToBigDecimalHanlder.toBigDecimalOrZero;
 import static school.hei.asa.number.NullToBigDecimalHanlder.toDoubleOrZero;
 
@@ -94,14 +95,34 @@ public class InvoiceService {
           null);
     }
     var contractLevel = contract.level();
-    Double unitPrice =
-        switch (contractLevel.type()) {
-          case partnerContractor, studentContractor -> contractLevel.dailyPay();
-          case fullTimeEmployee -> null;
-        };
+    var description = contract.jobTitle();
+
+    if (contractLevel.type() == fullTimeEmployee) {
+      var monthlyPay = toBigDecimalOrZero(contractLevel.monthlyPay());
+      var parsedMonthlyPay = numberConverter.convertToWords(numberParser.parseToNumber(monthlyPay));
+
+      return new InvoiceForm(
+          null,
+          null,
+          null,
+          null,
+          description,
+          1d,
+          monthlyPay,
+          monthlyPay,
+          null,
+          null,
+          null,
+          null,
+          null,
+          monthlyPay,
+          parsedMonthlyPay,
+          null);
+    }
+
+    var unitPrice = contractLevel.dailyPay();
     var amount = toBigDecimalOrZero(totalDaysWorked * toDoubleOrZero(unitPrice));
     var parsedAmount = numberConverter.convertToWords(numberParser.parseToNumber(amount));
-    var description = contract.jobTitle();
 
     return new InvoiceForm(
         null,

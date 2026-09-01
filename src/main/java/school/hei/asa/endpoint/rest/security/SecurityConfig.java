@@ -48,6 +48,8 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers("/")
                     .permitAll()
+                    .requestMatchers("/ping")
+                    .permitAll()
                     .anyRequest()
                     .authenticated())
         .addFilterBefore(statePaddingFixFilter, BasicAuthenticationFilter.class)

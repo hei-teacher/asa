@@ -20,7 +20,7 @@ public class WorkerToModelAdder implements BiFunction<WorkerModelAdderParam, Mod
   @Override
   public Worker apply(WorkerModelAdderParam workerModelAdderParam, Model model) {
     var worker =
-        workerModelAdderParam.workerCode() == null
+        workerModelAdderParam.workerCode() == null || workerModelAdderParam.workerCode().isBlank()
             ? workerService.findWorkerByCode(workerModelAdderParam.authenticatedWorkerCode())
             : workerService.findWorkerByCode(workerModelAdderParam.workerCode());
     var workersSensitiveWorkerFiltered =

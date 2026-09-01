@@ -29,8 +29,7 @@ public class ContractRepository {
   @Transactional
   public Optional<Contract> findActiveContractByWorker(Worker worker) {
     return jContractRepository
-        .findFirstByWorkerAndDurationInDaysIsNotNullOrderByEntranceInstantDesc(
-            workerMapper.toEntity(worker))
+        .findActiveContractByWorker(workerMapper.toEntity(worker).getCode())
         .map(jContract -> contractMapper.toDomain(List.of(jContract)).getFirst());
   }
 

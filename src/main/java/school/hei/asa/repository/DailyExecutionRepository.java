@@ -2,6 +2,7 @@ package school.hei.asa.repository;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.springframework.transaction.annotation.Isolation.SERIALIZABLE;
+import static school.hei.asa.model.contract.ContractType.fullTimeEmployee;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -34,7 +35,10 @@ public class DailyExecutionRepository {
   @Transactional(isolation = SERIALIZABLE)
   public void save(DailyExecution dailyExecution) {
     var date = dailyExecution.date();
-    if (contractRepository.findActiveContractByWorker(dailyExecution.worker()).isEmpty()) {
+    var contract = contractRepository.findActiveContractByWorker(dailyExecution.worker());
+    if (contract.isEmpty()
+        || contract.get().level().type() != fullTimeEmployee
+            && contract.get().duration().toDays() == 0) {
       throw new IllegalStateException("Unable to punch in : you have no active contract.");
     }
     if (!missionExecutionRepository.findAllBy(dailyExecution.worker(), date).isEmpty()) {

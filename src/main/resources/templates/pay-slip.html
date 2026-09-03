@@ -12,246 +12,261 @@
             margin: 40px 0 40px 20px;
         }
 
-        header {
-            margin-top: 50px;
-            margin-bottom: 10px;
-        }
-
-        .table-head {
-            width: 100%;
-        }
-
-        .table-head p {
-            margin: 2px 0;
-            letter-spacing: 0.2px;
-            line-height: 1.2;
-        }
-
-        .table-head p:first-child {
-            font-weight: 600;
-        }
-
-        .text-justify {
-            text-align: justify;
-        }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
 
         .grand-titre {
             text-align: center;
             font-family: 'EB Garamond', serif;
             font-weight: 700;
-            font-size: 26px;
+            font-size: 22px;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin: 10px 0 20px 0;
+            margin: 10px 0 16px 0;
         }
 
-        #footer {
-            display: block;
+        .ident-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
         }
-
-        #footer p {
-            margin: 2px 0;
-            letter-spacing: 0.08px;
-            line-height: 1.2;
+        .ident-table td {
+            vertical-align: top;
+            font-size: 11px;
+            padding: 1px 4px;
         }
+        .ident-table p { margin: 1px 0; line-height: 1.3; }
+        .ident-label { font-weight: 700; width: 140px; display: inline-block; }
 
-        #content {
-            page-break-inside: auto;
-            margin-top: 60px;
-        }
-
-        .field-section {
-            margin-top: 10px;
-        }
-
-        .field-section h2 {
-            font-family: 'EB Garamond', serif;
-            font-size: 15px;
+        .mois-line {
+            font-size: 13px;
             font-weight: 700;
+            margin: 14px 0 6px 0;
+        }
+
+        table.payroll {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+            font-family: 'EB Garamond', serif;
+        }
+        table.payroll th, table.payroll td {
+            padding: 3px 4px;
+            font-size: 9px;
+            border: 1px solid #999999;
+        }
+        table.payroll thead th {
+            border-top: 1px solid black;
             border-bottom: 1px solid black;
-            padding-bottom: 4px;
-            margin: 24px 0 10px 0;
+        }
+        table.payroll tbody tr.total-row td {
+            border-top: 1px solid black;
+            font-weight: 700;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+        }
+        .summary-table td {
+            vertical-align: top;
+            width: 50%;
+            padding: 0 10px;
+        }
+        .summary-table .field-row { padding: 3px 0; }
+        .summary-table .field-row.net {
+            font-weight: 700;
+            font-size: 13px;
+            border-top: 1px solid black;
+            padding-top: 6px;
         }
 
         .field-row {
             display: flex;
             align-items: baseline;
             gap: 8px;
-            padding: 5px 0;
             page-break-inside: avoid;
         }
-
         .field-label {
             font-family: 'EB Garamond', serif;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 11px;
             white-space: nowrap;
         }
-
         .field-fill {
             flex: 1;
             border-bottom: 1px dotted #888888;
             height: 1em;
             margin: 0 4px;
         }
-
         .field-value {
             font-family: 'EB Garamond', serif;
-            font-size: 14px;
+            font-size: 11px;
             white-space: nowrap;
             text-align: right;
         }
 
+        /* donnée qu'on n'a pas encore côté backend : affiche le nom du champ en guise de valeur */
+        .ph {
+            font-style: italic;
+            color: #999999;
+        }
+
         @page {
             size: A4;
-            margin-top: 50px;
-            margin-bottom: 120px;
-            @bottom-center {
-                content: element(footer)
-            }
+            margin-top: 40px;
+            margin-bottom: 40px;
         }
     </style>
 </head>
 <body>
-<div style="position:absolute; right:0; width:75px; height:75px;">
-    <img sizes="75px"
-         src="https://static.wixstatic.com/media/c6fa1c_88cd4438b50842cd89c29b47b21fdbcb~mv2.png/v1/fill/w_53,h_53,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/image-fotor-20230713142318.png"
-         alt="Numer"
-         style="object-fit:cover"></img>
-</div>
-<header>
-    <table class="table-head">
+<table style="width: 100%; margin-bottom: 6px;">
+    <tr>
+        <td style="width: 50%; vertical-align: top;">
+            <p style="font-weight: 700; font-size: 15px; margin: 0;">NUMER MADAGASCAR (SARLU)</p>
+            <p style="margin: 1px 0;">LOT II J 161 R AMBOHIJATOVO</p>
+            <p style="margin: 1px 0;">101 Antananarivo, Madagascar</p>
+            <p style="margin: 1px 0;">NIF : 4011 84 6446 - STAT : 62022 11 2022 0 10730</p>
+            <p style="margin: 1px 0;">RCS : 2022 B 007111</p>
+        </td>
+        <td style="width: 50%; vertical-align: top;">
+            <p class="grand-titre" style="margin: 0;">Fiche de Paie</p>
+        </td>
+    </tr>
+</table>
+
+<hr style="border: none; border-top: 0.3px solid #444; margin: 6px 0 8px 0;"/>
+
+<table class="ident-table">
+    <tr>
+        <td style="width: 50%;">
+            <p><span class="ident-label">N° Matricule :</span> <span th:text="${worker.code}"></span></p>
+            <p><span class="ident-label">Nom :</span> <span th:text="${worker.fullname}"></span></p>
+            <p><span class="ident-label">Prénoms :</span> <span class="ph">Prénoms</span></p>
+            <p><span class="ident-label">Sexe :</span> <span class="ph">Sexe</span></p>
+            <p><span class="ident-label">Date de naissance :</span> <span class="ph">Date de naissance</span></p>
+            <p><span class="ident-label">Téléphone :</span> <span class="ph">Téléphone</span></p>
+        </td>
+        <td style="width: 50%;">
+            <p><span class="ident-label">Fonction :</span> <span th:text="${invoice.description}"></span></p>
+            <p><span class="ident-label">Catégorie :</span> <span class="ph">Catégorie</span></p>
+            <p><span class="ident-label">Nb d'enf. à charge :</span> <span class="ph">Nb d'enf. à charge</span></p>
+            <p><span class="ident-label">Adresse :</span> <span th:text="${worker.address}"></span></p>
+            <p><span class="ident-label">N°CnaPs :</span> <span class="ph">N°CnaPs</span></p>
+            <p><span class="ident-label">Date d'embauche :</span> <span class="ph">Date d'embauche</span></p>
+            <p><span class="ident-label">Date de départ :</span> <span class="ph">Date de départ</span></p>
+        </td>
+    </tr>
+</table>
+
+<p class="mois-line">Mois de <span th:text="${yearMonth}"></span></p>
+
+<table class="payroll">
+    <thead>
         <tr>
-            <td>
-                <p th:text="${worker.fullname}"><strong></strong></p>
-                <p th:text="${worker.address}"></p>
-                <p th:text="${worker.city}"></p>
-                <p th:text="${'NIF: ' + worker.nif + ' -  STAT: ' + worker.stat}" class="text-justify"></p>
-            </td>
+            <th rowspan="2" class="text-left">N°</th>
+            <th rowspan="2" class="text-left">Désignation</th>
+            <th rowspan="2" class="text-center">Nombre</th>
+            <th rowspan="2" class="text-right">Base</th>
+            <th colspan="2" class="text-center">Part salarial</th>
+            <th colspan="2" class="text-center">Part patronal</th>
         </tr>
-    </table>
-</header>
-
-<hr style="border: none; border-top: 0.3px solid #444; margin: 10px 0 2px 0;"/>
-
-<div id="footer">
-    <table style="width: 100%;">
         <tr>
-            <td style="width: 43%; vertical-align: top;">
-                <p th:text="'Bulletin : BUL' + ${invoice.reference}" style="font-family: 'EB Garamond', serif; font-weight: 700;"></p>
-                <p th:text="'Date d\'émission : ' + ${invoice.issueDate}" style="font-family: 'EB Garamond', serif; font-weight: 700;"></p>
-                <p th:text="'Mois facturé : ' + ${yearMonth}" style="font-family: 'EB Garamond', serif; font-weight: 700;"></p>
-            </td>
-            <td style="width: 57%; vertical-align: top;">
-                <p><strong>NUMER MADAGASCAR (SARLU)</strong></p>
-                <p>LOT II J 161 R AMBOHIJATOVO</p>
-                <p>101 Antananarivo, Madagascar</p>
-                <p>RCS : 2022 B 007111 - NIF : 4011 84 6446 - STAT : 62022 11 2022 0 10730</p>
-            </td>
+            <th class="text-center">Taux %</th>
+            <th class="text-right">Gain / Retenue</th>
+            <th class="text-center">Taux %</th>
+            <th class="text-right">Retenue</th>
         </tr>
-    </table>
-</div>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1000</td>
+            <td>Salaire de base</td>
+            <td class="text-center ph">Nombre</td>
+            <td class="text-right ph">Base</td>
+            <td class="text-center">-</td>
+            <td class="text-right" th:text="${invoice.amount}"></td>
+            <td class="text-center">-</td>
+            <td class="text-center">-</td>
+            <td class="text-right">-</td>
+        </tr>
+        <tr><td>1100</td><td>Absence</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
+        <tr><td>1150</td><td>Allocation congé payé</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
+        <tr><td>1200</td><td>Heures Supp. non imposable 130%</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
+        <tr><td>1201</td><td>Heures Supp. non imposable 150%</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
+        <tr><td>1202</td><td>Heures Supp. imposable 150%</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
+        <tr><td>1203</td><td>Heures majorées trav. nuit habituel</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
+        <tr><td>1204</td><td>Heures majorées trav. nuit occas.</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
+        <tr><td>1205</td><td>Heures majorées trav. dimanche</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
+        <tr><td>1206</td><td>Heures majorées trav. jours fériés</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
+        <tr><td>1300</td><td>Indemnités diverses</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center">-</td><td class="text-right ph">Gain</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>1350</td><td>Primes divers</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center">-</td><td class="text-right ph">Gain</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>1400</td><td>Retenues diverses</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-right ph">Retenue</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr class="total-row">
+            <td></td>
+            <td>TOTAL BRUT</td>
+            <td class="text-center">-</td>
+            <td class="text-right">-</td>
+            <td class="text-center">-</td>
+            <td class="text-right" th:text="${invoice.total}"></td>
+            <td class="text-right">-</td>
+            <td class="text-center">-</td>
+            <td class="text-right">-</td>
+        </tr>
+        <tr><td>5000</td><td>Retenue CNAPS</td><td class="text-center">-</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right">-</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
+        <tr><td>6000</td><td>Retenue OSTIE</td><td class="text-center">-</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right">-</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
+        <tr><td>7000</td><td>Retenue FMFP</td><td class="text-center">-</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right">-</td><td class="text-right ph">Retenue</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr class="total-row">
+            <td></td><td>TOTAL COTISATION</td>
+            <td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td>
+            <td class="text-right ph">Retenue</td><td class="text-center">-</td><td class="text-right ph">Retenue</td>
+        </tr>
+        <tr><td>8000</td><td>Retenue IRSA</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-right ph">Retenue</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>9000</td><td>Autres gains ni soumis cotis. ni imposable</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right ph">Gain</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>9500</td><td>Autres retenues ni soumises cotis. ni imposable</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-right ph">Retenue</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr class="total-row">
+            <td></td><td>TOTAL NON SOUMIS</td>
+            <td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td>
+            <td class="text-right ph">Retenue</td><td class="text-center">-</td><td class="text-right">-</td>
+        </tr>
+        <tr class="total-row">
+            <td></td><td>TOTAL</td>
+            <td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td>
+            <td class="text-right" th:text="${invoice.total}"></td>
+            <td class="text-right ph">Retenue</td><td class="text-center">-</td><td class="text-right">-</td>
+        </tr>
+    </tbody>
+</table>
 
-<div id="content">
-    <p class="grand-titre">Fiche de Paie</p>
+<table class="summary-table">
+    <tr>
+        <td>
+            <div class="field-row"><span class="field-label">Salaire brut avant cotisation</span><span class="field-fill"></span><span class="field-value" th:text="${invoice.total}"></span></div>
+            <div class="field-row"><span class="field-label">Avantage en nature (non perçu en num)</span><span class="field-fill"></span><span class="field-value ph">Avantage en nature</span></div>
+            <div class="field-row"><span class="field-label">Part de cet avantage en nature imposable</span><span class="field-fill"></span><span class="field-value ph">Part avantage en nature imposable</span></div>
+            <div class="field-row"><span class="field-label">Montant brut imposable</span><span class="field-fill"></span><span class="field-value ph">Montant brut imposable</span></div>
+            <div class="field-row"><span class="field-label">Réduct° pour pers. à charge</span><span class="field-fill"></span><span class="field-value ph">Réduction pers. à charge</span></div>
+            <div class="field-row net"><span class="field-label">Net à payer</span><span class="field-fill"></span><span class="field-value ph">Net à payer</span></div>
+            <div class="field-row" style="margin-top: 8px;"><span class="field-label">Montant en lettres</span><span class="field-fill"></span><span class="field-value" th:text="${invoice.parsedAmount + ' Ariary'}"></span></div>
+            <div class="field-row"><span class="field-label">Mode de paiement (virement vers)</span><span class="field-fill"></span><span class="field-value" th:text="${invoice.rib}"></span></div>
+        </td>
+        <td>
+            <div class="field-row"><span class="field-label">Solde congé non pris mois précéd.</span><span class="field-fill"></span><span class="field-value ph">Solde congé non pris</span></div>
+            <div class="field-row"><span class="field-label">Congé pris de la période</span><span class="field-fill"></span><span class="field-value ph">Congé pris</span></div>
+            <div class="field-row"><span class="field-label">Congé acquis période</span><span class="field-fill"></span><span class="field-value ph">Congé acquis</span></div>
+            <div class="field-row"><span class="field-label" style="font-weight: 700;">Solde congé</span><span class="field-fill"></span><span class="field-value ph" style="font-weight: 700;">Solde congé</span></div>
+        </td>
+    </tr>
+</table>
 
-    <section class="field-section">
-        <h2>Salarié</h2>
-        <div class="field-row">
-            <span class="field-label">Nom</span>
-            <span class="field-fill"></span>
-            <span class="field-value" th:text="${worker.fullname}"></span>
-        </div>
-        <div class="field-row">
-            <span class="field-label">Poste</span>
-            <span class="field-fill"></span>
-            <span class="field-value" th:text="${invoice.description}"></span>
-        </div>
-    </section>
-
-    <section class="field-section">
-        <h2>Période</h2>
-        <div class="field-row">
-            <span class="field-label">Mois</span>
-            <span class="field-fill"></span>
-            <span class="field-value" th:text="${yearMonth}"></span>
-        </div>
-        <div class="field-row">
-            <span class="field-label">Date d'émission</span>
-            <span class="field-fill"></span>
-            <span class="field-value" th:text="${invoice.issueDate}"></span>
-        </div>
-    </section>
-
-    <section class="field-section">
-        <h2>Rémunération</h2>
-        <div class="field-row">
-            <span class="field-label">Quantité (mois)</span>
-            <span class="field-fill"></span>
-            <span class="field-value" th:text="${invoice.quantity}"></span>
-        </div>
-        <div class="field-row">
-            <span class="field-label">Salaire mensuel (Ariary)</span>
-            <span class="field-fill"></span>
-            <span class="field-value" th:text="${invoice.unitPrice}"></span>
-        </div>
-        <div class="field-row">
-            <span class="field-label">Montant (Ariary)</span>
-            <span class="field-fill"></span>
-            <span class="field-value" th:text="${invoice.amount}"></span>
-        </div>
-        <div class="field-row" th:if="${invoice.hasUpgradedLevel}">
-            <span class="field-label">Description complémentaire</span>
-            <span class="field-fill"></span>
-            <span class="field-value" th:text="${invoice.extraDescription}"></span>
-        </div>
-        <div class="field-row" th:if="${invoice.hasUpgradedLevel}">
-            <span class="field-label">Quantité complémentaire</span>
-            <span class="field-fill"></span>
-            <span class="field-value" th:text="${invoice.extraQuantity}"></span>
-        </div>
-        <div class="field-row" th:if="${invoice.hasUpgradedLevel}">
-            <span class="field-label">Prix unitaire complémentaire (Ariary)</span>
-            <span class="field-fill"></span>
-            <span class="field-value" th:text="${invoice.extraUnitPrice}"></span>
-        </div>
-        <div class="field-row" th:if="${invoice.hasUpgradedLevel}">
-            <span class="field-label">Montant complémentaire (Ariary)</span>
-            <span class="field-fill"></span>
-            <span class="field-value" th:text="${invoice.extraAmount}"></span>
-        </div>
-        <div class="field-row">
-            <span class="field-label" style="font-size: 15px; font-weight: 700;">Total (Ariary)</span>
-            <span class="field-fill"></span>
-            <span class="field-value" style="font-size: 15px; font-weight: 700;" th:text="${invoice.total}"></span>
-        </div>
-        <div class="field-row">
-            <span class="field-label">Montant total arrêté à la somme de</span>
-            <span class="field-fill"></span>
-            <span class="field-value" th:text="${invoice.parsedAmount + ' Ariary'}"></span>
-        </div>
-    </section>
-
-    <section class="field-section">
-        <h2>Paiement</h2>
-        <div class="field-row">
-            <span class="field-label">Mode de paiement (virement vers)</span>
-            <span class="field-fill"></span>
-            <span class="field-value" th:text="${invoice.rib}"></span>
-        </div>
-    </section>
-
-    <div style="margin-top: 60px; display: flex; gap: 8px; align-items: center;">
-        <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 400;">
-           Générée par <a href="https://asa.poja.io/">https://asa.poja.io/</a> le
-        </span>
-        <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 400;" th:text="${creationDate}"></span>
-        <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 400;">(UTC+0)</span>
-    </div>
-    <div style="margin-top: 2px; display: flex; gap: 8px; align-items: center;">
-        <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 400;">id:</span>
-        <span style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 400;" th:text="${invoiceId}"></span>
-    </div>
+<div style="margin-top: 20px; display: flex; gap: 8px; align-items: center;">
+    <span style="font-family: 'EB Garamond', serif; font-size: 10px;">
+       Générée par <a href="https://asa.poja.io/">https://asa.poja.io/</a> le
+    </span>
+    <span style="font-family: 'EB Garamond', serif; font-size: 10px;" th:text="${creationDate}"></span>
+    <span style="font-family: 'EB Garamond', serif; font-size: 10px;">(UTC+0) - id: </span>
+    <span style="font-family: 'EB Garamond', serif; font-size: 10px;" th:text="${invoiceId}"></span>
 </div>
 </body>
 </html>

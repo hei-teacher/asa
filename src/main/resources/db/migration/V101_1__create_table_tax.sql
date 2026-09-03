@@ -1,0 +1,5 @@
+-- CREATE TABLE IF NOT EXISTS Tax (
+--   id  VARCHAR NOT NULL,
+--   "name" VARCHAR NOT NULL
+--
+-- );

@@ -1,3 +1,8 @@
 package school.hei.asa.model.contract;
 
-public record ContractLevel(String code, ContractType type, Double monthlyPay, Double dailyPay) {}
+public record ContractLevel(
+    String code,
+    ContractType type,
+    Double monthlyPay,
+    Double dailyPay,
+    Double paidLeaveDaysNumber) {}

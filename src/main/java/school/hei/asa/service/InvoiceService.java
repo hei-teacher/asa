@@ -20,9 +20,11 @@ import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
 import school.hei.asa.model.BankAccount;
+import school.hei.asa.model.GeneratedDocument;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
+import school.hei.asa.model.PaySlipForm;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.number.NumberConverter;
@@ -290,5 +292,34 @@ public class InvoiceService {
   public void saveInvoice(InvoiceForm invoiceForm, Worker worker) {
     saveInvoiceReference(invoiceForm, worker);
     invoiceFormRepository.saveInvoiceForm(invoiceForm);
+  }
+
+  public GeneratedDocument generateDistinctInvoice(Worker worker, InvoiceForm invoiceForm) {
+    var workerContracts =
+        contractRepository.findAllByWorker(worker).stream()
+            .sorted(comparing(Contract::entranceInstant, Comparator.reverseOrder()))
+            .toList();
+    var isFullTimeEmployee =
+        !workerContracts.isEmpty() && workerContracts.getFirst().level().type() == fullTimeEmployee;
+
+    return isFullTimeEmployee
+        ? generatePaySlip(worker, invoiceForm.yearMonth())
+        : extractInvoiceForm(worker, invoiceForm);
+  }
+
+  // ponytail: skeleton only — amounts/taxes/credits wired once Tax & Credit docs land
+  private PaySlipForm generatePaySlip(Worker worker, YearMonth yearMonth) {
+    return new PaySlipForm(
+        null,
+        yearMonth == null ? YearMonth.from(now()) : yearMonth,
+        null,
+        null,
+        List.of(),
+        null,
+        0,
+        0,
+        null,
+        null,
+        List.of());
   }
 }

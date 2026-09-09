@@ -7,6 +7,7 @@ import static java.util.Locale.FRENCH;
 import com.lowagie.text.DocumentException;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
@@ -18,13 +19,23 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.file.FileWriter;
 import school.hei.asa.model.Worker;
+import school.hei.asa.number.NumberParser;
 import school.hei.asa.service.TemplateResolverEngine;
 
 @Component
 @AllArgsConstructor
 public class InvoicePDFGenerator {
+  // ponytail: rates mirror migration V101_4 seed data; replace with a real Tax/Credit lookup
+  // once that repository plumbing lands.
+  private static final double CNAPS_EMPLOYEE_RATE = 0.01;
+  private static final double CNAPS_EMPLOYER_RATE = 0.13;
+  private static final double OSTIE_EMPLOYEE_RATE = 0.01;
+  private static final double OSTIE_EMPLOYER_RATE = 0.05;
+  private static final double FMFP_EMPLOYER_RATE = 0.01;
+
   private final FileWriter fileWriter;
   private final TemplateResolverEngine templateResolverEngine;
+  private final NumberParser numberParser;
 
   public File apply(Worker worker, ThInvoiceForm thInvoiceForm, String template) {
     var renderer = new ITextRenderer();
@@ -64,6 +75,22 @@ public class InvoicePDFGenerator {
     context.setVariable("invoice", thInvoiceForm);
     context.setVariable("yearMonth", String.format("%s %s", month, year));
 
+    var base = numberParser.parseToDouble(thInvoiceForm.amount());
+    context.setVariable("cnapsEmployee", formatTax(base, CNAPS_EMPLOYEE_RATE));
+    context.setVariable("cnapsEmployer", formatTax(base, CNAPS_EMPLOYER_RATE));
+    context.setVariable("ostieEmployee", formatTax(base, OSTIE_EMPLOYEE_RATE));
+    context.setVariable("ostieEmployer", formatTax(base, OSTIE_EMPLOYER_RATE));
+    context.setVariable("fmfpEmployer", formatTax(base, FMFP_EMPLOYER_RATE));
+    context.setVariable(
+        "totalCotisationEmployee", formatTax(base, CNAPS_EMPLOYEE_RATE + OSTIE_EMPLOYEE_RATE));
+    context.setVariable(
+        "totalCotisationEmployer",
+        formatTax(base, CNAPS_EMPLOYER_RATE + OSTIE_EMPLOYER_RATE + FMFP_EMPLOYER_RATE));
+
     return context;
+  }
+
+  private String formatTax(double base, double rate) {
+    return numberParser.parseToNumber(BigDecimal.valueOf(base * rate));
   }
 }

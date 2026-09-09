@@ -36,4 +36,7 @@ public class JTaxProgression {
   @Enumerated(STRING)
   @Column(name = "tax_side", nullable = false)
   private TaxSide taxSide;
+
+  @Column(name = "default_value", nullable = false)
+  private BigDecimal defaultValue;
 }

@@ -58,8 +58,8 @@ public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated>
                 invoiceReference.worker().name(), invoiceReference.yearMonth()),
             String.format(
                 "Hello,\n"
-                    + " Please find attached the generated invoice for %s for the month of %s.Best"
-                    + " regards,",
+                    + " Please find attached the generated invoice for %s for the month of %s. \n"
+                    + " Best regards,",
                 invoiceReference.worker().name(), invoiceReference.yearMonth()),
             List.of(pdf));
 

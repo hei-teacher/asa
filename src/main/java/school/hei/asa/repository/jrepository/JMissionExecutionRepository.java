@@ -2,12 +2,14 @@ package school.hei.asa.repository.jrepository;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import school.hei.asa.repository.model.JMissionExecution;
+import school.hei.asa.repository.model.JWorker;
 import school.hei.asa.repository.model.WorkerDayPercentageSummary;
 
 @Repository
@@ -39,4 +41,16 @@ public interface JMissionExecutionRepository extends JpaRepository<JMissionExecu
       @Param("workerCode") String workerCode,
       @Param("startDate") Instant startDate,
       @Param("endDate") Instant endDate);
+
+  @Query(
+      """
+    SELECT me
+    FROM JMissionExecution me
+    WHERE me.worker = :worker
+      AND me.missionCode = 'CA-ABP'
+      AND YEAR(me.date) = :#{#yearMonth.year}
+      AND MONTH(me.date) = :#{#yearMonth.monthValue}
+""")
+  List<JMissionExecution> findPaidLeaveByWorkerByYearMonth(
+      @Param("worker") JWorker worker, @Param("yearMonth") YearMonth yearMonth);
 }

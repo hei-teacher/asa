@@ -8,9 +8,14 @@
             <th:block th:replace="fragments/nav :: nav('/contracts', 'Contracts', 'gavel', '', 'text-gray-300')"></th:block>
             <th:block th:replace="fragments/nav :: nav('/invoice', 'Invoices', 'description', '', 'text-gray-300')"></th:block>
 
-            <div class="ml-auto flex text-white items-center gap-2">
+            <div class="ml-auto flex text-white items-center gap-3">
                 <i class="material-icons">person</i>
-                <strong th:text="${#authentication.getPrincipal().getAttribute('email')} + ' '"></strong>
+                <div class="flex flex-col leading-tight">
+                    <strong class="whitespace-nowrap" th:text="${#authentication.getPrincipal().getAttribute('email')}"></strong>
+                    <span th:if="${authenticatedWorkerCode != null}"
+                          class="whitespace-nowrap text-xs text-gray-400 font-mono mt-2"
+                          th:text="'workerCode: ' + ${authenticatedWorkerCode}"></span>
+                </div>
                 <th:block th:replace="fragments/nav :: nav('/logout', 'Log out', 'logout', 'bg-red-600', 'bg-red-700')"></th:block>
             </div>
         </div>

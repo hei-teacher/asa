@@ -11,8 +11,7 @@ public record PaySlipForm(
     BigDecimal netAmount,
     List<Tax> taxes,
     BigDecimal totalAmount,
-    int paidLeaveAmount,
-    int takenPaidLeave,
+    PaidLeave paidLeave,
     BigDecimal leaveBaseAmount,
     BigDecimal leaveAmount,
     List<Credit> credits)

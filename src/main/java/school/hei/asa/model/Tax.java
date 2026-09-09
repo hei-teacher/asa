@@ -6,6 +6,7 @@ import static school.hei.asa.number.NullToBigDecimalHanlder.calculatePercentageV
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,25 +15,34 @@ import lombok.Getter;
 public class Tax {
   private final String id;
   private final String name;
-  private final List<TaxProgression> taxProgression;
+  private final List<TaxProgression> taxProgressions;
 
   public TaxAmount resolve(BigDecimal base) {
-    var rateEmployee = findRate(base, EMPLOYEE);
-    var rateEmployer = findRate(base, EMPLOYER);
-    return new TaxAmount(
-        calculatePercentageValue(rateEmployer, base), calculatePercentageValue(rateEmployee, base));
+    return new TaxAmount(resolveSide(base, EMPLOYER), resolveSide(base, EMPLOYEE));
   }
 
-  private Double findRate(BigDecimal base, TaxSide side) {
-    return taxProgression.stream()
+  // default_value is a floor/fixed amount for brackets a rate alone can't express
+  // (ex: IRSA's 0-350k bracket is 0% but has a 3 000 Ar minimum; a fully fixed tax
+  // would be rate=0 with default_value = its flat amount).
+  private BigDecimal resolveSide(BigDecimal base, TaxSide side) {
+    var bracketsForSide =
+        taxProgressions.stream().filter(range -> range.taxSide() == side).toList();
+    if (bracketsForSide.isEmpty()) {
+      // this tax has no side at all (ex: FMFP has no EMPLOYEE side) : contributes nothing
+      return BigDecimal.ZERO;
+    }
+    return findBracket(bracketsForSide, base)
+        .map(bracket -> calculatePercentageValue(bracket.rate(), base).max(bracket.defaultValue()))
+        .orElseThrow(
+            () -> new RuntimeException(String.format("The number %s is not supported", base)));
+  }
+
+  private Optional<TaxProgression> findBracket(
+      List<TaxProgression> bracketsForSide, BigDecimal base) {
+    return bracketsForSide.stream()
         .filter(
             range ->
-                range.minAmount().compareTo(base) <= 0
-                    && base.compareTo(range.maxAmount()) <= 0
-                    && range.taxSide() == side)
-        .findFirst()
-        .orElseThrow(
-            () -> new RuntimeException(String.format("The number %s is not supported", base)))
-        .rate();
+                range.minAmount().compareTo(base) <= 0 && base.compareTo(range.maxAmount()) <= 0)
+        .findFirst();
   }
 }

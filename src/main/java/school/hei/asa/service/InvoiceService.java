@@ -24,16 +24,20 @@ import school.hei.asa.model.GeneratedDocument;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
+import school.hei.asa.model.PaidLeave;
 import school.hei.asa.model.PaySlipForm;
+import school.hei.asa.model.TaxAmount;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.number.NumberConverter;
 import school.hei.asa.number.NumberParser;
 import school.hei.asa.repository.BankAccountRepository;
 import school.hei.asa.repository.ContractRepository;
+import school.hei.asa.repository.CreditRepository;
 import school.hei.asa.repository.InvoiceFormRepository;
 import school.hei.asa.repository.InvoiceReferenceRepository;
 import school.hei.asa.repository.MissionExecutionRepository;
+import school.hei.asa.repository.TaxRepository;
 
 @Slf4j
 @AllArgsConstructor
@@ -48,6 +52,8 @@ public class InvoiceService {
   private final MissionService missionService;
   private final EventProducer<NewInvoiceGenerated> eventProducer;
   private final InvoiceFormRepository invoiceFormRepository;
+  private final TaxRepository taxRepository;
+  private final CreditRepository creditRepository;
 
   public Optional<InvoiceReference> findInvoiceReference(Worker worker, YearMonth yearMonth) {
     var invoiceReferenceList = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker);
@@ -309,17 +315,43 @@ public class InvoiceService {
 
   // ponytail: skeleton only — amounts/taxes/credits wired once Tax & Credit docs land
   private PaySlipForm generatePaySlip(Worker worker, YearMonth yearMonth) {
+    var contract =
+        contractRepository.findActiveContractByWorker(worker).stream()
+            .filter(contract1 -> contract1.level().type() == fullTimeEmployee)
+            .findFirst()
+            .get();
+    var taxes = taxRepository.findAll();
+    var credits = creditRepository.findAll();
+    var grossAmount = toBigDecimalOrZero(contract.level().monthlyPay());
+    var creditsTotalAmount =
+        credits.stream()
+            .map(credit -> credit.getAmount(grossAmount))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    var taxableGrossSalary = grossAmount.add(creditsTotalAmount);
+    var basePaidLeave = contract.level().paidLeaveDaysNumber();
+    var employeeTotalTaxAmount =
+        taxes.stream()
+            .map(tax -> tax.resolve(taxableGrossSalary))
+            .map(TaxAmount::employeeContributionValue)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    var netAmount = taxableGrossSalary.subtract(employeeTotalTaxAmount);
+    var takenPaidLeave = missionExecutionRepository.getPaidLeaveCountByWorker(worker, yearMonth);
+    var takenPaidLeaveTheMonthBefore =
+        missionExecutionRepository.getPaidLeaveCountByWorker(worker, yearMonth.minusMonths(1));
+    var paidLeave =
+        new PaidLeave(
+            basePaidLeave, takenPaidLeave, takenPaidLeaveTheMonthBefore); // not taken paidLeave
+
     return new PaySlipForm(
         null,
         yearMonth == null ? YearMonth.from(now()) : yearMonth,
+        grossAmount,
+        netAmount,
+        taxes,
+        null,
+        paidLeave,
         null,
         null,
-        List.of(),
-        null,
-        0,
-        0,
-        null,
-        null,
-        List.of());
+        credits);
   }
 }

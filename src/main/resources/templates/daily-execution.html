@@ -56,6 +56,13 @@
 
 <div th:replace="fragments/header :: header"></div>
 
+<div th:if="${warningBannerMessage != null}"
+     th:class="${#strings.contains(warningBannerMessage, 'do not have an active contract')}
+         ? 'text-center py-2 font-bold text-lg shadow-md w-full bg-red-600 text-white animate-pulse'
+         : 'text-center py-2 font-bold text-lg shadow-md w-full bg-yellow-400 text-black'"
+     th:text="${warningBannerMessage}">
+</div>
+
 <main class="mx-auto px-6 py-12">
     <h1 class="text-4xl font-bold text-[#3F2F6A] mb-6">What did you do that day?</h1>
 
@@ -112,7 +119,8 @@
         flatpickr("#date", {
             minDate: `${currentYear-1}-01-01`,
             maxDate: `${currentYear+1}-12-31`,
-            dateFormat: "Y-m-d"
+            dateFormat: "Y-m-d",
+            defaultDate: "today"
         });
         createInputs(5);
     });

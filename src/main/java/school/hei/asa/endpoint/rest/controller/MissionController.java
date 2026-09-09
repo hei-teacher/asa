@@ -172,7 +172,7 @@ public class MissionController {
     LocalDate startDate = month.atDay(1);
     LocalDate endDate = month.atEndOfMonth();
 
-    if (workerCode == null || workerCode.isBlank()) {
+    if (workerCode == null || workerCode.isBlank() || workerCode.equals("")) {
       return dailyExecutionRepository.findByDateBetween(startDate, endDate).stream()
           .collect(groupingBy(DailyExecution::date));
     }

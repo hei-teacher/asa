@@ -1,8 +1,11 @@
 package school.hei.asa.service;
 
+import static java.time.ZoneId.systemDefault;
 import static java.util.Locale.FRENCH;
+import static java.util.Locale.US;
 import static school.hei.asa.model.DailyExecution.Type.fullCare;
 import static school.hei.asa.model.DailyExecution.Type.fullWork;
+import static school.hei.asa.model.contract.ContractType.fullTimeEmployee;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -11,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +55,31 @@ public class ContractService {
     return contractRepository.findAllByWorker(worker);
   }
 
+  public Optional<Contract> findActiveContractByWorker(Worker worker) {
+    return contractRepository.findActiveContractByWorker(worker);
+  }
+
+  public double getRemainingDaysOnActiveContractOrZero(Worker worker) {
+    var activeContractOpt = findActiveContractByWorker(worker);
+    if (activeContractOpt.isEmpty()) {
+      return 0d;
+    }
+
+    if (activeContractOpt.get().level().type().equals(fullTimeEmployee)) {
+      return Double.MAX_VALUE;
+    }
+
+    var contract = activeContractOpt.get();
+    var startDate = contract.entranceInstant().atZone(systemDefault()).toLocalDate();
+    var endDate =
+        contract.endInstant() == null
+            ? LocalDate.now()
+            : contract.endInstant().atZone(systemDefault()).toLocalDate();
+    var actualWorkedDays = getActualWorkedDaysByDateByWorker(startDate, worker.code(), endDate);
+    var workedDays = actualWorkedDays.equals("-") ? 0d : Double.parseDouble(actualWorkedDays);
+    return contract.duration().toDays() - workedDays;
+  }
+
   public String getActualWorkedDaysByDateByWorker(
       LocalDate startDate, String workerCode, LocalDate endDate) {
     var dailyExecutions =
@@ -82,7 +111,7 @@ public class ContractService {
                 })
             .reduce(Double::sum)
             .get();
-    return String.format("%.1f", result);
+    return String.format(US, "%.1f", result);
   }
 
   public List<Contract> findActiveContracts() {

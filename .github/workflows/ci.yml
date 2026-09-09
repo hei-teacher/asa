@@ -38,6 +38,12 @@ jobs:
               (github.ref == 'refs/heads/prod') && secrets.PROD_SENSITIVE_WORKERS_CODES ||
               (github.ref == 'refs/heads/preprod') && secrets.PREPROD_SENSITIVE_WORKERS_CODES
               }}
+      LOW_REMAINING_DAYS_THRESHOLD: ${{
+              (github.event_name == 'pull_request' && github.base_ref == 'prod') && secrets.PROD_LOW_REMAINING_DAYS_THRESHOLD ||
+              (github.event_name == 'pull_request' && github.base_ref == 'preprod') && secrets.PREPROD_LOW_REMAINING_DAYS_THRESHOLD ||
+              (github.ref == 'refs/heads/prod') && secrets.PROD_LOW_REMAINING_DAYS_THRESHOLD ||
+              (github.ref == 'refs/heads/preprod') && secrets.PREPROD_LOW_REMAINING_DAYS_THRESHOLD
+              }}
 
 
     steps:
@@ -53,7 +59,8 @@ jobs:
           ./gradlew test \
             -Daccountants="$ACCOUNTANTS" \
             -Dmax.lateness.report="$MAX_LATENESS_REPORT" \
-            -Dsensitive.workers.codes="$SENSITIVE_WORKERS_CODES"
+            -Dsensitive.workers.codes="$SENSITIVE_WORKERS_CODES" \
+            -Dlow.remaining.days.threshold="$LOW_REMAINING_DAYS_THRESHOLD"
 
       
 

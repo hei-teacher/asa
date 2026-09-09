@@ -4,6 +4,7 @@ import static java.time.LocalDate.now;
 import static java.time.ZoneOffset.UTC;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
+import static school.hei.asa.model.contract.ContractType.fullTimeEmployee;
 import static school.hei.asa.number.NullToBigDecimalHanlder.toBigDecimalOrZero;
 import static school.hei.asa.number.NullToBigDecimalHanlder.toDoubleOrZero;
 
@@ -19,18 +20,24 @@ import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
 import school.hei.asa.model.BankAccount;
+import school.hei.asa.model.GeneratedDocument;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
+import school.hei.asa.model.PaidLeave;
+import school.hei.asa.model.PaySlipForm;
+import school.hei.asa.model.TaxAmount;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.number.NumberConverter;
 import school.hei.asa.number.NumberParser;
 import school.hei.asa.repository.BankAccountRepository;
 import school.hei.asa.repository.ContractRepository;
+import school.hei.asa.repository.CreditRepository;
 import school.hei.asa.repository.InvoiceFormRepository;
 import school.hei.asa.repository.InvoiceReferenceRepository;
 import school.hei.asa.repository.MissionExecutionRepository;
+import school.hei.asa.repository.TaxRepository;
 
 @Slf4j
 @AllArgsConstructor
@@ -45,6 +52,8 @@ public class InvoiceService {
   private final MissionService missionService;
   private final EventProducer<NewInvoiceGenerated> eventProducer;
   private final InvoiceFormRepository invoiceFormRepository;
+  private final TaxRepository taxRepository;
+  private final CreditRepository creditRepository;
 
   public Optional<InvoiceReference> findInvoiceReference(Worker worker, YearMonth yearMonth) {
     var invoiceReferenceList = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker);
@@ -94,14 +103,34 @@ public class InvoiceService {
           null);
     }
     var contractLevel = contract.level();
-    Double unitPrice =
-        switch (contractLevel.type()) {
-          case partnerContractor, studentContractor -> contractLevel.dailyPay();
-          case fullTimeEmployee -> null;
-        };
+    var description = contract.jobTitle();
+
+    if (contractLevel.type() == fullTimeEmployee) {
+      var monthlyPay = toBigDecimalOrZero(contractLevel.monthlyPay());
+      var parsedMonthlyPay = numberConverter.convertToWords(numberParser.parseToNumber(monthlyPay));
+
+      return new InvoiceForm(
+          null,
+          null,
+          null,
+          null,
+          description,
+          1d,
+          monthlyPay,
+          monthlyPay,
+          null,
+          null,
+          null,
+          null,
+          null,
+          monthlyPay,
+          parsedMonthlyPay,
+          null);
+    }
+
+    var unitPrice = contractLevel.dailyPay();
     var amount = toBigDecimalOrZero(totalDaysWorked * toDoubleOrZero(unitPrice));
     var parsedAmount = numberConverter.convertToWords(numberParser.parseToNumber(amount));
-    var description = contract.jobTitle();
 
     return new InvoiceForm(
         null,
@@ -269,5 +298,60 @@ public class InvoiceService {
   public void saveInvoice(InvoiceForm invoiceForm, Worker worker) {
     saveInvoiceReference(invoiceForm, worker);
     invoiceFormRepository.saveInvoiceForm(invoiceForm);
+  }
+
+  public GeneratedDocument generateDistinctInvoice(Worker worker, InvoiceForm invoiceForm) {
+    var workerContracts =
+        contractRepository.findAllByWorker(worker).stream()
+            .sorted(comparing(Contract::entranceInstant, Comparator.reverseOrder()))
+            .toList();
+    var isFullTimeEmployee =
+        !workerContracts.isEmpty() && workerContracts.getFirst().level().type() == fullTimeEmployee;
+
+    return isFullTimeEmployee
+        ? generatePaySlip(worker, invoiceForm.yearMonth())
+        : extractInvoiceForm(worker, invoiceForm);
+  }
+
+  // ponytail: skeleton only — amounts/taxes/credits wired once Tax & Credit docs land
+  private PaySlipForm generatePaySlip(Worker worker, YearMonth yearMonth) {
+    var contract =
+        contractRepository.findActiveContractByWorker(worker).stream()
+            .filter(contract1 -> contract1.level().type() == fullTimeEmployee)
+            .findFirst()
+            .get();
+    var taxes = taxRepository.findAll();
+    var credits = creditRepository.findAll();
+    var grossAmount = toBigDecimalOrZero(contract.level().monthlyPay());
+    var creditsTotalAmount =
+        credits.stream()
+            .map(credit -> credit.getAmount(grossAmount))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    var taxableGrossSalary = grossAmount.add(creditsTotalAmount);
+    var basePaidLeave = contract.level().paidLeaveDaysNumber();
+    var employeeTotalTaxAmount =
+        taxes.stream()
+            .map(tax -> tax.resolve(taxableGrossSalary))
+            .map(TaxAmount::employeeContributionValue)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    var netAmount = taxableGrossSalary.subtract(employeeTotalTaxAmount);
+    var takenPaidLeave = missionExecutionRepository.getPaidLeaveCountByWorker(worker, yearMonth);
+    var takenPaidLeaveTheMonthBefore =
+        missionExecutionRepository.getPaidLeaveCountByWorker(worker, yearMonth.minusMonths(1));
+    var paidLeave =
+        new PaidLeave(
+            basePaidLeave, takenPaidLeave, takenPaidLeaveTheMonthBefore); // not taken paidLeave
+
+    return new PaySlipForm(
+        null,
+        yearMonth == null ? YearMonth.from(now()) : yearMonth,
+        grossAmount,
+        netAmount,
+        taxes,
+        null,
+        paidLeave,
+        null,
+        null,
+        credits);
   }
 }

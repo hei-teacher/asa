@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS credit (
+  id  VARCHAR  PRIMARY KEY,
+  "name" VARCHAR NOT NULL,
+  divisor NUMERIC(12,2) NOT NULL,
+  rate NUMERIC(5,2) NOT NULL CHECK (rate BETWEEN 0 AND 100),
+  number_of_units NUMERIC(12,2)
+);

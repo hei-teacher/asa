@@ -47,7 +47,7 @@ public interface JMissionExecutionRepository extends JpaRepository<JMissionExecu
     SELECT me
     FROM JMissionExecution me
     WHERE me.worker = :worker
-      AND me.missionCode = 'CA-ABP'
+      AND me.mission_code = 'CA-ABP'
       AND YEAR(me.date) = :#{#yearMonth.year}
       AND MONTH(me.date) = :#{#yearMonth.monthValue}
 """)

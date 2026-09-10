@@ -10,9 +10,10 @@ public record PaySlipForm(
     BigDecimal grossAmount,
     BigDecimal netAmount,
     List<Tax> taxes,
-    BigDecimal totalAmount,
+    BigDecimal employeeTotalTaxAmount,
+    BigDecimal employerTotalTaxAmount,
+    BigDecimal taxableGrossAmount,
     PaidLeave paidLeave,
-    BigDecimal leaveBaseAmount,
-    BigDecimal leaveAmount,
-    List<Credit> credits)
+    BigDecimal amountAfterTaxes,
+    List<EarnedCredit> credits)
     implements GeneratedDocument {}

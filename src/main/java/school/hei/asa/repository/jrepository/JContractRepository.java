@@ -2,6 +2,7 @@ package school.hei.asa.repository.jrepository;
 
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,4 +36,5 @@ public interface JContractRepository extends JpaRepository<JContract, String> {
         AND c.worker.code = :workerCode
       """)
   Optional<JContract> findActiveContractByWorker(@Param("workerCode") String workerCode);
+
 }

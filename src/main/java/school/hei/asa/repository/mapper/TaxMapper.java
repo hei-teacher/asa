@@ -13,6 +13,7 @@ public class TaxMapper {
     return new Tax(
         jTax.getId(),
         jTax.getName(),
+        jTax.getDeductionType(),
         jTax.getTaxProgressions().stream().map(this::toDomain).toList());
   }
 

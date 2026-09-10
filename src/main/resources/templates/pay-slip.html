@@ -183,58 +183,58 @@
         <tr>
             <td>1000</td>
             <td>Salaire de base</td>
-            <td class="text-center ph">Nombre</td>
-            <td class="text-right ph">Base</td>
             <td class="text-center">-</td>
-            <td class="text-right" th:text="${invoice.amount}"></td>
+            <td class="text-right">-</td>
+            <td class="text-center">-</td>
+            <td class="text-right" th:text="${payslipGrossAmount}"></td>
             <td class="text-center">-</td>
             <td class="text-center">-</td>
             <td class="text-right">-</td>
         </tr>
-        <tr><td>1100</td><td>Absence</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
-        <tr><td>1150</td><td>Allocation congé payé</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
-        <tr><td>1200</td><td>Heures Supp. non imposable 130%</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
-        <tr><td>1201</td><td>Heures Supp. non imposable 150%</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
-        <tr><td>1202</td><td>Heures Supp. imposable 150%</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
-        <tr><td>1203</td><td>Heures majorées trav. nuit habituel</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
-        <tr><td>1204</td><td>Heures majorées trav. nuit occas.</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
-        <tr><td>1205</td><td>Heures majorées trav. dimanche</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
-        <tr><td>1206</td><td>Heures majorées trav. jours fériés</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center ph">Taux %</td><td class="text-right ph">Gain</td><td class="text-right ph">Retenue</td><td class="text-center ph">Taux %</td><td class="text-right ph">Retenue</td></tr>
-        <tr><td>1300</td><td>Indemnités diverses</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center">-</td><td class="text-right ph">Gain</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
-        <tr><td>1350</td><td>Primes divers</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center">-</td><td class="text-right ph">Gain</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
-        <tr><td>1400</td><td>Retenues diverses</td><td class="text-center ph">Nombre</td><td class="text-right ph">Base</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-right ph">Retenue</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>1100</td><td>Absence</td><td class="text-center" th:text="${creditQuantities['ABSENCE']} ?: '-'"></td><td class="text-right" th:text="${creditBases['ABSENCE']}"></td><td class="text-center">-</td><td class="text-right">-</td><td class="text-right" th:text="${creditAmounts['ABSENCE']} ?: '-'"></td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>1150</td><td>Allocation congé payé</td><td class="text-center" th:text="${creditQuantities['ALLOCATION_CONGE_PAYE']} ?: '-'"></td><td class="text-right" th:text="${creditBases['ALLOCATION_CONGE_PAYE']}"></td><td class="text-center">-</td><td class="text-right" th:text="${creditAmounts['ALLOCATION_CONGE_PAYE']} ?: '-'"></td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>1200</td><td>Heures Supp. non imposable 130%</td><td class="text-center" th:text="${creditQuantities['HEURES_SUPP_NON_IMPOSABLE_130']} ?: '-'"></td><td class="text-right" th:text="${creditBases['HEURES_SUPP_NON_IMPOSABLE_130']}"></td><td class="text-center">130%</td><td class="text-right" th:text="${creditAmounts['HEURES_SUPP_NON_IMPOSABLE_130']} ?: '-'"></td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>1201</td><td>Heures Supp. non imposable 150%</td><td class="text-center" th:text="${creditQuantities['HEURES_SUPP_NON_IMPOSABLE_150']} ?: '-'"></td><td class="text-right" th:text="${creditBases['HEURES_SUPP_NON_IMPOSABLE_150']}"></td><td class="text-center">150%</td><td class="text-right" th:text="${creditAmounts['HEURES_SUPP_NON_IMPOSABLE_150']} ?: '-'"></td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>1202</td><td>Heures Supp. imposable 150%</td><td class="text-center" th:text="${creditQuantities['HEURES_SUPP_IMPOSABLE_150']} ?: '-'"></td><td class="text-right" th:text="${creditBases['HEURES_SUPP_IMPOSABLE_150']}"></td><td class="text-center">150%</td><td class="text-right" th:text="${creditAmounts['HEURES_SUPP_IMPOSABLE_150']} ?: '-'"></td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>1203</td><td>Heures majorées trav. nuit habituel</td><td class="text-center" th:text="${creditQuantities['HEURES_MAJOREES_NUIT_HABITUEL']} ?: '-'"></td><td class="text-right" th:text="${creditBases['HEURES_MAJOREES_NUIT_HABITUEL']}"></td><td class="text-center">30%</td><td class="text-right" th:text="${creditAmounts['HEURES_MAJOREES_NUIT_HABITUEL']} ?: '-'"></td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>1204</td><td>Heures majorées trav. nuit occas.</td><td class="text-center" th:text="${creditQuantities['HEURES_MAJOREES_NUIT_OCCAS']} ?: '-'"></td><td class="text-right" th:text="${creditBases['HEURES_MAJOREES_NUIT_OCCAS']}"></td><td class="text-center">50%</td><td class="text-right" th:text="${creditAmounts['HEURES_MAJOREES_NUIT_OCCAS']} ?: '-'"></td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>1205</td><td>Heures majorées trav. dimanche</td><td class="text-center" th:text="${creditQuantities['HEURES_MAJOREES_DIMANCHE']} ?: '-'"></td><td class="text-right" th:text="${creditBases['HEURES_MAJOREES_DIMANCHE']}"></td><td class="text-center">40%</td><td class="text-right" th:text="${creditAmounts['HEURES_MAJOREES_DIMANCHE']} ?: '-'"></td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>1206</td><td>Heures majorées trav. jours fériés</td><td class="text-center" th:text="${creditQuantities['HEURES_MAJOREES_JOURS_FERIES']} ?: '-'"></td><td class="text-right" th:text="${creditBases['HEURES_MAJOREES_JOURS_FERIES']}"></td><td class="text-center">50%</td><td class="text-right" th:text="${creditAmounts['HEURES_MAJOREES_JOURS_FERIES']} ?: '-'"></td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>1300</td><td>Indemnités diverses</td><td class="text-center" th:text="${creditQuantities['INDEMNITES_DIVERSES']} ?: '-'"></td><td class="text-right" th:text="${creditBases['INDEMNITES_DIVERSES']}"></td><td class="text-center">-</td><td class="text-right" th:text="${creditAmounts['INDEMNITES_DIVERSES']} ?: '-'"></td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>1350</td><td>Primes divers</td><td class="text-center" th:text="${creditQuantities['PRIMES_DIVERS']} ?: '-'"></td><td class="text-right" th:text="${creditBases['PRIMES_DIVERS']}"></td><td class="text-center">-</td><td class="text-right" th:text="${creditAmounts['PRIMES_DIVERS']} ?: '-'"></td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>1400</td><td>Retenues diverses</td><td class="text-center" th:text="${creditQuantities['RETENUES_DIVERSES']} ?: '-'"></td><td class="text-right" th:text="${creditBases['RETENUES_DIVERSES']}"></td><td class="text-center">-</td><td class="text-right">-</td><td class="text-right" th:text="${creditAmounts['RETENUES_DIVERSES']} ?: '-'"></td><td class="text-center">-</td><td class="text-right">-</td></tr>
         <tr class="total-row">
             <td></td>
             <td>TOTAL BRUT</td>
             <td class="text-center">-</td>
             <td class="text-right">-</td>
             <td class="text-center">-</td>
-            <td class="text-right" th:text="${invoice.total}"></td>
+            <td class="text-right" th:text="${payslipGrossAmount}"></td>
             <td class="text-right">-</td>
             <td class="text-center">-</td>
             <td class="text-right">-</td>
         </tr>
-        <tr><td>5000</td><td>Retenue CNAPS</td><td class="text-center">-</td><td class="text-right" th:text="${invoice.amount}"></td><td class="text-center">1%</td><td class="text-right">-</td><td class="text-right" th:text="${cnapsEmployee}"></td><td class="text-center">13%</td><td class="text-right" th:text="${cnapsEmployer}"></td></tr>
-        <tr><td>6000</td><td>Retenue OSTIE</td><td class="text-center">-</td><td class="text-right" th:text="${invoice.amount}"></td><td class="text-center">1%</td><td class="text-right">-</td><td class="text-right" th:text="${ostieEmployee}"></td><td class="text-center">5%</td><td class="text-right" th:text="${ostieEmployer}"></td></tr>
-        <tr><td>7000</td><td>Retenue FMFP</td><td class="text-center">-</td><td class="text-right" th:text="${invoice.amount}"></td><td class="text-center">-</td><td class="text-right">-</td><td class="text-right">-</td><td class="text-center">1%</td><td class="text-right" th:text="${fmfpEmployer}"></td></tr>
+        <tr><td>5000</td><td>Retenue CNAPS</td><td class="text-center">-</td><td class="text-right" th:text="${payslipTaxableGrossAmount}"></td><td class="text-center">1%</td><td class="text-right">-</td><td class="text-right" th:text="${taxEmployeeAmounts['CNAPS']}"></td><td class="text-center">13%</td><td class="text-right" th:text="${taxEmployerAmounts['CNAPS']}"></td></tr>
+        <tr><td>6000</td><td>Retenue OSTIE</td><td class="text-center">-</td><td class="text-right" th:text="${payslipTaxableGrossAmount}"></td><td class="text-center">1%</td><td class="text-right">-</td><td class="text-right" th:text="${taxEmployeeAmounts['OSTIE']}"></td><td class="text-center">5%</td><td class="text-right" th:text="${taxEmployerAmounts['OSTIE']}"></td></tr>
+        <tr><td>7000</td><td>Retenue FMFP</td><td class="text-center">-</td><td class="text-right" th:text="${payslipTaxableGrossAmount}"></td><td class="text-center">-</td><td class="text-right">-</td><td class="text-right">-</td><td class="text-center">1%</td><td class="text-right" th:text="${taxEmployerAmounts['FMFP']}"></td></tr>
         <tr class="total-row">
             <td></td><td>TOTAL COTISATION</td>
             <td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td>
             <td class="text-right" th:text="${totalCotisationEmployee}"></td><td class="text-center">-</td><td class="text-right" th:text="${totalCotisationEmployer}"></td>
         </tr>
-        <tr><td>8000</td><td>Retenue IRSA</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-right ph">Retenue</td><td class="text-center">-</td><td class="text-right">-</td></tr>
-        <tr><td>9000</td><td>Autres gains ni soumis cotis. ni imposable</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right ph">Gain</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
-        <tr><td>9500</td><td>Autres retenues ni soumises cotis. ni imposable</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-right ph">Retenue</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>8000</td><td>Retenue IRSA</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-right" th:text="${taxEmployeeAmounts['IRSA']}"></td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>9000</td><td>Autres gains ni soumis cotis. ni imposable</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right" th:text="${creditAmounts['AUTRES_GAINS_NON_SOUMIS']} ?: '-'"></td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td></tr>
+        <tr><td>9500</td><td>Autres retenues ni soumises cotis. ni imposable</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td><td class="text-right" th:text="${creditAmounts['AUTRES_RETENUES_NON_SOUMISES']} ?: '-'"></td><td class="text-center">-</td><td class="text-right">-</td></tr>
         <tr class="total-row">
             <td></td><td>TOTAL NON SOUMIS</td>
             <td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td>
-            <td class="text-right ph">Retenue</td><td class="text-center">-</td><td class="text-right">-</td>
+            <td class="text-right" th:text="${payslipEmployeeTotalTaxAmount}"></td><td class="text-center">-</td><td class="text-right">-</td>
         </tr>
         <tr class="total-row">
             <td></td><td>TOTAL</td>
             <td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td>
-            <td class="text-right" th:text="${invoice.total}"></td>
-            <td class="text-right ph">Retenue</td><td class="text-center">-</td><td class="text-right">-</td>
+            <td class="text-right" th:text="${payslipNetAmount}"></td>
+            <td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td>
         </tr>
     </tbody>
 </table>
@@ -242,20 +242,20 @@
 <table class="summary-table">
     <tr>
         <td>
-            <div class="field-row"><span class="field-label">Salaire brut avant cotisation</span><span class="field-fill"></span><span class="field-value" th:text="${invoice.total}"></span></div>
+            <div class="field-row"><span class="field-label">Salaire brut avant cotisation</span><span class="field-fill"></span><span class="field-value" th:text="${payslipGrossAmount}"></span></div>
             <div class="field-row"><span class="field-label">Avantage en nature (non perçu en num)</span><span class="field-fill"></span><span class="field-value ph">Avantage en nature</span></div>
             <div class="field-row"><span class="field-label">Part de cet avantage en nature imposable</span><span class="field-fill"></span><span class="field-value ph">Part avantage en nature imposable</span></div>
-            <div class="field-row"><span class="field-label">Montant brut imposable</span><span class="field-fill"></span><span class="field-value ph">Montant brut imposable</span></div>
+            <div class="field-row"><span class="field-label">Montant brut imposable</span><span class="field-fill"></span><span class="field-value" th:text="${payslipTaxableGrossAmount}"></span></div>
             <div class="field-row"><span class="field-label">Réduct° pour pers. à charge</span><span class="field-fill"></span><span class="field-value ph">Réduction pers. à charge</span></div>
-            <div class="field-row net"><span class="field-label">Net à payer</span><span class="field-fill"></span><span class="field-value ph">Net à payer</span></div>
+            <div class="field-row net"><span class="field-label">Net à payer</span><span class="field-fill"></span><span class="field-value" th:text="${payslipNetAmount}"></span></div>
             <div class="field-row" style="margin-top: 8px;"><span class="field-label">Montant en lettres</span><span class="field-fill"></span><span class="field-value" th:text="${invoice.parsedAmount + ' Ariary'}"></span></div>
             <div class="field-row"><span class="field-label">Mode de paiement (virement vers)</span><span class="field-fill"></span><span class="field-value" th:text="${invoice.rib}"></span></div>
         </td>
         <td>
-            <div class="field-row"><span class="field-label">Solde congé non pris mois précéd.</span><span class="field-fill"></span><span class="field-value ph">Solde congé non pris</span></div>
-            <div class="field-row"><span class="field-label">Congé pris de la période</span><span class="field-fill"></span><span class="field-value ph">Congé pris</span></div>
-            <div class="field-row"><span class="field-label">Congé acquis période</span><span class="field-fill"></span><span class="field-value ph">Congé acquis</span></div>
-            <div class="field-row"><span class="field-label" style="font-weight: 700;">Solde congé</span><span class="field-fill"></span><span class="field-value ph" style="font-weight: 700;">Solde congé</span></div>
+            <div class="field-row"><span class="field-label">Solde congé non pris mois précéd.</span><span class="field-fill"></span><span class="field-value" th:text="${paidLeave.notTakenTheLastMonth}"></span></div>
+            <div class="field-row"><span class="field-label">Congé pris de la période</span><span class="field-fill"></span><span class="field-value" th:text="${paidLeave.taken}"></span></div>
+            <div class="field-row"><span class="field-label">Congé acquis période</span><span class="field-fill"></span><span class="field-value" th:text="${paidLeave.base}"></span></div>
+            <div class="field-row"><span class="field-label" style="font-weight: 700;">Solde congé</span><span class="field-fill"></span><span class="field-value" style="font-weight: 700;" th:text="${paidLeave.left}"></span></div>
         </td>
     </tr>
 </table>

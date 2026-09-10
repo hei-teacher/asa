@@ -14,6 +14,9 @@ import lombok.Setter;
 public class JCredit {
   @Id private String id;
 
+  @Column(name = "credit_code", nullable = false)
+  private String creditCode;
+
   @Column(name = "name", nullable = false)
   private String name;
 
@@ -23,6 +26,6 @@ public class JCredit {
   @Column(name = "rate", nullable = false)
   private Double rate;
 
-  @Column(name = "number_of_units")
-  private Double numberOfUnits;
+  @Column(name = "taxable", nullable = false)
+  private Boolean taxable;
 }

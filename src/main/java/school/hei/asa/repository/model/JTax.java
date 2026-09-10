@@ -13,10 +13,11 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
+import school.hei.asa.model.DeductionType;
 import school.hei.asa.model.TaxType;
 
 @Entity
-@Table(name = "tax")
+@Table(name = "deduction")
 @Getter
 @Setter
 public class JTax {
@@ -28,6 +29,10 @@ public class JTax {
   @Enumerated(STRING)
   @Column(name = "tax_type", nullable = false)
   private TaxType taxType;
+
+  @Enumerated(STRING)
+  @Column(name = "type", nullable = false)
+  private DeductionType deductionType;
 
   @OneToMany
   @JoinColumn(name = "tax_id")

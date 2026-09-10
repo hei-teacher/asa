@@ -10,9 +10,10 @@ public class CreditMapper {
   public Credit toDomain(JCredit jCredit) {
     return new Credit(
         jCredit.getId(),
+        jCredit.getCreditCode(),
         jCredit.getName(),
         jCredit.getDivisor(),
         jCredit.getRate(),
-        jCredit.getNumberOfUnits());
+        jCredit.getTaxable());
   }
 }

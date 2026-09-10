@@ -15,6 +15,7 @@ import lombok.Getter;
 public class Tax {
   private final String id;
   private final String name;
+  private final DeductionType deductionType;
   private final List<TaxProgression> taxProgressions;
 
   public TaxAmount resolve(BigDecimal base) {

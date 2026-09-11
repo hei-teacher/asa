@@ -41,7 +41,9 @@ class CalendarControllerIT extends FacadeIT {
             "address",
             "random city",
             "nif",
-            "stat");
+            "stat",
+            null,
+            null);
     model = mock(Model.class);
 
     when(workerFromAuthentication.apply(authentication))

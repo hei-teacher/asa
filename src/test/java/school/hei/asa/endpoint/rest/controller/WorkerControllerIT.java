@@ -48,7 +48,9 @@ class WorkerControllerIT extends FacadeIT {
             "address",
             "random city",
             "nif",
-            "stat");
+            "stat",
+            null,
+            null);
     model = mock(Model.class);
     var level = new ContractLevel("levelCode", studentContractor, null, 55_556d, null);
     var mockContract =

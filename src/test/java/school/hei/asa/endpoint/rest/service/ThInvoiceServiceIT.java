@@ -70,7 +70,8 @@ public class ThInvoiceServiceIT extends FacadeIT {
   }
 
   private Worker newWorker() {
-    return new Worker("w-code", "name", "email", "fullname", "address", "city", "nif", "stat");
+    return new Worker(
+        "w-code", "name", "email", "fullname", "address", "city", "nif", "stat", null, null);
   }
 
   private Contract contractWithType(

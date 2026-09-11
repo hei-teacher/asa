@@ -9,7 +9,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.HashMap;
@@ -25,6 +27,7 @@ import school.hei.asa.model.DeductionType;
 import school.hei.asa.model.EarnedCredit;
 import school.hei.asa.model.Worker;
 import school.hei.asa.number.NumberParser;
+import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.CreditRepository;
 import school.hei.asa.service.InvoiceService;
 import school.hei.asa.service.TemplateResolverEngine;
@@ -33,12 +36,14 @@ import school.hei.asa.service.TemplateResolverEngine;
 @AllArgsConstructor
 public class InvoicePDFGenerator {
   private static final String PAY_SLIP_TEMPLATE = "pay-slip";
+  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
   private final FileWriter fileWriter;
   private final TemplateResolverEngine templateResolverEngine;
   private final NumberParser numberParser;
   private final InvoiceService invoiceService;
   private final CreditRepository creditRepository;
+  private final ContractRepository contractRepository;
 
   public File apply(Worker worker, ThInvoiceForm thInvoiceForm, String template) {
     var renderer = new ITextRenderer();
@@ -98,6 +103,24 @@ public class InvoicePDFGenerator {
     context.setVariable("payslipDeductionTotalAmount", format(paySlip.deductionTotalAmount()));
     context.setVariable("payslipDeductionAndTaxTotal", format(paySlip.deductionAndTaxTotal()));
     context.setVariable("paidLeave", paySlip.paidLeave());
+    context.setVariable("invoiceReference", paySlip.invoiceReference());
+
+    var activeContract = contractRepository.findActiveContractByWorker(worker);
+    context.setVariable("contractCategory", activeContract.map(c -> c.level().code()).orElse("-"));
+    context.setVariable(
+        "contractEntranceDate",
+        activeContract.map(c -> formatInstant(c.entranceInstant())).orElse("-"));
+    context.setVariable(
+        "contractEndDate",
+        activeContract
+            .map(c -> c.endInstant() == null ? "-" : formatInstant(c.endInstant()))
+            .orElse("-"));
+
+    // 2000 Ar par enfant a charge, deduit de chaque taxe de type DEDUCTION (IRSA) -
+    // doit rester coherent avec InvoiceService.generatePaySlip.
+    var kidsNumber = worker.kidsNumber() == null ? 0 : worker.kidsNumber();
+    var reductionForDependents = BigDecimal.valueOf(kidsNumber).multiply(BigDecimal.valueOf(2000));
+    context.setVariable("payslipReductionForDependents", format(reductionForDependents));
 
     Map<String, String> taxEmployeeAmounts = new HashMap<>();
     Map<String, String> taxEmployerAmounts = new HashMap<>();
@@ -105,11 +128,14 @@ public class InvoicePDFGenerator {
     var socialContributionEmployer = BigDecimal.ZERO;
     for (var tax : paySlip.taxes()) {
       var amount = tax.resolve(taxableBase);
-      taxEmployeeAmounts.put(tax.getId(), format(amount.employeeContributionValue()));
+      var employeeAmount = amount.employeeContributionValue();
+      if (tax.getDeductionType() == DeductionType.DEDUCTION) {
+        employeeAmount = employeeAmount.subtract(reductionForDependents).max(BigDecimal.ZERO);
+      }
+      taxEmployeeAmounts.put(tax.getId(), format(employeeAmount));
       taxEmployerAmounts.put(tax.getId(), format(amount.employerContributionValue()));
       if (tax.getDeductionType() == DeductionType.TAX) {
-        socialContributionEmployee =
-            socialContributionEmployee.add(amount.employeeContributionValue());
+        socialContributionEmployee = socialContributionEmployee.add(employeeAmount);
         socialContributionEmployer =
             socialContributionEmployer.add(amount.employerContributionValue());
       }
@@ -147,5 +173,9 @@ public class InvoicePDFGenerator {
 
   private String format(BigDecimal amount) {
     return numberParser.parseToNumber(amount);
+  }
+
+  private String formatInstant(java.time.Instant instant) {
+    return LocalDate.ofInstant(instant, ZoneId.systemDefault()).format(DATE_FORMATTER);
   }
 }

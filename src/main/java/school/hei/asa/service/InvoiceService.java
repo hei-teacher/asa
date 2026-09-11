@@ -352,12 +352,18 @@ public class InvoiceService {
             .map(TaxAmount::employerContributionValue)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+    // 2000 Ar par enfant a charge, deduit directement de l'IRSA (reduction pour charge de famille)
+    var reductionForDependents =
+        BigDecimal.valueOf(worker.kidsNumber() == null ? 0 : worker.kidsNumber())
+            .multiply(BigDecimal.valueOf(2000));
     var deductionTotalAmount =
         taxes.stream()
             .filter(tax -> tax.getDeductionType() == DeductionType.DEDUCTION)
             .map(tax -> tax.resolve(taxableGrossSalary))
             .map(TaxAmount::employeeContributionValue)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+            .reduce(BigDecimal.ZERO, BigDecimal::add)
+            .subtract(reductionForDependents)
+            .max(BigDecimal.ZERO);
     var deductionAndTaxTotal = deductionTotalAmount.add(employeeTotalTaxAmount);
     var amountAfterTaxes = taxableGrossSalary.subtract(employeeTotalTaxAmount);
     var netAmount =

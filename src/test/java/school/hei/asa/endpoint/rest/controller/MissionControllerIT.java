@@ -67,7 +67,9 @@ public class MissionControllerIT extends FacadeIT {
             "address",
             "random city",
             "nif",
-            "stat");
+            "stat",
+            null,
+            null);
     authentication = mock(Authentication.class);
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));
@@ -98,7 +100,9 @@ public class MissionControllerIT extends FacadeIT {
             "address",
             "random city",
             "nif",
-            "stat");
+            "stat",
+            null,
+            null);
     authentication = mock(Authentication.class);
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));

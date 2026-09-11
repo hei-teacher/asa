@@ -30,7 +30,9 @@ public class WorkerMapper {
             jWorker.getAddress(),
             jWorker.getCity(),
             jWorker.getNif(),
-            jWorker.getStat());
+            jWorker.getStat(),
+            jWorker.getKidsNumber(),
+            jWorker.getCnapsRef());
     cache.put(code, worker, Worker.class);
 
     return worker;

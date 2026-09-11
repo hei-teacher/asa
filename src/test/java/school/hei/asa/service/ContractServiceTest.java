@@ -49,7 +49,7 @@ class ContractServiceTest {
             missionService,
             careProductCodeSupplier);
 
-    worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
+    worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "", null, null);
   }
 
   @Test

@@ -352,18 +352,19 @@ public class InvoiceService {
             .map(TaxAmount::employerContributionValue)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    var deductionTotalTaxAmount =
+    var deductionTotalAmount =
         taxes.stream()
             .filter(tax -> tax.getDeductionType() == DeductionType.DEDUCTION)
             .map(tax -> tax.resolve(taxableGrossSalary))
-            .map(TaxAmount::employerContributionValue)
+            .map(TaxAmount::employeeContributionValue)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
+    var deductionAndTaxTotal = deductionTotalAmount.add(employeeTotalTaxAmount);
     var amountAfterTaxes = taxableGrossSalary.subtract(employeeTotalTaxAmount);
     var netAmount =
         taxableGrossSalary
             .subtract(employeeTotalTaxAmount)
             .add(notTaxableCreditsTotalAmount)
-            .subtract(deductionTotalTaxAmount);
+            .subtract(deductionTotalAmount);
     var takenPaidLeave = missionExecutionRepository.getPaidLeaveCountByWorker(worker, yearMonth);
     var takenPaidLeaveTheMonthBefore =
         missionExecutionRepository.getPaidLeaveCountByWorker(worker, yearMonth.minusMonths(1));
@@ -371,7 +372,13 @@ public class InvoiceService {
     var paidLeave =
         new PaidLeave(
             basePaidLeave, takenPaidLeave, notTakenPaidLeaveTheMonthBefore, basePaidLeave);
-
+    var increment =
+        invoiceReferenceRepository
+            .findInvoiceRefByWorkerByYearMonth(worker, yearMonth.plusMonths(1))
+            .map(InvoiceReference::autoincrement)
+            .orElse(0);
+    var invoiceRef =
+        new InvoiceReference(UUID.randomUUID().toString(), yearMonth, increment + 1, worker);
     return new PaySlipForm(
         null,
         yearMonth == null ? YearMonth.from(now()) : yearMonth,
@@ -379,10 +386,13 @@ public class InvoiceService {
         netAmount,
         taxes,
         employeeTotalTaxAmount,
+        deductionTotalAmount,
+        deductionAndTaxTotal,
         employerTotalTaxAmount,
         taxableGrossSalary,
         paidLeave,
         amountAfterTaxes,
-        earnedCredits);
+        earnedCredits,
+        invoiceRef);
   }
 }

@@ -228,13 +228,13 @@
         <tr class="total-row">
             <td></td><td>TOTAL NON SOUMIS</td>
             <td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td>
-            <td class="text-right" th:text="${payslipEmployeeTotalTaxAmount}"></td><td class="text-center">-</td><td class="text-right">-</td>
+            <td class="text-right" th:text="${payslipDeductionTotalAmount}"></td><td class="text-center">-</td><td class="text-right">-</td>
         </tr>
         <tr class="total-row">
             <td></td><td>TOTAL</td>
             <td class="text-center">-</td><td class="text-right">-</td><td class="text-center">-</td>
             <td class="text-right" th:text="${payslipNetAmount}"></td>
-            <td class="text-right">-</td><td class="text-center">-</td><td class="text-right">-</td>
+            <td class="text-right" th:text="${payslipDeductionAndTaxTotal}"></td><td class="text-center">-</td><td class="text-right">-</td>
         </tr>
     </tbody>
 </table>
@@ -249,7 +249,6 @@
             <div class="field-row"><span class="field-label">Réduct° pour pers. à charge</span><span class="field-fill"></span><span class="field-value ph">Réduction pers. à charge</span></div>
             <div class="field-row net"><span class="field-label">Net à payer</span><span class="field-fill"></span><span class="field-value" th:text="${payslipNetAmount}"></span></div>
             <div class="field-row" style="margin-top: 8px;"><span class="field-label">Montant en lettres</span><span class="field-fill"></span><span class="field-value" th:text="${invoice.parsedAmount + ' Ariary'}"></span></div>
-            <div class="field-row"><span class="field-label">Mode de paiement (virement vers)</span><span class="field-fill"></span><span class="field-value" th:text="${invoice.rib}"></span></div>
         </td>
         <td>
             <div class="field-row"><span class="field-label">Solde congé non pris mois précéd.</span><span class="field-fill"></span><span class="field-value" th:text="${paidLeave.notTakenTheLastMonth}"></span></div>

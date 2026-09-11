@@ -35,7 +35,6 @@ public class LowRemainingDaysAlertRequestedService
         internetAddressMapper.toInternetAddresses(
             Arrays.stream(this.accountants.split(",")).toList());
 
-    var workerCode = event.getWorkerCode();
     var workerName = event.getWorkerName();
     var remainingDays = event.getRemainingDays();
     var subject = String.format("ASA - ALERT: low remaining days - Worker %s", workerName);
@@ -50,7 +49,7 @@ public class LowRemainingDaysAlertRequestedService
 
     log.info(
         "Sending low remaining days alert to accountants for worker={}, remainingDays={}",
-        workerCode,
+        workerName,
         remainingDays);
 
     try {

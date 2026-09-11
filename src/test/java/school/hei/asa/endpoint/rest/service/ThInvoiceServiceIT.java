@@ -78,7 +78,7 @@ public class ThInvoiceServiceIT extends FacadeIT {
     return new Contract(
         worker,
         "job",
-        new ContractLevel("code", type, null, 55_556d),
+        new ContractLevel("code", type, null, 55_556d, null),
         Instant.now(),
         null,
         Duration.ofDays(100),

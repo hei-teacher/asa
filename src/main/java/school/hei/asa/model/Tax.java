@@ -29,7 +29,6 @@ public class Tax {
     var bracketsForSide =
         taxProgressions.stream().filter(range -> range.taxSide() == side).toList();
     if (bracketsForSide.isEmpty()) {
-      // this tax has no side at all (ex: FMFP has no EMPLOYEE side) : contributes nothing
       return BigDecimal.ZERO;
     }
     return findBracket(bracketsForSide, base)

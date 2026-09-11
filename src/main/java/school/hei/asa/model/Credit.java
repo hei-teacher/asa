@@ -1,6 +1,5 @@
 package school.hei.asa.model;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

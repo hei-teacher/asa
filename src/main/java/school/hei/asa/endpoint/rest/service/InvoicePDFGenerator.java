@@ -95,6 +95,8 @@ public class InvoicePDFGenerator {
     context.setVariable("payslipNetAmount", format(paySlip.netAmount()));
     context.setVariable("payslipEmployeeTotalTaxAmount", format(paySlip.employeeTotalTaxAmount()));
     context.setVariable("payslipEmployerTotalTaxAmount", format(paySlip.employerTotalTaxAmount()));
+    context.setVariable("payslipDeductionTotalAmount", format(paySlip.deductionTotalAmount()));
+    context.setVariable("payslipDeductionAndTaxTotal", format(paySlip.deductionAndTaxTotal()));
     context.setVariable("paidLeave", paySlip.paidLeave());
 
     Map<String, String> taxEmployeeAmounts = new HashMap<>();

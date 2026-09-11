@@ -55,7 +55,6 @@ public class LowRemainingDaysAlertService {
     eventProducer.accept(
         List.of(
             LowRemainingDaysAlertRequested.builder()
-                .workerCode(worker.code())
                 .workerName(worker.name())
                 .remainingDays((int) remainingDays)
                 .build()));

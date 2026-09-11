@@ -14,7 +14,7 @@ class PaySlipGenerationIT extends FacadeIT {
 
   // salaire de base : 450 000 Ar (fixture V101_6, tranche IRSA 400 000,01-500 000 = 10%)
   private Worker payslipWorker() {
-    return new Worker("W-PAYSLIP-01", "Rina Rakoto", "", "", "", "", "", "");
+    return new Worker("W-PAYSLIP-01", "Rina Rakoto", "", "", "", "", "", "", null, null);
   }
 
   @Test

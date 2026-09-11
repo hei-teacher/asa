@@ -24,7 +24,8 @@ public class WorkerMapperTest {
     var actual = workerMapper.toDomain(jWorker);
 
     var expected =
-        new Worker("code", "code", "email", "fullname", "address", "city", "NIF", "STAT");
+        new Worker(
+            "code", "code", "email", "fullname", "address", "city", "NIF", "STAT", null, null);
 
     assertEquals(expected, actual);
   }
@@ -41,7 +42,9 @@ public class WorkerMapperTest {
     expected.setNif("NIF");
     expected.setStat("STAT");
 
-    var worker = new Worker("code", "code", "email", "fullname", "address", "city", "NIF", "STAT");
+    var worker =
+        new Worker(
+            "code", "code", "email", "fullname", "address", "city", "NIF", "STAT", null, null);
 
     var actual = workerMapper.toEntity(worker);
 

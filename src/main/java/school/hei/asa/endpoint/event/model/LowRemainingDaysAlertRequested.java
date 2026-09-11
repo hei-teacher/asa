@@ -17,6 +17,7 @@ import lombok.ToString;
 public class LowRemainingDaysAlertRequested extends PojaEvent {
 
   private String workerCode;
+  private String workerName;
   private int remainingDays;
 
   @Override

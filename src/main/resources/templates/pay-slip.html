@@ -133,7 +133,6 @@
         </td>
         <td style="width: 50%; vertical-align: top;">
             <p class="grand-titre" style="margin: 0;">Fiche de Paie</p>
-            <p style="margin: 4px 0 0; text-align: center;">Bulletin : BUL<span th:text="${invoiceReference.autoincrement}"></span></p>
         </td>
     </tr>
 </table>
@@ -245,7 +244,7 @@
     <tr>
         <td>
             <div class="field-row"><span class="field-label">Salaire brut avant cotisation</span><span class="field-fill"></span><span class="field-value" th:text="${payslipGrossAmount}"></span></div>
-            <div class="field-row"><span class="field-label">Montant brut imposable</span><span class="field-fill"></span><span class="field-value" th:text="${payslipTaxableGrossAmount}"></span></div>
+            <div class="field-row"><span class="field-label">Montant brut imposable</span><span class="field-fill"></span><span class="field-value" th:text="${payslipAmountAfterTaxes}"></span></div>
             <div class="field-row"><span class="field-label">Réduct° pour pers. à charge (2 000 Ar/enfant)</span><span class="field-fill"></span><span class="field-value" th:text="${payslipReductionForDependents}"></span></div>
             <div class="field-row net"><span class="field-label">Net à payer</span><span class="field-fill"></span><span class="field-value" th:text="${payslipNetAmount}"></span></div>
         </td>

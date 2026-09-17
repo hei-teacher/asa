@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +22,12 @@ import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
 import school.hei.asa.model.BankAccount;
 import school.hei.asa.model.DeductionType;
-import school.hei.asa.model.GeneratedDocument;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.PaidLeave;
 import school.hei.asa.model.PaySlipForm;
+import school.hei.asa.model.ResolvedTax;
 import school.hei.asa.model.TaxAmount;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
@@ -178,6 +179,10 @@ public class InvoiceService {
     return String.format("FAC-NUM-2025-%s-%s.pdf", worker.code(), savedInvoice.autoincrement());
   }
 
+  public String generatePaySlipFileName(Worker worker, YearMonth yearMonth) {
+    return String.format("FDP_Numer_2026_%s_%s.pdf", worker.code(), yearMonth);
+  }
+
   public String getInvoiceBucketKey(Worker worker, YearMonth yearMonth) {
     var invoiceReference =
         invoiceReferenceRepository.findInvoiceReferenceByWorker(worker).stream()
@@ -301,25 +306,15 @@ public class InvoiceService {
     invoiceFormRepository.saveInvoiceForm(invoiceForm);
   }
 
-  public GeneratedDocument generateDistinctInvoice(Worker worker, InvoiceForm invoiceForm) {
-    var workerContracts =
-        contractRepository.findAllByWorker(worker).stream()
-            .sorted(comparing(Contract::entranceInstant, Comparator.reverseOrder()))
-            .toList();
-    var isFullTimeEmployee =
-        !workerContracts.isEmpty() && workerContracts.getFirst().level().type() == fullTimeEmployee;
-
-    return isFullTimeEmployee
-        ? generatePaySlip(worker, invoiceForm.yearMonth())
-        : extractInvoiceForm(worker, invoiceForm);
-  }
-
   public PaySlipForm generatePaySlip(Worker worker, YearMonth yearMonth) {
     var contract =
         contractRepository.findActiveContractByWorker(worker).stream()
             .filter(contract1 -> contract1.level().type() == fullTimeEmployee)
             .findFirst()
-            .get();
+            .orElseThrow(
+                () ->
+                    new NoSuchElementException(
+                        "No active fullTimeEmployee contract found for worker " + worker.code()));
 
     var taxes = taxRepository.findAll();
     var earnedCredits = earnedCreditRepository.findAllByWorkerAndYearMonth(worker, yearMonth);
@@ -336,41 +331,64 @@ public class InvoiceService {
             .map(credit -> credit.getAmount(grossAmount))
             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    var taxableGrossSalary = grossAmount.add(taxableCreditsTotalAmount);
+    var totalTaxableSalary = grossAmount.add(taxableCreditsTotalAmount);
     var basePaidLeave = contract.level().paidLeaveDaysNumber();
-    var employeeTotalTaxAmount =
+
+    // resolues une seule fois ici (base + reduction pour charge) : le PDF (InvoicePDFGenerator)
+    // ne fait plus que lire resolvedTaxes, jamais de recalcul cote affichage.
+    var resolvedDeductions =
         taxes.stream()
-            .filter(tax -> tax.getDeductionType() == DeductionType.TAX)
-            .map(tax -> tax.resolve(taxableGrossSalary))
-            .map(TaxAmount::employeeContributionValue)
+            .filter(tax -> tax.getDeductionType() == DeductionType.DEDUCTION)
+            .map(tax -> new ResolvedTax(tax, tax.resolve(totalTaxableSalary)))
+            .toList();
+
+    var employeeTotalTaxAmount =
+        resolvedDeductions.stream()
+            .map(resolvedTax -> resolvedTax.amount().employeeContributionValue())
             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
     var employerTotalTaxAmount =
-        taxes.stream()
-            .filter(tax -> tax.getDeductionType() == DeductionType.TAX)
-            .map(tax -> tax.resolve(taxableGrossSalary))
-            .map(TaxAmount::employerContributionValue)
+        resolvedDeductions.stream()
+            .map(resolvedTax -> resolvedTax.amount().employerContributionValue())
             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    // 2000 Ar par enfant a charge, deduit directement de l'IRSA (reduction pour charge de famille)
     var reductionForDependents =
         BigDecimal.valueOf(worker.kidsNumber() == null ? 0 : worker.kidsNumber())
             .multiply(BigDecimal.valueOf(2000));
-    var deductionTotalAmount =
+
+    var amountAfterTaxes = totalTaxableSalary.subtract(employeeTotalTaxAmount);
+    var resolvedTaxType =
         taxes.stream()
-            .filter(tax -> tax.getDeductionType() == DeductionType.DEDUCTION)
-            .map(tax -> tax.resolve(taxableGrossSalary))
-            .map(TaxAmount::employeeContributionValue)
-            .reduce(BigDecimal.ZERO, BigDecimal::add)
-            .subtract(reductionForDependents)
-            .max(BigDecimal.ZERO);
+            .filter(tax -> tax.getDeductionType() == DeductionType.TAX)
+            .map(
+                tax -> {
+                  var resolved = tax.resolve(amountAfterTaxes);
+                  var reducedEmployeeAmount =
+                      resolved
+                          .employeeContributionValue()
+                          .subtract(reductionForDependents)
+                          .max(BigDecimal.ZERO);
+                  return new ResolvedTax(
+                      tax,
+                      new TaxAmount(resolved.employerContributionValue(), reducedEmployeeAmount));
+                })
+            .toList();
+
+    var deductionTotalAmount =
+        resolvedTaxType.stream()
+            .map(resolvedTax -> resolvedTax.amount().employeeContributionValue())
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    var resolvedTaxes =
+        Stream.concat(resolvedDeductions.stream(), resolvedTaxType.stream()).toList();
+
     var deductionAndTaxTotal = deductionTotalAmount.add(employeeTotalTaxAmount);
-    var amountAfterTaxes = taxableGrossSalary.subtract(employeeTotalTaxAmount);
     var netAmount =
-        taxableGrossSalary
+        totalTaxableSalary
             .subtract(employeeTotalTaxAmount)
             .add(notTaxableCreditsTotalAmount)
             .subtract(deductionTotalAmount);
+
     var takenPaidLeave = missionExecutionRepository.getPaidLeaveCountByWorker(worker, yearMonth);
     var takenPaidLeaveTheMonthBefore =
         missionExecutionRepository.getPaidLeaveCountByWorker(worker, yearMonth.minusMonths(1));
@@ -378,27 +396,20 @@ public class InvoiceService {
     var paidLeave =
         new PaidLeave(
             basePaidLeave, takenPaidLeave, notTakenPaidLeaveTheMonthBefore, basePaidLeave);
-    var increment =
-        invoiceReferenceRepository
-            .findInvoiceRefByWorkerByYearMonth(worker, yearMonth.plusMonths(1))
-            .map(InvoiceReference::autoincrement)
-            .orElse(0);
-    var invoiceRef =
-        new InvoiceReference(UUID.randomUUID().toString(), yearMonth, increment + 1, worker);
     return new PaySlipForm(
         null,
         yearMonth == null ? YearMonth.from(now()) : yearMonth,
         grossAmount,
         netAmount,
-        taxes,
+        resolvedTaxes,
         employeeTotalTaxAmount,
         deductionTotalAmount,
         deductionAndTaxTotal,
         employerTotalTaxAmount,
-        taxableGrossSalary,
+        totalTaxableSalary,
         paidLeave,
         amountAfterTaxes,
         earnedCredits,
-        invoiceRef);
+        reductionForDependents);
   }
 }

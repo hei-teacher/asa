@@ -33,14 +33,14 @@ class ContractServiceIT extends FacadeIT {
   }
 
   @Test
-  void ended_contract_computes_remaining_days_within_its_own_date_range() {
-    // contract entrance=2024-01-01, endInstant=2024-06-01, duration=80 days, no
-    // mission_execution for this worker in the fixtures
+  void ended_contract_has_zero_remaining_days() {
+    // contract entrance=2024-01-01, endInstant=2024-06-01 : endInstant is set, so it is not an
+    // active contract (active = endInstant IS NULL)
     var worker = newWorker();
 
     var actual = contractService.getRemainingDaysOnActiveContractOrZero(worker);
 
-    assertEquals(80d, actual);
+    assertEquals(0d, actual);
   }
 
   private Worker studentWorker() {

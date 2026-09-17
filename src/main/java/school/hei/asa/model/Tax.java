@@ -31,10 +31,18 @@ public class Tax {
     if (bracketsForSide.isEmpty()) {
       return BigDecimal.ZERO;
     }
-    return findBracket(bracketsForSide, base)
-        .map(bracket -> calculatePercentageValue(bracket.rate(), base).max(bracket.defaultValue()))
+    // une base imposable ne peut pas etre negative (ex: une retenue diverse plus grosse que le
+    // salaire) : on la ramene a 0 plutot que de laisser la recherche de tranche echouer.
+    var nonNegativeBase = base.max(BigDecimal.ZERO);
+    return findBracket(bracketsForSide, nonNegativeBase)
+        .map(
+            bracket ->
+                calculatePercentageValue(bracket.rate(), nonNegativeBase)
+                    .max(bracket.defaultValue()))
         .orElseThrow(
-            () -> new RuntimeException(String.format("The number %s is not supported", base)));
+            () ->
+                new RuntimeException(
+                    String.format("The number %s is not supported", nonNegativeBase)));
   }
 
   private Optional<TaxProgression> findBracket(

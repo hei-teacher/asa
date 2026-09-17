@@ -9,7 +9,7 @@ public record PaySlipForm(
     YearMonth yearMonth,
     BigDecimal grossAmount,
     BigDecimal netAmount,
-    List<Tax> taxes,
+    List<ResolvedTax> resolvedTaxes,
     BigDecimal employeeTotalTaxAmount,
     BigDecimal deductionTotalAmount,
     BigDecimal deductionAndTaxTotal,
@@ -18,5 +18,5 @@ public record PaySlipForm(
     PaidLeave paidLeave,
     BigDecimal amountAfterTaxes,
     List<EarnedCredit> credits,
-    InvoiceReference invoiceReference)
+    BigDecimal reductionForDependents)
     implements GeneratedDocument {}

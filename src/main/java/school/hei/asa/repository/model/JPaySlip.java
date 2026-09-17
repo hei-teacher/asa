@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.List;
@@ -20,6 +21,10 @@ import org.hibernate.annotations.BatchSize;
 public class JPaySlip {
   @Id private String id;
 
+  @ManyToOne
+  @JoinColumn(name = "worker_code")
+  private JWorker worker;
+
   @Column(name = "year_month", nullable = false)
   private String yearMonth;
 
@@ -33,10 +38,13 @@ public class JPaySlip {
   private BigDecimal totalAmount;
 
   @Column(name = "paid_leave_amount")
-  private Integer paidLeaveAmount;
+  private Double paidLeaveAmount;
 
   @Column(name = "taken_paid_leave")
-  private Integer takenPaidLeave;
+  private Double takenPaidLeave;
+
+  @Column(name = "left_paid_leave")
+  private Double leftPaidLeave;
 
   @Column(name = "leave_base_amount")
   private BigDecimal leaveBaseAmount;

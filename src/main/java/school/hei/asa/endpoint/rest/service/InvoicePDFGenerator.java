@@ -23,7 +23,6 @@ import org.thymeleaf.context.Context;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.file.FileWriter;
-import school.hei.asa.model.DeductionType;
 import school.hei.asa.model.EarnedCredit;
 import school.hei.asa.model.Worker;
 import school.hei.asa.number.NumberParser;
@@ -97,13 +96,13 @@ public class InvoicePDFGenerator {
 
     context.setVariable("payslipGrossAmount", format(grossAmount));
     context.setVariable("payslipTaxableGrossAmount", format(taxableBase));
+    context.setVariable("payslipAmountAfterTaxes", format(paySlip.amountAfterTaxes()));
     context.setVariable("payslipNetAmount", format(paySlip.netAmount()));
     context.setVariable("payslipEmployeeTotalTaxAmount", format(paySlip.employeeTotalTaxAmount()));
     context.setVariable("payslipEmployerTotalTaxAmount", format(paySlip.employerTotalTaxAmount()));
     context.setVariable("payslipDeductionTotalAmount", format(paySlip.deductionTotalAmount()));
     context.setVariable("payslipDeductionAndTaxTotal", format(paySlip.deductionAndTaxTotal()));
     context.setVariable("paidLeave", paySlip.paidLeave());
-    context.setVariable("invoiceReference", paySlip.invoiceReference());
 
     var activeContract = contractRepository.findActiveContractByWorker(worker);
     context.setVariable("contractCategory", activeContract.map(c -> c.level().code()).orElse("-"));
@@ -116,34 +115,22 @@ public class InvoicePDFGenerator {
             .map(c -> c.endInstant() == null ? "-" : formatInstant(c.endInstant()))
             .orElse("-"));
 
-    // 2000 Ar par enfant a charge, deduit de chaque taxe de type DEDUCTION (IRSA) -
-    // doit rester coherent avec InvoiceService.generatePaySlip.
-    var kidsNumber = worker.kidsNumber() == null ? 0 : worker.kidsNumber();
-    var reductionForDependents = BigDecimal.valueOf(kidsNumber).multiply(BigDecimal.valueOf(2000));
-    context.setVariable("payslipReductionForDependents", format(reductionForDependents));
+    context.setVariable("payslipReductionForDependents", format(paySlip.reductionForDependents()));
 
+    // les montants sont deja resolus (base + reduction pour charge appliquees) par
+    // InvoiceService.generatePaySlip - ici on ne fait plus que lire et formater.
     Map<String, String> taxEmployeeAmounts = new HashMap<>();
     Map<String, String> taxEmployerAmounts = new HashMap<>();
-    var socialContributionEmployee = BigDecimal.ZERO;
-    var socialContributionEmployer = BigDecimal.ZERO;
-    for (var tax : paySlip.taxes()) {
-      var amount = tax.resolve(taxableBase);
-      var employeeAmount = amount.employeeContributionValue();
-      if (tax.getDeductionType() == DeductionType.DEDUCTION) {
-        employeeAmount = employeeAmount.subtract(reductionForDependents).max(BigDecimal.ZERO);
-      }
-      taxEmployeeAmounts.put(tax.getId(), format(employeeAmount));
-      taxEmployerAmounts.put(tax.getId(), format(amount.employerContributionValue()));
-      if (tax.getDeductionType() == DeductionType.TAX) {
-        socialContributionEmployee = socialContributionEmployee.add(employeeAmount);
-        socialContributionEmployer =
-            socialContributionEmployer.add(amount.employerContributionValue());
-      }
+    for (var resolvedTax : paySlip.resolvedTaxes()) {
+      taxEmployeeAmounts.put(
+          resolvedTax.tax().getId(), format(resolvedTax.amount().employeeContributionValue()));
+      taxEmployerAmounts.put(
+          resolvedTax.tax().getId(), format(resolvedTax.amount().employerContributionValue()));
     }
     context.setVariable("taxEmployeeAmounts", taxEmployeeAmounts);
     context.setVariable("taxEmployerAmounts", taxEmployerAmounts);
-    context.setVariable("totalCotisationEmployee", format(socialContributionEmployee));
-    context.setVariable("totalCotisationEmployer", format(socialContributionEmployer));
+    context.setVariable("totalCotisationEmployee", format(paySlip.employeeTotalTaxAmount()));
+    context.setVariable("totalCotisationEmployer", format(paySlip.employerTotalTaxAmount()));
 
     var earnedByCode = new HashMap<String, EarnedCredit>();
     for (var earnedCredit : paySlip.credits()) {

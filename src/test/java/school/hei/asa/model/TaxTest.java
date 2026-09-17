@@ -12,7 +12,7 @@ class TaxTest {
     return new Tax(
         "IRSA",
         "IRSA",
-        DeductionType.DEDUCTION,
+        DeductionType.TAX,
         List.of(
             new TaxProgression(
                 0d,
@@ -81,12 +81,21 @@ class TaxTest {
   }
 
   @Test
+  void a_negative_base_is_clamped_to_zero_instead_of_throwing() {
+    // une retenue diverse peut rendre le salaire imposable negatif : la tranche 0 (avec son
+    // plancher de 3 000) doit s'appliquer plutot que de faire planter la resolution.
+    var result = irsa().resolve(BigDecimal.valueOf(-450000));
+
+    assertEquals(0, BigDecimal.valueOf(3000).compareTo(result.employeeContributionValue()));
+  }
+
+  @Test
   void a_base_outside_every_bracket_throws() {
     var tax =
         new Tax(
             "IRSA",
             "IRSA",
-            DeductionType.DEDUCTION,
+            DeductionType.TAX,
             List.of(
                 new TaxProgression(
                     0d,

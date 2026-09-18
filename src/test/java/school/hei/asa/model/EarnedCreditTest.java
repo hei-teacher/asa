@@ -40,7 +40,9 @@ class EarnedCreditTest {
 
   @Test
   void a_neutral_zero_rate_credit_gives_a_zero_amount_regardless_of_units() {
-    var credit = new Credit("INDEMNITES_DIVERSES", "INDEMNITES_DIVERSES", "Indemnites diverses", 1d, 0d, true);
+    var credit =
+        new Credit(
+            "INDEMNITES_DIVERSES", "INDEMNITES_DIVERSES", "Indemnites diverses", 1d, 0d, true);
     var earnedCredit = new EarnedCredit("id", credit, 5d, YearMonth.of(2026, 4), null);
 
     var result = earnedCredit.getAmount(BigDecimal.valueOf(450000));

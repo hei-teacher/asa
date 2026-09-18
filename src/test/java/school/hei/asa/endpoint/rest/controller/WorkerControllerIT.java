@@ -50,7 +50,7 @@ class WorkerControllerIT extends FacadeIT {
             "nif",
             "stat");
     model = mock(Model.class);
-    var level = new ContractLevel("levelCode", studentContractor, null, 55_556d);
+    var level = new ContractLevel("levelCode", studentContractor, null, 55_556d, null);
     var mockContract =
         new Contract(
             authenticatedWorker, "DevSecOps", level, Instant.now(), null, null, null, null);

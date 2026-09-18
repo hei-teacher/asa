@@ -72,7 +72,7 @@ class FinancialPlanServiceIT extends FacadeIT {
         new Contract(
             fteWorker,
             "jobTitle",
-            new ContractLevel("level", fullTimeEmployee, FTE_MONTHLY_PAY, null),
+            new ContractLevel("level", fullTimeEmployee, FTE_MONTHLY_PAY, null, null),
             JAN1_2026.atStartOfDay(ZoneId.systemDefault()).toInstant(),
             null,
             null,

@@ -44,7 +44,7 @@ public class InvoiceServiceIT extends FacadeIT {
         new Contract(
             newWorker(),
             "job",
-            new ContractLevel("code", studentContractor, null, 55_556d),
+            new ContractLevel("code", studentContractor, null, 55_556d, null),
             Instant.now(),
             null,
             Duration.ofDays(100),
@@ -156,7 +156,7 @@ public class InvoiceServiceIT extends FacadeIT {
         new Contract(
             worker,
             "Senior Dev",
-            new ContractLevel("L2", studentContractor, null, 80_000d),
+            new ContractLevel("L2", studentContractor, null, 80_000d, null),
             Instant.parse("2026-01-15T00:00:00Z"),
             null,
             Duration.ofDays(30),
@@ -166,7 +166,7 @@ public class InvoiceServiceIT extends FacadeIT {
         new Contract(
             worker,
             "Junior Dev",
-            new ContractLevel("L1", studentContractor, null, 50_000d),
+            new ContractLevel("L1", studentContractor, null, 50_000d, null),
             Instant.parse("2025-01-01T00:00:00Z"),
             null,
             Duration.ofDays(365),
@@ -213,7 +213,7 @@ public class InvoiceServiceIT extends FacadeIT {
         new Contract(
             worker,
             "Dev",
-            new ContractLevel("L1", studentContractor, null, 60_000d),
+            new ContractLevel("L1", studentContractor, null, 60_000d, null),
             Instant.parse("2025-01-01T00:00:00Z"),
             null,
             Duration.ofDays(365),

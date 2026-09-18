@@ -13,7 +13,7 @@ class EarnedCreditRepositoryTest extends FacadeIT {
 
   @Test
   void find_all_by_worker_and_year_month_returns_the_earned_credit() {
-    var worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
+    var worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "", null, null);
 
     var actual = earnedCreditRepository.findAllByWorkerAndYearMonth(worker, YearMonth.of(2026, 1));
 
@@ -23,7 +23,7 @@ class EarnedCreditRepositoryTest extends FacadeIT {
 
   @Test
   void find_all_by_worker_and_year_month_returns_empty_when_nothing_earned() {
-    var worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
+    var worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "", null, null);
 
     var actual = earnedCreditRepository.findAllByWorkerAndYearMonth(worker, YearMonth.of(2020, 1));
 

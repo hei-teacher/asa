@@ -24,12 +24,12 @@ public class ContractRepositoryTest extends FacadeIT {
   @Test
   void fetch_by_year_between() {
     var actual = contractRepository.findByYearBetween(2024, 2026);
-    Assertions.assertEquals(4, actual.size());
+    Assertions.assertEquals(6, actual.size());
     Assertions.assertTrue(
         actual.stream().anyMatch(contract -> contract.worker().code().equals("W-P-2024-01")));
   }
 
   private Worker newWorker() {
-    return new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
+    return new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "", null, null);
   }
 }

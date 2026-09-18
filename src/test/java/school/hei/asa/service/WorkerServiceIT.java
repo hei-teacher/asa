@@ -45,13 +45,16 @@ public class WorkerServiceIT extends FacadeIT {
   }
 
   private List<Worker> workersFromYear() {
-    var worker1 = new Worker("W-101", "John", null, null, null, null, null, null);
-    var worker2 = new Worker("W-P-2024-01", "Lita Andria", null, null, null, null, null, null);
-    var worker3 = new Worker("worker-code", "code", null, null, null, null, null, null);
+    var worker1 = new Worker("W-101", "John", null, null, null, null, null, null, null, null);
+    var worker2 =
+        new Worker("W-P-2024-01", "Lita Andria", null, null, null, null, null, null, null, null);
+    var worker3 = new Worker("worker-code", "code", null, null, null, null, null, null, null, null);
     var worker4 =
         new Worker(
             "no-remaining-days-worker",
             "No Remaining Days Worker",
+            null,
+            null,
             null,
             null,
             null,
@@ -63,12 +66,15 @@ public class WorkerServiceIT extends FacadeIT {
   }
 
   private List<Worker> workersFromDateRange() {
-    var worker1 = new Worker("W-101", "John", null, null, null, null, null, null);
-    var worker2 = new Worker("W-P-2024-01", "Lita Andria", null, null, null, null, null, null);
+    var worker1 = new Worker("W-101", "John", null, null, null, null, null, null, null, null);
+    var worker2 =
+        new Worker("W-P-2024-01", "Lita Andria", null, null, null, null, null, null, null, null);
     var worker3 =
         new Worker(
             "no-remaining-days-worker",
             "No Remaining Days Worker",
+            null,
+            null,
             null,
             null,
             null,

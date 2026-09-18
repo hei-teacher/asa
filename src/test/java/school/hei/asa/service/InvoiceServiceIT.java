@@ -75,7 +75,7 @@ public class InvoiceServiceIT extends FacadeIT {
             null,
             null,
             null);
-    var worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
+    var worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "", null, null);
 
     // Sauvegarde réelle en base de données
     invoiceService.saveInvoiceReference(invoiceData, worker);
@@ -253,6 +253,7 @@ public class InvoiceServiceIT extends FacadeIT {
   }
 
   private Worker newWorker() {
-    return new Worker("w-code", "name", "email", "fullname", "address", "city", "nif", "stat");
+    return new Worker(
+        "w-code", "name", "email", "fullname", "address", "city", "nif", "stat", null, null);
   }
 }

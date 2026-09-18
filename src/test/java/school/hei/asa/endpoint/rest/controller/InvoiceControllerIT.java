@@ -61,7 +61,9 @@ class InvoiceControllerIT extends FacadeITMockedThirdParties {
             "address",
             "random city",
             "nif",
-            "stat");
+            "stat",
+            null,
+            null);
     bankAccount = new BankAccount("", "", "", "", "", authenticatedWorker);
     model = mock(Model.class);
     when(thInvoiceService.generateInvoiceFileName(any(Worker.class)))

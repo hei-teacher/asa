@@ -55,7 +55,9 @@ class FinancialPlanServiceIT extends FacadeIT {
             "address",
             "random city",
             "nif",
-            "stat");
+            "stat",
+            null,
+            null);
 
     var fteWorker =
         new Worker(
@@ -66,7 +68,9 @@ class FinancialPlanServiceIT extends FacadeIT {
             "address",
             "random city",
             "nif",
-            "stat");
+            "stat",
+            null,
+            null);
 
     var fteContract =
         new Contract(

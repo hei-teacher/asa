@@ -44,10 +44,10 @@ class ContractServiceIT extends FacadeIT {
   }
 
   private Worker studentWorker() {
-    return new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
+    return new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "", null, null);
   }
 
   private Worker newWorker() {
-    return new Worker("W-101", "John", "", "", "", "", "", "");
+    return new Worker("W-101", "John", "", "", "", "", "", "", null, null);
   }
 }

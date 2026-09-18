@@ -2,7 +2,6 @@ package school.hei.asa.repository.jrepository;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,10 +31,9 @@ public interface JContractRepository extends JpaRepository<JContract, String> {
   @Query(
       """
       SELECT c FROM JContract c
-      WHERE c.worker = ?1
+      WHERE c.worker.code = ?1
         AND c.endInstant IS NULL
       ORDER BY c.entranceInstant DESC
       """)
   Optional<JContract> findActiveContractByWorker(@Param("workerCode") String workerCode);
-
 }

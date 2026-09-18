@@ -61,7 +61,7 @@ class PaySlipGenerationIT extends FacadeIT {
 
   @Test
   void throws_a_clear_error_when_worker_has_no_active_full_time_employee_contract() {
-    // W-101 n'a qu'un contrat partnerContractor deja termine (endInstant fixe)
+    // W-101 n'a qu'un contrat partnerContractor (jamais fullTimeEmployee)
     var worker = new Worker("W-101", "John", "", "", "", "", "", "", null, null);
 
     var exception =

@@ -46,17 +46,25 @@ public class WorkerServiceIT extends FacadeIT {
 
   private List<Worker> workersFromYear() {
     var worker1 = new Worker("W-101", "John", null, null, null, null, null, null, null, null);
-    var worker2 = new Worker("W-P-2024-01", "Lita Andria", null, null, null, null, null, null, null, null);
-    var worker3 = new Worker("worker-code", "code", null, null, null, null, null, null, null, null);
+    var worker2 =
+        new Worker("W-P-2024-01", "Lita Andria", null, null, null, null, null, null, null, null);
+    var worker3 =
+        new Worker("W-PAYSLIP-01", "Rina Rakoto", null, null, null, null, null, null, null, null);
+    var worker4 = new Worker("worker-code", "code", null, null, null, null, null, null, null, null);
 
-    return List.of(worker1, worker2, worker3);
+    return List.of(worker1, worker2, worker3, worker4);
   }
 
   private List<Worker> workersFromDateRange() {
-    var worker1 = new Worker("W-101", "John", null, null, null, null, null, null, null, null);
-    var worker2 =
+    var worker1 =
+        new Worker("W-ENDED-01", "Ended Worker", null, null, null, null, null, null, null, null);
+    var worker2 = new Worker("W-101", "John", null, null, null, null, null, null, null, null);
+    var worker3 =
         new Worker("W-P-2024-01", "Lita Andria", null, null, null, null, null, null, null, null);
+    var worker4 =
+        new Worker("W-PAYSLIP-01", "Rina Rakoto", null, null, null, null, null, null, null, null);
+    var worker5 = new Worker("worker-code", "code", null, null, null, null, null, null, null, null);
 
-    return List.of(worker1, worker2);
+    return List.of(worker1, worker2, worker3, worker4, worker5);
   }
 }

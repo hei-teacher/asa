@@ -13,6 +13,7 @@ import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,9 @@ import school.hei.asa.service.ContractService;
 public class ThContractService {
   private final ContractService contractService;
   private final ThContractMapper thContractMapper;
-  private final DateTimeFormatter localDateFormatter = ofPattern("dd MMM yyyy");
+  // locale fixee explicitement : sans elle, le format depend de la locale par defaut de la JVM
+  // (ex: "01 Jan 2025" en anglais vs "01 janv. 2025" en francais selon l'environnement).
+  private final DateTimeFormatter localDateFormatter = ofPattern("dd MMM yyyy", Locale.FRANCE);
 
   public Map<Worker, List<ThContract>> totalWorkDaysPerWorker() {
     var totalWorkDaysPerWorker = contractService.totalWorkDaysPerWorker();

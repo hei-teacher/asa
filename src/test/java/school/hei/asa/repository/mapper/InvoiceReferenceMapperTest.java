@@ -39,7 +39,8 @@ public class InvoiceReferenceMapperTest {
   }
 
   private Worker newWorker() {
-    return new Worker("code", "code", "email", "fullname", "address", "city", "NIF", "STAT");
+    return new Worker(
+        "code", "code", "email", "fullname", "address", "city", "NIF", "STAT", null, null);
   }
 
   private JInvoiceReference newJInvoiceDetails() {

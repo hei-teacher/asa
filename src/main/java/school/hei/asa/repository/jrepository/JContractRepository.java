@@ -30,9 +30,10 @@ public interface JContractRepository extends JpaRepository<JContract, String> {
 
   @Query(
       """
-        SELECT c FROM JContract c
-        WHERE c.endInstant IS NULL
-        AND c.worker.code = :workerCode
+      SELECT c FROM JContract c
+      WHERE c.worker.code = ?1
+        AND c.endInstant IS NULL
+      ORDER BY c.entranceInstant DESC
       """)
   Optional<JContract> findActiveContractByWorker(@Param("workerCode") String workerCode);
 }

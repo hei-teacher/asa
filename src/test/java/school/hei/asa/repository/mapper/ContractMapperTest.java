@@ -60,7 +60,7 @@ public class ContractMapperTest {
   }
 
   private Contract newModel(Worker w, DailyExecution de) {
-    var level = new ContractLevel("level", studentContractor, null, 50_000.);
+    var level = new ContractLevel("level", studentContractor, null, 50_000., null);
     return new Contract(
         w, "job title", level, newInstant(), null, Duration.ofDays(100), null, "DUMMY_BUCKET");
   }
@@ -80,7 +80,8 @@ public class ContractMapperTest {
   }
 
   private Worker newWorker() {
-    return new Worker("code", "code", "email", "fullname", "address", "city", "NIF", "STAT");
+    return new Worker(
+        "code", "code", "email", "fullname", "address", "city", "NIF", "STAT", null, null);
   }
 
   private JContractLevel newJWorkerLevel() {

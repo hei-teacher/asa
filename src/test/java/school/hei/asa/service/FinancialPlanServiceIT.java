@@ -55,7 +55,9 @@ class FinancialPlanServiceIT extends FacadeIT {
             "address",
             "random city",
             "nif",
-            "stat");
+            "stat",
+            null,
+            null);
 
     var fteWorker =
         new Worker(
@@ -66,13 +68,15 @@ class FinancialPlanServiceIT extends FacadeIT {
             "address",
             "random city",
             "nif",
-            "stat");
+            "stat",
+            null,
+            null);
 
     var fteContract =
         new Contract(
             fteWorker,
             "jobTitle",
-            new ContractLevel("level", fullTimeEmployee, FTE_MONTHLY_PAY, null),
+            new ContractLevel("level", fullTimeEmployee, FTE_MONTHLY_PAY, null, null),
             JAN1_2026.atStartOfDay(ZoneId.systemDefault()).toInstant(),
             null,
             null,

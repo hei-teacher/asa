@@ -75,7 +75,9 @@ public class InvoiceController {
     var worker = workerToModelAdder.apply(new WorkerModelAdderParam(null, workerCodeOrAuth), model);
     var invoice = thInvoiceService.extractInvoice(worker, invoiceForm);
 
-    File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
+    File pdfFile =
+        invoicePDFGenerator.apply(
+            worker, invoice.invoiceData(), thInvoiceService.resolveTemplateName(worker));
     FileSystemResource resource = new FileSystemResource(pdfFile);
     return ResponseEntity.ok()
         .contentType(APPLICATION_PDF)
@@ -90,7 +92,9 @@ public class InvoiceController {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(new WorkerModelAdderParam(null, workerCodeOrAuth), model);
     var invoice = thInvoiceService.extractInvoice(worker, invoiceForm);
-    File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
+    File pdfFile =
+        invoicePDFGenerator.apply(
+            worker, invoice.invoiceData(), thInvoiceService.resolveTemplateName(worker));
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();
     log.info("invoice id : {}", invoice.invoiceData().id());
     log.info("saving reference to database...");

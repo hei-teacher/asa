@@ -20,4 +20,6 @@ public class Worker {
   private final String city;
   private final String nif;
   private final String stat;
+  private final Integer kidsNumber;
+  private final String cnapsRef;
 }

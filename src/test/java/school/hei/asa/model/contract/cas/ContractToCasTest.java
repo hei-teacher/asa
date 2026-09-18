@@ -145,7 +145,7 @@ public class ContractToCasTest {
     return new Contract(
         mock(Worker.class),
         "jobTitle",
-        new ContractLevel("level", studentContractor, null, (double) dailyPay),
+        new ContractLevel("level", studentContractor, null, (double) dailyPay, null),
         toInstant(entranceDate),
         null,
         Duration.ofDays(nbDays),
@@ -157,7 +157,7 @@ public class ContractToCasTest {
     return new Contract(
         mock(Worker.class),
         "jobTitle",
-        new ContractLevel("level", partnerContractor, null, (double) dailyPay),
+        new ContractLevel("level", partnerContractor, null, (double) dailyPay, null),
         toInstant(entranceDate),
         null,
         Duration.ofDays(nbDays),
@@ -169,7 +169,7 @@ public class ContractToCasTest {
     return new Contract(
         mock(Worker.class),
         "jobTitle",
-        new ContractLevel("level", fullTimeEmployee, (double) monthlyPay, null),
+        new ContractLevel("level", fullTimeEmployee, (double) monthlyPay, null, null),
         toInstant(entranceDate),
         null,
         null,

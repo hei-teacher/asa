@@ -11,6 +11,10 @@ public class ContractLevelMapper {
     var jLevel = jContract.getLevel();
     var jType = jLevel.getType();
     return new ContractLevel(
-        jContract.getLevel().getCode(), jType, jLevel.getMonthlyPay(), jLevel.getDailyPay());
+        jContract.getLevel().getCode(),
+        jType,
+        jLevel.getMonthlyPay(),
+        jLevel.getDailyPay(),
+        jLevel.getPaidLeaveDaysNumber());
   }
 }

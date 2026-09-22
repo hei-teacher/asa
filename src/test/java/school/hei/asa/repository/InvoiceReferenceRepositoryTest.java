@@ -19,7 +19,8 @@ public class InvoiceReferenceRepositoryTest extends FacadeIT {
 
   @Test
   void fetch_all_invoice_details_for_worker() {
-    var worker = new Worker("W-P-2024-01", "Lita Andria", null, null, null, null, null, null);
+    var worker =
+        new Worker("W-P-2024-01", "Lita Andria", null, null, null, null, null, null, null, null);
     var invoiceDetails1 =
         new InvoiceReference("id1", YearMonth.parse("2025-01", ofPattern("yyyy-MM")), 1, worker);
     var invoiceDetails2 =
@@ -37,7 +38,7 @@ public class InvoiceReferenceRepositoryTest extends FacadeIT {
 
   @Test
   void save_invoice_details_for_worker() {
-    var worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
+    var worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "", null, null);
     var expected =
         new InvoiceReference("id5", YearMonth.parse("2025-05", ofPattern("yyyy-MM")), 5, worker);
 

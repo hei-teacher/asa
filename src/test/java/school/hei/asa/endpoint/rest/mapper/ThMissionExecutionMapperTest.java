@@ -73,6 +73,6 @@ class ThMissionExecutionMapperTest extends FacadeIT {
   }
 
   private Worker newWorker() {
-    return new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
+    return new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "", null, null);
   }
 }

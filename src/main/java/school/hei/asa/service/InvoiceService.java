@@ -4,6 +4,7 @@ import static java.time.LocalDate.now;
 import static java.time.ZoneOffset.UTC;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
+import static school.hei.asa.model.contract.ContractType.fullTimeEmployee;
 import static school.hei.asa.number.NullToBigDecimalHanlder.toBigDecimalOrZero;
 import static school.hei.asa.number.NullToBigDecimalHanlder.toDoubleOrZero;
 
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -19,18 +21,25 @@ import org.springframework.stereotype.Service;
 import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
 import school.hei.asa.model.BankAccount;
+import school.hei.asa.model.DeductionType;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
+import school.hei.asa.model.PaidLeave;
+import school.hei.asa.model.PaySlipForm;
+import school.hei.asa.model.ResolvedTax;
+import school.hei.asa.model.TaxAmount;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.number.NumberConverter;
 import school.hei.asa.number.NumberParser;
 import school.hei.asa.repository.BankAccountRepository;
 import school.hei.asa.repository.ContractRepository;
+import school.hei.asa.repository.EarnedCreditRepository;
 import school.hei.asa.repository.InvoiceFormRepository;
 import school.hei.asa.repository.InvoiceReferenceRepository;
 import school.hei.asa.repository.MissionExecutionRepository;
+import school.hei.asa.repository.TaxRepository;
 
 @Slf4j
 @AllArgsConstructor
@@ -45,6 +54,8 @@ public class InvoiceService {
   private final MissionService missionService;
   private final EventProducer<NewInvoiceGenerated> eventProducer;
   private final InvoiceFormRepository invoiceFormRepository;
+  private final TaxRepository taxRepository;
+  private final EarnedCreditRepository earnedCreditRepository;
 
   public Optional<InvoiceReference> findInvoiceReference(Worker worker, YearMonth yearMonth) {
     var invoiceReferenceList = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker);
@@ -94,14 +105,34 @@ public class InvoiceService {
           null);
     }
     var contractLevel = contract.level();
-    Double unitPrice =
-        switch (contractLevel.type()) {
-          case partnerContractor, studentContractor -> contractLevel.dailyPay();
-          case fullTimeEmployee -> null;
-        };
+    var description = contract.jobTitle();
+
+    if (contractLevel.type() == fullTimeEmployee) {
+      var monthlyPay = toBigDecimalOrZero(contractLevel.monthlyPay());
+      var parsedMonthlyPay = numberConverter.convertToWords(numberParser.parseToNumber(monthlyPay));
+
+      return new InvoiceForm(
+          null,
+          null,
+          null,
+          null,
+          description,
+          1d,
+          monthlyPay,
+          monthlyPay,
+          null,
+          null,
+          null,
+          null,
+          null,
+          monthlyPay,
+          parsedMonthlyPay,
+          null);
+    }
+
+    var unitPrice = contractLevel.dailyPay();
     var amount = toBigDecimalOrZero(totalDaysWorked * toDoubleOrZero(unitPrice));
     var parsedAmount = numberConverter.convertToWords(numberParser.parseToNumber(amount));
-    var description = contract.jobTitle();
 
     return new InvoiceForm(
         null,
@@ -146,6 +177,10 @@ public class InvoiceService {
             .getFirst();
 
     return String.format("FAC-NUM-2025-%s-%s.pdf", worker.code(), savedInvoice.autoincrement());
+  }
+
+  public String generatePaySlipFileName(Worker worker, YearMonth yearMonth) {
+    return String.format("FDP_Numer_2026_%s_%s.pdf", worker.code(), yearMonth);
   }
 
   public String getInvoiceBucketKey(Worker worker, YearMonth yearMonth) {
@@ -269,5 +304,110 @@ public class InvoiceService {
   public void saveInvoice(InvoiceForm invoiceForm, Worker worker) {
     saveInvoiceReference(invoiceForm, worker);
     invoiceFormRepository.saveInvoiceForm(invoiceForm);
+  }
+
+  public PaySlipForm generatePaySlip(Worker worker, YearMonth yearMonth) {
+    var contract =
+        contractRepository.findActiveContractByWorker(worker).stream()
+            .filter(contract1 -> contract1.level().type() == fullTimeEmployee)
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    new NoSuchElementException(
+                        "No active fullTimeEmployee contract found for worker " + worker.code()));
+
+    var taxes = taxRepository.findAll();
+    var earnedCredits = earnedCreditRepository.findAllByWorkerAndYearMonth(worker, yearMonth);
+    var grossAmount = toBigDecimalOrZero(contract.level().monthlyPay());
+    var taxableCreditsTotalAmount =
+        earnedCredits.stream()
+            .filter(credit -> credit.getCredit().getTaxable())
+            .map(credit -> credit.getAmount(grossAmount))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    var notTaxableCreditsTotalAmount =
+        earnedCredits.stream()
+            .filter(credit -> !credit.getCredit().getTaxable())
+            .map(credit -> credit.getAmount(grossAmount))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    var totalTaxableSalary = grossAmount.add(taxableCreditsTotalAmount);
+    var basePaidLeave = contract.level().paidLeaveDaysNumber();
+
+    var resolvedDeductions =
+        taxes.stream()
+            .filter(tax -> tax.getDeductionType() == DeductionType.DEDUCTION)
+            .map(tax -> new ResolvedTax(tax, tax.resolve(totalTaxableSalary)))
+            .toList();
+
+    var employeeTotalTaxAmount =
+        resolvedDeductions.stream()
+            .map(resolvedTax -> resolvedTax.amount().employeeContributionValue())
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    var employerTotalTaxAmount =
+        resolvedDeductions.stream()
+            .map(resolvedTax -> resolvedTax.amount().employerContributionValue())
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    var reductionForDependents =
+        BigDecimal.valueOf(worker.kidsNumber() == null ? 0 : worker.kidsNumber())
+            .multiply(BigDecimal.valueOf(2000));
+
+    var amountAfterTaxes = totalTaxableSalary.subtract(employeeTotalTaxAmount);
+    var resolvedTaxType =
+        taxes.stream()
+            .filter(tax -> tax.getDeductionType() == DeductionType.TAX)
+            .map(
+                tax -> {
+                  var resolved = tax.resolve(amountAfterTaxes);
+                  var reducedEmployeeAmount =
+                      resolved
+                          .employeeContributionValue()
+                          .subtract(reductionForDependents)
+                          .max(BigDecimal.ZERO);
+                  return new ResolvedTax(
+                      tax,
+                      new TaxAmount(resolved.employerContributionValue(), reducedEmployeeAmount));
+                })
+            .toList();
+
+    var deductionTotalAmount =
+        resolvedTaxType.stream()
+            .map(resolvedTax -> resolvedTax.amount().employeeContributionValue())
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    var resolvedTaxes =
+        Stream.concat(resolvedDeductions.stream(), resolvedTaxType.stream()).toList();
+
+    var deductionAndTaxTotal = deductionTotalAmount.add(employeeTotalTaxAmount);
+    var netAmount =
+        totalTaxableSalary
+            .subtract(employeeTotalTaxAmount)
+            .add(notTaxableCreditsTotalAmount)
+            .subtract(deductionTotalAmount);
+
+    var takenPaidLeave = missionExecutionRepository.getPaidLeaveCountByWorker(worker, yearMonth);
+    var takenPaidLeaveTheMonthBefore =
+        missionExecutionRepository.getPaidLeaveCountByWorker(worker, yearMonth.minusMonths(1));
+    var notTakenPaidLeaveTheMonthBefore = basePaidLeave - takenPaidLeaveTheMonthBefore;
+    var paidLeave =
+        new PaidLeave(
+            basePaidLeave, takenPaidLeave, notTakenPaidLeaveTheMonthBefore, basePaidLeave);
+    return new PaySlipForm(
+        null,
+        yearMonth == null ? YearMonth.from(now()) : yearMonth,
+        grossAmount,
+        netAmount,
+        resolvedTaxes,
+        employeeTotalTaxAmount,
+        deductionTotalAmount,
+        deductionAndTaxTotal,
+        employerTotalTaxAmount,
+        totalTaxableSalary,
+        paidLeave,
+        amountAfterTaxes,
+        earnedCredits,
+        reductionForDependents);
   }
 }

@@ -26,5 +26,6 @@ public class EnvConf {
     registry.add("MAX_LATENESS_REPORT", () -> 4);
     registry.add("SENSITIVE_WORKERS_CODES", () -> "W-059,W-00");
     registry.add("LOW_REMAINING_DAYS_THRESHOLD", () -> 10);
+    registry.add("spring.datasource.hikari.maximum-pool-size", () -> "2");
   }
 }

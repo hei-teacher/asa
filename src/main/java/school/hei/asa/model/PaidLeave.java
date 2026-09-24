@@ -8,10 +8,10 @@ import lombok.Getter;
 public class PaidLeave {
   private Double base;
   private Double taken;
-  private Double notTakenTheLastMonth;
+  private Double leftTheMonthBefore;
   private Double earnedPaidLeave;
 
   public Double getLeft() {
-    return notTakenTheLastMonth + base - taken;
+    return leftTheMonthBefore + base - taken;
   }
 }

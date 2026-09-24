@@ -19,6 +19,7 @@ import school.hei.asa.endpoint.rest.controller.mapper.ThInvoiceFormMapper;
 import school.hei.asa.endpoint.rest.model.th.ThInvoice;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.endpoint.rest.model.th.ThMonthInvoiceStatus;
+import school.hei.asa.model.GeneratedDocument;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.ContractType;
 import school.hei.asa.service.ContractService;
@@ -43,6 +44,10 @@ public class ThInvoiceService {
   public void saveInvoice(ThInvoiceForm thInvoiceForm, Worker worker) {
     var invoiceData = thInvoiceFormMapper.toDomain(thInvoiceForm);
     invoiceService.saveInvoice(invoiceData, worker);
+  }
+
+  public GeneratedDocument generateAndSave(ThInvoiceForm thInvoiceForm, Worker worker) {
+    return invoiceService.generateAndSave(worker, thInvoiceFormMapper.toDomain(thInvoiceForm));
   }
 
   public List<ThMonthInvoiceStatus> getMonthInvoiceStatusForWorker(Worker worker, int year) {

@@ -10,57 +10,50 @@ import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
 import school.hei.asa.file.bucket.BucketComponent;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
-import school.hei.asa.model.InvoiceReference;
-import school.hei.asa.service.InvoiceService;
+import school.hei.asa.repository.WorkerRepository;
 import school.hei.asa.service.mapper.InternetAddressMapper;
 
 @Service
 public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated> {
-  private static final String INVOICES_FOLDER = "invoices/";
   private final String accountants;
   private final Mailer mailer;
   private final BucketComponent bucketComponent;
-  private final InvoiceService invoiceService;
+  private final WorkerRepository workerRepository;
   private final InternetAddressMapper emailService;
 
   public NewInvoiceGeneratedService(
       @Value("${ACCOUNTANTS}") String accountants,
       Mailer mailer,
       BucketComponent bucketComponent,
-      InvoiceService invoiceService,
+      WorkerRepository workerRepository,
       InternetAddressMapper emailService) {
     this.accountants = accountants;
     this.mailer = mailer;
     this.bucketComponent = bucketComponent;
-    this.invoiceService = invoiceService;
+    this.workerRepository = workerRepository;
     this.emailService = emailService;
   }
 
   @Override
   public void accept(NewInvoiceGenerated event) {
-    InvoiceReference invoiceReference = invoiceService.getInvoiceReference(event.getInvoiceId());
+    var worker = workerRepository.findByCode(event.getWorkerCode());
 
-    var listEmailsWithWorkerEmail =
-        String.format("%s,%s", accountants, invoiceReference.worker().email());
+    var listEmailsWithWorkerEmail = String.format("%s,%s", accountants, worker.email());
     var emailList = Arrays.asList(listEmailsWithWorkerEmail.split(","));
     var internetAddresses = emailService.toInternetAddresses(emailList);
 
-    var fileName =
-        invoiceService.getInvoiceBucketKey(invoiceReference.worker(), invoiceReference.yearMonth());
-    File pdf = bucketComponent.download(INVOICES_FOLDER + fileName);
+    File pdf = bucketComponent.download(event.getBucketKey());
     var email =
         new Email(
             internetAddresses.getFirst(),
             internetAddresses.stream().skip(1).toList(),
             List.of(),
-            String.format(
-                "ASA INVOICE GENERATED - %s - %s",
-                invoiceReference.worker().name(), invoiceReference.yearMonth()),
+            String.format("ASA PAYMENT DOCUMENT - %s - %s", worker.name(), event.getYearMonth()),
             String.format(
                 "Hello,\n"
-                    + " Please find attached the generated invoice for %s for the month of %s.Best"
-                    + " regards,",
-                invoiceReference.worker().name(), invoiceReference.yearMonth()),
+                    + " Please find attached your payment document for %s for the month of"
+                    + " %s.Best regards,",
+                worker.name(), event.getYearMonth()),
             List.of(pdf));
 
     mailer.accept(email);

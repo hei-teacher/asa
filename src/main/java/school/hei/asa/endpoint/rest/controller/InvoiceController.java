@@ -26,7 +26,6 @@ import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.endpoint.rest.service.InvoicePDFGenerator;
 import school.hei.asa.endpoint.rest.service.ThInvoiceService;
 import school.hei.asa.file.bucket.BucketComponent;
-import school.hei.asa.repository.PaySlipRepository;
 import school.hei.asa.service.InvoiceService;
 
 @Slf4j
@@ -40,10 +39,6 @@ public class InvoiceController {
   private final InvoiceService invoiceService;
   private final BucketComponent bucketComponent;
   private final ThInvoiceService thInvoiceService;
-  private final PaySlipRepository paySlipRepository;
-  private static final String INVOICES_FOLDER = "invoices/";
-  private static final String PAY_SLIPS_FOLDER = "payslips/";
-  private static final String PAY_SLIP_TEMPLATE = "pay-slip";
 
   @GetMapping("/invoice")
   public String getInvoicePage(
@@ -100,28 +95,16 @@ public class InvoiceController {
     File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), template);
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();
 
-    String fileName;
-    String bucketFolder;
-    if (PAY_SLIP_TEMPLATE.equals(template)) {
-      var yearMonth =
-          YearMonth.parse(invoiceForm.yearMonth(), DateTimeFormatter.ofPattern("yyyy-MM"));
-      log.info("saving payslip to database...");
-      var paySlip = invoiceService.generatePaySlip(worker, yearMonth);
-      paySlipRepository.save(paySlip, worker);
-      fileName = invoiceService.generatePaySlipFileName(worker, yearMonth);
-      bucketFolder = PAY_SLIPS_FOLDER;
-    } else {
-      log.info("invoice id : {}", invoice.invoiceData().id());
-      log.info("saving reference to database...");
-      thInvoiceService.saveInvoice(invoice.invoiceData(), worker);
-      fileName = thInvoiceService.generateInvoiceFileName(worker);
-      bucketFolder = INVOICES_FOLDER;
-      log.info("sending mail copies...");
-      invoiceService.sendGenerateInvoiceEvent(invoice.invoiceData().id());
-    }
-    log.info("uploading...");
-    log.info("fileName = {}", fileName);
-    bucketComponent.upload(pdfFile, bucketFolder + fileName);
+    log.info("saving document to database...");
+    var document = thInvoiceService.generateAndSave(invoice.invoiceData(), worker);
+    var fileName = invoiceService.resolvePdfName(worker, document);
+    var bucketKey = invoiceService.resolveBucketFolder(document) + fileName;
+
+    log.info("uploading {}...", bucketKey);
+    bucketComponent.upload(pdfFile, bucketKey);
+
+    log.info("sending mail copies...");
+    invoiceService.sendGeneratedDocumentEvent(worker, document, bucketKey);
 
     return ResponseEntity.ok()
         .header(CONTENT_DISPOSITION, "attachment; filename=" + fileName)

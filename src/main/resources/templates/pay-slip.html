@@ -248,7 +248,7 @@
             <div class="field-row net"><span class="field-label">Net à payer</span><span class="field-fill"></span><span class="field-value" th:text="${payslipNetAmount}"></span></div>
         </td>
         <td>
-            <div class="field-row"><span class="field-label">Solde congé non pris mois précéd.</span><span class="field-fill"></span><span class="field-value" th:text="${paidLeave.notTakenTheLastMonth}"></span></div>
+            <div class="field-row"><span class="field-label">Solde congé non pris mois précéd.</span><span class="field-fill"></span><span class="field-value" th:text="${paidLeave.leftTheMonthBefore}"></span></div>
             <div class="field-row"><span class="field-label">Congé pris de la période</span><span class="field-fill"></span><span class="field-value" th:text="${paidLeave.taken}"></span></div>
             <div class="field-row"><span class="field-label">Congé acquis période</span><span class="field-fill"></span><span class="field-value" th:text="${paidLeave.base}"></span></div>
             <div class="field-row"><span class="field-label" style="font-weight: 700;">Solde congé</span><span class="field-fill"></span><span class="field-value" style="font-weight: 700;" th:text="${paidLeave.left}"></span></div>

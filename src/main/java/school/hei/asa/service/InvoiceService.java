@@ -22,6 +22,7 @@ import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.endpoint.event.model.NewInvoiceGenerated;
 import school.hei.asa.model.BankAccount;
 import school.hei.asa.model.DeductionType;
+import school.hei.asa.model.GeneratedDocument;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.InvoiceReference;
 import school.hei.asa.model.MissionExecution;
@@ -39,12 +40,16 @@ import school.hei.asa.repository.EarnedCreditRepository;
 import school.hei.asa.repository.InvoiceFormRepository;
 import school.hei.asa.repository.InvoiceReferenceRepository;
 import school.hei.asa.repository.MissionExecutionRepository;
+import school.hei.asa.repository.PaySlipRepository;
 import school.hei.asa.repository.TaxRepository;
 
 @Slf4j
 @AllArgsConstructor
 @Service
 public class InvoiceService {
+  private static final String INVOICES_FOLDER = "invoices/";
+  private static final String PAY_SLIPS_FOLDER = "payslips/";
+
   private final NumberConverter numberConverter;
   private final NumberParser numberParser;
   private final ContractRepository contractRepository;
@@ -56,6 +61,7 @@ public class InvoiceService {
   private final InvoiceFormRepository invoiceFormRepository;
   private final TaxRepository taxRepository;
   private final EarnedCreditRepository earnedCreditRepository;
+  private final PaySlipRepository paySlipRepository;
 
   public Optional<InvoiceReference> findInvoiceReference(Worker worker, YearMonth yearMonth) {
     var invoiceReferenceList = invoiceReferenceRepository.findInvoiceReferenceByWorker(worker);
@@ -201,8 +207,15 @@ public class InvoiceService {
   }
 
   @SneakyThrows
-  public void sendGenerateInvoiceEvent(String invoiceId) {
-    var event = NewInvoiceGenerated.builder().invoiceId(invoiceId).build();
+  public void sendGeneratedDocumentEvent(
+      Worker worker, GeneratedDocument document, String bucketKey) {
+    var event =
+        NewInvoiceGenerated.builder()
+            .invoiceId(document.id())
+            .workerCode(worker.code())
+            .bucketKey(bucketKey)
+            .yearMonth(document.yearMonth().toString())
+            .build();
     eventProducer.accept(List.of(event));
   }
 
@@ -306,6 +319,32 @@ public class InvoiceService {
     invoiceFormRepository.saveInvoiceForm(invoiceForm);
   }
 
+  @Transactional
+  public GeneratedDocument generateAndSave(Worker worker, InvoiceForm invoiceForm) {
+    if (hasActiveFullTimeContract(worker)) {
+      var paySlip = generatePaySlip(worker, invoiceForm.yearMonth());
+      paySlipRepository.save(paySlip, worker);
+      return paySlip;
+    }
+    saveInvoice(invoiceForm, worker);
+    return invoiceForm;
+  }
+
+  public String resolvePdfName(Worker worker, GeneratedDocument document) {
+    return document instanceof PaySlipForm
+        ? generatePaySlipFileName(worker, document.yearMonth())
+        : generateInvoiceFileName(worker);
+  }
+
+  public String resolveBucketFolder(GeneratedDocument document) {
+    return document instanceof PaySlipForm ? PAY_SLIPS_FOLDER : INVOICES_FOLDER;
+  }
+
+  private boolean hasActiveFullTimeContract(Worker worker) {
+    return contractRepository.findActiveContractByWorker(worker).stream()
+        .anyMatch(contract -> contract.level().type() == fullTimeEmployee);
+  }
+
   public PaySlipForm generatePaySlip(Worker worker, YearMonth yearMonth) {
     var contract =
         contractRepository.findActiveContractByWorker(worker).stream()
@@ -388,12 +427,10 @@ public class InvoiceService {
             .subtract(deductionTotalAmount);
 
     var takenPaidLeave = missionExecutionRepository.getPaidLeaveCountByWorker(worker, yearMonth);
-    var takenPaidLeaveTheMonthBefore =
-        missionExecutionRepository.getPaidLeaveCountByWorker(worker, yearMonth.minusMonths(1));
-    var notTakenPaidLeaveTheMonthBefore = basePaidLeave - takenPaidLeaveTheMonthBefore;
+    var leftPaidLeaveTheMonthBefore =
+        paySlipRepository.findLeftPaidLeave(worker, yearMonth.minusMonths(1)).orElse(0.0);
     var paidLeave =
-        new PaidLeave(
-            basePaidLeave, takenPaidLeave, notTakenPaidLeaveTheMonthBefore, basePaidLeave);
+        new PaidLeave(basePaidLeave, takenPaidLeave, leftPaidLeaveTheMonthBefore, basePaidLeave);
     return new PaySlipForm(
         null,
         yearMonth == null ? YearMonth.from(now()) : yearMonth,

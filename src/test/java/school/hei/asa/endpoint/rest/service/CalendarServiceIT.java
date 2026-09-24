@@ -182,7 +182,6 @@ class CalendarServiceIT extends FacadeIT {
     var product = new Product("pcode", "pname", "pdescription");
     var careProduct = new Product(DUMMY_CARE_PRODUCT_CODE, "", "");
     productRepository.save(product);
-    productRepository.save(careProduct);
     var mission1 = new Mission("mission1-code", "title1", "description1", 10, product);
     var mission2 = new Mission("mission2-code", "title2", "description2", 2, product);
     var careMission = new Mission("careMission-code", "", "", 2, careProduct);

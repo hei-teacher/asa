@@ -19,16 +19,23 @@ import school.hei.asa.endpoint.rest.controller.mapper.ThInvoiceFormMapper;
 import school.hei.asa.endpoint.rest.model.th.ThInvoice;
 import school.hei.asa.endpoint.rest.model.th.ThInvoiceForm;
 import school.hei.asa.endpoint.rest.model.th.ThMonthInvoiceStatus;
+import school.hei.asa.model.GeneratedDocument;
 import school.hei.asa.model.Worker;
+import school.hei.asa.model.contract.ContractType;
+import school.hei.asa.service.ContractService;
 import school.hei.asa.service.InvoiceService;
 
 @Slf4j
 @AllArgsConstructor
 @Service
 public class ThInvoiceService {
+  private static final String INVOICE_TEMPLATE = "invoice";
+  private static final String PAY_SLIP_TEMPLATE = "pay-slip";
+
   private final InvoiceService invoiceService;
   private final ThInvoiceFormMapper thInvoiceFormMapper;
   private final InvoicePDFGenerator invoicePDFGenerator;
+  private final ContractService contractService;
 
   public String generateInvoiceFileName(Worker worker) {
     return invoiceService.generateInvoiceFileName(worker);
@@ -37,6 +44,10 @@ public class ThInvoiceService {
   public void saveInvoice(ThInvoiceForm thInvoiceForm, Worker worker) {
     var invoiceData = thInvoiceFormMapper.toDomain(thInvoiceForm);
     invoiceService.saveInvoice(invoiceData, worker);
+  }
+
+  public GeneratedDocument generateAndSave(ThInvoiceForm thInvoiceForm, Worker worker) {
+    return invoiceService.generateAndSave(worker, thInvoiceFormMapper.toDomain(thInvoiceForm));
   }
 
   public List<ThMonthInvoiceStatus> getMonthInvoiceStatusForWorker(Worker worker, int year) {
@@ -51,6 +62,15 @@ public class ThInvoiceService {
         .toList();
   }
 
+  public String resolveTemplateName(Worker worker) {
+    return contractService
+        .findActiveContractByWorker(worker)
+        .map(contract -> contract.level().type())
+        .filter(ContractType.fullTimeEmployee::equals)
+        .map(type -> PAY_SLIP_TEMPLATE)
+        .orElse(INVOICE_TEMPLATE);
+  }
+
   @SneakyThrows
   public ThInvoice extractInvoice(Worker worker, ThInvoiceForm invoiceForm) {
     var invoiceData =
@@ -58,7 +78,8 @@ public class ThInvoiceService {
     log.info("mapping invoice to th ...");
     var thInvoiceData = thInvoiceFormMapper.toTh(invoiceData);
     log.info("successfully mapped to th");
-    File data = invoicePDFGenerator.apply(worker, thInvoiceData, "invoice");
+    var invoiceTemplateType = resolveTemplateName(worker);
+    File data = invoicePDFGenerator.apply(worker, thInvoiceData, invoiceTemplateType);
 
     try (PDDocument document = PDDocument.load(data)) {
       PDFRenderer pdfRenderer = new PDFRenderer(document);

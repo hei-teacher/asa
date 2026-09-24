@@ -17,9 +17,9 @@ class SensitiveWorkerFilterTest extends FacadeIT {
 
   @Test
   void sensitive_worker_sees_own_executions_but_not_other_sensitive_workers() {
-    var worker1 = new Worker("W-059", null, null, null, null, null, null, null);
-    var worker2 = new Worker("W-038", null, null, null, null, null, null, null);
-    var worker3 = new Worker("W-037", null, null, null, null, null, null, null);
+    var worker1 = new Worker("W-059", null, null, null, null, null, null, null, null, null);
+    var worker2 = new Worker("W-038", null, null, null, null, null, null, null, null, null);
+    var worker3 = new Worker("W-037", null, null, null, null, null, null, null, null, null);
 
     var de1 =
         new DailyExecution(
@@ -51,9 +51,9 @@ class SensitiveWorkerFilterTest extends FacadeIT {
 
   @Test
   void normal_worker_can_not_see_sensitive_workers_daily_executions() {
-    var worker1 = new Worker("W-059", null, null, null, null, null, null, null);
-    var worker2 = new Worker("W-038", null, null, null, null, null, null, null);
-    var worker3 = new Worker("W-037", null, null, null, null, null, null, null);
+    var worker1 = new Worker("W-059", null, null, null, null, null, null, null, null, null);
+    var worker2 = new Worker("W-038", null, null, null, null, null, null, null, null, null);
+    var worker3 = new Worker("W-037", null, null, null, null, null, null, null, null, null);
 
     var de1 =
         new DailyExecution(
@@ -83,9 +83,9 @@ class SensitiveWorkerFilterTest extends FacadeIT {
 
   @Test
   void normal_worker_can_not_select_sensitives_workers() {
-    var worker1 = new Worker("W-059", null, null, null, null, null, null, null);
-    var worker2 = new Worker("W-038", null, null, null, null, null, null, null);
-    var worker3 = new Worker("W-037", null, null, null, null, null, null, null);
+    var worker1 = new Worker("W-059", null, null, null, null, null, null, null, null, null);
+    var worker2 = new Worker("W-038", null, null, null, null, null, null, null, null, null);
+    var worker3 = new Worker("W-037", null, null, null, null, null, null, null, null, null);
 
     var actual =
         sensitiveWorkerFilter.filterSensitiveWorkers(
@@ -98,9 +98,9 @@ class SensitiveWorkerFilterTest extends FacadeIT {
 
   @Test
   void sensitive_worker_can_self_select() {
-    var worker1 = new Worker("W-059", null, null, null, null, null, null, null);
-    var worker2 = new Worker("W-038", null, null, null, null, null, null, null);
-    var worker3 = new Worker("W-037", null, null, null, null, null, null, null);
+    var worker1 = new Worker("W-059", null, null, null, null, null, null, null, null, null);
+    var worker2 = new Worker("W-038", null, null, null, null, null, null, null, null, null);
+    var worker3 = new Worker("W-037", null, null, null, null, null, null, null, null, null);
 
     var actual =
         sensitiveWorkerFilter.filterSensitiveWorkers(

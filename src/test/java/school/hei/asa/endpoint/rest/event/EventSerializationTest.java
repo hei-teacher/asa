@@ -14,11 +14,14 @@ public class EventSerializationTest {
 
   @Test
   void can_serialize_event() throws JsonProcessingException {
-    var event = new NewInvoiceGenerated("invoiceId");
+    var event = new NewInvoiceGenerated("invoiceId", "W-101", "payslips/doc.pdf", "2025-08");
     var serialized = om.writeValueAsString(event);
     var deserialized = om.readValue(serialized, NewInvoiceGenerated.class);
     assertEquals(event, deserialized);
     assertNotNull(event.getInvoiceId());
+    assertEquals("W-101", deserialized.getWorkerCode());
+    assertEquals("payslips/doc.pdf", deserialized.getBucketKey());
+    assertEquals("2025-08", deserialized.getYearMonth());
     assertEquals(Duration.ofSeconds(45), event.maxConsumerDuration());
     assertEquals(Duration.ofSeconds(30), event.maxConsumerBackoffBetweenRetries());
   }

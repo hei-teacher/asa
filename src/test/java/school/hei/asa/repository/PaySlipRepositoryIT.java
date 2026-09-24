@@ -49,4 +49,24 @@ class PaySlipRepositoryIT extends FacadeIT {
             .toList();
     assertEquals(1, matching.size());
   }
+
+  @Test
+  void find_left_paid_leave_returns_the_saved_balance() {
+    var worker = payslipWorker();
+    var yearMonth = YearMonth.of(2026, 5);
+    var paySlip = invoiceService.generatePaySlip(worker, yearMonth);
+    paySlipRepository.save(paySlip, worker);
+
+    var leftPaidLeave = paySlipRepository.findLeftPaidLeave(worker, yearMonth);
+
+    assertTrue(leftPaidLeave.isPresent());
+    assertEquals(paySlip.paidLeave().getLeft(), leftPaidLeave.get());
+  }
+
+  @Test
+  void find_left_paid_leave_is_empty_when_nothing_was_saved() {
+    var leftPaidLeave = paySlipRepository.findLeftPaidLeave(payslipWorker(), YearMonth.of(2020, 1));
+
+    assertTrue(leftPaidLeave.isEmpty());
+  }
 }

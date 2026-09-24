@@ -9,6 +9,7 @@ import static org.springframework.http.HttpStatus.OK;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.YearMonth;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,7 @@ import school.hei.asa.endpoint.rest.service.ThInvoiceService;
 import school.hei.asa.file.hash.FileHash;
 import school.hei.asa.file.hash.FileHashAlgorithm;
 import school.hei.asa.model.BankAccount;
+import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.Worker;
 import school.hei.asa.repository.BankAccountRepository;
 import school.hei.asa.service.InvoiceService;
@@ -157,6 +159,28 @@ class InvoiceControllerIT extends FacadeITMockedThirdParties {
     var fakeInvoice = new ThInvoice("base64dummy", invoiceForm);
     FileHash fileHash = new FileHash(FileHashAlgorithm.NONE, "/invoices");
     when(thInvoiceService.extractInvoice(any(Worker.class), any())).thenReturn(fakeInvoice);
+
+    var domainInvoiceForm =
+        new InvoiceForm(
+            "inv-001",
+            YearMonth.of(2025, 8),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
+    invoiceService.saveInvoiceReference(domainInvoiceForm, authenticatedWorker);
+    when(thInvoiceService.generateAndSave(any(), any(Worker.class))).thenReturn(domainInvoiceForm);
+
     var response = invoiceController.generateInvoice(model, authentication, invoiceForm);
 
     Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());

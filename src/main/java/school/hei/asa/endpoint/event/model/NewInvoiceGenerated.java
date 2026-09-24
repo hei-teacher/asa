@@ -18,6 +18,9 @@ import lombok.ToString;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NewInvoiceGenerated extends PojaEvent {
   private String invoiceId;
+  private String workerCode;
+  private String bucketKey;
+  private String yearMonth;
 
   @Override
   public Duration maxConsumerDuration() {

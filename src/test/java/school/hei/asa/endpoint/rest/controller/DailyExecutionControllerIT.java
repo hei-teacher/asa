@@ -135,6 +135,54 @@ class DailyExecutionControllerIT extends FacadeIT {
   }
 
   @Test
+  void cannot_punch_in_more_work_than_remaining_days() {
+    authenticateAs("no-remaining-days-worker");
+
+    assertThrows(
+        IllegalStateException.class,
+        () ->
+            dailyExecutionController.createDailyExecution(
+                authentication, form("2024-12-02", "mission0-code", "1", null, null)));
+  }
+
+  @Test
+  void can_punch_in_remaining_work_with_care() {
+    authenticateAs("no-remaining-days-worker");
+
+    var view =
+        dailyExecutionController.createDailyExecution(
+            authentication, form("2024-12-03", "mission0-code", "0.5", "care-mission-code", "0.5"));
+
+    assertEquals("redirect:/work-and-care-calendar", view);
+  }
+
+  private void authenticateAs(String workerCode) {
+    when(workerFromAuthentication.apply(authentication))
+        .thenReturn(Optional.of(workerRepository.findByCode(workerCode)));
+  }
+
+  private static ThDailyExecutionForm form(
+      String date, String mission1, String percentage1, String mission2, String percentage2) {
+    return new ThDailyExecutionForm(
+        date,
+        mission1,
+        percentage1,
+        "comment1",
+        mission2,
+        percentage2,
+        "comment2",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null);
+  }
+
+  @Test
   void read_worker_lita_with_duplicate_missions_and_percentage_over_100_ok() {
     LocalDate firstOfJanuary2024 = LocalDate.parse("2024-01-01");
     dailyExecutionRepository.findByWorkerCodeAndDateBetween(

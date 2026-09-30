@@ -4,6 +4,7 @@ import static java.lang.Double.parseDouble;
 import static java.lang.System.lineSeparator;
 import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Locale.ENGLISH;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -28,7 +29,7 @@ import school.hei.asa.service.ContractService;
 public class ThContractService {
   private final ContractService contractService;
   private final ThContractMapper thContractMapper;
-  private final DateTimeFormatter localDateFormatter = ofPattern("dd MMM yyyy");
+  private final DateTimeFormatter localDateFormatter = ofPattern("dd MMM yyyy", ENGLISH);
 
   public Map<Worker, List<ThContract>> totalWorkDaysPerWorker() {
     var totalWorkDaysPerWorker = contractService.totalWorkDaysPerWorker();

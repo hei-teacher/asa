@@ -48,7 +48,9 @@ public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated>
             internetAddresses.getFirst(),
             internetAddresses.stream().skip(1).toList(),
             List.of(),
-            String.format("ASA PAYMENT DOCUMENT - %s - %s", worker.name(), event.getYearMonth()),
+            String.format(
+                "ASA PAYMENT DOCUMENT - %s - %s - %s",
+                worker.code(), worker.name(), event.getYearMonth()),
             String.format(
                 "Hello,\n"
                     + " Please find attached your payment document for %s for the month of"

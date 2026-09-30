@@ -24,7 +24,16 @@ class ThDailyExecutionMapperTest {
     var mission2 = new Mission("mission2-code", "title2", "description2", 2, product);
     var worker =
         new Worker(
-            "worker-code", "code", "email", "full code", "address", "random city", "nif", "stat");
+            "worker-code",
+            "code",
+            "email",
+            "full code",
+            "address",
+            "random city",
+            "nif",
+            "stat",
+            null,
+            null);
     var me1 =
         new MissionExecution(
             mission1, worker, LocalDate.of(2025, 1, 15), 0.4, "comment1", Instant.now());

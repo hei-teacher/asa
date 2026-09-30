@@ -28,4 +28,7 @@ public class JContractLevel {
 
   @Column(name = "daily_pay")
   private Double dailyPay;
+
+  @Column(name = "paidLeaveDaysNumber")
+  private Double paidLeaveDaysNumber;
 }

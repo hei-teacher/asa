@@ -18,7 +18,6 @@ import school.hei.asa.service.InvoiceService;
 @AllArgsConstructor
 public class DownloadController {
   private static final String CONTRACTS_FOLDER = "contracts/";
-  private static final String INVOICES_FOLDER = "invoices/";
   private final WorkerFromAuthentication workerFromAuthentication;
   private final WorkerToModelAdder workerToModelAdder;
   private final BucketComponent bucketComponent;
@@ -44,12 +43,9 @@ public class DownloadController {
     var worker =
         workerToModelAdder.apply(
             new WorkerModelAdderParam(workerCodeOrAuth, workerCodeOrAuth), model);
-    var invoiceBucketKey = invoiceService.getInvoiceBucketKey(worker, date);
+    var bucketKey = invoiceService.resolveBucketKey(worker, date);
 
-    String presignedUrl =
-        bucketComponent
-            .presign(INVOICES_FOLDER + invoiceBucketKey, Duration.ofMinutes(5))
-            .toString();
+    String presignedUrl = bucketComponent.presign(bucketKey, Duration.ofMinutes(5)).toString();
     return "redirect:" + presignedUrl;
   }
 }

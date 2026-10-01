@@ -340,6 +340,17 @@ public class InvoiceService {
     return document instanceof PaySlipForm ? PAY_SLIPS_FOLDER : INVOICES_FOLDER;
   }
 
+  public boolean hasGeneratedDocument(Worker worker, YearMonth yearMonth) {
+    return findInvoiceReference(worker, yearMonth).isPresent()
+        || paySlipRepository.existsByWorkerAndYearMonth(worker, yearMonth);
+  }
+
+  public String resolveBucketKey(Worker worker, YearMonth yearMonth) {
+    return paySlipRepository.existsByWorkerAndYearMonth(worker, yearMonth)
+        ? PAY_SLIPS_FOLDER + generatePaySlipFileName(worker, yearMonth)
+        : INVOICES_FOLDER + getInvoiceBucketKey(worker, yearMonth);
+  }
+
   private boolean hasActiveFullTimeContract(Worker worker) {
     return contractRepository.findActiveContractByWorker(worker).stream()
         .anyMatch(contract -> contract.level().type() == fullTimeEmployee);

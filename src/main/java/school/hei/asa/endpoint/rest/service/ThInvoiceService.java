@@ -56,8 +56,8 @@ public class ThInvoiceService {
         .map(
             month -> {
               var yearMonth = YearMonth.of(year, month.getValue());
-              var invoiceReference = invoiceService.findInvoiceReference(worker, yearMonth);
-              return new ThMonthInvoiceStatus(yearMonth, invoiceReference.isPresent());
+              var hasGeneratedDocument = invoiceService.hasGeneratedDocument(worker, yearMonth);
+              return new ThMonthInvoiceStatus(yearMonth, hasGeneratedDocument);
             })
         .toList();
   }

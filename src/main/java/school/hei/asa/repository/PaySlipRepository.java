@@ -28,4 +28,11 @@ public class PaySlipRepository {
         .findByWorkerCodeAndYearMonth(worker.code(), yearMonth.toString())
         .map(JPaySlip::getLeftPaidLeave);
   }
+
+  @Transactional
+  public boolean existsByWorkerAndYearMonth(Worker worker, YearMonth yearMonth) {
+    return jPaySlipRepository
+        .findByWorkerCodeAndYearMonth(worker.code(), yearMonth.toString())
+        .isPresent();
+  }
 }

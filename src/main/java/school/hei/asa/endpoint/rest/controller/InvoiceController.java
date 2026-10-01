@@ -39,6 +39,7 @@ public class InvoiceController {
   private final InvoiceService invoiceService;
   private final BucketComponent bucketComponent;
   private final ThInvoiceService thInvoiceService;
+  private static final String INVOICES_FOLDER = "invoices/";
 
   @GetMapping("/invoice")
   public String getInvoicePage(
@@ -74,9 +75,7 @@ public class InvoiceController {
     var worker = workerToModelAdder.apply(new WorkerModelAdderParam(null, workerCodeOrAuth), model);
     var invoice = thInvoiceService.extractInvoice(worker, invoiceForm);
 
-    File pdfFile =
-        invoicePDFGenerator.apply(
-            worker, invoice.invoiceData(), thInvoiceService.resolveTemplateName(worker));
+    File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     FileSystemResource resource = new FileSystemResource(pdfFile);
     return ResponseEntity.ok()
         .contentType(APPLICATION_PDF)
@@ -91,21 +90,19 @@ public class InvoiceController {
     var workerCodeOrAuth = workerFromAuthentication.apply(authentication).get().code();
     var worker = workerToModelAdder.apply(new WorkerModelAdderParam(null, workerCodeOrAuth), model);
     var invoice = thInvoiceService.extractInvoice(worker, invoiceForm);
-    var template = thInvoiceService.resolveTemplateName(worker);
-    File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), template);
+    File pdfFile = invoicePDFGenerator.apply(worker, invoice.invoiceData(), "invoice");
     var fileBytes = new FileInputStream(pdfFile).readAllBytes();
-
-    log.info("saving document to database...");
-    var document = thInvoiceService.generateAndSave(invoice.invoiceData(), worker);
-    var fileName = invoiceService.resolvePdfName(worker, document);
-    var bucketKey = invoiceService.resolveBucketFolder(document) + fileName;
-
-    log.info("uploading {}...", bucketKey);
-    bucketComponent.upload(pdfFile, bucketKey);
+    log.info("invoice id : {}", invoice.invoiceData().id());
+    log.info("saving reference to database...");
+    thInvoiceService.saveInvoice(invoice.invoiceData(), worker);
+    log.info("Generating name for bucket key...");
+    var fileName = thInvoiceService.generateInvoiceFileName(worker);
+    log.info("uploading...");
+    log.info("fileName = {}", fileName);
+    bucketComponent.upload(pdfFile, INVOICES_FOLDER + fileName);
 
     log.info("sending mail copies...");
-    invoiceService.sendGeneratedDocumentEvent(worker, document, bucketKey);
-
+    invoiceService.sendGenerateInvoiceEvent(invoice.invoiceData().id());
     return ResponseEntity.ok()
         .header(CONTENT_DISPOSITION, "attachment; filename=" + fileName)
         .contentType(APPLICATION_PDF)

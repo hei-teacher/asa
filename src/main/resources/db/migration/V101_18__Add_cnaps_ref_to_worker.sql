@@ -1,1 +1,0 @@
-ALTER TABLE worker ADD COLUMN cnaps_ref VARCHAR;

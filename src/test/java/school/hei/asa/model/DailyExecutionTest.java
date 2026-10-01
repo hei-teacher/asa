@@ -16,16 +16,7 @@ class DailyExecutionTest {
     var product = new Product("pcode", "pname", "pdescription");
     var worker =
         new Worker(
-            "worker-code",
-            "code",
-            "email",
-            "full code",
-            "address",
-            "random city",
-            "nif",
-            "stat",
-            null,
-            null);
+            "worker-code", "code", "email", "full code", "address", "random city", "nif", "stat");
     var mission = new Mission("mission-code", "title", "description", 10, product);
     assertThrows(
         IllegalArgumentException.class,
@@ -42,16 +33,7 @@ class DailyExecutionTest {
     var product = new Product("pcode", "pname", "pdescription");
     var worker =
         new Worker(
-            "worker-code",
-            "code",
-            "email",
-            "full code",
-            "address",
-            "random city",
-            "nif",
-            "stat",
-            null,
-            null);
+            "worker-code", "code", "email", "full code", "address", "random city", "nif", "stat");
     var mission = new Mission("mission-code", "title", "description", 10, product);
 
     assertDoesNotThrow(
@@ -75,16 +57,7 @@ class DailyExecutionTest {
     var product = new Product("pcode", "pname", "pdescription");
     var worker =
         new Worker(
-            "worker-code",
-            "code",
-            "email",
-            "full code",
-            "address",
-            "random city",
-            "nif",
-            "stat",
-            null,
-            null);
+            "worker-code", "code", "email", "full code", "address", "random city", "nif", "stat");
     var mission = new Mission("mission-code", "title", "description", 10, product);
     var now = Instant.now();
 

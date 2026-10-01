@@ -66,16 +66,14 @@ class LowRemainingDaysAlertServiceIT extends FacadeIT {
   }
 
   private Worker workerBelowThreshold() {
-    return new Worker(
-        "alert-worker-below", "Alert Worker Below", "", "", "", "", "", "", null, null);
+    return new Worker("alert-worker-below", "Alert Worker Below", "", "", "", "", "", "");
   }
 
   private Worker workerAboveThreshold() {
-    return new Worker(
-        "alert-worker-above", "Alert Worker Above", "", "", "", "", "", "", null, null);
+    return new Worker("alert-worker-above", "Alert Worker Above", "", "", "", "", "", "");
   }
 
   private Worker workerWithoutContract() {
-    return new Worker("alert-worker-none", "Alert Worker None", "", "", "", "", "", "", null, null);
+    return new Worker("alert-worker-none", "Alert Worker None", "", "", "", "", "", "");
   }
 }

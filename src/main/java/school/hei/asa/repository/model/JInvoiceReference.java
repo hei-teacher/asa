@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.Generated;
-import org.hibernate.generator.EventType;
+import org.hibernate.annotations.GenerationTime;
 
 @Entity
 @Table(name = "invoice")
@@ -26,7 +26,7 @@ public class JInvoiceReference {
   @Column(name = "year_month")
   private String yearMonth;
 
-  @Generated(event = EventType.INSERT)
+  @Generated(GenerationTime.INSERT)
   @Column(name = "autoincrement", updatable = false, insertable = false)
   private Integer autoincrement;
 

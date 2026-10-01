@@ -39,17 +39,7 @@ class MissionServiceIT extends FacadeIT {
     var mission1 = new Mission("CA-TEAMBUILDING", "Team Building", "description1", 100, product);
     var mission2 = new Mission("CA-DAYOFF", "Day Off", "description2", 100, product);
     var worker =
-        new Worker(
-            "workerCode",
-            "name",
-            "email",
-            "fullname",
-            "address",
-            "city",
-            "nif",
-            "stat",
-            null,
-            null);
+        new Worker("workerCode", "name", "email", "fullname", "address", "city", "nif", "stat");
     var missionExecution1 =
         new MissionExecution(
             mission1, worker, LocalDate.now(), 0.5d, "team building", Instant.now());

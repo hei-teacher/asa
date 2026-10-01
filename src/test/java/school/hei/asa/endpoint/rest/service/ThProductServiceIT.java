@@ -47,9 +47,7 @@ class ThProductServiceIT extends FacadeIT {
             "address",
             "random city",
             "nif",
-            "stat",
-            null,
-            null);
+            "stat");
     workerRepository.save(authenticatedWorker);
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));

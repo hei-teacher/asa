@@ -25,8 +25,6 @@ public class JWorker {
   private String city;
   private String nif;
   private String stat;
-  private Integer kidsNumber;
-  private String cnapsRef;
 
   @OneToMany
   @JoinColumn(name = "worker_code")

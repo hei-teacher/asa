@@ -55,16 +55,7 @@ class DailyExecutionControllerIT extends FacadeIT {
     authentication = mock(Authentication.class);
     authenticatedWorker =
         new Worker(
-            "worker-code",
-            "code",
-            "email",
-            "full code",
-            "address",
-            "random city",
-            "nif",
-            "stat",
-            null,
-            null);
+            "worker-code", "code", "email", "full code", "address", "random city", "nif", "stat");
     workerRepository.save(authenticatedWorker);
     when(workerFromAuthentication.apply(authentication))
         .thenReturn(Optional.of(authenticatedWorker));

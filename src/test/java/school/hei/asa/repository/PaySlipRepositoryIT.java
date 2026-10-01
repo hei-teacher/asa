@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.YearMonth;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import school.hei.asa.conf.FacadeIT;
@@ -48,6 +49,23 @@ class PaySlipRepositoryIT extends FacadeIT {
             .filter(p -> "2026-04".equals(p.getYearMonth()))
             .toList();
     assertEquals(1, matching.size());
+  }
+
+  @Test
+  void a_saved_payslip_gets_a_uuid_reused_across_saves() {
+    var worker = payslipWorker();
+    var yearMonth = YearMonth.of(2026, 6);
+    var paySlip = invoiceService.generatePaySlip(worker, yearMonth);
+
+    paySlipRepository.save(paySlip, worker);
+    var firstId =
+        jPaySlipRepository.findByWorkerCodeAndYearMonth("W-PAYSLIP-01", "2026-06").get().getId();
+    paySlipRepository.save(paySlip, worker);
+    var secondId =
+        jPaySlipRepository.findByWorkerCodeAndYearMonth("W-PAYSLIP-01", "2026-06").get().getId();
+
+    assertEquals(UUID.fromString(firstId).toString(), firstId);
+    assertEquals(firstId, secondId);
   }
 
   @Test

@@ -46,12 +46,6 @@ public class JPaySlip {
   @Column(name = "left_paid_leave")
   private Double leftPaidLeave;
 
-  @Column(name = "leave_base_amount")
-  private BigDecimal leaveBaseAmount;
-
-  @Column(name = "leave_amount")
-  private BigDecimal leaveAmount;
-
   @ManyToMany
   @JoinTable(
       name = "payslip_tax",

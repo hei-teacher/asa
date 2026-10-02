@@ -31,6 +31,7 @@ import school.hei.asa.repository.WorkerRepository;
 @Service
 @AllArgsConstructor
 public class ContractService {
+  private static final double CLOSE_REMAINING_DAYS_TOLERANCE = 0.01;
   private final WorkerRepository workerRepository;
   private final ContractRepository contractRepository;
   private final DailyExecutionRepository dailyExecutionRepository;
@@ -78,6 +79,13 @@ public class ContractService {
     var actualWorkedDays = getActualWorkedDaysByDateByWorker(startDate, worker.code(), endDate);
     var workedDays = actualWorkedDays.equals("-") ? 0d : Double.parseDouble(actualWorkedDays);
     return contract.duration().toDays() - workedDays;
+  }
+
+  public void closeActiveContractIfNoRemainingDays(Worker worker, LocalDate date) {
+    if (getRemainingDaysOnActiveContractOrZero(worker) <= CLOSE_REMAINING_DAYS_TOLERANCE) {
+      contractRepository.closeActiveContractByWorker(
+          worker, date.atStartOfDay(systemDefault()).toInstant());
+    }
   }
 
   public String getActualWorkedDaysByDateByWorker(

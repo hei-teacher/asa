@@ -1,8 +1,10 @@
 package school.hei.asa.repository.jrepository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -36,4 +38,9 @@ public interface JContractRepository extends JpaRepository<JContract, String> {
       ORDER BY c.entranceInstant DESC
       """)
   Optional<JContract> findActiveContractByWorker(@Param("workerCode") String workerCode);
+
+  @Modifying
+  @Query(
+      "UPDATE JContract c SET c.endInstant = ?2 WHERE c.worker.code = ?1 AND c.endInstant IS NULL")
+  void closeActiveContractByWorker(String workerCode, Instant endInstant);
 }

@@ -48,7 +48,7 @@ import school.hei.asa.repository.TaxRepository;
 @Service
 public class InvoiceService {
   private static final String INVOICES_FOLDER = "invoices/";
-  private static final String PAY_SLIPS_FOLDER = "payslips/";
+  public static final String PAY_SLIPS_FOLDER = "payslips/";
 
   private final NumberConverter numberConverter;
   private final NumberParser numberParser;

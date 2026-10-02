@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,10 @@ public class WorkerServiceIT extends FacadeIT {
         new Worker("W-PAYSLIP-01", "Rina Rakoto", null, null, null, null, null, null, null, null);
     var worker5 = new Worker("worker-code", "code", null, null, null, null, null, null, null, null);
 
-    return List.of(worker1, worker2, worker3, worker4, worker5);
+    return Stream.concat(
+            autoCloseWorkers().stream(),
+            List.of(worker1, worker2, worker3, worker4, worker5).stream())
+        .toList();
   }
 
   private List<Worker> workersFromDateRange() {
@@ -88,6 +92,46 @@ public class WorkerServiceIT extends FacadeIT {
     var worker5 =
         new Worker("W-PAYSLIP-01", "Rina Rakoto", null, null, null, null, null, null, null, null);
 
-    return List.of(worker1, worker2, worker3, worker4, worker5);
+    return Stream.concat(
+            autoCloseWorkers().stream(),
+            List.of(worker1, worker2, worker3, worker4, worker5).stream())
+        .toList();
+  }
+
+  private List<Worker> autoCloseWorkers() {
+    return List.of(
+        new Worker(
+            "auto-close-care-worker",
+            "Auto Close Care Worker",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null),
+        new Worker(
+            "auto-close-partial-worker",
+            "Auto Close Partial Worker",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null),
+        new Worker(
+            "auto-close-worker",
+            "Auto Close Worker",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null));
   }
 }

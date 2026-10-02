@@ -51,7 +51,7 @@ class ContractServiceTest {
             missionService,
             careProductCodeSupplier);
 
-    worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "");
+    worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "", null, null);
   }
 
   @Test
@@ -131,7 +131,7 @@ class ContractServiceTest {
     return new Contract(
         worker,
         "job_title",
-        new ContractLevel("L5P-2026", partnerContractor, 0d, 50000d),
+        new ContractLevel("L5P-2026", partnerContractor, 0d, 50000d, null),
         entranceInstant,
         endInstant,
         Duration.ofDays(durationInDays),

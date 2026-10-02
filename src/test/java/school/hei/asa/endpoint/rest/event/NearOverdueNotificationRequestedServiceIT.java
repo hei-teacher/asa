@@ -36,7 +36,9 @@ public class NearOverdueNotificationRequestedServiceIT extends FacadeIT {
   @Test
   public void send_email_to_unreported_worker_ok() {
     LocalDate date = LocalDate.of(2024, 6, 15);
-    var worker1 = new Worker("W-36", "name", "email", "fullNAme", "address", "city", "nif", "stat");
+    var worker1 =
+        new Worker(
+            "W-36", "name", "email", "fullNAme", "address", "city", "nif", "stat", null, null);
 
     nearOverdueNotificationRequestedService.sendEmailToWorkersWhoDidNotReportYet(
         List.of(worker1), date);
@@ -51,8 +53,12 @@ public class NearOverdueNotificationRequestedServiceIT extends FacadeIT {
 
   @Test
   public void late_reported_days_check_ok() {
-    var worker1 = new Worker("W-36", "name", "email", "fullNAme", "address", "city", "nif", "stat");
-    var worker2 = new Worker("W-37", "name", "email", "fullNAme", "address", "city", "nif", "stat");
+    var worker1 =
+        new Worker(
+            "W-36", "name", "email", "fullNAme", "address", "city", "nif", "stat", null, null);
+    var worker2 =
+        new Worker(
+            "W-37", "name", "email", "fullNAme", "address", "city", "nif", "stat", null, null);
     var date = LocalDate.of(2026, 4, 18);
     when(contractService.findActiveContracts())
         .thenReturn(

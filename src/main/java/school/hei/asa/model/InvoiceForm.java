@@ -20,4 +20,5 @@ public record InvoiceForm(
     BigDecimal extraAmount,
     BigDecimal total,
     String parsedAmount,
-    String rib) {}
+    String rib)
+    implements GeneratedDocument {}

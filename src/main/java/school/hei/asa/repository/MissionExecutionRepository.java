@@ -3,6 +3,7 @@ package school.hei.asa.repository;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import school.hei.asa.model.Worker;
 import school.hei.asa.repository.jrepository.JMissionExecutionRepository;
 import school.hei.asa.repository.mapper.MissionExecutionMapper;
 import school.hei.asa.repository.mapper.WorkerMapper;
+import school.hei.asa.repository.model.JMissionExecution;
 import school.hei.asa.repository.model.WorkerDayPercentageSummary;
 
 @AllArgsConstructor
@@ -56,5 +58,14 @@ public class MissionExecutionRepository {
       LocalDate startDate, LocalDate endDate) {
     return missionExecutionMapper.toDomain(
         jMissionExecutionRepository.findByDateBetween(startDate, endDate));
+  }
+
+  public double getPaidLeaveCountByWorker(Worker worker, YearMonth yearMonth) {
+    var missionExecutions =
+        jMissionExecutionRepository.findPaidLeaveByWorkerByYearMonth(
+            workerMapper.toEntity(worker), yearMonth);
+    return missionExecutions.stream()
+        .map(JMissionExecution::getDayPercentage)
+        .reduce(0.0, Double::sum);
   }
 }

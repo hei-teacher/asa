@@ -111,8 +111,7 @@ public class ThContractService {
             ? LocalDate.parse(thContract.endInstant(), localDateFormatter)
             : now();
 
-    var res =
-        parseDouble(thContract.duration()) - parseDouble(actualWorkedDaysToString(thContract));
+    var res = parseDouble(thContract.duration()) - parseDouble(thContract.actualWorkedDays());
     return formatDays(res);
   }
 

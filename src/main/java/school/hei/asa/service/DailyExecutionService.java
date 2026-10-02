@@ -34,6 +34,9 @@ public class DailyExecutionService {
           "Unable to punch in : only " + remainingDays + " day(s) remaining on your contract.");
     }
     dailyExecutionRepository.save(dailyExecution);
+    if (requestedDays > 0) {
+      contractService.closeActiveContractIfNoRemainingDays(worker, dailyExecution.date());
+    }
     lowRemainingDaysAlertService.sendAlertEmailIfLowRemainingDays(dailyExecution.worker());
   }
 }

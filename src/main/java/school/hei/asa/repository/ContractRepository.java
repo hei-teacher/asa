@@ -1,6 +1,7 @@
 package school.hei.asa.repository;
 
 import jakarta.transaction.Transactional;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -48,5 +49,10 @@ public class ContractRepository {
 
   public List<Contract> findAllActiveContracts() {
     return contractMapper.toDomain(jContractRepository.findActiveContracts());
+  }
+
+  @Transactional
+  public void closeActiveContractByWorker(Worker worker, Instant endInstant) {
+    jContractRepository.closeActiveContractByWorker(worker.code(), endInstant);
   }
 }

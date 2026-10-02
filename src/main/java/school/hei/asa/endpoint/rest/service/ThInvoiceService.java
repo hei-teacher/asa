@@ -71,6 +71,10 @@ public class ThInvoiceService {
         .orElse(INVOICE_TEMPLATE);
   }
 
+  public String resolveDocumentLabel(Worker worker) {
+    return PAY_SLIP_TEMPLATE.equals(resolveTemplateName(worker)) ? "payslip" : "invoice";
+  }
+
   @SneakyThrows
   public ThInvoice extractInvoice(Worker worker, ThInvoiceForm invoiceForm) {
     var invoiceData =

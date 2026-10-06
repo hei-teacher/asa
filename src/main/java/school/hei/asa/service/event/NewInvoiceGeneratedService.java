@@ -11,6 +11,7 @@ import school.hei.asa.file.bucket.BucketComponent;
 import school.hei.asa.mail.Email;
 import school.hei.asa.mail.Mailer;
 import school.hei.asa.repository.WorkerRepository;
+import school.hei.asa.service.InvoiceService;
 import school.hei.asa.service.mapper.InternetAddressMapper;
 
 @Service
@@ -43,19 +44,19 @@ public class NewInvoiceGeneratedService implements Consumer<NewInvoiceGenerated>
     var internetAddresses = emailService.toInternetAddresses(emailList);
 
     File pdf = bucketComponent.download(event.getBucketKey());
+    var document =
+        event.getBucketKey().startsWith(InvoiceService.PAY_SLIPS_FOLDER) ? "payslip" : "invoice";
     var email =
         new Email(
             internetAddresses.getFirst(),
             internetAddresses.stream().skip(1).toList(),
             List.of(),
             String.format(
-                "ASA PAYMENT DOCUMENT - %s - %s - %s",
-                worker.code(), worker.name(), event.getYearMonth()),
+                "ASA %s - %s - %s - %s",
+                document.toUpperCase(), worker.code(), worker.name(), event.getYearMonth()),
             String.format(
-                "Hello,\n"
-                    + " Please find attached your payment document for %s for the month of"
-                    + " %s.Best regards,",
-                worker.name(), event.getYearMonth()),
+                "Hello,\n Please find attached your %s for %s for the month of %s.\nBest regards,",
+                document, worker.name(), event.getYearMonth()),
             List.of(pdf));
 
     mailer.accept(email);

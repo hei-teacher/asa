@@ -166,7 +166,7 @@ class DailyExecutionControllerIT extends FacadeIT {
 
     var view =
         dailyExecutionController.createDailyExecution(
-            authentication, form("2024-12-03", "mission0-code", "0.5", "care-mission-code", "0.5"));
+            authentication, form("2026-03-03", "mission0-code", "0.5", "care-mission-code", "0.5"));
 
     assertEquals("redirect:/work-and-care-calendar", view);
   }
@@ -176,14 +176,14 @@ class DailyExecutionControllerIT extends FacadeIT {
     authenticateAs("auto-close-worker");
 
     dailyExecutionController.createDailyExecution(
-        authentication, form("2024-03-04", "mission0-code", "1", null, null));
+        authentication, form("2026-03-04", "mission0-code", "1", null, null));
 
     var contract =
         contractRepository
             .findAllByWorker(workerRepository.findByCode("auto-close-worker"))
             .getFirst();
     assertEquals(
-        LocalDate.of(2024, 3, 4).atStartOfDay(systemDefault()).toInstant(), contract.endInstant());
+        LocalDate.of(2026, 3, 4).atStartOfDay(systemDefault()).toInstant(), contract.endInstant());
   }
 
   @Test

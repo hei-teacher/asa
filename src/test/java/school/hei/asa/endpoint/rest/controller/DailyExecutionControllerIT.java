@@ -1,9 +1,11 @@
 package school.hei.asa.endpoint.rest.controller;
 
 import static java.time.Month.DECEMBER;
+import static java.time.ZoneId.systemDefault;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -23,12 +25,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import school.hei.asa.conf.FacadeIT;
+import school.hei.asa.endpoint.event.EventProducer;
 import school.hei.asa.endpoint.rest.model.th.ThDailyExecutionForm;
 import school.hei.asa.endpoint.rest.security.SecurityConfig;
 import school.hei.asa.endpoint.rest.security.WorkerFromAuthentication;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.Product;
 import school.hei.asa.model.Worker;
+import school.hei.asa.repository.ContractRepository;
 import school.hei.asa.repository.DailyExecutionRepository;
 import school.hei.asa.repository.MissionRepository;
 import school.hei.asa.repository.ProductRepository;
@@ -42,7 +46,9 @@ class DailyExecutionControllerIT extends FacadeIT {
   @Autowired MissionRepository missionRepository;
   @Autowired DailyExecutionRepository dailyExecutionRepository;
   @Autowired CalendarController calendarController;
+  @Autowired ContractRepository contractRepository;
 
+  @MockBean EventProducer eventProducer;
   @MockBean SecurityConfig securityConfig;
   @MockBean WorkerFromAuthentication workerFromAuthentication;
 
@@ -160,9 +166,50 @@ class DailyExecutionControllerIT extends FacadeIT {
 
     var view =
         dailyExecutionController.createDailyExecution(
-            authentication, form("2024-12-03", "mission0-code", "0.5", "care-mission-code", "0.5"));
+            authentication, form("2026-03-03", "mission0-code", "0.5", "care-mission-code", "0.5"));
 
     assertEquals("redirect:/work-and-care-calendar", view);
+  }
+
+  @Test
+  void punching_last_remaining_day_closes_contract_at_punch_date() {
+    authenticateAs("auto-close-worker");
+
+    dailyExecutionController.createDailyExecution(
+        authentication, form("2026-03-04", "mission0-code", "1", null, null));
+
+    var contract =
+        contractRepository
+            .findAllByWorker(workerRepository.findByCode("auto-close-worker"))
+            .getFirst();
+    assertEquals(
+        LocalDate.of(2026, 3, 4).atStartOfDay(systemDefault()).toInstant(), contract.endInstant());
+  }
+
+  @Test
+  void punching_part_of_remaining_days_keeps_contract_active() {
+    authenticateAs("auto-close-partial-worker");
+
+    dailyExecutionController.createDailyExecution(
+        authentication, form("2024-03-04", "mission0-code", "0.5", "care-mission-code", "0.5"));
+
+    assertTrue(
+        contractRepository
+            .findActiveContractByWorker(workerRepository.findByCode("auto-close-partial-worker"))
+            .isPresent());
+  }
+
+  @Test
+  void punching_only_care_keeps_contract_active() {
+    authenticateAs("auto-close-care-worker");
+
+    dailyExecutionController.createDailyExecution(
+        authentication, form("2024-03-04", "care-mission-code", "1", null, null));
+
+    assertTrue(
+        contractRepository
+            .findActiveContractByWorker(workerRepository.findByCode("auto-close-care-worker"))
+            .isPresent());
   }
 
   private void authenticateAs(String workerCode) {

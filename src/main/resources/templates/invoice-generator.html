@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title th:text="${#strings.capitalize(documentLabel)} + ' Generator'">Invoice Generator</title>
+    <title>Invoice Generator</title>
     <link href="/main.css" rel="stylesheet" />
     <link
       rel="stylesheet"
@@ -25,10 +25,7 @@
     <div class="flex flex-1 overflow-hidden">
       <!-- Left section -->
       <div class="w-1/2 p-5 bg-gray-100 box-border h-full overflow-y-auto">
-        <h1
-          class="text-4xl px-3 font-bold text-[#3F2F6A] mt-3 mb-4"
-          th:text="'Get your ' + ${documentLabel}"
-        >
+        <h1 class="text-4xl px-3 font-bold text-[#3F2F6A] mt-3 mb-4">
           Get your invoice
         </h1>
 
@@ -106,10 +103,7 @@
                 Warning
               </h2>
               <div class="mt-2">
-                <p
-                  class="text-sm font-semibold text-gray-500"
-                  th:text="'Remember, you can only generate the ' + ${documentLabel} + ' once.'"
-                >
+                <p class="text-sm font-semibold text-gray-500">
                   Remember, you can only generate the invoice once.
                 </p>
                 <p class="text-sm text-gray-500">

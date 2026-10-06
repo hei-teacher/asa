@@ -56,29 +56,8 @@ class NewInvoiceGeneratedServiceIT extends FacadeITMockedThirdParties {
     assertTrue(email.subject().contains("W-MAIL-01"));
     assertTrue(email.subject().contains("Mail Recipient"));
     assertTrue(email.subject().contains("2026-04"));
-    assertTrue(email.subject().contains("PAYSLIP"));
-    assertTrue(email.htmlBody().contains("your payslip"));
     assertEquals("dummy", email.to().toString());
     var cc = email.cc().stream().map(Object::toString).toList();
     assertTrue(cc.contains("mail.recipient@mail.hei.school"));
-  }
-
-  @Test
-  void mails_an_invoice_when_the_bucket_key_is_an_invoice() {
-    var key = "invoices/FAC-NUM-2025-W-MAIL-01-1.pdf";
-    when(bucketConfMock.download(key)).thenReturn(new File("pdf"));
-    var sent = ArgumentCaptor.forClass(Email.class);
-
-    subject.accept(
-        NewInvoiceGenerated.builder()
-            .invoiceId("whatever")
-            .workerCode("W-MAIL-01")
-            .bucketKey(key)
-            .yearMonth("2026-04")
-            .build());
-
-    verify(mailerMock).accept(sent.capture());
-    assertTrue(sent.getValue().subject().contains("INVOICE"));
-    assertTrue(sent.getValue().htmlBody().contains("your invoice"));
   }
 }

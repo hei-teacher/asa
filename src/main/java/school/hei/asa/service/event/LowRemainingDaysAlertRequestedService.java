@@ -37,7 +37,9 @@ public class LowRemainingDaysAlertRequestedService
 
     var workerName = event.getWorkerName();
     var remainingDays = event.getRemainingDays();
-    var subject = String.format("ASA - ALERT: low remaining days - Worker %s", workerName);
+    var subject =
+        String.format(
+            "ASA - ALERT: low remaining days - Worker %s - %s", workerName, event.getWorkerCode());
     var body =
         String.format(
             "Hello,\n\n"

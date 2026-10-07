@@ -56,6 +56,7 @@ public class LowRemainingDaysAlertService {
         List.of(
             LowRemainingDaysAlertRequested.builder()
                 .workerName(worker.name())
+                .workerCode(worker.code())
                 .remainingDays((int) remainingDays)
                 .build()));
   }

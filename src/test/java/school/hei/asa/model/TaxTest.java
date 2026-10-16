@@ -88,6 +88,20 @@ class TaxTest {
   }
 
   @Test
+  void the_published_cumulative_tax_at_the_top_of_the_twenty_percent_bracket_is_707500() {
+    var result = irsa().resolve(BigDecimal.valueOf(4000000));
+
+    assertEquals(0, BigDecimal.valueOf(707500.00).compareTo(result.employeeContributionValue()));
+  }
+
+  @Test
+  void only_the_portion_above_four_millions_is_taxed_at_twenty_five_percent() {
+    var result = irsa().resolve(BigDecimal.valueOf(5000000));
+
+    assertEquals(0, BigDecimal.valueOf(957500.00).compareTo(result.employeeContributionValue()));
+  }
+
+  @Test
   void a_base_above_the_last_bracket_is_taxed_up_to_that_bracket() {
     var tax =
         new Tax(

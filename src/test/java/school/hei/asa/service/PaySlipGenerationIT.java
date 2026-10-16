@@ -27,9 +27,9 @@ class PaySlipGenerationIT extends FacadeIT {
     assertBigDecimalEquals(450000, paySlip.taxableGrossAmount());
     assertBigDecimalEquals(9000, paySlip.employeeTotalTaxAmount());
     assertBigDecimalEquals(85500, paySlip.employerTotalTaxAmount());
-    assertBigDecimalEquals(44100, paySlip.deductionTotalAmount());
-    assertBigDecimalEquals(53100, paySlip.deductionAndTaxTotal());
-    assertBigDecimalEquals(396900, paySlip.netAmount());
+    assertBigDecimalEquals(6600, paySlip.deductionTotalAmount());
+    assertBigDecimalEquals(15600, paySlip.deductionAndTaxTotal());
+    assertBigDecimalEquals(434400, paySlip.netAmount());
   }
 
   @Test
@@ -38,8 +38,8 @@ class PaySlipGenerationIT extends FacadeIT {
 
     assertBigDecimalEquals(487500, paySlip.taxableGrossAmount());
     assertBigDecimalEquals(9750, paySlip.employeeTotalTaxAmount());
-    assertBigDecimalEquals(47775, paySlip.deductionTotalAmount());
-    assertBigDecimalEquals(429975, paySlip.netAmount());
+    assertBigDecimalEquals(10275, paySlip.deductionTotalAmount());
+    assertBigDecimalEquals(467475, paySlip.netAmount());
     assertEquals(1, paySlip.credits().size());
     assertEquals("ABSENCE", paySlip.credits().getFirst().getCredit().getCreditCode());
   }
@@ -74,10 +74,25 @@ class PaySlipGenerationIT extends FacadeIT {
     assertBigDecimalEquals(-453000, paySlip.netAmount());
   }
 
+  @Test
+  void a_salary_spanning_every_bracket_is_taxed_slice_by_slice() {
+    var worker = new Worker("W-PAYSLIP-02", "Hery Randria", "", "", "", "", "", "", null, null);
+
+    var paySlip = invoiceService.generatePaySlip(worker, YearMonth.of(2026, 3));
+
+    assertBigDecimalEquals(new BigDecimal("1412627.58"), paySlip.taxableGrossAmount());
+    assertBigDecimalEquals(new BigDecimal("28252.56"), paySlip.employeeTotalTaxAmount());
+    assertBigDecimalEquals(new BigDecimal("1384375.02"), paySlip.amountAfterTaxes());
+    assertBigDecimalEquals(new BigDecimal("184375.00"), paySlip.deductionTotalAmount());
+    assertBigDecimalEquals(new BigDecimal("1200000.02"), paySlip.netAmount());
+  }
+
   private void assertBigDecimalEquals(long expected, BigDecimal actual) {
+    assertBigDecimalEquals(BigDecimal.valueOf(expected), actual);
+  }
+
+  private void assertBigDecimalEquals(BigDecimal expected, BigDecimal actual) {
     assertEquals(
-        0,
-        BigDecimal.valueOf(expected).compareTo(actual),
-        () -> "expected " + expected + " but was " + actual);
+        0, expected.compareTo(actual), () -> "expected " + expected + " but was " + actual);
   }
 }

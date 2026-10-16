@@ -6,7 +6,6 @@ import static school.hei.asa.number.NullToBigDecimalHanlder.calculatePercentageV
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -29,23 +28,21 @@ public class Tax {
       return BigDecimal.ZERO;
     }
     var nonNegativeBase = base.max(BigDecimal.ZERO);
-    return findBracket(bracketsForSide, nonNegativeBase)
-        .map(
-            bracket ->
-                calculatePercentageValue(bracket.rate(), nonNegativeBase)
-                    .max(bracket.defaultValue()))
-        .orElseThrow(
-            () ->
-                new RuntimeException(
-                    String.format("The number %s is not supported", nonNegativeBase)));
-  }
-
-  private Optional<TaxProgression> findBracket(
-      List<TaxProgression> bracketsForSide, BigDecimal base) {
-    return bracketsForSide.stream()
-        .filter(
-            range ->
-                range.minAmount().compareTo(base) <= 0 && base.compareTo(range.maxAmount()) <= 0)
-        .findFirst();
+    var total = BigDecimal.ZERO;
+    var floor = BigDecimal.ZERO;
+    for (var bracket : bracketsForSide) {
+      if (bracket.minAmount().compareTo(nonNegativeBase) > 0) {
+        continue;
+      }
+      var taxableSlice =
+          bracket
+              .maxAmount()
+              .min(nonNegativeBase)
+              .subtract(bracket.minAmount())
+              .max(BigDecimal.ZERO);
+      total = total.add(calculatePercentageValue(bracket.rate(), taxableSlice));
+      floor = floor.max(bracket.defaultValue());
+    }
+    return total.max(floor);
   }
 }

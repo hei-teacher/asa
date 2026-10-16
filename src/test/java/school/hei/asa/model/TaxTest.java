@@ -135,6 +135,20 @@ class TaxTest {
   }
 
   @Test
+  void a_reduction_is_subtracted_from_the_total_but_never_below_the_floor() {
+    var result = irsa().resolve(BigDecimal.valueOf(450000), BigDecimal.valueOf(2000));
+
+    assertEquals(0, BigDecimal.valueOf(5500.00).compareTo(result.employeeContributionValue()));
+  }
+
+  @Test
+  void a_reduction_larger_than_the_tax_leaves_the_floor_standing() {
+    var result = irsa().resolve(BigDecimal.valueOf(450000), BigDecimal.valueOf(20000));
+
+    assertEquals(0, BigDecimal.valueOf(3000).compareTo(result.employeeContributionValue()));
+  }
+
+  @Test
   void irsa_has_no_employer_side() {
     var result = irsa().resolve(BigDecimal.valueOf(250000));
 

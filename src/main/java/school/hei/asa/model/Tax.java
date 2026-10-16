@@ -18,10 +18,16 @@ public class Tax {
   private final List<TaxProgression> taxProgressions;
 
   public TaxAmount resolve(BigDecimal base) {
-    return new TaxAmount(resolveSide(base, EMPLOYER), resolveSide(base, EMPLOYEE));
+    return resolve(base, BigDecimal.ZERO);
   }
 
-  private BigDecimal resolveSide(BigDecimal base, TaxSide side) {
+  public TaxAmount resolve(BigDecimal base, BigDecimal employeeReduction) {
+    return new TaxAmount(
+        resolveSide(base, EMPLOYER, BigDecimal.ZERO),
+        resolveSide(base, EMPLOYEE, employeeReduction));
+  }
+
+  private BigDecimal resolveSide(BigDecimal base, TaxSide side, BigDecimal reduction) {
     var bracketsForSide =
         taxProgressions.stream().filter(range -> range.taxSide() == side).toList();
     if (bracketsForSide.isEmpty()) {
@@ -43,6 +49,6 @@ public class Tax {
       total = total.add(calculatePercentageValue(bracket.rate(), taxableSlice));
       floor = floor.max(bracket.defaultValue());
     }
-    return total.max(floor);
+    return total.subtract(reduction).max(floor);
   }
 }

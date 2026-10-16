@@ -30,7 +30,6 @@ import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.PaidLeave;
 import school.hei.asa.model.PaySlipForm;
 import school.hei.asa.model.ResolvedTax;
-import school.hei.asa.model.TaxAmount;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.number.NumberConverter;
@@ -48,8 +47,6 @@ import school.hei.asa.repository.TaxRepository;
 @AllArgsConstructor
 @Service
 public class InvoiceService {
-  private static final int MAX_DEPENDENTS = 6;
-  private static final BigDecimal REDUCTION_PER_DEPENDENT = BigDecimal.valueOf(2000);
   private static final String INVOICES_FOLDER = "invoices/";
   public static final String PAY_SLIPS_FOLDER = "payslips/";
 
@@ -403,9 +400,9 @@ public class InvoiceService {
             .map(resolvedTax -> resolvedTax.amount().employerContributionValue())
             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    var dependents =
-        worker.kidsNumber() == null ? 0 : Math.clamp(worker.kidsNumber(), 0, MAX_DEPENDENTS);
-    var reductionForDependents = BigDecimal.valueOf(dependents).multiply(REDUCTION_PER_DEPENDENT);
+    var reductionForDependents =
+        BigDecimal.valueOf(worker.kidsNumber() == null ? 0 : worker.kidsNumber())
+            .multiply(BigDecimal.valueOf(2000));
 
     var amountAfterTaxes = totalTaxableSalary.subtract(employeeTotalTaxAmount);
     // CGI art. 01.03.16: the taxable base is rounded down to the nearest hundred Ariary
@@ -414,17 +411,8 @@ public class InvoiceService {
         taxes.stream()
             .filter(tax -> tax.getDeductionType() == DeductionType.TAX)
             .map(
-                tax -> {
-                  var resolved = tax.resolve(roundedTaxableBase);
-                  var reducedEmployeeAmount =
-                      resolved
-                          .employeeContributionValue()
-                          .subtract(reductionForDependents)
-                          .max(BigDecimal.ZERO);
-                  return new ResolvedTax(
-                      tax,
-                      new TaxAmount(resolved.employerContributionValue(), reducedEmployeeAmount));
-                })
+                tax ->
+                    new ResolvedTax(tax, tax.resolve(roundedTaxableBase, reductionForDependents)))
             .toList();
 
     var deductionTotalAmount =

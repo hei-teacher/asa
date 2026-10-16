@@ -88,14 +88,14 @@ class PaySlipGenerationIT extends FacadeIT {
   }
 
   @Test
-  void the_reduction_for_dependents_is_capped_at_six() {
+  void the_reduction_for_dependents_cannot_push_the_irsa_below_its_legal_minimum() {
     var worker = new Worker("W-PAYSLIP-03", "Zo Rakotoarisoa", "", "", "", "", "", "", 8, null);
 
     var paySlip = invoiceService.generatePaySlip(worker, YearMonth.of(2026, 3));
 
-    assertBigDecimalEquals(new BigDecimal("12000"), paySlip.reductionForDependents());
-    assertBigDecimalEquals(new BigDecimal("3410.00"), paySlip.deductionTotalAmount());
-    assertBigDecimalEquals(new BigDecimal("515990.00"), paySlip.netAmount());
+    assertBigDecimalEquals(new BigDecimal("16000"), paySlip.reductionForDependents());
+    assertBigDecimalEquals(new BigDecimal("3000"), paySlip.deductionTotalAmount());
+    assertBigDecimalEquals(new BigDecimal("516400.00"), paySlip.netAmount());
   }
 
   private void assertBigDecimalEquals(long expected, BigDecimal actual) {

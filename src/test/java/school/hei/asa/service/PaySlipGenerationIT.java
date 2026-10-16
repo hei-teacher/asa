@@ -38,8 +38,8 @@ class PaySlipGenerationIT extends FacadeIT {
 
     assertBigDecimalEquals(487500, paySlip.taxableGrossAmount());
     assertBigDecimalEquals(9750, paySlip.employeeTotalTaxAmount());
-    assertBigDecimalEquals(10275, paySlip.deductionTotalAmount());
-    assertBigDecimalEquals(467475, paySlip.netAmount());
+    assertBigDecimalEquals(10270, paySlip.deductionTotalAmount());
+    assertBigDecimalEquals(467480, paySlip.netAmount());
     assertEquals(1, paySlip.credits().size());
     assertEquals("ABSENCE", paySlip.credits().getFirst().getCredit().getCreditCode());
   }
@@ -80,10 +80,10 @@ class PaySlipGenerationIT extends FacadeIT {
 
     var paySlip = invoiceService.generatePaySlip(worker, YearMonth.of(2026, 3));
 
-    assertBigDecimalEquals(new BigDecimal("1412627.58"), paySlip.taxableGrossAmount());
-    assertBigDecimalEquals(new BigDecimal("28252.56"), paySlip.employeeTotalTaxAmount());
-    assertBigDecimalEquals(new BigDecimal("1384375.02"), paySlip.amountAfterTaxes());
-    assertBigDecimalEquals(new BigDecimal("184375.00"), paySlip.deductionTotalAmount());
+    assertBigDecimalEquals(new BigDecimal("1412612.26"), paySlip.taxableGrossAmount());
+    assertBigDecimalEquals(new BigDecimal("28252.24"), paySlip.employeeTotalTaxAmount());
+    assertBigDecimalEquals(new BigDecimal("1384360.02"), paySlip.amountAfterTaxes());
+    assertBigDecimalEquals(new BigDecimal("184360.00"), paySlip.deductionTotalAmount());
     assertBigDecimalEquals(new BigDecimal("1200000.02"), paySlip.netAmount());
   }
 

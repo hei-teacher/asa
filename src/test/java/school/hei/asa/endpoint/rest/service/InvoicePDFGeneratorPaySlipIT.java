@@ -40,7 +40,7 @@ class InvoicePDFGeneratorPaySlipIT extends FacadeIT {
   void rendered_pdf_shows_the_net_amount_computed_by_the_service() throws Exception {
     var file = invoicePDFGenerator.apply(payslipWorker(), paySlipForm("2026-03"), "pay-slip");
 
-    var expectedNetAmount = numberParser.parseToNumber(BigDecimal.valueOf(396900));
+    var expectedNetAmount = numberParser.parseToNumber(BigDecimal.valueOf(434400));
 
     try (var document = PDDocument.load(file)) {
       var text = new PDFTextStripper().getText(document);

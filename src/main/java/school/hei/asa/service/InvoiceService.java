@@ -10,6 +10,7 @@ import static school.hei.asa.number.NullToBigDecimalHanlder.toDoubleOrZero;
 
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
@@ -29,7 +30,6 @@ import school.hei.asa.model.MissionExecution;
 import school.hei.asa.model.PaidLeave;
 import school.hei.asa.model.PaySlipForm;
 import school.hei.asa.model.ResolvedTax;
-import school.hei.asa.model.TaxAmount;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.number.NumberConverter;
@@ -405,21 +405,14 @@ public class InvoiceService {
             .multiply(BigDecimal.valueOf(2000));
 
     var amountAfterTaxes = totalTaxableSalary.subtract(employeeTotalTaxAmount);
+    // CGI art. 01.03.16: the taxable base is rounded down to the nearest hundred Ariary
+    var roundedTaxableBase = amountAfterTaxes.setScale(-2, RoundingMode.FLOOR).setScale(2);
     var resolvedTaxType =
         taxes.stream()
             .filter(tax -> tax.getDeductionType() == DeductionType.TAX)
             .map(
-                tax -> {
-                  var resolved = tax.resolve(amountAfterTaxes);
-                  var reducedEmployeeAmount =
-                      resolved
-                          .employeeContributionValue()
-                          .subtract(reductionForDependents)
-                          .max(BigDecimal.ZERO);
-                  return new ResolvedTax(
-                      tax,
-                      new TaxAmount(resolved.employerContributionValue(), reducedEmployeeAmount));
-                })
+                tax ->
+                    new ResolvedTax(tax, tax.resolve(roundedTaxableBase, reductionForDependents)))
             .toList();
 
     var deductionTotalAmount =

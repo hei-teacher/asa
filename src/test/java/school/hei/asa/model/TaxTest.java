@@ -67,10 +67,99 @@ class TaxTest {
   }
 
   @Test
-  void bracket_2_computes_a_real_percentage_above_the_floor() {
+  void the_floor_still_wins_when_the_cumulative_total_stays_below_it() {
     var result = irsa().resolve(BigDecimal.valueOf(380000));
 
-    assertEquals(0, BigDecimal.valueOf(19000.00).compareTo(result.employeeContributionValue()));
+    assertEquals(0, BigDecimal.valueOf(3000).compareTo(result.employeeContributionValue()));
+  }
+
+  @Test
+  void every_bracket_is_taxed_at_its_own_rate_instead_of_the_last_one() {
+    var result = irsa().resolve(BigDecimal.valueOf(450000));
+
+    assertEquals(0, BigDecimal.valueOf(7500.00).compareTo(result.employeeContributionValue()));
+  }
+
+  @Test
+  void a_base_spanning_five_brackets_sums_each_slice() {
+    var result = irsa().resolve(new BigDecimal("1384374.46"));
+
+    assertEquals(0, new BigDecimal("184374.89").compareTo(result.employeeContributionValue()));
+  }
+
+  @Test
+  void the_published_cumulative_tax_at_the_top_of_the_twenty_percent_bracket_is_707500() {
+    var result = irsa().resolve(BigDecimal.valueOf(4000000));
+
+    assertEquals(0, BigDecimal.valueOf(707500.00).compareTo(result.employeeContributionValue()));
+  }
+
+  @Test
+  void only_the_portion_above_four_millions_is_taxed_at_twenty_five_percent() {
+    var result = irsa().resolve(BigDecimal.valueOf(5000000));
+
+    assertEquals(0, BigDecimal.valueOf(957500.00).compareTo(result.employeeContributionValue()));
+  }
+
+  @Test
+  void a_base_above_the_last_bracket_is_taxed_up_to_that_bracket() {
+    var tax =
+        new Tax(
+            "IRSA",
+            "IRSA",
+            DeductionType.TAX,
+            List.of(
+                new TaxProgression(
+                    10d,
+                    TaxSide.EMPLOYEE,
+                    BigDecimal.valueOf(0),
+                    BigDecimal.valueOf(350000),
+                    BigDecimal.ZERO)));
+
+    var result = tax.resolve(BigDecimal.valueOf(10000000));
+
+    assertEquals(0, BigDecimal.valueOf(35000.00).compareTo(result.employeeContributionValue()));
+  }
+
+  @Test
+  void a_single_bracket_tax_is_unchanged_by_the_cumulative_computation() {
+    var cnaps =
+        new Tax(
+            "CNAPS",
+            "CNAPS",
+            DeductionType.DEDUCTION,
+            List.of(
+                new TaxProgression(
+                    1d,
+                    TaxSide.EMPLOYEE,
+                    BigDecimal.valueOf(0),
+                    new BigDecimal("9999999999.99"),
+                    BigDecimal.ZERO),
+                new TaxProgression(
+                    13d,
+                    TaxSide.EMPLOYER,
+                    BigDecimal.valueOf(0),
+                    new BigDecimal("9999999999.99"),
+                    BigDecimal.ZERO)));
+
+    var result = cnaps.resolve(BigDecimal.valueOf(1412627));
+
+    assertEquals(0, new BigDecimal("14126.27").compareTo(result.employeeContributionValue()));
+    assertEquals(0, new BigDecimal("183641.51").compareTo(result.employerContributionValue()));
+  }
+
+  @Test
+  void a_reduction_is_subtracted_from_the_total_but_never_below_the_floor() {
+    var result = irsa().resolve(BigDecimal.valueOf(450000), BigDecimal.valueOf(2000));
+
+    assertEquals(0, BigDecimal.valueOf(5500.00).compareTo(result.employeeContributionValue()));
+  }
+
+  @Test
+  void a_reduction_larger_than_the_tax_leaves_the_floor_standing() {
+    var result = irsa().resolve(BigDecimal.valueOf(450000), BigDecimal.valueOf(20000));
+
+    assertEquals(0, BigDecimal.valueOf(3000).compareTo(result.employeeContributionValue()));
   }
 
   @Test
@@ -85,24 +174,5 @@ class TaxTest {
     var result = irsa().resolve(BigDecimal.valueOf(-450000));
 
     assertEquals(0, BigDecimal.valueOf(3000).compareTo(result.employeeContributionValue()));
-  }
-
-  @Test
-  void a_base_outside_every_bracket_throws() {
-    var tax =
-        new Tax(
-            "IRSA",
-            "IRSA",
-            DeductionType.TAX,
-            List.of(
-                new TaxProgression(
-                    0d,
-                    TaxSide.EMPLOYEE,
-                    BigDecimal.valueOf(0),
-                    BigDecimal.valueOf(350000),
-                    BigDecimal.valueOf(3000))));
-
-    org.junit.jupiter.api.Assertions.assertThrows(
-        RuntimeException.class, () -> tax.resolve(BigDecimal.valueOf(10000000)));
   }
 }

@@ -46,6 +46,8 @@ public class WorkerServiceIT extends FacadeIT {
   }
 
   private List<Worker> workersFromYear() {
+    var highSalaryWorker =
+        new Worker("W-PAYSLIP-02", "Hery Randria", null, null, null, null, null, null, null, null);
     var worker1 = new Worker("W-101", "John", null, null, null, null, null, null, null, null);
     var worker2 =
         new Worker("W-P-2024-01", "Lita Andria", null, null, null, null, null, null, null, null);
@@ -64,16 +66,23 @@ public class WorkerServiceIT extends FacadeIT {
     var worker4 =
         new Worker("W-PAYSLIP-01", "Rina Rakoto", null, null, null, null, null, null, null, null);
     var worker5 = new Worker("worker-code", "code", null, null, null, null, null, null, null, null);
+    var manyDependentsWorker =
+        new Worker(
+            "W-PAYSLIP-03", "Zo Rakotoarisoa", null, null, null, null, null, null, null, null);
 
     return Stream.concat(
             autoCloseWorkers().stream(),
-            List.of(worker1, worker2, worker3, worker4, worker5).stream())
+            List.of(
+                highSalaryWorker, worker1, worker2, worker3, worker4, manyDependentsWorker, worker5)
+                .stream())
         .toList();
   }
 
   private List<Worker> workersFromDateRange() {
     var worker1 =
         new Worker("W-ENDED-01", "Ended Worker", null, null, null, null, null, null, null, null);
+    var highSalaryWorker =
+        new Worker("W-PAYSLIP-02", "Hery Randria", null, null, null, null, null, null, null, null);
     var worker2 = new Worker("W-101", "John", null, null, null, null, null, null, null, null);
     var worker3 =
         new Worker("W-P-2024-01", "Lita Andria", null, null, null, null, null, null, null, null);
@@ -91,10 +100,15 @@ public class WorkerServiceIT extends FacadeIT {
             null);
     var worker5 =
         new Worker("W-PAYSLIP-01", "Rina Rakoto", null, null, null, null, null, null, null, null);
+    var manyDependentsWorker =
+        new Worker(
+            "W-PAYSLIP-03", "Zo Rakotoarisoa", null, null, null, null, null, null, null, null);
 
     return Stream.concat(
             autoCloseWorkers().stream(),
-            List.of(worker1, worker2, worker3, worker4, worker5).stream())
+            List.of(
+                worker1, highSalaryWorker, worker2, worker3, worker4, worker5, manyDependentsWorker)
+                .stream())
         .toList();
   }
 

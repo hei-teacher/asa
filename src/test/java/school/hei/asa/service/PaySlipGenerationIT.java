@@ -87,6 +87,17 @@ class PaySlipGenerationIT extends FacadeIT {
     assertBigDecimalEquals(new BigDecimal("1200000.02"), paySlip.netAmount());
   }
 
+  @Test
+  void the_reduction_for_dependents_is_capped_at_six() {
+    var worker = new Worker("W-PAYSLIP-03", "Zo Rakotoarisoa", "", "", "", "", "", "", 8, null);
+
+    var paySlip = invoiceService.generatePaySlip(worker, YearMonth.of(2026, 3));
+
+    assertBigDecimalEquals(new BigDecimal("12000"), paySlip.reductionForDependents());
+    assertBigDecimalEquals(new BigDecimal("3410.00"), paySlip.deductionTotalAmount());
+    assertBigDecimalEquals(new BigDecimal("515990.00"), paySlip.netAmount());
+  }
+
   private void assertBigDecimalEquals(long expected, BigDecimal actual) {
     assertBigDecimalEquals(BigDecimal.valueOf(expected), actual);
   }

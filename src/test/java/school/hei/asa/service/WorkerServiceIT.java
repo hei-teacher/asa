@@ -66,10 +66,15 @@ public class WorkerServiceIT extends FacadeIT {
     var worker4 =
         new Worker("W-PAYSLIP-01", "Rina Rakoto", null, null, null, null, null, null, null, null);
     var worker5 = new Worker("worker-code", "code", null, null, null, null, null, null, null, null);
+    var manyDependentsWorker =
+        new Worker(
+            "W-PAYSLIP-03", "Zo Rakotoarisoa", null, null, null, null, null, null, null, null);
 
     return Stream.concat(
             autoCloseWorkers().stream(),
-            List.of(highSalaryWorker, worker1, worker2, worker3, worker4, worker5).stream())
+            List.of(
+                highSalaryWorker, worker1, worker2, worker3, worker4, manyDependentsWorker, worker5)
+                .stream())
         .toList();
   }
 
@@ -95,10 +100,15 @@ public class WorkerServiceIT extends FacadeIT {
             null);
     var worker5 =
         new Worker("W-PAYSLIP-01", "Rina Rakoto", null, null, null, null, null, null, null, null);
+    var manyDependentsWorker =
+        new Worker(
+            "W-PAYSLIP-03", "Zo Rakotoarisoa", null, null, null, null, null, null, null, null);
 
     return Stream.concat(
             autoCloseWorkers().stream(),
-            List.of(worker1, highSalaryWorker, worker2, worker3, worker4, worker5).stream())
+            List.of(
+                worker1, highSalaryWorker, worker2, worker3, worker4, worker5, manyDependentsWorker)
+                .stream())
         .toList();
   }
 

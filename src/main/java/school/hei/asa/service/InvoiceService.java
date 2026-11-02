@@ -248,7 +248,7 @@ public class InvoiceService {
           sumDayPercentage(
               workerMissionExecutions,
               firstCurrentMonthDay,
-              LocalDate.ofInstant(firstContract.entranceInstant(), UTC));
+              LocalDate.ofInstant(firstContract.entranceInstant(), UTC).minusDays(1));
       var secondTotalDaysWorked =
           sumDayPercentage(
               workerMissionExecutions,

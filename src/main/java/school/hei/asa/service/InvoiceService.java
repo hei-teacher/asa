@@ -242,7 +242,6 @@ public class InvoiceService {
     var bankAccount = bankAccountForWorker != null ? bankAccountForWorker.toString() : "";
 
     if (hasUpgradedLevel) {
-      // contracts are sorted newest first: the older one covers the start of the month
       var newContract = workerContracts.getFirst();
       var firstContract = workerContracts.get(1);
       var secondContract = newContract;

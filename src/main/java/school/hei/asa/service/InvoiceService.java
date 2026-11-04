@@ -242,17 +242,18 @@ public class InvoiceService {
     var bankAccount = bankAccountForWorker != null ? bankAccountForWorker.toString() : "";
 
     if (hasUpgradedLevel) {
-      var firstContract = workerContracts.getFirst();
-      var secondContract = workerContracts.get(1);
+      var newContract = workerContracts.getFirst();
+      var firstContract = workerContracts.get(1);
+      var secondContract = newContract;
       var firstTotalDaysWorked =
           sumDayPercentage(
               workerMissionExecutions,
               firstCurrentMonthDay,
-              LocalDate.ofInstant(firstContract.entranceInstant(), UTC).minusDays(1));
+              LocalDate.ofInstant(newContract.entranceInstant(), UTC).minusDays(1));
       var secondTotalDaysWorked =
           sumDayPercentage(
               workerMissionExecutions,
-              LocalDate.ofInstant(firstContract.entranceInstant(), UTC),
+              LocalDate.ofInstant(newContract.entranceInstant(), UTC),
               lastCurrentMonthDay);
       var firstInvoiceForm = generateInvoiceFormFrom(firstTotalDaysWorked, firstContract);
       var secondInvoiceForm = generateInvoiceFormFrom(secondTotalDaysWorked, secondContract);

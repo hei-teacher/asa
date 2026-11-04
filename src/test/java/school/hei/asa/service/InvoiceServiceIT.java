@@ -80,7 +80,6 @@ public class InvoiceServiceIT extends FacadeIT {
             null);
     var worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "", null, null);
 
-    // Sauvegarde réelle en base de données
     invoiceService.saveInvoiceReference(invoiceData, worker);
 
     var expected = invoiceService.generateInvoiceFileName(worker);
@@ -232,7 +231,6 @@ public class InvoiceServiceIT extends FacadeIT {
             "");
     var product = new Product("p-code", "p-name", "p-description");
     var mission = new Mission("m-code", "m-title", "m-description", 0, product);
-    // 2 days before the new contract (incl. the day before its entrance), 3 from its entrance
     var executions =
         List.of(
             execution(mission, worker, LocalDate.of(2026, 1, 10)),
@@ -242,7 +240,6 @@ public class InvoiceServiceIT extends FacadeIT {
             execution(mission, worker, LocalDate.of(2026, 1, 31)));
     var bankAccount = new BankAccount("B1", "A1", "C1", "K1", "IBAN1", worker);
 
-    // contracts are sorted newest first, as extractInvoiceForm does
     var actual =
         invoiceService.extractInvoiceData(
             invoiceForm, List.of(newContract, oldContract), executions, bankAccount);

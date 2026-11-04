@@ -26,6 +26,9 @@ import school.hei.asa.conf.FacadeIT;
 import school.hei.asa.model.BankAccount;
 import school.hei.asa.model.InvoiceForm;
 import school.hei.asa.model.InvoiceReference;
+import school.hei.asa.model.Mission;
+import school.hei.asa.model.MissionExecution;
+import school.hei.asa.model.Product;
 import school.hei.asa.model.Worker;
 import school.hei.asa.model.contract.Contract;
 import school.hei.asa.model.contract.ContractLevel;
@@ -77,7 +80,6 @@ public class InvoiceServiceIT extends FacadeIT {
             null);
     var worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "", null, null);
 
-    // Sauvegarde réelle en base de données
     invoiceService.saveInvoiceReference(invoiceData, worker);
 
     var expected = invoiceService.generateInvoiceFileName(worker);
@@ -184,6 +186,78 @@ public class InvoiceServiceIT extends FacadeIT {
     assertTrue(result.hasUpgradedLevel());
     assertNotNull(result.total());
     assertNotNull(result.parsedAmount());
+  }
+
+  @Test
+  void extractInvoiceData_with_upgraded_level_should_price_each_period_with_its_own_contract() {
+    var worker = newWorker();
+    var invoiceForm =
+        new InvoiceForm(
+            "inv-periods",
+            YearMonth.of(2026, Month.JANUARY),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
+    var newContract =
+        new Contract(
+            worker,
+            "Senior Dev",
+            new ContractLevel("L2", studentContractor, null, 80_000d, null),
+            Instant.parse("2026-01-15T00:00:00Z"),
+            null,
+            Duration.ofDays(30),
+            "company",
+            "");
+    var oldContract =
+        new Contract(
+            worker,
+            "Junior Dev",
+            new ContractLevel("L1", studentContractor, null, 50_000d, null),
+            Instant.parse("2025-01-01T00:00:00Z"),
+            null,
+            Duration.ofDays(365),
+            "company",
+            "");
+    var product = new Product("p-code", "p-name", "p-description");
+    var mission = new Mission("m-code", "m-title", "m-description", 0, product);
+    var executions =
+        List.of(
+            execution(mission, worker, LocalDate.of(2026, 1, 10)),
+            execution(mission, worker, LocalDate.of(2026, 1, 14)),
+            execution(mission, worker, LocalDate.of(2026, 1, 15)),
+            execution(mission, worker, LocalDate.of(2026, 1, 20)),
+            execution(mission, worker, LocalDate.of(2026, 1, 31)));
+    var bankAccount = new BankAccount("B1", "A1", "C1", "K1", "IBAN1", worker);
+
+    var actual =
+        invoiceService.extractInvoiceData(
+            invoiceForm, List.of(newContract, oldContract), executions, bankAccount);
+
+    assertTrue(actual.hasUpgradedLevel());
+    assertEquals("Junior Dev", actual.description());
+    assertEquals(2d, actual.quantity());
+    assertEquals(0, BigDecimal.valueOf(50_000).compareTo(actual.unitPrice()));
+    assertEquals(0, BigDecimal.valueOf(100_000).compareTo(actual.amount()));
+    assertEquals("Senior Dev", actual.extraDescription());
+    assertEquals(3d, actual.extraQuantity());
+    assertEquals(0, BigDecimal.valueOf(80_000).compareTo(actual.extraUnitPrice()));
+    assertEquals(0, BigDecimal.valueOf(240_000).compareTo(actual.extraAmount()));
+    assertEquals(0, BigDecimal.valueOf(340_000).compareTo(actual.total()));
+  }
+
+  private MissionExecution execution(Mission mission, Worker worker, LocalDate date) {
+    return new MissionExecution(mission, worker, date, 1d, "comment", Instant.now());
   }
 
   @Test

@@ -116,6 +116,19 @@ class ContractServiceTest {
   }
 
   @Test
+  void open_ended_contract_counts_future_executions_window() {
+    var contract = newContract(worker, 11, Instant.parse("2026-10-28T08:00:00Z"), null);
+    when(contractRepository.findActiveContractByWorker(worker)).thenReturn(Optional.of(contract));
+    when(dailyExecutionRepository.findByWorkerCodeAndDateBetween(
+            "W-P-2024-01", LocalDate.of(2026, 10, 28), LocalDate.of(9999, 12, 31)))
+        .thenReturn(List.of());
+
+    var actual = contractService.getRemainingDaysOnActiveContractOrZero(worker);
+
+    assertEquals(11d, actual);
+  }
+
+  @Test
   void find_active_contract_delegates_to_repository() {
     var contract = newContract(worker, 80, Instant.parse("2025-01-01T08:00:00Z"), null);
     when(contractRepository.findActiveContractByWorker(worker)).thenReturn(Optional.of(contract));

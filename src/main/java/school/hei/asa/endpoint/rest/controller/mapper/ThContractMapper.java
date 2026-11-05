@@ -49,7 +49,9 @@ public class ThContractMapper {
                   : dateFormater.format(current.endInstant().atZone(systemDefault()).toLocalDate());
           var startDate = LocalDate.parse(entranceDate, dateFormater);
           var localEndDate =
-              !endDate.equals("-") ? LocalDate.parse(endDate, dateFormater) : LocalDate.now();
+              !endDate.equals("-")
+                  ? LocalDate.parse(endDate, dateFormater)
+                  : ContractService.OPEN_ENDED_CONTRACT_UPPER_BOUND;
           result.add(
               new ThContract(
                   contractLevel.code(),

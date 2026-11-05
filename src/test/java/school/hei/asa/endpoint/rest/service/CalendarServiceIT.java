@@ -1,6 +1,6 @@
 package school.hei.asa.endpoint.rest.service;
 
-import static java.time.Month.DECEMBER;
+import static java.time.Month.JANUARY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -55,7 +55,7 @@ class CalendarServiceIT extends FacadeIT {
     dailyExecutionController.createDailyExecution(
         authentication,
         new ThDailyExecutionForm(
-            "2024-12-01",
+            "2025-01-01",
             "mission1-code",
             "0.2",
             "missionComment1",
@@ -73,11 +73,11 @@ class CalendarServiceIT extends FacadeIT {
             null));
 
     var worker = workerRepository.findByCode(authenticatedWorkerCode);
-    var datesByDailyExecutionType = calendarService.datesByDailyExecutionType(worker, 2024);
+    var datesByDailyExecutionType = calendarService.datesByDailyExecutionType(worker, 2025);
 
     var fullWorkDates = datesByDailyExecutionType.get(fullWork);
     assertEquals(1, fullWorkDates.size());
-    assertEquals(LocalDate.of(2024, DECEMBER, 1), fullWorkDates.get(0));
+    assertEquals(LocalDate.of(2025, JANUARY, 1), fullWorkDates.get(0));
     assertEquals(0, datesByDailyExecutionType.get(fullCare).size());
     assertEquals(0, datesByDailyExecutionType.get(mixedWorkAndCare).size());
   }
@@ -135,7 +135,7 @@ class CalendarServiceIT extends FacadeIT {
     dailyExecutionController.createDailyExecution(
         authentication,
         new ThDailyExecutionForm(
-            "2024-06-01",
+            "2025-06-01",
             "mission1-code",
             "0.2",
             "missionComment1",
@@ -153,7 +153,7 @@ class CalendarServiceIT extends FacadeIT {
             null));
 
     var worker = workerRepository.findByCode(authenticatedWorkerCode);
-    var datesByDailyExecutionType = calendarService.datesByDailyExecutionType(worker, 2024);
+    var datesByDailyExecutionType = calendarService.datesByDailyExecutionType(worker, 2025);
 
     assertEquals(0, datesByDailyExecutionType.get(fullCare).size());
     assertEquals(0, datesByDailyExecutionType.get(fullWork).size());

@@ -1,5 +1,7 @@
 package school.hei.asa.service;
 
+import static java.time.ZoneId.systemDefault;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.asa.CareProductCodeSupplier;
@@ -17,8 +19,16 @@ public class DailyExecutionService {
 
   public void saveAndAlert(DailyExecution dailyExecution) {
     var worker = dailyExecution.worker();
-    if (contractService.findActiveContractByWorker(worker).isEmpty()) {
-      throw new IllegalStateException("Unable to punch in : you have no active contract.");
+    var activeContract =
+        contractService
+            .findActiveContractByWorker(worker)
+            .orElseThrow(
+                () ->
+                    new IllegalStateException("Unable to punch in : you have no active contract."));
+    var contractStart = activeContract.entranceInstant().atZone(systemDefault()).toLocalDate();
+    if (dailyExecution.date().isBefore(contractStart)) {
+      throw new IllegalStateException(
+          "Unable to punch in : date is before your contract start (" + contractStart + ").");
     }
     var careProductCode = careProductCodeSupplier.get();
     var requestedDays =

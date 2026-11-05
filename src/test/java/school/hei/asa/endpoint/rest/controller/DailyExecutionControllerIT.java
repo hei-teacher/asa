@@ -1,6 +1,6 @@
 package school.hei.asa.endpoint.rest.controller;
 
-import static java.time.Month.DECEMBER;
+import static java.time.Month.JANUARY;
 import static java.time.ZoneId.systemDefault;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -87,7 +87,7 @@ class DailyExecutionControllerIT extends FacadeIT {
   void save_then_read_with_duplicates_ok_if_sum_of_set_is_100() {
     var dmeForm =
         new ThDailyExecutionForm(
-            "2024-12-03",
+            "2025-01-03",
             "mission1-code",
             "0.4",
             "missionComment1",
@@ -109,7 +109,7 @@ class DailyExecutionControllerIT extends FacadeIT {
     var savedWorker = workerRepository.findByCode(authenticatedWorker.code());
     var dailyExecutions =
         dailyExecutionRepository.findByWorkerCodeAndDateBetween(
-            savedWorker.code(), LocalDate.of(2024, DECEMBER, 3), LocalDate.of(2024, DECEMBER, 3));
+            savedWorker.code(), LocalDate.of(2025, JANUARY, 3), LocalDate.of(2025, JANUARY, 3));
     assertEquals(1, dailyExecutions.size());
     var savedMission1 = missionRepository.findByCode("mission1-code");
     assertEquals(1, savedMission1.get().workers().size());
@@ -126,7 +126,7 @@ class DailyExecutionControllerIT extends FacadeIT {
   void cannot_save_if_mission_execution_already_exists() {
     var dmeForm =
         new ThDailyExecutionForm(
-            "2024-12-01",
+            "2025-01-01",
             "mission1-code",
             "0.2",
             "missionComment1",
@@ -158,6 +158,17 @@ class DailyExecutionControllerIT extends FacadeIT {
         () ->
             dailyExecutionController.createDailyExecution(
                 authentication, form("2024-12-02", "mission0-code", "1", null, null)));
+  }
+
+  @Test
+  void cannot_punch_in_before_active_contract_start() {
+    authenticateAs("auto-close-partial-worker");
+
+    assertThrows(
+        IllegalStateException.class,
+        () ->
+            dailyExecutionController.createDailyExecution(
+                authentication, form("2023-12-31", "mission0-code", "1", null, null)));
   }
 
   @Test
@@ -249,7 +260,7 @@ class DailyExecutionControllerIT extends FacadeIT {
   void concurrently_create_daily_execution() {
     var dmeForm =
         new ThDailyExecutionForm(
-            "2024-12-01",
+            "2025-01-01",
             "mission1-code",
             "0.2",
             "missionComment1",

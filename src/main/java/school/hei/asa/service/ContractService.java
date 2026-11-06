@@ -31,6 +31,8 @@ import school.hei.asa.repository.WorkerRepository;
 @Service
 @AllArgsConstructor
 public class ContractService {
+  // Arbitrary far-future bound for open-ended contracts (not LocalDate.MAX: overflows SQL BETWEEN)
+  public static final LocalDate OPEN_ENDED_CONTRACT_UPPER_BOUND = LocalDate.of(9999, 12, 31);
   private static final double CLOSE_REMAINING_DAYS_TOLERANCE = 0.01;
   private final WorkerRepository workerRepository;
   private final ContractRepository contractRepository;
@@ -74,7 +76,7 @@ public class ContractService {
     var startDate = contract.entranceInstant().atZone(systemDefault()).toLocalDate();
     var endDate =
         contract.endInstant() == null
-            ? LocalDate.now()
+            ? OPEN_ENDED_CONTRACT_UPPER_BOUND
             : contract.endInstant().atZone(systemDefault()).toLocalDate();
     var actualWorkedDays = getActualWorkedDaysByDateByWorker(startDate, worker.code(), endDate);
     var workedDays = actualWorkedDays.equals("-") ? 0d : Double.parseDouble(actualWorkedDays);

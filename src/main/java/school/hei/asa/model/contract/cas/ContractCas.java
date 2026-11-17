@@ -86,12 +86,17 @@ public class ContractCas extends Cas {
           contract.ppId());
     }
 
+    // a worked month is paid on PAY_DAY of the following month
+    var lastPayMonthEnd =
+        contract.endDate() == null
+            ? entranceDate.plusYears(99)
+            : YearMonth.from(contract.endDate()).plusMonths(1).atEndOfMonth();
     new TransfertArgent(
         contract.ppId(),
         compteCompany,
         compteWorker,
         LocalDate.of(entranceDate.getYear(), entranceDate.getMonthValue(), 1).plusMonths(1),
-        entranceDate().plusYears(99), // TODO: check end when Contract.endDate is added,
+        lastPayMonthEnd,
         PAY_DAY,
         new Argent(contract.level().monthlyPay(), devise));
   }
@@ -100,22 +105,19 @@ public class ContractCas extends Cas {
   protected void suivi() {}
 
   private void payContractorAllMonths(Compte compteWorker) {
-    // First month, potentially partial
-    var daysToPayMonth1 = contractorDaysToPayMonth1();
-    payContractorMonthNth(1, compteWorker, daysToPayMonth1);
-
-    // Intermediate months, all full
-    var remainingDays = contract.duration().toDays() - daysToPayMonth1;
-    var monthNth = 2;
-    var daysPerMonth = contractTypeToDaysPerMonth.apply(contract.level().type());
-    while (remainingDays > daysPerMonth) {
-      payContractorMonthNth(monthNth, compteWorker, daysPerMonth);
-      remainingDays -= daysPerMonth;
+    var remainingDays = (double) contract.duration().toDays();
+    var workedMonth = YearMonth.from(entranceDate());
+    var lastWorkedMonth = contract.endDate() == null ? null : YearMonth.from(contract.endDate());
+    var monthNth = 1;
+    // First and last months are potentially partial, intermediate ones are full
+    while (remainingDays > 0
+        && (lastWorkedMonth == null || !workedMonth.isAfter(lastWorkedMonth))) {
+      var daysToPay = Math.min(contractorDaysToPay(workedMonth), remainingDays);
+      payContractorMonthNth(monthNth, compteWorker, daysToPay);
+      remainingDays -= daysToPay;
+      workedMonth = workedMonth.plusMonths(1);
       monthNth++;
     }
-
-    // Last month, potentially partial
-    payContractorMonthNth(monthNth, compteWorker, remainingDays);
   }
 
   private void payContractorMonthNth(int monthNth, Compte compteWorker, double daysToPay) {
@@ -127,21 +129,19 @@ public class ContractCas extends Cas {
         String.format("[Mois %s] %s", monthNth, contract.ppId()),
         compteCompany,
         compteWorker,
-        payDateOfMonth0.plusMonths(monthNth), // TODO: emit warn if > Contract.endDate when added
+        payDateOfMonth0.plusMonths(monthNth),
         new Argent(contract.level().dailyPay() * daysToPay, devise));
   }
 
-  private int contractorDaysToPayMonth1() {
-    var contractLevel = contract.level();
-    var daysToWorkPerMonth = contractTypeToDaysPerMonth.apply(contractLevel.type());
-
-    var entranceDate = entranceDate();
-    int year = entranceDate.getYear();
-    int month = entranceDate.getMonthValue();
-    var lengthOfMonth1 = YearMonth.of(year, month).lengthOfMonth();
-
-    var month1Completeness = (lengthOfMonth1 - entranceDate.getDayOfMonth() + 1.) / lengthOfMonth1;
-    return (int) (daysToWorkPerMonth * month1Completeness);
+  /** Monthly quota of days, prorated on the calendar days of the month covered by the contract. */
+  private int contractorDaysToPay(YearMonth month) {
+    var daysToWorkPerMonth = contractTypeToDaysPerMonth.apply(contract.level().type());
+    var lengthOfMonth = month.lengthOfMonth();
+    var coveredDays = contract.daysCovered(month.atDay(1), month.atEndOfMonth());
+    if (coveredDays == lengthOfMonth) {
+      return daysToWorkPerMonth;
+    }
+    return (int) (daysToWorkPerMonth * ((double) coveredDays / lengthOfMonth));
   }
 
   private LocalDate entranceDate() {

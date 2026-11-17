@@ -141,6 +141,55 @@ public class ContractToCasTest {
         cas.patrimoine().projectionFuture(DEC31_2026).getValeurComptable());
   }
 
+  @Test
+  void studentContract_ended_early_stops_paying_after_end_month() {
+    var dailyPay = 50_000;
+    var contract =
+        withEnd(studentContract(JAN1_2026, 33, dailyPay), LocalDate.of(2026, FEBRUARY, 14));
+
+    var compteCompany = new Compte("Compte-company", JAN1_2026, new Argent(0, MGA));
+    var cas = new ContractToCas(compteCompany, MGA).apply(contract);
+
+    assertEquals(
+        new Argent(dailyPay * 11, MGA),
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 5)).getValeurComptable());
+    // February is prorated: 14 of 28 days of the 11 days quota
+    assertEquals(
+        new Argent(dailyPay * (11 + 5), MGA),
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, MARCH, 5)).getValeurComptable());
+    assertEquals(
+        new Argent(dailyPay * (11 + 5), MGA),
+        cas.patrimoine().projectionFuture(DEC31_2026).getValeurComptable());
+  }
+
+  @Test
+  void fteContract_ended_stops_paying_after_end_month() {
+    var contract = withEnd(fteContract(JAN1_2026, 500_000), LocalDate.of(2026, MARCH, 15));
+
+    var compteCompany = new Compte("Compte-company", JAN1_2026, new Argent(0, MGA));
+    var cas = new ContractToCas(compteCompany, MGA, Map.of()).apply(contract);
+
+    // January, February and March are paid on the 5th of the following month
+    assertEquals(
+        new Argent(1_500_000, MGA),
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, APRIL, 5)).getValeurComptable());
+    assertEquals(
+        new Argent(1_500_000, MGA),
+        cas.patrimoine().projectionFuture(DEC31_2026).getValeurComptable());
+  }
+
+  static Contract withEnd(Contract contract, LocalDate endDate) {
+    return new Contract(
+        contract.worker(),
+        contract.jobTitle(),
+        contract.level(),
+        contract.entranceInstant(),
+        toInstant(endDate),
+        contract.duration(),
+        contract.company(),
+        contract.contractBucketKey());
+  }
+
   public static Contract studentContract(LocalDate entranceDate, int nbDays, int dailyPay) {
     return new Contract(
         mock(Worker.class),

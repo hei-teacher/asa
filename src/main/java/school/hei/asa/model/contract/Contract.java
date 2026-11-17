@@ -20,12 +20,20 @@ public record Contract(
     return LocalDate.ofInstant(entranceInstant, ZoneId.systemDefault());
   }
 
+  /** Last day covered by the contract (inclusive), or null if open-ended. */
+  public LocalDate endDate() {
+    return endInstant == null ? null : LocalDate.ofInstant(endInstant, ZoneId.systemDefault());
+  }
+
+  /** {@code date}, capped to the contract's end date. */
+  public LocalDate capToEnd(LocalDate date) {
+    var endDate = endDate();
+    return endDate == null || date.isBefore(endDate) ? date : endDate;
+  }
+
   public boolean overlaps(YearMonth yearMonth) {
     var startsBeforeMonthEnds = !entranceDate().isAfter(yearMonth.atEndOfMonth());
-    var endsAfterMonthStarts =
-        endInstant == null
-            || !LocalDate.ofInstant(endInstant, ZoneId.systemDefault())
-                .isBefore(yearMonth.atDay(1));
+    var endsAfterMonthStarts = endDate() == null || !endDate().isBefore(yearMonth.atDay(1));
     return startsBeforeMonthEnds && endsAfterMonthStarts;
   }
 

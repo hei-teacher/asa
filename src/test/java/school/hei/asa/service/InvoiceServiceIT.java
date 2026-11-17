@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
@@ -386,6 +387,105 @@ public class InvoiceServiceIT extends FacadeIT {
     assertEquals("Junior Dev", actual.description());
     assertEquals(0, BigDecimal.valueOf(50_000).compareTo(actual.unitPrice()));
     assertEquals(0, BigDecimal.valueOf(100_000).compareTo(actual.total()));
+  }
+
+  @Test
+  void extractInvoiceData_should_not_pay_executions_after_contract_end() {
+    var worker = newWorker();
+    var contract =
+        dailyContract(worker, "Dev", 50_000d, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 10, 10));
+    var mission = newMission();
+    var executions =
+        List.of(
+            execution(mission, worker, LocalDate.of(2026, 10, 5)),
+            execution(mission, worker, LocalDate.of(2026, 10, 10)),
+            execution(mission, worker, LocalDate.of(2026, 10, 20)));
+
+    var actual =
+        invoiceService.extractInvoiceData(
+            emptyInvoiceForm(YearMonth.of(2026, Month.OCTOBER)),
+            List.of(contract),
+            executions,
+            null);
+
+    assertFalse(actual.hasUpgradedLevel());
+    assertEquals(2d, actual.quantity());
+    assertEquals(0, BigDecimal.valueOf(100_000).compareTo(actual.total()));
+  }
+
+  @Test
+  void extractInvoiceData_should_split_when_new_contract_starts_on_last_day_of_month() {
+    var worker = newWorker();
+    var oldContract = dailyContract(worker, "Junior Dev", 50_000d, LocalDate.of(2025, 1, 1), null);
+    var newContract = dailyContract(worker, "Senior Dev", 80_000d, LocalDate.of(2026, 1, 31), null);
+    var mission = newMission();
+    var executions =
+        List.of(
+            execution(mission, worker, LocalDate.of(2026, 1, 30)),
+            execution(mission, worker, LocalDate.of(2026, 1, 31)));
+
+    var actual =
+        invoiceService.extractInvoiceData(
+            emptyInvoiceForm(YearMonth.of(2026, Month.JANUARY)),
+            List.of(newContract, oldContract),
+            executions,
+            null);
+
+    assertTrue(actual.hasUpgradedLevel());
+    assertEquals(1d, actual.quantity());
+    assertEquals(1d, actual.extraQuantity());
+    assertEquals(0, BigDecimal.valueOf(130_000).compareTo(actual.total()));
+  }
+
+  @Test
+  void extractInvoiceData_with_upgraded_level_should_not_pay_old_contract_after_its_end() {
+    var worker = newWorker();
+    var oldContract =
+        dailyContract(
+            worker, "Junior Dev", 50_000d, LocalDate.of(2025, 1, 1), LocalDate.of(2026, 1, 10));
+    var newContract = dailyContract(worker, "Senior Dev", 80_000d, LocalDate.of(2026, 1, 20), null);
+    var mission = newMission();
+    var executions =
+        List.of(
+            execution(mission, worker, LocalDate.of(2026, 1, 5)),
+            execution(mission, worker, LocalDate.of(2026, 1, 15)),
+            execution(mission, worker, LocalDate.of(2026, 1, 25)));
+
+    var actual =
+        invoiceService.extractInvoiceData(
+            emptyInvoiceForm(YearMonth.of(2026, Month.JANUARY)),
+            List.of(newContract, oldContract),
+            executions,
+            null);
+
+    assertTrue(actual.hasUpgradedLevel());
+    assertEquals(1d, actual.quantity());
+    assertEquals(1d, actual.extraQuantity());
+    assertEquals(0, BigDecimal.valueOf(130_000).compareTo(actual.total()));
+  }
+
+  private static Contract dailyContract(
+      Worker worker, String jobTitle, double dailyPay, LocalDate start, LocalDate end) {
+    return new Contract(
+        worker,
+        jobTitle,
+        new ContractLevel(jobTitle, studentContractor, null, dailyPay, null),
+        start.atTime(8, 0).atZone(ZoneId.systemDefault()).toInstant(),
+        end == null ? null : end.atStartOfDay(ZoneId.systemDefault()).toInstant(),
+        Duration.ofDays(365),
+        "company",
+        "");
+  }
+
+  private static Mission newMission() {
+    var product = new Product("p-code", "p-name", "p-description");
+    return new Mission("m-code", "m-title", "m-description", 0, product);
+  }
+
+  private static InvoiceForm emptyInvoiceForm(YearMonth yearMonth) {
+    return new InvoiceForm(
+        "inv", yearMonth, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null);
   }
 
   private Worker newWorker() {

@@ -235,7 +235,6 @@ public class InvoiceService {
     var hasUpgradedLevel =
         hasContract
             && workerContracts.size() > 1
-            && workerContracts.getFirst().entranceDate().isBefore(lastCurrentMonthDay)
             && workerContracts.getFirst().entranceDate().isAfter(firstCurrentMonthDay);
     var bankAccount = bankAccountForWorker != null ? bankAccountForWorker.toString() : "";
 
@@ -247,10 +246,12 @@ public class InvoiceService {
           sumDayPercentage(
               workerMissionExecutions,
               firstCurrentMonthDay,
-              newContract.entranceDate().minusDays(1));
+              firstContract.capToEnd(newContract.entranceDate().minusDays(1)));
       var secondTotalDaysWorked =
           sumDayPercentage(
-              workerMissionExecutions, newContract.entranceDate(), lastCurrentMonthDay);
+              workerMissionExecutions,
+              newContract.entranceDate(),
+              newContract.capToEnd(lastCurrentMonthDay));
       var firstInvoiceForm = generateInvoiceFormFrom(firstTotalDaysWorked, firstContract);
       var secondInvoiceForm = generateInvoiceFormFrom(secondTotalDaysWorked, secondContract);
       var firstAmount =
@@ -278,9 +279,12 @@ public class InvoiceService {
           bankAccount);
     }
 
-    var totalDaysWorked =
-        sumDayPercentage(workerMissionExecutions, firstCurrentMonthDay, lastCurrentMonthDay);
     var contract = hasContract ? workerContracts.getFirst() : null;
+    var totalDaysWorked =
+        sumDayPercentage(
+            workerMissionExecutions,
+            firstCurrentMonthDay,
+            contract == null ? lastCurrentMonthDay : contract.capToEnd(lastCurrentMonthDay));
     var tempResult = generateInvoiceFormFrom(totalDaysWorked, contract);
     return new InvoiceForm(
         invoiceForm.id(),

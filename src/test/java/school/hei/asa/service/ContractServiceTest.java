@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.hei.asa.CareProductCodeSupplier;
 import school.hei.asa.model.DailyExecution;
 import school.hei.asa.model.Mission;
 import school.hei.asa.model.MissionExecution;
@@ -31,7 +30,7 @@ class ContractServiceTest {
 
   private ContractRepository contractRepository;
   private DailyExecutionRepository dailyExecutionRepository;
-  private CareProductCodeSupplier careProductCodeSupplier;
+  private MissionService missionService;
   private ContractService contractService;
   private Worker worker;
 
@@ -40,16 +39,11 @@ class ContractServiceTest {
     var workerRepository = mock(WorkerRepository.class);
     contractRepository = mock(ContractRepository.class);
     dailyExecutionRepository = mock(DailyExecutionRepository.class);
-    var missionService = mock(MissionService.class);
-    careProductCodeSupplier = mock(CareProductCodeSupplier.class);
+    missionService = mock(MissionService.class);
 
     contractService =
         new ContractService(
-            workerRepository,
-            contractRepository,
-            dailyExecutionRepository,
-            missionService,
-            careProductCodeSupplier);
+            workerRepository, contractRepository, dailyExecutionRepository, missionService);
 
     worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "", null, null);
   }
@@ -90,7 +84,6 @@ class ContractServiceTest {
     when(dailyExecutionRepository.findByWorkerCodeAndDateBetween(
             anyString(), any(LocalDate.class), any(LocalDate.class)))
         .thenReturn(List.of(dailyExecution));
-    when(careProductCodeSupplier.get()).thenReturn("CARE-PRODUCT");
 
     var actual = contractService.getRemainingDaysOnActiveContractOrZero(worker);
 
@@ -137,6 +130,56 @@ class ContractServiceTest {
 
     assertTrue(actual.isPresent());
     assertEquals(contract, actual.get());
+  }
+
+  @Test
+  void paid_care_day_consumes_contract_days() {
+    var actual = remainingDaysAfter(dailyExecution(execution("CA-TB", 1.0d)), "CA-TB", false);
+
+    assertEquals(79d, actual);
+  }
+
+  @Test
+  void unpaid_care_day_does_not_consume_contract_days() {
+    var actual = remainingDaysAfter(dailyExecution(execution("CA-ABNP", 1.0d)), "CA-ABNP", true);
+
+    assertEquals(80d, actual);
+  }
+
+  @Test
+  void mixed_work_and_unpaid_care_day_consumes_only_work() {
+    var actual =
+        remainingDaysAfter(
+            dailyExecution(execution("M1", 0.5d), execution("CA-ABNP", 0.5d)), "CA-ABNP", true);
+
+    assertEquals(79.5d, actual);
+  }
+
+  private double remainingDaysAfter(
+      DailyExecution dailyExecution, String careMissionCode, boolean isUnpaidCare) {
+    var contract = newContract(worker, 80, Instant.parse("2025-01-01T08:00:00Z"), null);
+    when(contractRepository.findActiveContractByWorker(worker)).thenReturn(Optional.of(contract));
+    when(dailyExecutionRepository.findByWorkerCodeAndDateBetween(
+            anyString(), any(LocalDate.class), any(LocalDate.class)))
+        .thenReturn(List.of(dailyExecution));
+    when(missionService.isUnpaidCare(any()))
+        .thenAnswer(
+            invocation -> {
+              MissionExecution me = invocation.getArgument(0);
+              return isUnpaidCare && me.mission().code().equals(careMissionCode);
+            });
+    return contractService.getRemainingDaysOnActiveContractOrZero(worker);
+  }
+
+  private DailyExecution dailyExecution(MissionExecution... executions) {
+    return new DailyExecution(worker, LocalDate.of(2025, 1, 2), List.of(executions));
+  }
+
+  private MissionExecution execution(String missionCode, double dayPercentage) {
+    var product = new Product(missionCode.startsWith("CA") ? "CA" : "WORK", "p", "desc");
+    var mission = new Mission(missionCode, missionCode, "desc", 5, product);
+    return new MissionExecution(
+        mission, worker, LocalDate.of(2025, 1, 2), dayPercentage, "comment", null);
   }
 
   private Contract newContract(

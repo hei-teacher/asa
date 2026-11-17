@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import school.hei.asa.model.Worker;
 
 public record Contract(
@@ -29,6 +30,13 @@ public record Contract(
   public LocalDate capToEnd(LocalDate date) {
     var endDate = endDate();
     return endDate == null || date.isBefore(endDate) ? date : endDate;
+  }
+
+  /** Number of days of [from, to] (inclusive) covered by the contract. */
+  public long daysCovered(LocalDate from, LocalDate to) {
+    var start = from.isAfter(entranceDate()) ? from : entranceDate();
+    var end = capToEnd(to);
+    return start.isAfter(end) ? 0 : ChronoUnit.DAYS.between(start, end) + 1;
   }
 
   public boolean overlaps(YearMonth yearMonth) {

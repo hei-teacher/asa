@@ -94,6 +94,11 @@ class FinancialPlanServiceIT extends FacadeIT {
         .thenAnswer(
             invocation -> {
               InvoiceForm passedForm = invocation.getArgument(0);
+              List<Contract> passedContracts = invocation.getArgument(1);
+              var total =
+                  passedContracts.isEmpty()
+                      ? BigDecimal.valueOf(2000)
+                      : BigDecimal.valueOf(FTE_MONTHLY_PAY);
               return new InvoiceForm(
                   passedForm.id(),
                   passedForm.yearMonth(),
@@ -101,14 +106,14 @@ class FinancialPlanServiceIT extends FacadeIT {
                   LocalDate.now().plusDays(3),
                   "job",
                   0.0d,
-                  BigDecimal.valueOf(2000),
-                  BigDecimal.valueOf(2000),
+                  BigDecimal.valueOf(1000),
+                  BigDecimal.valueOf(1000), // first line only: must not be what is summed
                   false,
                   null,
                   null,
                   null,
                   null,
-                  BigDecimal.valueOf(2000),
+                  total,
                   "Zéro",
                   "Banque: Multi");
             });
@@ -126,12 +131,12 @@ class FinancialPlanServiceIT extends FacadeIT {
     verify(contractRepository).findByYear(testYear);
     verify(workerRepository).findAll();
     verify(missionExecutionRepository).missionExecutionsByDateBetweenAllWorkers(yearStart, yearEnd);
-    verify(invoiceService, org.mockito.Mockito.times(12))
+    verify(invoiceService, org.mockito.Mockito.times(24))
         .extractInvoiceData(any(), any(), any(), any());
   }
 
   @Test
-  void executed_cost_counts_full_time_salary_only_during_contract_months() {
+  void executed_cost_only_passes_contracts_covering_the_month() {
     int testYear = 2026;
     var yearStart = LocalDate.of(testYear, 1, 1);
     var yearEnd = LocalDate.of(testYear, 12, 31);
@@ -171,8 +176,9 @@ class FinancialPlanServiceIT extends FacadeIT {
         .thenAnswer(
             invocation -> {
               List<Contract> passedContracts = invocation.getArgument(1);
-              assertTrue(passedContracts.isEmpty());
+              assertTrue(passedContracts.stream().noneMatch(c -> c.equals(endedContract)));
               InvoiceForm passedForm = invocation.getArgument(0);
+              var total = passedContracts.isEmpty() ? null : BigDecimal.valueOf(FTE_MONTHLY_PAY);
               return new InvoiceForm(
                   passedForm.id(),
                   passedForm.yearMonth(),
@@ -187,7 +193,7 @@ class FinancialPlanServiceIT extends FacadeIT {
                   null,
                   null,
                   null,
-                  null,
+                  total,
                   null,
                   null);
             });

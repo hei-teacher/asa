@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static school.hei.asa.model.contract.ContractType.fullTimeEmployee;
 import static school.hei.asa.model.contract.ContractType.studentContractor;
 
 import java.math.BigDecimal;
@@ -462,6 +463,98 @@ public class InvoiceServiceIT extends FacadeIT {
     assertEquals(1d, actual.quantity());
     assertEquals(1d, actual.extraQuantity());
     assertEquals(0, BigDecimal.valueOf(130_000).compareTo(actual.total()));
+  }
+
+  @Test
+  void extractInvoiceData_should_pay_full_salary_for_full_month() {
+    var worker = newWorker();
+    var contract = salariedContract(worker, 310_000d, LocalDate.of(2025, 1, 1), null);
+
+    var actual =
+        invoiceService.extractInvoiceData(
+            emptyInvoiceForm(YearMonth.of(2026, Month.MARCH)), List.of(contract), List.of(), null);
+
+    assertEquals(1d, actual.quantity());
+    assertEquals(0, BigDecimal.valueOf(310_000).compareTo(actual.total()));
+  }
+
+  @Test
+  void extractInvoiceData_should_prorate_salary_over_calendar_days_covered() {
+    var worker = newWorker();
+    var contract = salariedContract(worker, 300_000d, LocalDate.of(2026, 6, 15), null);
+
+    var actual =
+        invoiceService.extractInvoiceData(
+            emptyInvoiceForm(YearMonth.of(2026, Month.JUNE)), List.of(contract), List.of(), null);
+
+    // 16 of 30 days
+    assertEquals(0.53d, actual.quantity());
+    assertEquals(0, BigDecimal.valueOf(160_000).compareTo(actual.total()));
+  }
+
+  @Test
+  void extractInvoiceData_should_prorate_salary_when_switching_to_contractor_mid_month() {
+    var worker = newWorker();
+    var salaried =
+        salariedContract(worker, 310_000d, LocalDate.of(2025, 1, 1), LocalDate.of(2026, 3, 14));
+    var contractor = dailyContract(worker, "Dev", 50_000d, LocalDate.of(2026, 3, 15), null);
+    var mission = newMission();
+    var executions =
+        List.of(
+            execution(mission, worker, LocalDate.of(2026, 3, 16)),
+            execution(mission, worker, LocalDate.of(2026, 3, 17)));
+
+    var actual =
+        invoiceService.extractInvoiceData(
+            emptyInvoiceForm(YearMonth.of(2026, Month.MARCH)),
+            List.of(contractor, salaried),
+            executions,
+            null);
+
+    assertTrue(actual.hasUpgradedLevel());
+    // 14 of 31 days of salary, then 2 days as contractor
+    assertEquals(0, BigDecimal.valueOf(140_000).compareTo(actual.amount()));
+    assertEquals(0, BigDecimal.valueOf(100_000).compareTo(actual.extraAmount()));
+    assertEquals(0, BigDecimal.valueOf(240_000).compareTo(actual.total()));
+  }
+
+  @Test
+  void extractInvoiceData_should_prorate_salary_when_switching_from_contractor_mid_month() {
+    var worker = newWorker();
+    var contractor =
+        dailyContract(worker, "Dev", 50_000d, LocalDate.of(2025, 1, 1), LocalDate.of(2026, 3, 14));
+    var salaried = salariedContract(worker, 310_000d, LocalDate.of(2026, 3, 15), null);
+    var mission = newMission();
+    var executions =
+        List.of(
+            execution(mission, worker, LocalDate.of(2026, 3, 2)),
+            execution(mission, worker, LocalDate.of(2026, 3, 3)));
+
+    var actual =
+        invoiceService.extractInvoiceData(
+            emptyInvoiceForm(YearMonth.of(2026, Month.MARCH)),
+            List.of(salaried, contractor),
+            executions,
+            null);
+
+    assertTrue(actual.hasUpgradedLevel());
+    // 2 days as contractor, then 17 of 31 days of salary
+    assertEquals(0, BigDecimal.valueOf(100_000).compareTo(actual.amount()));
+    assertEquals(0, BigDecimal.valueOf(170_000).compareTo(actual.extraAmount()));
+    assertEquals(0, BigDecimal.valueOf(270_000).compareTo(actual.total()));
+  }
+
+  private static Contract salariedContract(
+      Worker worker, double monthlyPay, LocalDate start, LocalDate end) {
+    return new Contract(
+        worker,
+        "Salaried",
+        new ContractLevel("S", fullTimeEmployee, monthlyPay, null, null),
+        start.atTime(8, 0).atZone(ZoneId.systemDefault()).toInstant(),
+        end == null ? null : end.atStartOfDay(ZoneId.systemDefault()).toInstant(),
+        null,
+        "company",
+        "");
   }
 
   private static Contract dailyContract(

@@ -89,7 +89,12 @@ public class InvoiceService {
     return extractInvoiceData(invoiceForm, workerContracts, workerMissionExecutions, bankAccount);
   }
 
-  private InvoiceForm generateInvoiceFormFrom(Double totalDaysWorked, Contract contract) {
+  /**
+   * @param from first day of the invoiced period, within a single month
+   * @param to last day of the invoiced period, within the same month
+   */
+  private InvoiceForm generateInvoiceFormFrom(
+      Double totalDaysWorked, Contract contract, LocalDate from, LocalDate to) {
     if (contract == null) {
       return new InvoiceForm(
           null,
@@ -114,7 +119,23 @@ public class InvoiceService {
 
     if (contractLevel.type() == fullTimeEmployee) {
       var monthlyPay = toBigDecimalOrZero(contractLevel.monthlyPay());
-      var parsedMonthlyPay = numberConverter.convertToWords(numberParser.parseToNumber(monthlyPay));
+      // prorated over the calendar days of the month the contract covers
+      var monthDays = YearMonth.from(from).lengthOfMonth();
+      var coveredDays = contract.daysCovered(from, to);
+      var isFullMonth = coveredDays == monthDays;
+      var amount =
+          isFullMonth
+              ? monthlyPay
+              : monthlyPay
+                  .multiply(BigDecimal.valueOf(coveredDays))
+                  .divide(BigDecimal.valueOf(monthDays), 2, RoundingMode.HALF_UP);
+      var quantity =
+          isFullMonth
+              ? 1d
+              : BigDecimal.valueOf(coveredDays)
+                  .divide(BigDecimal.valueOf(monthDays), 2, RoundingMode.HALF_UP)
+                  .doubleValue();
+      var parsedAmount = numberConverter.convertToWords(numberParser.parseToNumber(amount));
 
       return new InvoiceForm(
           null,
@@ -122,16 +143,16 @@ public class InvoiceService {
           null,
           null,
           description,
-          1d,
+          quantity,
           monthlyPay,
-          monthlyPay,
+          amount,
           null,
           null,
           null,
           null,
           null,
-          monthlyPay,
-          parsedMonthlyPay,
+          amount,
+          parsedAmount,
           null);
     }
 
@@ -252,8 +273,18 @@ public class InvoiceService {
               workerMissionExecutions,
               newContract.entranceDate(),
               newContract.capToEnd(lastCurrentMonthDay));
-      var firstInvoiceForm = generateInvoiceFormFrom(firstTotalDaysWorked, firstContract);
-      var secondInvoiceForm = generateInvoiceFormFrom(secondTotalDaysWorked, secondContract);
+      var firstInvoiceForm =
+          generateInvoiceFormFrom(
+              firstTotalDaysWorked,
+              firstContract,
+              firstCurrentMonthDay,
+              newContract.entranceDate().minusDays(1));
+      var secondInvoiceForm =
+          generateInvoiceFormFrom(
+              secondTotalDaysWorked,
+              secondContract,
+              newContract.entranceDate(),
+              lastCurrentMonthDay);
       var firstAmount =
           firstInvoiceForm.amount() != null ? firstInvoiceForm.amount() : BigDecimal.ZERO;
       var secondAmount =
@@ -285,7 +316,9 @@ public class InvoiceService {
             workerMissionExecutions,
             firstCurrentMonthDay,
             contract == null ? lastCurrentMonthDay : contract.capToEnd(lastCurrentMonthDay));
-    var tempResult = generateInvoiceFormFrom(totalDaysWorked, contract);
+    var tempResult =
+        generateInvoiceFormFrom(
+            totalDaysWorked, contract, firstCurrentMonthDay, lastCurrentMonthDay);
     return new InvoiceForm(
         invoiceForm.id(),
         yearMonth,

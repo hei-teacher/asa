@@ -4,8 +4,6 @@ import static gen.patrimoine.modele.Devise.MGA;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
-import static school.hei.asa.model.contract.ContractType.fullTimeEmployee;
-import static school.hei.asa.number.NullToBigDecimalHanlder.toBigDecimalOrZero;
 
 import gen.patrimoine.cas.Cas;
 import gen.patrimoine.modele.Argent;
@@ -124,20 +122,13 @@ public class FinancialPlanService {
                             .filter(contract -> contract.overlaps(yearMonth))
                             .sorted(comparing(Contract::entranceInstant, Comparator.reverseOrder()))
                             .toList();
-                    var isFullTimeEmployeeContract =
-                        !workerContracts.isEmpty()
-                            && workerContracts.getFirst().level().type().equals(fullTimeEmployee);
-                    if (isFullTimeEmployeeContract) {
-                      return toBigDecimalOrZero(workerContracts.getFirst().level().monthlyPay());
-                    }
-
                     var workerMissionExecutions =
                         missionExecutionsByWorker.getOrDefault(worker, List.of());
                     var bankAccount = bankAccountByWorkerCode.get(worker);
                     return invoiceService
                         .extractInvoiceData(
                             invoiceForm, workerContracts, workerMissionExecutions, bankAccount)
-                        .amount();
+                        .total();
                   })
               .map(a -> a == null ? BigDecimal.ZERO : a)
               .reduce(BigDecimal.ZERO, BigDecimal::add);

@@ -34,10 +34,12 @@ import school.hei.asa.model.contract.Contract;
 import school.hei.asa.model.contract.ContractLevel;
 import school.hei.asa.repository.BankAccountRepository;
 import school.hei.asa.repository.ContractRepository;
+import school.hei.asa.repository.WorkerRepository;
 
 public class InvoiceServiceIT extends FacadeIT {
 
   @Autowired InvoiceService invoiceService;
+  @Autowired WorkerRepository workerRepository;
   @MockBean ContractRepository contractRepository;
   @MockBean BankAccountRepository bankAccountRepository;
 
@@ -48,7 +50,7 @@ public class InvoiceServiceIT extends FacadeIT {
             newWorker(),
             "job",
             new ContractLevel("code", studentContractor, null, 55_556d, null),
-            Instant.now(),
+            Instant.parse("2025-01-01T08:00:00Z"),
             null,
             Duration.ofDays(100),
             "company",
@@ -78,7 +80,9 @@ public class InvoiceServiceIT extends FacadeIT {
             null,
             null,
             null);
-    var worker = new Worker("W-P-2024-01", "Lita Andria", "", "", "", "", "", "", null, null);
+    // own worker: invoice references saved here must not leak into InvoiceReferenceRepositoryTest
+    var worker = new Worker("W-INVOICE-IT", "Invoice IT", "", "", "", "", "", "", null, null);
+    workerRepository.save(worker);
 
     invoiceService.saveInvoiceReference(invoiceData, worker);
 
@@ -324,6 +328,64 @@ public class InvoiceServiceIT extends FacadeIT {
             NoSuchElementException.class, () -> invoiceService.getInvoiceReference(invoiceId));
 
     assertEquals("Invoice reference not found", exception.getMessage());
+  }
+
+  @Test
+  void extractInvoiceData_should_price_past_month_with_contract_of_that_month() {
+    var worker = newWorker();
+    var invoiceForm =
+        new InvoiceForm(
+            "inv-past",
+            YearMonth.of(2025, Month.DECEMBER),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
+    var newContract =
+        new Contract(
+            worker,
+            "Senior Dev",
+            new ContractLevel("L2", studentContractor, null, 80_000d, null),
+            Instant.parse("2026-01-01T08:00:00Z"),
+            null,
+            Duration.ofDays(30),
+            "company",
+            "");
+    var oldContract =
+        new Contract(
+            worker,
+            "Junior Dev",
+            new ContractLevel("L1", studentContractor, null, 50_000d, null),
+            Instant.parse("2025-01-01T08:00:00Z"),
+            Instant.parse("2025-12-31T08:00:00Z"),
+            Duration.ofDays(365),
+            "company",
+            "");
+    var product = new Product("p-code", "p-name", "p-description");
+    var mission = new Mission("m-code", "m-title", "m-description", 0, product);
+    var executions =
+        List.of(
+            execution(mission, worker, LocalDate.of(2025, 12, 10)),
+            execution(mission, worker, LocalDate.of(2025, 12, 11)));
+
+    var actual =
+        invoiceService.extractInvoiceData(
+            invoiceForm, List.of(newContract, oldContract), executions, null);
+
+    assertFalse(actual.hasUpgradedLevel());
+    assertEquals("Junior Dev", actual.description());
+    assertEquals(0, BigDecimal.valueOf(50_000).compareTo(actual.unitPrice()));
+    assertEquals(0, BigDecimal.valueOf(100_000).compareTo(actual.total()));
   }
 
   private Worker newWorker() {

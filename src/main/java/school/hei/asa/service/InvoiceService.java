@@ -226,10 +226,11 @@ public class InvoiceService {
       BankAccount bankAccountForWorker) {
 
     var isEmpty = invoiceForm.yearMonth() == null;
-    var hasContract = !workerContracts.isEmpty();
     var referenceDate = now();
     var issueDate = referenceDate.plusDays(3);
     var yearMonth = isEmpty ? YearMonth.from(referenceDate) : invoiceForm.yearMonth();
+    workerContracts = workerContracts.stream().filter(c -> c.overlaps(yearMonth)).toList();
+    var hasContract = !workerContracts.isEmpty();
     var firstCurrentMonthDay = yearMonth.atDay(1);
     var lastCurrentMonthDay = yearMonth.atEndOfMonth();
     var hasUpgradedLevel =

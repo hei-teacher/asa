@@ -43,7 +43,6 @@ public class FinancialPlanService {
   private final WorkerRepository workerRepository;
   private final BankAccountRepository bankAccountRepository;
   private final MissionExecutionRepository missionExecutionRepository;
-  private final ContractService contractService;
 
   @Transactional
   public FinancialPlan financialPlan(int year) {
@@ -122,14 +121,13 @@ public class FinancialPlanService {
                             null);
                     var workerContracts =
                         contractsByWorker.getOrDefault(worker, List.of()).stream()
+                            .filter(contract -> contract.overlaps(yearMonth))
                             .sorted(comparing(Contract::entranceInstant, Comparator.reverseOrder()))
                             .toList();
                     var isFullTimeEmployeeContract =
                         !workerContracts.isEmpty()
                             && workerContracts.getFirst().level().type().equals(fullTimeEmployee);
-                    if (isFullTimeEmployeeContract
-                        && contractService.isActiveContract(
-                            workerContracts.getFirst(), yearMonth)) {
+                    if (isFullTimeEmployeeContract) {
                       return toBigDecimalOrZero(workerContracts.getFirst().level().monthlyPay());
                     }
 

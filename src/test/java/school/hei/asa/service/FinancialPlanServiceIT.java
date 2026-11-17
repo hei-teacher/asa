@@ -129,4 +129,74 @@ class FinancialPlanServiceIT extends FacadeIT {
     verify(invoiceService, org.mockito.Mockito.times(12))
         .extractInvoiceData(any(), any(), any(), any());
   }
+
+  @Test
+  void executed_cost_counts_full_time_salary_only_during_contract_months() {
+    int testYear = 2026;
+    var yearStart = LocalDate.of(testYear, 1, 1);
+    var yearEnd = LocalDate.of(testYear, 12, 31);
+    var endedWorker =
+        new Worker("W-201", "Ended", "e@x", "Ended", "a", "c", "nif", "stat", null, null);
+    var lateWorker =
+        new Worker("W-202", "Late", "l@x", "Late", "a", "c", "nif", "stat", null, null);
+    var fteLevel = new ContractLevel("level", fullTimeEmployee, FTE_MONTHLY_PAY, null, null);
+    var endedContract =
+        new Contract(
+            endedWorker,
+            "jobTitle",
+            fteLevel,
+            LocalDate.of(2021, 11, 1).atStartOfDay(ZoneId.systemDefault()).toInstant(),
+            LocalDate.of(2025, 12, 31).atStartOfDay(ZoneId.systemDefault()).toInstant(),
+            null,
+            "company",
+            "contractBucketKey");
+    var lateContract =
+        new Contract(
+            lateWorker,
+            "jobTitle",
+            fteLevel,
+            LocalDate.of(2026, 6, 15).atStartOfDay(ZoneId.systemDefault()).toInstant(),
+            null,
+            null,
+            "company",
+            "contractBucketKey");
+
+    when(contractRepository.findByYear(testYear)).thenReturn(List.of());
+    when(workerRepository.findAll()).thenReturn(List.of(endedWorker, lateWorker));
+    when(contractRepository.findAll()).thenReturn(List.of(endedContract, lateContract));
+    when(bankAccountRepository.findAll()).thenReturn(List.of());
+    when(missionExecutionRepository.missionExecutionsByDateBetweenAllWorkers(yearStart, yearEnd))
+        .thenReturn(List.of());
+    when(invoiceService.extractInvoiceData(any(), any(), any(), any()))
+        .thenAnswer(
+            invocation -> {
+              List<Contract> passedContracts = invocation.getArgument(1);
+              assertTrue(passedContracts.isEmpty());
+              InvoiceForm passedForm = invocation.getArgument(0);
+              return new InvoiceForm(
+                  passedForm.id(),
+                  passedForm.yearMonth(),
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  false,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null);
+            });
+
+    var executedCost = subject.financialPlan(testYear).executedCost();
+
+    assertEquals("0.0", executedCost.get(Month.JANUARY).ppMontant().trim());
+    assertEquals("0.0", executedCost.get(Month.MAY).ppMontant().trim());
+    assertEquals("300000.0", executedCost.get(Month.JUNE).ppMontant().trim());
+    assertEquals("300000.0", executedCost.get(Month.DECEMBER).ppMontant().trim());
+  }
 }

@@ -92,4 +92,30 @@ public record FinancialPlan(
     }
     return mapOfDiff;
   }
+
+  /** Planned cost from January up to each month (included). */
+  public Map<Month, Argent> getYearToDatePlannedCost() {
+    return yearToDate(plannedCost);
+  }
+
+  /** Executed cost from January up to each month (included). */
+  public Map<Month, Argent> getYearToDateExecutedCost() {
+    return yearToDate(executedCost);
+  }
+
+  /** Difference from planned, from January up to each month (included). */
+  public Map<Month, Argent> getYearToDateDifferenceFromPlanned() {
+    return yearToDate(getDifferenceFromPlanned());
+  }
+
+  private static Map<Month, Argent> yearToDate(Map<Month, Argent> perMonth) {
+    var yearToDate = new HashMap<Month, Argent>();
+    Argent runningTotal = null;
+    for (Month month : Month.values()) {
+      var monthAmount = perMonth.get(month);
+      runningTotal = runningTotal == null ? monthAmount : runningTotal.add(monthAmount, now());
+      yearToDate.put(month, runningTotal);
+    }
+    return yearToDate;
+  }
 }

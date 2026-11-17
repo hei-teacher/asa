@@ -30,7 +30,20 @@ public class FinancialPlanController {
     model.addAttribute("executedCost", fp.executedCost());
     model.addAttribute("differenceFromPlanned", fp.getDifferenceFromPlanned());
     model.addAttribute("koContracts", fp.koContracts());
+    model.addAttribute("ytdPlannedCost", fp.getYearToDatePlannedCost());
+    model.addAttribute("ytdExecutedCost", fp.getYearToDateExecutedCost());
+    model.addAttribute("ytdDifferenceFromPlanned", fp.getYearToDateDifferenceFromPlanned());
+    model.addAttribute("ytdLastMonth", ytdLastMonth(defaultYearValue));
 
     return "financial-plan";
+  }
+
+  /** Last month (1-12) whose year-to-date is shown: none for future years, all for past ones. */
+  private static int ytdLastMonth(int year) {
+    var today = now();
+    if (year < today.getYear()) {
+      return 12;
+    }
+    return year == today.getYear() ? today.getMonthValue() : 0;
   }
 }

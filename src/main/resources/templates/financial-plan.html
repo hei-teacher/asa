@@ -137,6 +137,70 @@
 
     </div>
 
+    <h3 class="mt-8 mb-3 text-lg font-semibold text-gray-900">
+        Year to date
+    </h3>
+
+    <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+
+        <table class="min-w-full text-sm">
+
+            <thead>
+            <tr class="bg-gray-50">
+
+                <th class="px-4 py-3 text-left font-semibold text-gray-700 border-b">
+                    Type
+                </th>
+
+                <th th:each="m : ${months}"
+                    class="px-4 py-3 text-right font-semibold text-gray-700 border-b whitespace-nowrap"
+                    th:text="${m.getDisplayName(T(java.time.format.TextStyle).SHORT, T(java.util.Locale).ENGLISH)}">
+                </th>
+
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 font-medium border-b">
+                    Planned
+                </td>
+
+                <td th:each="m : ${months}"
+                    class="px-4 py-3 text-right tabular-nums border-b text-gray-700"
+                    th:text="${m.getValue() <= ytdLastMonth} ? ${@numberFormatter.compact(ytdPlannedCost.get(m).ppMontant())} : '—'">
+                </td>
+            </tr>
+
+            <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 font-medium border-b">
+                    Executed
+                </td>
+
+                <td th:each="m : ${months}"
+                    class="px-4 py-3 text-right tabular-nums border-b text-gray-700"
+                    th:text="${m.getValue() <= ytdLastMonth} ? ${@numberFormatter.compact(ytdExecutedCost.get(m).ppMontant())} : '—'">
+                </td>
+            </tr>
+
+            <tr class="hover:bg-gray-50 transition bg-gray-50">
+                <td class="px-4 py-3 font-semibold border-b">
+                    Difference
+                </td>
+
+                <td th:each="m : ${months}"
+                    class="px-4 py-3 text-right tabular-nums border-b font-semibold"
+                    th:text="${m.getValue() <= ytdLastMonth} ? ${@numberFormatter.compact(ytdDifferenceFromPlanned.get(m).ppMontant())} : '—'">
+                </td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
     <p class="mt-3 flex items-start gap-1.5 text-sm text-gray-500">
         <span class="material-icons text-base text-gray-400">info</span>
         <span>

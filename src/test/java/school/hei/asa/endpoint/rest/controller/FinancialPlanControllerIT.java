@@ -51,6 +51,10 @@ class FinancialPlanControllerIT extends FacadeIT {
     verify(model).addAttribute(eq("differenceFromPlanned"), any(Map.class));
 
     verify(model).addAttribute(eq("koContracts"), any(Map.class));
+    verify(model).addAttribute(eq("ytdPlannedCost"), any(Map.class));
+    verify(model).addAttribute(eq("ytdExecutedCost"), any(Map.class));
+    verify(model).addAttribute(eq("ytdDifferenceFromPlanned"), any(Map.class));
+    verify(model).addAttribute(eq("ytdLastMonth"), any(Integer.class));
 
     assertEquals("financial-plan", viewName);
   }

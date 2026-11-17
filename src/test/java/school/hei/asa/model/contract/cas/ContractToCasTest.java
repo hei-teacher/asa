@@ -6,7 +6,6 @@ import static java.time.Month.DECEMBER;
 import static java.time.Month.FEBRUARY;
 import static java.time.Month.JANUARY;
 import static java.time.Month.MARCH;
-import static java.time.Month.MAY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static school.hei.asa.model.contract.ContractType.fullTimeEmployee;
@@ -39,10 +38,10 @@ public class ContractToCasTest {
 
     assertEquals(
         new Argent(0, MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 4)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, JANUARY, 30)).getValeurComptable());
     assertEquals(
         new Argent(550_000, MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 5)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, JANUARY, 31)).getValeurComptable());
     assertEquals(
         new Argent(550_000, MGA),
         cas.patrimoine().projectionFuture(DEC31_2026).getValeurComptable());
@@ -60,16 +59,16 @@ public class ContractToCasTest {
 
     assertEquals(
         new Argent(0, MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 4)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, JANUARY, 27)).getValeurComptable());
     assertEquals(
         new Argent(500_000, MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 5)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, JANUARY, 28)).getValeurComptable());
     assertEquals(
-        new Argent(5_500_000, MGA),
+        new Argent(6_000_000, MGA),
         cas.patrimoine().projectionFuture(DEC31_2026).getValeurComptable());
 
     assertEquals(
-        new Argent(-5_500_000, MGA), compteCompany.projectionFuture(DEC31_2026).valeurComptable());
+        new Argent(-6_000_000, MGA), compteCompany.projectionFuture(DEC31_2026).valeurComptable());
   }
 
   @Test
@@ -82,13 +81,13 @@ public class ContractToCasTest {
 
     assertEquals(
         new Argent(0, MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 4)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, JANUARY, 30)).getValeurComptable());
     assertEquals(
         new Argent(dailyPay * 6, MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 5)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, JANUARY, 31)).getValeurComptable());
     assertEquals(
         new Argent(dailyPay * 11, MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, MARCH, 5)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 28)).getValeurComptable());
     assertEquals(
         new Argent(dailyPay * 11, MGA),
         cas.patrimoine().projectionFuture(DEC31_2026).getValeurComptable());
@@ -104,19 +103,19 @@ public class ContractToCasTest {
 
     assertEquals(
         new Argent(0, MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 4)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, JANUARY, 30)).getValeurComptable());
     assertEquals(
         new Argent(dailyPay * 6, MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 5)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, JANUARY, 31)).getValeurComptable());
     assertEquals(
         new Argent(dailyPay * (6 + 11), MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, MARCH, 5)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 28)).getValeurComptable());
     assertEquals(
         new Argent(dailyPay * (6 + 11 + 11), MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, APRIL, 5)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, MARCH, 31)).getValeurComptable());
     assertEquals(
         new Argent(dailyPay * 33, MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, MAY, 5)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, APRIL, 30)).getValeurComptable());
 
     assertEquals(
         new Argent(dailyPay * 33, MGA),
@@ -132,10 +131,10 @@ public class ContractToCasTest {
 
     assertEquals(
         new Argent(0, MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 4)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, JANUARY, 30)).getValeurComptable());
     assertEquals(
         new Argent(1800000, MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 5)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, JANUARY, 31)).getValeurComptable());
     assertEquals(
         new Argent(1800000, MGA),
         cas.patrimoine().projectionFuture(DEC31_2026).getValeurComptable());
@@ -152,11 +151,11 @@ public class ContractToCasTest {
 
     assertEquals(
         new Argent(dailyPay * 11, MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 5)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, JANUARY, 31)).getValeurComptable());
     // February is prorated: 14 of 28 days of the 11 days quota
     assertEquals(
         new Argent(dailyPay * (11 + 5), MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, MARCH, 5)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, FEBRUARY, 28)).getValeurComptable());
     assertEquals(
         new Argent(dailyPay * (11 + 5), MGA),
         cas.patrimoine().projectionFuture(DEC31_2026).getValeurComptable());
@@ -169,10 +168,10 @@ public class ContractToCasTest {
     var compteCompany = new Compte("Compte-company", JAN1_2026, new Argent(0, MGA));
     var cas = new ContractToCas(compteCompany, MGA, Map.of()).apply(contract);
 
-    // January, February and March are paid on the 5th of the following month
+    // January, February and March costs are assigned to their own month
     assertEquals(
         new Argent(1_500_000, MGA),
-        cas.patrimoine().projectionFuture(LocalDate.of(2026, APRIL, 5)).getValeurComptable());
+        cas.patrimoine().projectionFuture(LocalDate.of(2026, MARCH, 31)).getValeurComptable());
     assertEquals(
         new Argent(1_500_000, MGA),
         cas.patrimoine().projectionFuture(DEC31_2026).getValeurComptable());

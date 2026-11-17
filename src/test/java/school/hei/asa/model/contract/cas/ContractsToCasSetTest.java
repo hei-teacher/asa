@@ -1,7 +1,7 @@
 package school.hei.asa.model.contract.cas;
 
 import static gen.patrimoine.modele.Devise.MGA;
-import static java.time.Month.FEBRUARY;
+import static java.time.Month.JANUARY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static school.hei.asa.model.contract.cas.ContractToCasTest.DEC31_2026;
 import static school.hei.asa.model.contract.cas.ContractToCasTest.JAN1_2026;
@@ -30,14 +30,14 @@ class ContractsToCasSetTest {
         new Argent(0, MGA),
         companyCas
             .patrimoine()
-            .projectionFuture(LocalDate.of(2026, FEBRUARY, 4))
+            .projectionFuture(LocalDate.of(2026, JANUARY, 30))
             .getValeurComptable());
     var paidToWorkers = new Argent(50_000 * 11 + 100_000 * 18, MGA).mult(-1);
     assertEquals(
         paidToWorkers,
         companyCas
             .patrimoine()
-            .projectionFuture(LocalDate.of(2026, FEBRUARY, 5))
+            .projectionFuture(LocalDate.of(2026, JANUARY, 31))
             .getValeurComptable());
     assertEquals(
         paidToWorkers, companyCas.patrimoine().projectionFuture(DEC31_2026).getValeurComptable());

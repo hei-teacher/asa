@@ -121,8 +121,8 @@ class FinancialPlanServiceIT extends FacadeIT {
     var financialPlan = subject.financialPlan(testYear);
 
     assertNotNull(financialPlan);
-    assertEquals("550000.0", financialPlan.plannedCost().get(Month.FEBRUARY).ppMontant().trim());
-    assertEquals("0.0", financialPlan.plannedCost().get(Month.JANUARY).ppMontant().trim());
+    assertEquals("550000.0", financialPlan.plannedCost().get(Month.JANUARY).ppMontant().trim());
+    assertEquals("0.0", financialPlan.plannedCost().get(Month.FEBRUARY).ppMontant().trim());
     assertEquals("302000.0", financialPlan.executedCost().get(Month.JANUARY).ppMontant().trim());
     assertEquals("302000.0", financialPlan.executedCost().get(Month.DECEMBER).ppMontant().trim());
     assertEquals(12, financialPlan.executedCost().size());

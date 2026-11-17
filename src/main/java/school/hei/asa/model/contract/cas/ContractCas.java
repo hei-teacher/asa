@@ -26,7 +26,9 @@ public class ContractCas extends Cas {
   private final Devise devise;
   private final Map<Contract, Exception> koContracts;
 
-  private static final int PAY_DAY = 5;
+  // Costs are assigned to the worked month (actual payment happens the following month).
+  // FTE: recurring on a day that exists in every month; contractors: last day of the month.
+  private static final int FTE_COST_DAY = 28;
 
   protected ContractCas(
       LocalDate ajd,
@@ -86,18 +88,18 @@ public class ContractCas extends Cas {
           contract.ppId());
     }
 
-    // a worked month is paid on PAY_DAY of the following month
-    var lastPayMonthEnd =
+    // Cost is assigned to the worked month, although it is actually paid the following month
+    var lastWorkedMonthEnd =
         contract.endDate() == null
             ? entranceDate.plusYears(99)
-            : YearMonth.from(contract.endDate()).plusMonths(1).atEndOfMonth();
+            : YearMonth.from(contract.endDate()).atEndOfMonth();
     new TransfertArgent(
         contract.ppId(),
         compteCompany,
         compteWorker,
-        LocalDate.of(entranceDate.getYear(), entranceDate.getMonthValue(), 1).plusMonths(1),
-        lastPayMonthEnd,
-        PAY_DAY,
+        entranceDate,
+        lastWorkedMonthEnd,
+        FTE_COST_DAY,
         new Argent(contract.level().monthlyPay(), devise));
   }
 
@@ -113,23 +115,20 @@ public class ContractCas extends Cas {
     while (remainingDays > 0
         && (lastWorkedMonth == null || !workedMonth.isAfter(lastWorkedMonth))) {
       var daysToPay = Math.min(contractorDaysToPay(workedMonth), remainingDays);
-      payContractorMonthNth(monthNth, compteWorker, daysToPay);
+      payContractorMonthNth(monthNth, workedMonth, compteWorker, daysToPay);
       remainingDays -= daysToPay;
       workedMonth = workedMonth.plusMonths(1);
       monthNth++;
     }
   }
 
-  private void payContractorMonthNth(int monthNth, Compte compteWorker, double daysToPay) {
-    var entranceDate = entranceDate();
-    var payDateOfMonth0 =
-        LocalDate.of(entranceDate.getYear(), entranceDate.getMonthValue(), PAY_DAY);
-
+  private void payContractorMonthNth(
+      int monthNth, YearMonth workedMonth, Compte compteWorker, double daysToPay) {
     new TransfertArgent(
         String.format("[Mois %s] %s", monthNth, contract.ppId()),
         compteCompany,
         compteWorker,
-        payDateOfMonth0.plusMonths(monthNth),
+        workedMonth.atEndOfMonth(),
         new Argent(contract.level().dailyPay() * daysToPay, devise));
   }
 

@@ -16,12 +16,16 @@ public record Contract(
     Duration duration,
     String company,
     String contractBucketKey) {
+  public LocalDate entranceDate() {
+    return LocalDate.ofInstant(entranceInstant, ZoneId.systemDefault());
+  }
+
   public boolean overlaps(YearMonth yearMonth) {
-    var zone = ZoneId.systemDefault();
-    var startsBeforeMonthEnds =
-        !LocalDate.ofInstant(entranceInstant, zone).isAfter(yearMonth.atEndOfMonth());
+    var startsBeforeMonthEnds = !entranceDate().isAfter(yearMonth.atEndOfMonth());
     var endsAfterMonthStarts =
-        endInstant == null || !LocalDate.ofInstant(endInstant, zone).isBefore(yearMonth.atDay(1));
+        endInstant == null
+            || !LocalDate.ofInstant(endInstant, ZoneId.systemDefault())
+                .isBefore(yearMonth.atDay(1));
     return startsBeforeMonthEnds && endsAfterMonthStarts;
   }
 

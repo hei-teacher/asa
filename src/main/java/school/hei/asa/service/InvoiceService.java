@@ -1,7 +1,6 @@
 package school.hei.asa.service;
 
 import static java.time.LocalDate.now;
-import static java.time.ZoneOffset.UTC;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static school.hei.asa.model.contract.ContractType.fullTimeEmployee;
@@ -236,10 +235,8 @@ public class InvoiceService {
     var hasUpgradedLevel =
         hasContract
             && workerContracts.size() > 1
-            && LocalDate.ofInstant(workerContracts.getFirst().entranceInstant(), UTC)
-                .isBefore(lastCurrentMonthDay)
-            && LocalDate.ofInstant(workerContracts.getFirst().entranceInstant(), UTC)
-                .isAfter(firstCurrentMonthDay);
+            && workerContracts.getFirst().entranceDate().isBefore(lastCurrentMonthDay)
+            && workerContracts.getFirst().entranceDate().isAfter(firstCurrentMonthDay);
     var bankAccount = bankAccountForWorker != null ? bankAccountForWorker.toString() : "";
 
     if (hasUpgradedLevel) {
@@ -250,12 +247,10 @@ public class InvoiceService {
           sumDayPercentage(
               workerMissionExecutions,
               firstCurrentMonthDay,
-              LocalDate.ofInstant(newContract.entranceInstant(), UTC).minusDays(1));
+              newContract.entranceDate().minusDays(1));
       var secondTotalDaysWorked =
           sumDayPercentage(
-              workerMissionExecutions,
-              LocalDate.ofInstant(newContract.entranceInstant(), UTC),
-              lastCurrentMonthDay);
+              workerMissionExecutions, newContract.entranceDate(), lastCurrentMonthDay);
       var firstInvoiceForm = generateInvoiceFormFrom(firstTotalDaysWorked, firstContract);
       var secondInvoiceForm = generateInvoiceFormFrom(secondTotalDaysWorked, secondContract);
       var firstAmount =

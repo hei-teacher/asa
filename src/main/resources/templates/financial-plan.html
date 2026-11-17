@@ -59,7 +59,7 @@
                        focus:ring-gray-400
                        cursor-pointer">
 
-                <option th:each="y : ${#numbers.sequence(2021, #dates.year(#dates.createNow()))}"
+                <option th:each="y : ${#numbers.sequence(2021, #dates.year(#dates.createNow()) + 1)}"
                         th:value="${y}"
                         th:text="${y}"
                         th:selected="${y == currentYear}">
